@@ -1,10 +1,5 @@
 <template>
-    <header>
-        <nav>
-            <button @click="routeStore.toRoute('home')">Home</button>
-            <button @click="routeStore.toRoute('projects')">Projects</button>
-        </nav>
-    </header>
+    <Navbar />
 
     <transition name="page" mode="out-in">
         <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
@@ -13,6 +8,7 @@
 
 <script setup>
 import { useRouteStore } from './stores/routeStore.js';
+import Navbar from './components/Navbar.vue';
 
 const routeStore = useRouteStore();
 </script>
