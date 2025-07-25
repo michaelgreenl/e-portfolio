@@ -1,8 +1,9 @@
 <template>
-  <div class="projects"></div>
+    <div class="projects">
+        <h1>Projects</h1>
+    </div>
 </template>
 
-<script setup>
-</script>
+<script setup></script>
 
-<script lang='scss' scoped></script>
+<script lang="scss" scoped></script>

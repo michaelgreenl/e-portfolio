@@ -1,18 +1,37 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router';
-</script>
-
 <template>
-  <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/projects">Projects</RouterLink>
-      </nav>
-    </div>
-  </header>
+    <header>
+        <nav>
+            <button @click="routeStore.toRoute('home')">Home</button>
+            <button @click="routeStore.toRoute('projects')">Projects</button>
+        </nav>
+    </header>
 
-  <RouterView />
+    <transition name="page" mode="out-in">
+        <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
+    </transition>
 </template>
 
-<style lang="scss" scoped></style>
+<script setup>
+import { useRouteStore } from './stores/routeStore.js';
+
+const routeStore = useRouteStore();
+</script>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+    transition: all 0.3s ease;
+}
+
+.page-enter-from {
+    opacity: 0;
+    transform: translateX(30px);
+}
+
+.page-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+</style>
+
+<style lang="scss"></style>
