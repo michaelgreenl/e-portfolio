@@ -1,11 +1,9 @@
 <template>
-    <div class="app">
-        <Navbar />
+    <Navbar />
 
-        <transition name="page" mode="out-in">
-            <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
-        </transition>
-    </div>
+    <transition name="page" mode="out-in">
+        <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
+    </transition>
 </template>
 
 <script setup>
@@ -23,7 +21,7 @@ const routeStore = useRouteStore();
 
 .page-enter-from {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(-30px);
 }
 
 .page-leave-to {
@@ -41,13 +39,10 @@ const routeStore = useRouteStore();
 
 html,
 body,
-.app {
-    height: 100vh;
+#app {
+    font-family: $primary-font-stack;
+    height: 100%;
     padding: 0;
     margin: 0;
-}
-
-.app {
-    font-family: $primary-font-stack;
 }
 </style>
