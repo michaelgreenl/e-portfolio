@@ -1,9 +1,11 @@
 <template>
-    <Navbar />
+    <div class="app">
+        <Navbar />
 
-    <transition name="page" mode="out-in">
-        <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
-    </transition>
+        <transition name="page" mode="out-in">
+            <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
+        </transition>
+    </div>
 </template>
 
 <script setup>
@@ -30,4 +32,22 @@ const routeStore = useRouteStore();
 }
 </style>
 
-<style lang="scss"></style>
+<style lang="scss">
+@use './assets/styles/_base.scss';
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+.app {
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+
+.app {
+    font-family: $primary-font-stack;
+}
+</style>
