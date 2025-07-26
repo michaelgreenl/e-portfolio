@@ -4,6 +4,7 @@
             <button @click="routeStore.toRoute('home')">Home</button>
             <button @click="routeStore.toRoute('projects')">Projects</button>
             <button @click="routeStore.toRoute('experience')">Experience</button>
+            <button @click="routeStore.toRoute('contact')">Contact</button>
         </nav>
     </header>
 </template>

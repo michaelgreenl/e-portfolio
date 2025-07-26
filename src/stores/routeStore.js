@@ -3,6 +3,7 @@ import { ref, markRaw } from 'vue';
 import HomeView from '../views/HomeView.vue';
 import ProjectsView from '../views/ProjectsView.vue';
 import ExperienceView from '../views/ExperienceView.vue';
+import ContactView from '../views/ContactView.vue';
 
 export const useRouteStore = defineStore('router', () => {
     const routes = {
@@ -17,6 +18,10 @@ export const useRouteStore = defineStore('router', () => {
         experience: {
             component: markRaw(ExperienceView),
             meta: { title: 'Experience' },
+        },
+        contact: {
+            component: markRaw(ContactView),
+            meta: { title: 'Contact' },
         },
     };
     const activeRoute = ref('home');
