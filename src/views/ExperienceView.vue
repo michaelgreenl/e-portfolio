@@ -6,4 +6,4 @@
 
 <script setup></script>
 
-<script lang="scss" scoped></script>
+<style lang="scss" scoped></style>
