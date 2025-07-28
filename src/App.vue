@@ -7,10 +7,25 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
+import { useThemeStore } from './stores/themeStore.js';
 import Navbar from './components/Navbar.vue';
 
 const routeStore = useRouteStore();
+const themeStore = useRouteStore();
+
+onMounted(() => {
+    let theme = localStorage.getItem('THEME');
+
+    if (theme === null) {
+        localStorage.setItem('THEME', 'dark');
+        theme = 'dark';
+    }
+
+    themeStore.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+});
 </script>
 
 <style>
@@ -44,5 +59,6 @@ body,
     height: 100%;
     padding: 0;
     margin: 0;
+    background-color: $color-bg-primary;
 }
 </style>
