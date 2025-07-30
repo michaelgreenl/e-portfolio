@@ -46,7 +46,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .slide-up-enter-active,
 .slide-up-leave-active {
-    transition: all 0.5s ease-out;
+    transition: all 0.3s ease;
 }
 
 .slide-up-enter-from,
