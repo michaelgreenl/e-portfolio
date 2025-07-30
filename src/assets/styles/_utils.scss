@@ -1,15 +1,36 @@
 @use 'sass:map';
+@use 'sass:string';
+
+// Dark/Light Theme
+@mixin theme-light {
+    [data-theme='light'] & {
+        @content;
+    }
+}
+
+@mixin theme-dark {
+    [data-theme='dark'] & {
+        @content;
+    }
+}
 
 // Mobile-first responsive breakpoints
 $breakpoints: (
-    sm: 576px,
-    md: 768px,
+    xsm: 332px,
+    sm: 682px,
+    md: 848px,
     lg: 992px,
     xl: 1200px,
     xxl: 1600px,
 ) !default;
 
-@mixin bp-sm-phone-landscape {
+@mixin bp-xsm-phone {
+    @media (min-width: map.get($breakpoints, 'xsm')) {
+        @content;
+    }
+}
+
+@mixin bp-sm-phone {
     @media (min-width: map.get($breakpoints, 'sm')) {
         @content;
     }
@@ -46,11 +67,21 @@ $breakpoints: (
     }
 }
 
-// Color variations
-@function lighten-color($color, $amount: 10%) {
-    @return lighten($color, $amount);
+@mixin bp-custom-max($max-width) {
+    @media (max-width: ($max-width + 'px')) {
+        @content;
+    }
 }
 
-@function darken-color($color, $amount: 10%) {
-    @return darken($color, $amount);
+// Color variations
+@function lighten-color($color, $percentage) {
+    $amount: $percentage;
+    $remaining: 100% - $amount;
+    @return string.unquote('color-mix(in srgb, #{$color} #{$remaining}, white #{$amount})');
+}
+
+@function darken-color($color, $percentage) {
+    $amount: $percentage;
+    $remaining: 100% - $amount;
+    @return string.unquote('color-mix(in srgb, #{$color} #{$remaining}, black #{$amount})');
 }
