@@ -57,11 +57,24 @@ onMounted(() => {
 
 .nav-desktop {
     display: none;
+    // TODO: Add styles in this tag
 }
 
 header {
+    height: 5em;
     display: flex;
     justify-content: flex-end;
+
+    .theme-button {
+        height: 100%;
+        background: transparent;
+
+        .icon {
+            height: 100%;
+            fill: $color-accent-dark;
+            stroke: $color-accent-dark;
+        }
+    }
 }
 
 .nav-mobile {
@@ -100,8 +113,6 @@ header {
         }
 
         &.active {
-            background-color: lighten-color($color-bg-secondary, 10%);
-
             @include theme-dark {
                 color: $color-primary;
             }
@@ -109,6 +120,11 @@ header {
             @include theme-light {
                 color: $color-gray2;
             }
+        }
+
+        &.active,
+        &:active {
+            background-color: lighten-color($color-bg-secondary, 10%);
         }
     }
 }
