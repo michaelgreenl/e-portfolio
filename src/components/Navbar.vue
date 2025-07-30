@@ -69,7 +69,7 @@ header {
     bottom: 0.5em;
     right: 0.5em;
     left: 0.5em;
-    max-width: 355px;
+    max-width: 335px;
     display: flex;
     justify-content: space-between;
     height: 3em;
