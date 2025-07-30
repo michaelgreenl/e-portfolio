@@ -1,59 +1,60 @@
 <template>
     <header>
         <nav class="nav-desktop">
-            <button @click="routeStore.toRoute('home')">Home</button>
-            <button @click="routeStore.toRoute('projects')">Projects</button>
-            <button @click="routeStore.toRoute('experience')">Experience</button>
-            <button @click="routeStore.toRoute('contact')">Contact</button>
+            <button v-for="(route, key) in routeStore.routes" :key="key" @click="routeStore.toRoute(key)">
+                {{ route.meta.title }}
+            </button>
         </nav>
         <button @click="themeStore.toggleTheme()" class="theme-button">
-            <MoonIcon v-if="themeStore.theme = 'dark'" class="icon" />
-            <SunIcon v-else-if="themeStore.theme = 'light'" class="icon" />
+            <MoonIcon v-if="themeStore.theme === 'dark'" class="icon" />
+            <SunIcon v-else-if="themeStore.theme === 'light'" class="icon" />
         </button>
     </header>
-    <!-- TODO: Loop through routeStore.routes here. (Add stuff like icons to the routes object?) -->
-    <nav class="nav-mobile">
-        <button @click="routeStore.toRoute('home')" :class="{ active: routeStore.activeRoute === 'home' }">
-            <HomeIconFill v-if="routeStore.activeRoute === 'home'" class="icon" />
-            <HomeIcon v-else class="icon" />
-            <span>Home</span>
-        </button>
-        <button @click="routeStore.toRoute('projects')" :class="{ active: routeStore.activeRoute === 'projects' }">
-            <ProjectsIcon class="icon" />
-            <span>Projects</span>
-        </button>
-        <button @click="routeStore.toRoute('experience')" :class="{ active: routeStore.activeRoute === 'experience' }">
-            <ResumeIconFill v-if="routeStore.activeRoute === 'experience'" class="icon" />
-            <ResumeIcon v-else class="icon" />
-            <span>Resume</span>
-        </button>
-        <button @click="routeStore.toRoute('contact')" :class="{ active: routeStore.activeRoute === 'contact' }">
-            <ContactIconFill v-if="routeStore.activeRoute === 'contact'" class="icon" />
-            <ContactIcon v-else class="icon" />
-            <span>Contact</span>
-        </button>
-    </nav>
+    <Transition name="slide-up">
+        <nav v-if="showMobileNav" class="nav-mobile">
+            <button
+                v-for="(route, key) in routeStore.routes"
+                :key="key"
+                @click="routeStore.toRoute(key)"
+                :class="{ active: routeStore.activeRoute === key }"
+            >
+                <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
+                <component :is="route.meta.icon" v-else class="icon" />
+                <span>{{ route.meta.title }}</span>
+            </button>
+        </nav>
+    </Transition>
 </template>
 
 <script setup>
 import { useRouteStore } from '../stores/routeStore.js';
 import { useThemeStore } from '../stores/themeStore.js';
+import { ref, onMounted } from 'vue';
 
-import HomeIcon from '../components/SVGs/HomeIcon.vue';
-import HomeIconFill from '../components/SVGs/HomeIconFill.vue';
-import ProjectsIcon from '../components/SVGs/ProjectsIcon.vue';
-import ResumeIcon from '../components/SVGs/ResumeIcon.vue';
-import ResumeIconFill from '../components/SVGs/ResumeIconFill.vue';
-import ContactIcon from '../components/SVGs/ContactIcon.vue';
-import ContactIconFill from '../components/SVGs/ContactIconFill.vue';
 import MoonIcon from '../components/SVGs/MoonIcon.vue';
 import SunIcon from '../components/SVGs/SunIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+const showMobileNav = ref(false);
+
+onMounted(() => {
+    showMobileNav.value = true;
+});
 </script>
 
 <style lang="scss" scoped>
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: all 0.5s ease-out;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
+}
+
 .nav-desktop {
     display: none;
 }
@@ -76,6 +77,7 @@ header {
     margin: 0 auto;
     background-color: $color-bg-secondary;
     border-radius: 16px;
+    box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.333);
 
     button {
         font-family: $primary-font-stack;

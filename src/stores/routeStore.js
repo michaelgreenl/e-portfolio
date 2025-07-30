@@ -4,24 +4,31 @@ import HomeView from '../views/HomeView.vue';
 import ProjectsView from '../views/ProjectsView.vue';
 import ExperienceView from '../views/ExperienceView.vue';
 import ContactView from '../views/ContactView.vue';
+import HomeIcon from '../components/SVGs/HomeIcon.vue';
+import HomeIconFill from '../components/SVGs/HomeIconFill.vue';
+import ProjectsIcon from '../components/SVGs/ProjectsIcon.vue';
+import ResumeIcon from '../components/SVGs/ResumeIcon.vue';
+import ResumeIconFill from '../components/SVGs/ResumeIconFill.vue';
+import ContactIcon from '../components/SVGs/ContactIcon.vue';
+import ContactIconFill from '../components/SVGs/ContactIconFill.vue';
 
 export const useRouteStore = defineStore('router', () => {
     const routes = {
         home: {
             component: markRaw(HomeView),
-            meta: { title: 'Home' },
+            meta: { title: 'Home', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
             component: markRaw(ProjectsView),
-            meta: { title: 'Projects' },
+            meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         experience: {
             component: markRaw(ExperienceView),
-            meta: { title: 'Experience' },
+            meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
             component: markRaw(ContactView),
-            meta: { title: 'Contact' },
+            meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
         },
     };
 
