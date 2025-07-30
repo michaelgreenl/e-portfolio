@@ -77,7 +77,7 @@ header {
     margin: 0 auto;
     background-color: $color-bg-secondary;
     border-radius: 16px;
-    box-shadow: 0 0 40px 5px rgba(0, 0, 0, 0.333);
+    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.333);
 
     button {
         font-family: $primary-font-stack;
