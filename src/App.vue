@@ -28,23 +28,6 @@ onMounted(() => {
 });
 </script>
 
-<style>
-.page-enter-active,
-.page-leave-active {
-    transition: all 0.3s ease;
-}
-
-.page-enter-from {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-.page-leave-to {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-</style>
-
 <style lang="scss">
 @use './assets/styles/_base.scss';
 
@@ -60,5 +43,20 @@ body,
     padding: 0;
     margin: 0;
     background-color: var(--color-bg-primary);
+}
+
+.page-enter-active,
+.page-leave-active {
+    transition: all 0.3s ease;
+}
+
+.page-enter-from {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.page-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
 }
 </style>
