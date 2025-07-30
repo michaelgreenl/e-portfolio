@@ -90,7 +90,7 @@ header {
     margin: 0 auto;
     background-color: $color-bg-secondary;
     border-radius: 16px;
-    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.333);
+    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.4);
 
     button {
         font-family: $primary-font-stack;
@@ -125,6 +125,7 @@ header {
         &.active,
         &:active {
             background-color: lighten-color($color-bg-secondary, 10%);
+            box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.4);
         }
     }
 }
