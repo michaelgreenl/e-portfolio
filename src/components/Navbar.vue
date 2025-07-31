@@ -1,14 +1,26 @@
 <template>
     <header>
+        <label class="theme-toggle">
+            <input
+                class="toggle-input"
+                type="checkbox"
+                id="theme"
+                true-value="dark"
+                false-value="light"
+                @click="themeStore.toggleTheme()"
+            />
+            <div class="toggle-thumb" :class="{ active: themeStore.theme === 'dark' }">
+                <Transition name="icon" mode="out-in">
+                    <MoonIcon v-if="themeStore.theme === 'dark'" class="icon" />
+                    <SunIcon v-else class="icon" />
+                </Transition>
+            </div>
+        </label>
         <nav class="nav-desktop">
             <button v-for="(route, key) in routeStore.routes" :key="key" @click="routeStore.toRoute(key)">
                 {{ route.meta.title }}
             </button>
         </nav>
-        <button @click="themeStore.toggleTheme()" class="theme-button">
-            <MoonIcon v-if="themeStore.theme === 'dark'" class="icon" />
-            <SunIcon v-else-if="themeStore.theme === 'light'" class="icon" />
-        </button>
     </header>
     <Transition name="slide-up">
         <nav v-if="showMobileNav" class="nav-mobile">
@@ -36,14 +48,44 @@ import SunIcon from '../components/SVGs/SunIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+
 const showMobileNav = ref(false);
 
 onMounted(() => {
+    let theme = localStorage.getItem('THEME');
+
+    if (theme === null) {
+        localStorage.setItem('THEME', 'dark');
+        theme = 'dark';
+    }
+
+    themeStore.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+
     showMobileNav.value = true;
 });
 </script>
 
 <style lang="scss" scoped>
+.icon-enter-active,
+.icon-leave-active {
+    transition: all 0.1s ease-in-out;
+}
+
+.icon-enter-from {
+    transform: rotate(-45deg);
+}
+
+.icon-leave-to {
+    transform: rotate(45deg);
+}
+
+.icon-enter-to,
+.icon-leave-from {
+    transform: rotate(0deg);
+    opacity: 1;
+}
+
 .slide-up-enter-active,
 .slide-up-leave-active {
     transition: all 0.3s ease;
@@ -61,18 +103,77 @@ onMounted(() => {
 }
 
 header {
-    height: 5em;
+    height: 4.5em;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
 
-    .theme-button {
-        height: 100%;
-        background: transparent;
+    @include theme-dark {
+        border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
+    }
 
-        .icon {
-            height: 100%;
-            fill: $color-accent-dark;
-            stroke: $color-accent-dark;
+    @include theme-light {
+        border-bottom: 1px solid darken-color($color-bg-primary, 5%);
+    }
+
+    .theme-toggle {
+        display: inline-flex;
+        padding-left: 0.4em;
+        margin: 1em;
+        width: 3.5em;
+        height: 2em;
+        border-radius: 100px;
+        box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
+        background-color: $color-bg-secondary;
+        cursor: pointer;
+
+        .toggle-input {
+            /* Hide the native checkbox visually but keep it accessible */
+            position: absolute;
+            width: 0;
+            height: 0;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            border-width: 0;
+        }
+
+        .toggle-thumb {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 100%;
+
+            .icon {
+                position: relative;
+
+                @include theme-dark {
+                    height: 1.25em;
+                    stroke: $color-bg-secondary;
+                    fill: $color-bg-secondary;
+                }
+
+                @include theme-light {
+                    height: 1.15em;
+                    fill: #c9be20;
+                    stroke: #c9be20;
+                }
+            }
+
+            &.active {
+                transform: translateX(115%);
+            }
+
+            &::before {
+                content: '';
+                position: absolute;
+                width: 1.5em;
+                height: 1.5em;
+                border-radius: 100%;
+                background-color: $color-gray4;
+                transition: transform 0.3s;
+                box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
+            }
         }
     }
 }
@@ -90,7 +191,7 @@ header {
     margin: 0 auto;
     background-color: $color-bg-secondary;
     border-radius: 16px;
-    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.333);
 
     button {
         font-family: $primary-font-stack;
@@ -125,7 +226,7 @@ header {
         &.active,
         &:active {
             background-color: lighten-color($color-bg-secondary, 10%);
-            box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.4);
+            box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
         }
     }
 }
@@ -172,10 +273,6 @@ header {
 
     .nav-desktop {
         display: flex;
-    }
-
-    header {
-        justify-content: space-between;
     }
 }
 </style>
