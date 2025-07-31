@@ -1,21 +1,12 @@
 <template>
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#000"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-    >
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <circle cx="256" cy="256" r="155.633"></circle>
+        <path
+            d="M256 60.204V10M158.102 86.436 133 42.958M86.436 158.102 42.958 133M60.204 256H10M86.436 353.898 42.958 379M158.102 425.564 133 469.042M256 451.796V502M353.898 425.564 379 469.042M425.564 353.898 469.042 379M451.796 256H502M425.564 158.102 469.042 133M353.898 86.436 379 42.958"
+            stroke-width="20"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-miterlimit="10"
+        ></path>
     </svg>
 </template>
