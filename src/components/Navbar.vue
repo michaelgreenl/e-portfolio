@@ -272,9 +272,16 @@ header {
                 width: 1.5em;
                 height: 1.5em;
                 border-radius: 100%;
-                background-color: $color-gray4;
                 transition: transform 0.3s;
                 box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
+
+                @include theme-dark {
+                    background-color: $color-gray4;
+                }
+
+                @include theme-light {
+                    background-color: $color-bg-primary;
+                }
             }
         }
     }
