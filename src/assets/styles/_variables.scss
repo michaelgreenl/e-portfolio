@@ -47,7 +47,8 @@ $secondary-font-stack:
 // LIGHT-MODE
 [data-theme='light'] {
     // Primary
-    --color-primary: #7a9ba8;
+    --color-primary: #6b8f9e;
+    // #7a9ba8
     --color-primary-light: #a0b0b8;
     --color-primary-dark: #5a6a70;
 
@@ -61,7 +62,7 @@ $secondary-font-stack:
     --color-bg-secondary: var(--color-primary);
 
     // Text
-    --color-text-primary: var(--color-gray9);
+    --color-text-primary: var(--color-primary-dark);
     --color-text-secondary: var(--color-gray7);
     --color-text-muted: var(--color-gray6);
 }
@@ -69,7 +70,7 @@ $secondary-font-stack:
 // DARK-MODE
 [data-theme='dark'] {
     // Primary
-    --color-primary: #7a9ba8;
+    --color-primary: #6b8f9e;
     --color-primary-light: #a0b0b8;
     --color-primary-dark: #5a6a70;
 
@@ -83,8 +84,8 @@ $secondary-font-stack:
     --color-bg-secondary: var(--color-gray8);
 
     // Text
-    --color-text-primary: var(--color-gray1);
-    --color-text-secondary: var(--color-gray4);
+    --color-text-primary: var(--color-gray4);
+    --color-text-secondary: var(--color-gray6);
     --color-text-muted: var(--color-gray7);
 }
 
