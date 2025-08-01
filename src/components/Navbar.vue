@@ -38,7 +38,6 @@
                 :class="{ active: routeStore.activeRoute === key }"
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
-                <component :is="route.meta.icon" v-else class="icon" />
                 <span>{{ route.meta.title }}</span>
             </button>
         </nav>
@@ -306,7 +305,7 @@ header {
         font-family: $primary-font-stack;
         font-weight: 600;
         display: flex;
-        flex-direction: column;
+        align-items: center;
         justify-content: center;
         border: 0;
         padding: 0.5em 0.8em;
@@ -342,10 +341,8 @@ header {
 
 @include bp-xsm-phone {
     .nav-mobile {
-        height: 5em;
-
         button {
-            gap: 2px;
+            gap: 0.4em;
 
             .icon {
                 display: block;
@@ -355,7 +352,7 @@ header {
             }
 
             span {
-                font-size: 1em;
+                font-size: clamp(0.9em, 3.6vw, 1em);
             }
 
             &.active {
