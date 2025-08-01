@@ -7,7 +7,6 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
 import Navbar from './components/Navbar.vue';
 
@@ -33,7 +32,7 @@ body,
 
 .page-enter-active,
 .page-leave-active {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .page-enter-from {
