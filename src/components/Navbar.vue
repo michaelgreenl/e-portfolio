@@ -1,5 +1,17 @@
 <template>
     <header>
+        <nav class="nav-desktop">
+            <button
+                v-for="(route, key) in routeStore.routes"
+                :key="key"
+                @click="routeStore.toRoute(key)"
+                :class="{ active: routeStore.activeRoute === key }"
+            >
+                <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
+                <component :is="route.meta.icon" v-else class="icon" />
+                {{ route.meta.title }}
+            </button>
+        </nav>
         <label class="theme-toggle">
             <input
                 class="toggle-input"
@@ -16,11 +28,6 @@
                 </Transition>
             </div>
         </label>
-        <nav class="nav-desktop">
-            <button v-for="(route, key) in routeStore.routes" :key="key" @click="routeStore.toRoute(key)">
-                {{ route.meta.title }}
-            </button>
-        </nav>
     </header>
     <Transition name="slide-up">
         <nav v-if="showMobileNav" class="nav-mobile">
@@ -99,13 +106,108 @@ onMounted(() => {
 
 .nav-desktop {
     display: none;
-    // TODO: Add styles in this tag
+    gap: 0.8em;
+
+    button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.6em;
+        font-weight: 500;
+        font-family: $primary-font-stack;
+        background-color: transparent;
+        border: 0;
+        font-size: 0.85em;
+        color: $color-text-primary;
+        padding: 0.75em 1.1em;
+        border-radius: 12px;
+
+        @include theme-dark {
+            color: $color-text-primary;
+        }
+
+        @include theme-light {
+            font-weight: 600;
+            color: $color-primary;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0.5em;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            transition: width 0.15s ease-in-out;
+            border-radius: 16px;
+
+            @include theme-dark {
+                background-color: $color-text-primary;
+            }
+
+            @include theme-light {
+                background-color: $color-primary;
+            }
+        }
+
+        &:hover {
+            @include theme-dark {
+                background-color: $color-bg-secondary;
+            }
+
+            @include theme-light {
+                background-color: lighten-color($color-primary-light, 28%);
+            }
+        }
+
+        &:active {
+            background-color: transparent !important;
+        }
+
+        &.active {
+            &:hover {
+                background-color: transparent;
+            }
+
+            &::after {
+                width: 88%;
+            }
+
+            .icon {
+                height: 1.4em;
+
+                @include theme-dark {
+                    fill: $color-text-primary;
+                    stroke: $color-text-primary;
+                }
+
+                @include theme-light {
+                    fill: $color-primary;
+                    stroke: $color-primary;
+                }
+            }
+        }
+
+        .icon {
+            height: 1.4em;
+
+            @include theme-dark {
+                fill: $color-text-secondary;
+                stroke: $color-text-secondary;
+            }
+
+            @include theme-light {
+                fill: $color-primary;
+                stroke: $color-primary;
+            }
+        }
+    }
 }
 
 header {
     height: 4.5em;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
 
     @include theme-dark {
         border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
@@ -123,8 +225,8 @@ header {
         height: 2em;
         border-radius: 100px;
         box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
-        background-color: $color-bg-secondary;
         cursor: pointer;
+        background-color: $color-bg-secondary;
 
         .toggle-input {
             /* Hide the native checkbox visually but keep it accessible */
@@ -155,8 +257,8 @@ header {
 
                 @include theme-light {
                     height: 1.15em;
-                    fill: #c9be20;
-                    stroke: #c9be20;
+                    fill: #b6ad23;
+                    stroke: #b6ad23;
                 }
             }
 
@@ -203,7 +305,7 @@ header {
         padding: 0.5em 0.8em;
         border-radius: 12px;
         background-color: transparent;
-        color: $color-accent-dark;
+        color: $color-accent;
 
         .icon {
             display: none;
@@ -241,8 +343,8 @@ header {
             .icon {
                 display: block;
                 height: 100%;
-                fill: $color-accent-dark;
-                stroke: $color-accent-dark;
+                fill: $color-accent;
+                stroke: $color-accent;
             }
 
             span {
@@ -271,8 +373,13 @@ header {
         display: none;
     }
 
-    .nav-desktop {
-        display: flex;
+    header {
+        padding-left: 1em;
+        justify-content: space-between;
+
+        .nav-desktop {
+            display: flex;
+        }
     }
 }
 </style>
