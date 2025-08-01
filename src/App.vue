@@ -1,18 +1,47 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router';
-</script>
-
 <template>
-  <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/projects">Projects</RouterLink>
-      </nav>
-    </div>
-  </header>
+    <Navbar />
 
-  <RouterView />
+    <transition name="page" mode="out-in">
+        <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
+    </transition>
 </template>
 
-<style lang="scss" scoped></style>
+<script setup>
+import { useRouteStore } from './stores/routeStore.js';
+import Navbar from './components/Navbar.vue';
+
+const routeStore = useRouteStore();
+</script>
+
+<style lang="scss">
+@use './assets/styles/_base.scss';
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    font-family: $primary-font-stack;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: var(--color-bg-primary);
+}
+
+.page-enter-active,
+.page-leave-active {
+    transition: all 0.2s ease;
+}
+
+.page-enter-from {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.page-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+</style>

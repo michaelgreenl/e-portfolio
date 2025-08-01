@@ -1,8 +1,9 @@
 <template>
-  <div class="home"></div>
+    <div>
+        <h1>Home</h1>
+    </div>
 </template>
 
-<script setup>
-</script>
+<script setup></script>
 
-<script lang='scss' scoped></script>
+<style lang="scss" scoped></style>

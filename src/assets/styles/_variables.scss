@@ -1,25 +1,117 @@
-$primary-font-family:
-  'Poppins',
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  'Helvetica Neue',
-  Arial,
-  sans-serif,
-  'Apple Color Emoji',
-  'Segoe UI Emoji',
-  'Segoe UI Symbol';
+@use 'fonts';
 
-$secondary-font-family:
-  'Michroma',
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  'Helvetica Neue',
-  Arial,
-  sans-serif,
-  'Apple Color Emoji',
-  'Segoe UI Emoji',
-  'Segoe UI Symbol';
+// ---------- FONTS ----------
+$primary-font-stack:
+    'Poppins',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol';
+
+$secondary-font-stack:
+    'Michroma',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol';
+
+// ---------- COLORS ----------
+// GLOBAL
+:root {
+    // Grayscale palette
+    --color-white: #ffffff;
+    --color-gray1: #f8f9fa;
+    --color-gray2: #e9ecef;
+    --color-gray3: #dee2e6;
+    --color-gray4: #ced4da;
+    --color-gray5: #adb5bd;
+    --color-gray6: #6c757d;
+    --color-gray7: #495057;
+    --color-gray8: #343a40;
+    --color-gray9: #212529;
+    --color-black: #000000;
+}
+
+// LIGHT-MODE
+[data-theme='light'] {
+    // Primary
+    --color-primary: #6b8f9e;
+    // #7a9ba8
+    --color-primary-light: #a0b0b8;
+    --color-primary-dark: #5a6a70;
+
+    // Accent
+    --color-accent: var(--color-gray4);
+    --color-accent-light: var(--color-gray3);
+    --color-accent-dark: var(--color-gray5);
+
+    // Background
+    --color-bg-primary: var(--color-gray3);
+    --color-bg-secondary: var(--color-primary);
+
+    // Text
+    --color-text-primary: var(--color-primary-dark);
+    --color-text-secondary: var(--color-gray7);
+    --color-text-muted: var(--color-gray6);
+}
+
+// DARK-MODE
+[data-theme='dark'] {
+    // Primary
+    --color-primary: #6b8f9e;
+    --color-primary-light: #a0b0b8;
+    --color-primary-dark: #5a6a70;
+
+    // Accent
+    --color-accent: var(--color-gray5);
+    --color-accent-light: var(--color-gray4);
+    --color-accent-dark: var(--color-gray6);
+
+    // Background
+    --color-bg-primary: var(--color-gray9);
+    --color-bg-secondary: var(--color-gray8);
+
+    // Text
+    --color-text-primary: var(--color-gray4);
+    --color-text-secondary: var(--color-gray6);
+    --color-text-muted: var(--color-gray7);
+}
+
+$color-white: var(--color-white);
+$color-gray1: var(--color-gray1);
+$color-gray2: var(--color-gray2);
+$color-gray3: var(--color-gray3);
+$color-gray4: var(--color-gray4);
+$color-gray5: var(--color-gray5);
+$color-gray6: var(--color-gray6);
+$color-gray7: var(--color-gray7);
+$color-gray8: var(--color-gray8);
+$color-gray9: var(--color-gray9);
+$color-black: var(--color-black);
+
+$color-primary: var(--color-primary);
+$color-primary-light: var(--color-primary-light);
+$color-primary-dark: var(--color-primary-dark);
+
+$color-accent: var(--color-accent);
+$color-accent-light: var(--color-accent-light);
+$color-accent-dark: var(--color-accent-dark);
+
+$color-bg-primary: var(--color-bg-primary);
+$color-bg-secondary: var(--color-bg-secondary);
+
+$color-text-primary: var(--color-text-primary);
+$color-text-secondary: var(--color-text-secondary);
+$color-text-muted: var(--color-text-muted);
