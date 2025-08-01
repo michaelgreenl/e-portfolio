@@ -1,5 +1,6 @@
 <template>
     <header>
+        <Logo />
         <nav class="nav-desktop">
             <button
                 v-for="(route, key) in routeStore.routes"
@@ -51,6 +52,7 @@ import { ref, onMounted } from 'vue';
 
 import MoonIcon from '../components/SVGs/MoonIcon.vue';
 import SunIcon from '../components/SVGs/SunIcon.vue';
+import Logo from '../components/Logo.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -207,6 +209,8 @@ header {
     height: 4.5em;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 0.5em;
 
     @include theme-dark {
         border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
@@ -378,9 +382,6 @@ header {
     }
 
     header {
-        padding-left: 1em;
-        justify-content: space-between;
-
         .nav-desktop {
             display: flex;
         }
