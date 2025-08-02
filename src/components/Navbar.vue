@@ -157,7 +157,7 @@ onMounted(() => {
             }
 
             @include theme-light {
-                background-color: lighten-color($color-primary-light, 28%);
+                background-color: #ced8de;
             }
         }
 
