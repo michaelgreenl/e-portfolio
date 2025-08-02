@@ -15,7 +15,7 @@ div {
 
     p {
         position: relative;
-        font-size: 1.4em;
+        font-size: 1.6em;
         letter-spacing: -0.2ch;
 
         span:first-child {
