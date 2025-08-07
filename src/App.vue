@@ -23,11 +23,11 @@ const routeStore = useRouteStore();
 html,
 body,
 #app {
-    font-family: $primary-font-stack;
     height: 100%;
     padding: 0;
     margin: 0;
-    background-color: var(--color-bg-primary);
+    font-family: $primary-font-stack;
+    background-color: $color-bg-primary;
 }
 
 .page-enter-active,
