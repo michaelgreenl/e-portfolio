@@ -9,14 +9,15 @@
 
 <style lang="scss" scoped>
 div {
-    font-family: $primary-font-stack;
     display: flex;
     padding-left: 1em;
+    font-family: $primary-font-stack;
 
     p {
         position: relative;
-        font-size: 1.6em;
-        letter-spacing: -0.2ch;
+        font-size: 2em;
+        font-weight: 600;
+        letter-spacing: -0.1ch;
 
         span:first-child {
             position: relative;
@@ -24,7 +25,7 @@ div {
             color: $color-gray3;
 
             @include theme-light {
-                color: $color-primary;
+                color: $color-primary-darker;
             }
         }
 
