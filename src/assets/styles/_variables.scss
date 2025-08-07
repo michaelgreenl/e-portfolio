@@ -2,26 +2,26 @@
 
 // ---------- FONTS ----------
 $primary-font-stack:
-    'Poppins',
+    'ClashDisplay',
     -apple-system,
-    BlinkMacSystemFont,
+    blinkmacsystemfont,
     'Segoe UI',
-    Roboto,
+    roboto,
     'Helvetica Neue',
-    Arial,
+    arial,
     sans-serif,
     'Apple Color Emoji',
     'Segoe UI Emoji',
     'Segoe UI Symbol';
 
 $secondary-font-stack:
-    'Michroma',
+    'Poppins',
     -apple-system,
-    BlinkMacSystemFont,
+    blinkmacsystemfont,
     'Segoe UI',
-    Roboto,
+    roboto,
     'Helvetica Neue',
-    Arial,
+    arial,
     sans-serif,
     'Apple Color Emoji',
     'Segoe UI Emoji',
@@ -31,7 +31,7 @@ $secondary-font-stack:
 // GLOBAL
 :root {
     // Grayscale palette
-    --color-white: #ffffff;
+    --color-white: #fff;
     --color-gray1: #f8f9fa;
     --color-gray2: #e9ecef;
     --color-gray3: #dee2e6;
@@ -41,16 +41,16 @@ $secondary-font-stack:
     --color-gray7: #495057;
     --color-gray8: #343a40;
     --color-gray9: #212529;
-    --color-black: #000000;
+    --color-black: #000;
 }
 
 // LIGHT-MODE
 [data-theme='light'] {
     // Primary
     --color-primary: #6b8f9e;
-    // #7a9ba8
     --color-primary-light: #a0b0b8;
     --color-primary-dark: #5a6a70;
+    --color-primary-darker: #3d505c;
 
     // Accent
     --color-accent: var(--color-gray4);
@@ -62,9 +62,9 @@ $secondary-font-stack:
     --color-bg-secondary: var(--color-primary);
 
     // Text
-    --color-text-primary: var(--color-primary-dark);
-    --color-text-secondary: var(--color-gray7);
-    --color-text-muted: var(--color-gray6);
+    --color-text-primary: var(--color-gray7);
+    --color-text-secondary: var(--color-gray6);
+    --color-text-muted: var(--color-gray5);
 }
 
 // DARK-MODE
@@ -104,6 +104,7 @@ $color-black: var(--color-black);
 $color-primary: var(--color-primary);
 $color-primary-light: var(--color-primary-light);
 $color-primary-dark: var(--color-primary-dark);
+$color-primary-darker: var(--color-primary-darker);
 
 $color-accent: var(--color-accent);
 $color-accent-light: var(--color-accent-light);
