@@ -90,8 +90,8 @@ onMounted(() => {
 
 .icon-enter-to,
 .icon-leave-from {
-    transform: rotate(0deg);
     opacity: 1;
+    transform: rotate(0deg);
 }
 
 .slide-up-enter-active,
@@ -101,8 +101,62 @@ onMounted(() => {
 
 .slide-up-enter-from,
 .slide-up-leave-to {
-    transform: translateY(100px);
     opacity: 0;
+    transform: translateY(100px);
+}
+
+.nav-mobile {
+    position: fixed;
+    z-index: 1;
+    right: 0.5em;
+    bottom: 0.5em;
+    left: 0.5em;
+    display: flex;
+    justify-content: space-between;
+    max-width: 335px;
+    height: 3em;
+    padding: 0.4em;
+    margin: 0 auto;
+    background-color: $color-bg-secondary;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
+
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5em 0.8em;
+        font-family: $primary-font-stack;
+        font-weight: 600;
+        color: $color-accent;
+        background-color: transparent;
+        border: 0;
+        border-radius: 12px;
+
+        .icon {
+            display: none;
+        }
+
+        span {
+            font-size: clamp(0.4em, 3.5vw, 1em);
+        }
+
+        &.active {
+            @include theme-dark {
+                color: $color-primary;
+            }
+
+            @include theme-light {
+                color: $color-gray2;
+            }
+        }
+
+        &.active,
+        &:active {
+            background-color: lighten-color($color-bg-secondary, 10%);
+            box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+        }
+    }
 }
 
 .nav-desktop {
@@ -112,15 +166,14 @@ onMounted(() => {
     button {
         position: relative;
         display: flex;
-        align-items: center;
         gap: 0.6em;
-        font-weight: 500;
+        align-items: center;
+        padding: 0.75em 1.1em;
         font-family: $primary-font-stack;
+        font-size: 0.85em;
+        font-weight: 500;
         background-color: transparent;
         border: 0;
-        font-size: 0.85em;
-        color: $color-text-primary;
-        padding: 0.75em 1.1em;
         border-radius: 12px;
 
         @include theme-dark {
@@ -128,26 +181,39 @@ onMounted(() => {
         }
 
         @include theme-light {
-            font-weight: 600;
-            color: $color-primary;
+            color: $color-primary-darker;
         }
 
-        &::after {
-            content: '';
-            position: absolute;
-            left: 0.5em;
-            bottom: 0;
-            width: 0;
-            height: 2px;
-            transition: width 0.15s ease-in-out;
-            border-radius: 16px;
+        .icon {
+            height: 1.4em;
 
             @include theme-dark {
-                background-color: $color-text-primary;
+                fill: $color-text-secondary;
+                stroke: $color-text-secondary;
             }
 
             @include theme-light {
-                background-color: $color-primary;
+                fill: $color-primary-darker;
+                stroke: $color-primary-darker;
+            }
+        }
+
+        &::after {
+            position: absolute;
+            bottom: 0;
+            left: 0.5em;
+            width: 0;
+            height: 1px;
+            content: '';
+            border-radius: 16px;
+            transition: width 0.15s ease-in-out;
+
+            @include theme-dark {
+                background-color: $color-text-secondary;
+            }
+
+            @include theme-light {
+                background-color: $color-primary-darker;
             }
         }
 
@@ -166,50 +232,40 @@ onMounted(() => {
         }
 
         &.active {
-            &:hover {
-                background-color: transparent;
+            .icon {
+                height: 1.4em;
+
+                @include theme-dark {
+                    fill: $color-text-secondary;
+                    stroke: $color-text-secondary;
+                }
+
+                @include theme-light {
+                    fill: $color-primary-darker;
+                    stroke: $color-primary-darker;
+                }
             }
 
             &::after {
                 width: 88%;
             }
 
-            .icon {
-                height: 1.4em;
-
-                @include theme-dark {
-                    fill: $color-text-primary;
-                    stroke: $color-text-primary;
-                }
-
-                @include theme-light {
-                    fill: $color-primary;
-                    stroke: $color-primary;
-                }
-            }
-        }
-
-        .icon {
-            height: 1.4em;
-
-            @include theme-dark {
-                fill: $color-text-secondary;
-                stroke: $color-text-secondary;
-            }
-
-            @include theme-light {
-                fill: $color-primary;
-                stroke: $color-primary;
+            &:hover {
+                background-color: transparent;
             }
         }
     }
 }
 
 header {
-    height: 4.5em;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 4.5em;
     padding: 0 0.5em;
 
     @include theme-dark {
@@ -222,14 +278,21 @@ header {
 
     .theme-toggle {
         display: inline-flex;
-        padding-left: 0.4em;
-        margin: 1em;
         width: 3.5em;
         height: 2em;
-        border-radius: 100px;
-        box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
+        padding-left: 0.4em;
+        margin: 1em;
         cursor: pointer;
-        background-color: $color-bg-secondary;
+        border-radius: 100px;
+        box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+
+        @include theme-dark {
+            background-color: $color-bg-secondary;
+        }
+
+        @include theme-light {
+            background-color: $color-primary-darker;
+        }
 
         .toggle-input {
             /* Hide the native checkbox visually but keep it accessible */
@@ -254,8 +317,8 @@ header {
 
                 @include theme-dark {
                     height: 1.25em;
-                    stroke: $color-bg-secondary;
                     fill: $color-bg-secondary;
+                    stroke: $color-bg-secondary;
                 }
 
                 @include theme-light {
@@ -270,13 +333,13 @@ header {
             }
 
             &::before {
-                content: '';
                 position: absolute;
+                content: '';
                 width: 1.5em;
                 height: 1.5em;
                 border-radius: 100%;
+                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
-                box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
 
                 @include theme-dark {
                     background-color: $color-gray4;
@@ -286,59 +349,6 @@ header {
                     background-color: $color-bg-primary;
                 }
             }
-        }
-    }
-}
-
-.nav-mobile {
-    position: fixed;
-    bottom: 0.5em;
-    right: 0.5em;
-    left: 0.5em;
-    max-width: 335px;
-    display: flex;
-    justify-content: space-between;
-    height: 3em;
-    padding: 0.4em;
-    margin: 0 auto;
-    background-color: $color-bg-secondary;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.333);
-
-    button {
-        font-family: $primary-font-stack;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
-        padding: 0.5em 0.8em;
-        border-radius: 12px;
-        background-color: transparent;
-        color: $color-accent;
-
-        .icon {
-            display: none;
-        }
-
-        span {
-            font-size: clamp(0.4em, 3.5vw, 1em);
-        }
-
-        &.active {
-            @include theme-dark {
-                color: $color-primary;
-            }
-
-            @include theme-light {
-                color: $color-gray2;
-            }
-        }
-
-        &.active,
-        &:active {
-            background-color: lighten-color($color-bg-secondary, 10%);
-            box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
         }
     }
 }
