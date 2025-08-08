@@ -218,7 +218,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
                 height: 1.2em;
 
                 @include theme-dark {
-                    fill: $color-text-secondary;
+                    fill: lighten-color($color-text-muted, 10%);
                 }
 
                 @include theme-light {
