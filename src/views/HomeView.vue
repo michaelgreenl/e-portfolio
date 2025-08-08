@@ -2,11 +2,7 @@
     <div class="home-container">
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
-            <h1>
-                Michael
-                <!-- <span class="tab">&ensp;&ensp;</span>  -->
-                Green
-            </h1>
+            <h1>Michael Green</h1>
             <h2>Full-Stack Developer</h2>
             <p>
                 Amet reprehenderit id eu consequat deserunt commodo eiusmod dolor deserunt dolore est aliqua deserunt
@@ -138,7 +134,8 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
                     }
                 }
 
-                &:hover {
+                &:hover,
+                &:active {
                     color: $color-bg-primary;
 
                     @include theme-dark {
@@ -156,6 +153,10 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
                             fill: $color-bg-primary;
                         }
                     }
+                }
+
+                &:active {
+                    transform: scale(0.9);
                 }
             }
 
