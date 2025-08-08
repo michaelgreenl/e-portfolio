@@ -92,6 +92,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
 
         p {
             max-width: 69ch;
+            color: $color-text-secondary;
             font-family: $secondary-font-stack;
         }
 
