@@ -135,8 +135,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
                     }
                 }
 
-                &:hover,
-                &:active {
+                @include interactive {
                     color: $color-bg-primary;
 
                     @include theme-dark {
@@ -244,7 +243,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
                 }
             }
 
-            &:hover {
+            @include interactive {
                 &::after {
                     right: 2px;
                 }
