@@ -2,7 +2,10 @@
     <div class="home-container">
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
-            <h1>Michael Green</h1>
+            <h1>
+                Michael
+                <span> Green </span>
+            </h1>
             <h2>Full-Stack Developer</h2>
             <p>
                 Hello, I am a software engineer with a passion for solving problems. I am writing this in english now
@@ -68,13 +71,18 @@ const routeStore = useRouteStore();
             font-family: $primary-font-stack;
             font-size: 5em;
             font-weight: 600;
-            line-height: 1ch;
+            line-height: 0.8ch;
+
+            span {
+                color: $color-primary-light;
+                margin-left: 1.4em;
+            }
         }
 
         h2 {
             font-size: 2em;
             font-weight: 400;
-            color: $color-primary;
+            color: $color-primary-light;
         }
 
         h3 {
