@@ -5,8 +5,8 @@
             <h1>Michael Green</h1>
             <h2>Full-Stack Developer</h2>
             <p>
-                Amet reprehenderit id eu consequat deserunt commodo eiusmod dolor deserunt dolore est aliqua deserunt
-                sit sit commodo in tempor sit mollit.
+                Hello, I am a software engineer with a passion for solving problems. I am writing this in english now
+                because lorem ipsum looks weird.
             </p>
             <div class="cta">
                 <button>Contact</button>
@@ -16,34 +16,28 @@
                 </button>
             </div>
         </div>
-        <div class="external-links">
+        <div class="site-nav">
             <hr />
-            <button>
-                <LinkedInIcon class="icon" />
-                LinkedIn
-            </button>
-            <button>
-                <GithubIcon class="icon" />
-                Github
-            </button>
+            <div v-for="(route, key) in routeStore.routes" :key="key">
+                <button v-if="key !== 'home'" @click="routeStore.toRoute(key)">
+                    <component :is="route.meta.iconFill" class="icon" />
+                    <span>{{ route.meta.title }}</span>
+                </button>
+            </div>
             <button>
                 <BlogIcon class="icon" />
                 My Blog
-            </button>
-            <button>
-                <ChessIcon class="icon" />
-                Lets Play Chess!
             </button>
         </div>
     </div>
 </template>
 
 <script setup>
+import { useRouteStore } from '../stores/routeStore.js';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
-import LinkedInIcon from '../components/SVGs/LinkedInIcon.vue';
-import GithubIcon from '../components/SVGs/GithubIcon.vue';
 import BlogIcon from '../components/SVGs/BlogIcon.vue';
-import ChessIcon from '../components/SVGs/ChessIcon.vue';
+
+const routeStore = useRouteStore();
 </script>
 
 <style lang="scss" scoped>
@@ -178,14 +172,12 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
         }
     }
 
-    .external-links {
-        display: flex;
+    .site-nav {
+        display: none;
         gap: 1em;
         justify-content: flex-end;
         align-items: center;
         flex-wrap: wrap-reverse;
-        max-width: 345px;
-        margin-left: auto;
         padding-left: 10%;
 
         hr {
@@ -200,7 +192,8 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
             font-family: $primary-font-stack;
             font-size: 1.2em;
             display: flex;
-            gap: 0.4em;
+            align-items: center;
+            gap: 0.6em;
             background: transparent;
             border: 0;
             border-radius: 12px;
@@ -214,7 +207,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
             }
 
             .icon {
-                height: 1.2em;
+                height: 1.4em;
 
                 @include theme-dark {
                     fill: lighten-color($color-text-muted, 10%);
@@ -229,7 +222,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
                 content: '';
                 position: absolute;
                 bottom: -6px;
-                left: 1.8em;
+                left: 2em;
                 right: 100%;
                 height: 1px;
                 transition: all 0.3s ease;
@@ -245,7 +238,7 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
 
             @include interactive {
                 &::after {
-                    right: 2px;
+                    right: 0;
                 }
             }
         }
@@ -253,10 +246,6 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
 
     @include bp-custom-min(400) {
         font-size: 1em;
-
-        .external-links {
-            max-width: 413px;
-        }
     }
 
     @include bp-custom-min(600) {
@@ -268,9 +257,8 @@ import ChessIcon from '../components/SVGs/ChessIcon.vue';
     }
 
     @include bp-md-tablet {
-        .external-links {
-            max-width: 100vw;
-            margin-left: 0;
+        .site-nav {
+            display: flex;
         }
     }
 

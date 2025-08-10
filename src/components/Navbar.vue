@@ -1,7 +1,7 @@
 <template>
     <header>
         <Logo />
-        <nav class="nav-desktop">
+        <nav v-if="routeStore.activeRoute !== 'home'" class="nav-desktop">
             <button
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
