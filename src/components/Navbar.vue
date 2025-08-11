@@ -138,12 +138,12 @@ onMounted(() => {
         }
 
         span {
-            font-size: clamp(0.4em, 3.5vw, 1em);
+            font-size: clamp(0.4em, 4vw, 1em);
         }
 
         &.active {
             @include theme-dark {
-                color: $color-primary;
+                color: $color-primary-light;
             }
 
             @include theme-light {
@@ -355,25 +355,27 @@ header {
 
 @include bp-xsm-phone {
     .nav-mobile {
+        font-size: 1.2em;
+
         button {
             gap: 0.4em;
 
             .icon {
                 display: block;
-                height: 100%;
+                height: 69%;
                 fill: $color-accent;
                 stroke: $color-accent;
             }
 
             span {
-                font-size: clamp(0.9em, 3.6vw, 1em);
+                font-size: clamp(0.9em, 3.7vw, 1em);
             }
 
             &.active {
                 .icon {
                     @include theme-dark {
-                        fill: $color-primary;
-                        stroke: $color-primary;
+                        fill: $color-primary-light;
+                        stroke: $color-primary-light;
                     }
 
                     @include theme-light {
