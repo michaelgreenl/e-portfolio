@@ -108,30 +108,30 @@ onMounted(() => {
 .nav-mobile {
     position: fixed;
     z-index: 1;
-    right: 0.5em;
-    bottom: 0.5em;
-    left: 0.5em;
+    right: $size-2;
+    bottom: $size-2;
+    left: $size-2;
     display: flex;
     justify-content: space-between;
     max-width: 335px;
-    height: 3em;
-    padding: 0.4em;
+    height: $size-10;
+    padding: $size-2;
     margin: 0 auto;
     background-color: $color-bg-secondary;
-    border-radius: 16px;
+    border-radius: $size-4;
     box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
 
     button {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.5em 0.8em;
+        padding: $size-2 $size-3;
         font-family: $primary-font-stack;
         font-weight: 600;
         color: $color-accent;
         background-color: transparent;
         border: 0;
-        border-radius: 12px;
+        border-radius: $size-3;
 
         .icon {
             display: none;
@@ -161,20 +161,20 @@ onMounted(() => {
 
 .nav-desktop {
     display: none;
-    gap: 0.8em;
+    gap: $size-3;
 
     button {
         position: relative;
-        display: flex;
-        gap: 0.6em;
-        align-items: center;
-        padding: 0.75em 1.1em;
-        font-family: $primary-font-stack;
         font-size: 0.85em;
+        font-family: $primary-font-stack;
         font-weight: 500;
+        display: flex;
+        gap: $size-3;
+        align-items: center;
+        padding: $size-3 $size-5;
         background-color: transparent;
         border: 0;
-        border-radius: 12px;
+        border-radius: $size-3;
 
         @include theme-dark {
             color: $color-text-primary;
@@ -185,7 +185,7 @@ onMounted(() => {
         }
 
         .icon {
-            height: 1.4em;
+            height: $size-6;
 
             @include theme-dark {
                 fill: $color-text-secondary;
@@ -201,11 +201,11 @@ onMounted(() => {
         &::after {
             position: absolute;
             bottom: 0;
-            left: 0.5em;
+            left: $size-2;
             width: 0;
             height: 1px;
             content: '';
-            border-radius: 16px;
+            border-radius: $size-4;
             transition: width 0.15s ease-in-out;
 
             @include theme-dark {
@@ -233,7 +233,7 @@ onMounted(() => {
 
         &.active {
             .icon {
-                height: 1.4em;
+                height: $size-6;
 
                 @include theme-dark {
                     fill: $color-text-secondary;
@@ -265,8 +265,8 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 4.5em;
-    padding: 0 0.5em;
+    height: $size-13;
+    padding: 0 $size-2;
 
     @include theme-dark {
         border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
@@ -278,10 +278,10 @@ header {
 
     .theme-toggle {
         display: inline-flex;
-        width: 3.5em;
-        height: 2em;
+        width: $size-11;
+        height: $size-8;
         padding-left: 0.4em;
-        margin: 1em;
+        margin: $size-4;
         cursor: pointer;
         border-radius: 100px;
         box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
@@ -316,7 +316,7 @@ header {
                 position: relative;
 
                 @include theme-dark {
-                    height: 1.25em;
+                    height: $size-5;
                     fill: $color-bg-secondary;
                     stroke: $color-bg-secondary;
                 }
@@ -335,8 +335,8 @@ header {
             &::before {
                 position: absolute;
                 content: '';
-                width: 1.5em;
-                height: 1.5em;
+                width: $size-6;
+                height: $size-6;
                 border-radius: 100%;
                 box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
@@ -358,7 +358,7 @@ header {
         font-size: 1.2em;
 
         button {
-            gap: 0.4em;
+            gap: $size-2;
 
             .icon {
                 display: block;
