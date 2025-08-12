@@ -22,7 +22,10 @@ div {
         span:first-child {
             position: relative;
             z-index: 2;
-            color: $color-gray3;
+
+            @include theme-dark {
+                color: $color-gray3;
+            }
 
             @include theme-light {
                 color: $color-primary-darker;
@@ -32,7 +35,14 @@ div {
         span:last-child {
             position: relative;
             z-index: 1;
-            color: $color-gray5;
+
+            @include theme-dark {
+                color: $color-primary-light;
+            }
+
+            @include theme-light {
+                color: $color-primary;
+            }
         }
     }
 }
