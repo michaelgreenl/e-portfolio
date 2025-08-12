@@ -6,10 +6,11 @@
                 Michael
                 <span> Green </span>
             </h1>
+            <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                Hello, I am a software engineer with a passion for solving problems. I am writing this in english now
-                because lorem ipsum looks weird.
+                Hello, I am a software engineer with a passion for solving problems. I am writing this in normal a a
+                english now.
             </p>
             <div class="cta">
                 <button>Contact</button>
@@ -20,7 +21,7 @@
             </div>
         </div>
         <div class="site-nav">
-            <hr />
+            <hr class="nav-line" />
             <div v-for="(route, key) in routeStore.routes" :key="key">
                 <button v-if="key !== 'home'" @click="routeStore.toRoute(key)">
                     <component :is="route.meta.iconFill" class="icon" />
@@ -45,19 +46,22 @@ const routeStore = useRouteStore();
 
 <style lang="scss" scoped>
 .home-container {
-    font-size: 0.8em;
+    font-size: clamp(10px, 4vw, 16px);
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
     height: 100vh;
-    padding: 4.5em 1em 0;
-    gap: 6.5em;
+    padding: 0 $size-4;
+    max-width: 400px;
+    margin: 0 auto;
+    gap: $size-17;
     color: $color-text-primary;
 
     .hero-content {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: $size-2;
 
         h1,
         h2,
@@ -67,48 +71,94 @@ const routeStore = useRouteStore();
         }
 
         h1 {
-            color: $color-primary-darker;
+            font-size: 5.1em;
             font-family: $primary-font-stack;
-            font-size: 5em;
             font-weight: 600;
             line-height: 0.8ch;
+            color: $color-primary-darker;
+            padding-bottom: $size-1;
 
             span {
-                color: $color-primary-light;
                 margin-left: 1.4em;
+
+                @include theme-dark {
+                    color: $color-primary-light;
+                }
+
+                @include theme-light {
+                    color: $color-primary;
+                }
+            }
+
+            @include theme-light {
+                text-shadow: 0px 3px 5px #00000025;
             }
         }
 
         h2 {
-            font-size: 2em;
+            font-size: 1.9em;
             font-weight: 400;
-            color: $color-primary-light;
+            border-right: solid 2px $color-text-primary;
+            width: fit-content;
+            margin: 0 auto;
+
+            @include theme-dark {
+                color: $color-primary-light;
+            }
+
+            @include theme-light {
+                color: $color-primary-darker;
+            }
+        }
+
+        h2,
+        p {
+            text-align: center;
         }
 
         h3 {
             color: $color-primary-darker;
             font-family: $primary-font-stack;
             font-weight: 400;
-            margin: 0 2px 4px;
+            margin: 0 2px $size-2;
         }
 
         p {
-            max-width: 69ch;
+            font-size: 1.1em;
+            max-width: 45ch;
             color: $color-text-secondary;
             font-family: $secondary-font-stack;
+            margin: 0 auto;
+        }
+
+        .hero-line {
+            border: 0;
+            width: 90%;
+            margin: 0 auto $size-2;
+            height: 1px;
+
+            @include theme-dark {
+                background-color: lighten-color($color-bg-primary, 5%);
+            }
+
+            @include theme-light {
+                background-color: darken-color($color-bg-primary, 5%);
+            }
         }
 
         .cta {
+            font-size: 1.1em;
             display: flex;
-            gap: 1em;
-            margin-top: 0.5em;
+            justify-content: center;
+            gap: $size-4;
+            margin-top: $size-2;
 
             button {
                 display: flex;
-                gap: 0.4em;
+                gap: $size-2;
                 align-items: center;
                 justify-content: center;
-                padding: 0.5em 1.1em;
+                padding: $size-2 $size-4;
                 font-family: $primary-font-stack;
                 font-size: 1em;
                 font-weight: 500;
@@ -116,7 +166,7 @@ const routeStore = useRouteStore();
                 border-radius: 12px;
 
                 svg {
-                    height: 1em;
+                    height: $size-4;
                 }
 
                 @include theme-dark {
@@ -175,6 +225,7 @@ const routeStore = useRouteStore();
             }
 
             button:last-child {
+                // Fix for odd spacing effect happening with icon
                 padding-right: 0.95em;
             }
         }
@@ -182,26 +233,27 @@ const routeStore = useRouteStore();
 
     .site-nav {
         display: none;
-        gap: 1em;
+        gap: $size-4;
+        align-self: flex-end;
         justify-content: flex-end;
         align-items: center;
         flex-wrap: wrap-reverse;
-        padding-left: 10%;
+        width: 90%;
 
-        hr {
+        .nav-line {
             border: 0;
-            height: 2px;
-            background-color: $color-text-muted !important;
+            height: 1px;
             flex-grow: 1;
+            background-color: $color-text-muted !important;
         }
 
         button {
             position: relative;
-            font-family: $primary-font-stack;
             font-size: 1.2em;
+            font-family: $primary-font-stack;
             display: flex;
             align-items: center;
-            gap: 0.6em;
+            gap: $size-2;
             background: transparent;
             border: 0;
             border-radius: 12px;
@@ -215,7 +267,7 @@ const routeStore = useRouteStore();
             }
 
             .icon {
-                height: 1.4em;
+                height: $size-5;
 
                 @include theme-dark {
                     fill: lighten-color($color-text-muted, 10%);
@@ -230,7 +282,7 @@ const routeStore = useRouteStore();
                 content: '';
                 position: absolute;
                 bottom: -6px;
-                left: 2em;
+                left: 1.9em;
                 right: 100%;
                 height: 1px;
                 transition: all 0.3s ease;
@@ -252,19 +304,55 @@ const routeStore = useRouteStore();
         }
     }
 
-    @include bp-custom-min(400) {
-        font-size: 1em;
-    }
+    @include bp-custom-min(612) {
+        max-width: 100vw;
 
-    @include bp-custom-min(600) {
-        padding: 4.5em 2em 0;
+        h1 {
+            font-size: clamp(5.1em, 12vw, 5.5em) !important;
+            line-height: 1ch !important;
+            max-width: 100vw !important;
+            margin: 0 auto !important;
+            padding-bottom: $size-1 !important;
+
+            span {
+                margin-left: 0 !important;
+            }
+        }
+
+        h3 {
+            font-size: 1.25em !important;
+            margin: 0 2px 0 !important;
+        }
     }
 
     @include bp-custom-min(750) {
-        padding: 4.5em 4em 0;
+        padding: 0 $size-11;
     }
 
     @include bp-md-tablet {
+        align-items: flex-start;
+        padding: $size-13 $size-10 0 $size-12;
+
+        h1 {
+            padding: 0 !important;
+        }
+        h2,
+        p {
+            margin: 0 !important;
+        }
+
+        p {
+            text-align: left !important;
+        }
+
+        .hero-line {
+            display: none;
+        }
+
+        .cta {
+            justify-content: flex-start !important;
+        }
+
         .site-nav {
             display: flex;
         }
