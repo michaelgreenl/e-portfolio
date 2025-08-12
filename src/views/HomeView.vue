@@ -14,10 +14,7 @@
             </p>
             <div class="cta">
                 <button>Contact</button>
-                <button>
-                    Resume/CV
-                    <DownloadIcon />
-                </button>
+                <DownloadResumeBtn />
             </div>
         </div>
         <div class="site-nav">
@@ -38,7 +35,7 @@
 
 <script setup>
 import { useRouteStore } from '../stores/routeStore.js';
-import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
+import DownloadResumeBtn from '../components/DownloadResumeBtn.vue';
 import BlogIcon from '../components/SVGs/BlogIcon.vue';
 
 const routeStore = useRouteStore();
