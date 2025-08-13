@@ -25,10 +25,6 @@
                     <span>{{ route.meta.title }}</span>
                 </button>
             </div>
-            <button>
-                <BlogIcon class="icon" />
-                My Blog
-            </button>
         </div>
     </div>
 </template>
@@ -236,7 +232,7 @@ const routeStore = useRouteStore();
         justify-content: flex-end;
         align-items: center;
         flex-wrap: wrap-reverse;
-        width: 90%;
+        width: 80%;
 
         .nav-line {
             border: 0;
@@ -329,7 +325,7 @@ const routeStore = useRouteStore();
 
     @include bp-md-tablet {
         align-items: flex-start;
-        padding: $size-13 $size-10 0 $size-12;
+        padding: $size-13 $size-12 0;
 
         h1 {
             padding: 0 !important;
