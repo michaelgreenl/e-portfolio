@@ -27,10 +27,10 @@ $secondary-font-stack:
     'Segoe UI Emoji',
     'Segoe UI Symbol';
 
-// ---------- COLORS ----------
-// GLOBAL
+// ---------- colors ----------
+// global
 :root {
-    // Grayscale palette
+    // grayscale palette
     --color-white: #fff;
     --color-gray1: #f8f9fa;
     --color-gray2: #e9ecef;
@@ -44,46 +44,46 @@ $secondary-font-stack:
     --color-black: #000;
 }
 
-// LIGHT-MODE
+// light-mode
 [data-theme='light'] {
-    // Primary
+    // primary
     --color-primary: #6b8f9e;
     --color-primary-light: #a0b0b8;
     --color-primary-dark: #5a6a70;
     --color-primary-darker: #3d505c;
 
-    // Accent
+    // accent
     --color-accent: var(--color-gray4);
     --color-accent-light: var(--color-gray3);
     --color-accent-dark: var(--color-gray5);
 
-    // Background
+    // background
     --color-bg-primary: var(--color-gray3);
     --color-bg-secondary: var(--color-primary);
 
-    // Text
+    // text
     --color-text-primary: var(--color-gray8);
     --color-text-secondary: var(--color-gray6);
     --color-text-muted: var(--color-gray5);
 }
 
-// DARK-MODE
+// dark-mode
 [data-theme='dark'] {
-    // Primary
+    // primary
     --color-primary: #6b8f9e;
     --color-primary-light: #b2cfd7;
     --color-primary-dark: #5a6a70;
 
-    // Accent
+    // accent
     --color-accent: var(--color-gray5);
     --color-accent-light: var(--color-gray4);
     --color-accent-dark: var(--color-gray6);
 
-    // Background
+    // background
     --color-bg-primary: var(--color-gray9);
     --color-bg-secondary: var(--color-gray8);
 
-    // Text
+    // text
     --color-text-primary: var(--color-gray4);
     --color-text-secondary: var(--color-gray5);
     --color-text-muted: var(--color-gray7);
