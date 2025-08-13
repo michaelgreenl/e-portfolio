@@ -1,8 +1,8 @@
 <template>
-    <button>
+    <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
         Resume/CV
         <DownloadIcon />
-    </button>
+    </a>
 </template>
 
 <script setup>
@@ -10,7 +10,7 @@ import DownloadIcon from './SVGs/DownloadIcon.vue';
 </script>
 
 <style lang="scss" scoped>
-button {
+a {
     display: flex;
     gap: $size-2;
     align-items: center;
@@ -18,7 +18,8 @@ button {
     padding: $size-2 $size-4;
     font-family: $primary-font-stack;
     font-size: 1em;
-    font-weight: 500;
+    font-weight: 400;
+    text-decoration: none;
     background: transparent;
     border-radius: 12px;
 
