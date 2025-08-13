@@ -2,7 +2,7 @@
     <Navbar />
 
     <transition name="page" mode="out-in">
-        <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
+        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
     </transition>
 </template>
 

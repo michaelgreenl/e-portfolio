@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, markRaw } from 'vue';
+import { ref, markRaw, computed } from 'vue';
 import HomeView from '../views/HomeView.vue';
 import ProjectsView from '../views/ProjectsView.vue';
 import ExperienceView from '../views/ExperienceView.vue';
@@ -32,37 +32,71 @@ export const useRouteStore = defineStore('router', () => {
         },
     };
 
-    const getInitialRoute = () => {
-        const hash = window.location.hash.slice(1); // Remove #
-        return routes[hash] ? hash : 'home';
-    };
-
-    const activeRoute = ref(getInitialRoute());
     const DEFAULT_TITLE = 'M. Green';
 
+    // Helper to parse a path string into base and params
+    function parsePath(path) {
+        const parts = path.split('/');
+        const base = parts[0] || 'home';
+        const params = { id: parts[1] || null }; // Assumes one param (id) for simplicity
+        return { base, params };
+    }
+
+    // Get initial path from hash, default to 'home'
+    function getInitialPath() {
+        const hash = window.location.hash.slice(1);
+        if (!hash) return 'home';
+        const { base } = parsePath(hash);
+        return routes[base] ? hash : 'home'; // Redirect invalid base to home
+    }
+
+    const activePath = ref(getInitialPath());
+
+    // Computed current route details
+    const currentRoute = computed(() => {
+        const { base, params } = parsePath(activePath.value);
+        return {
+            base,
+            params,
+            component: routes[base]?.component,
+            meta: routes[base]?.meta,
+        };
+    });
+
+    // Navigate to a new path
     function toRoute(to) {
-        activeRoute.value = to;
+        const { base } = parsePath(to);
+        if (!routes[base]) {
+            to = 'home'; // Redirect invalid routes
+        }
+        activePath.value = to;
         window.location.hash = to;
 
         let title = DEFAULT_TITLE;
-        title += ' | ' + routes[to].meta.title;
+        if (routes[base]?.meta?.title) {
+            title += ' | ' + routes[base].meta.title;
+        }
         document.title = title;
     }
 
     // Listen for browser back/forward buttons
     window.addEventListener('hashchange', () => {
-        const newRoute = getInitialRoute();
-        if (newRoute !== activeRoute.value) {
-            activeRoute.value = newRoute;
+        const newPath = getInitialPath();
+        if (newPath !== activePath.value) {
+            activePath.value = newPath;
+            const { base } = parsePath(newPath);
             let title = DEFAULT_TITLE;
-            title += ' | ' + routes[newRoute].meta.title;
+            if (routes[base]?.meta?.title) {
+                title += ' | ' + routes[base].meta.title;
+            }
             document.title = title;
         }
     });
 
+    // Set initial hash if missing
     if (!window.location.hash) {
-        window.location.hash = activeRoute.value;
+        window.location.hash = activePath.value;
     }
 
-    return { routes, activeRoute, toRoute };
+    return { routes, activePath, currentRoute, toRoute };
 });

@@ -1,14 +1,14 @@
 <template>
     <header>
         <Logo />
-        <nav v-if="routeStore.activeRoute !== 'home'" class="nav-desktop">
+        <nav v-if="routeStore.activePath !== 'home'" class="nav-desktop">
             <button
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
                 @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.activeRoute === key }"
+                :class="{ active: routeStore.activePath === key }"
             >
-                <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
+                <component :is="route.meta.iconFill" v-if="routeStore.activePath === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.meta.title }}
             </button>
@@ -36,9 +36,9 @@
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
                 @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.activeRoute === key }"
+                :class="{ active: routeStore.activePath === key }"
             >
-                <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
+                <component :is="route.meta.iconFill" v-if="routeStore.activePath === key" class="icon" />
                 <span>{{ route.meta.title }}</span>
             </button>
         </nav>
