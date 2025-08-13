@@ -13,8 +13,11 @@
                 english now.
             </p>
             <div class="cta">
-                <button @click="routeStore.toRoute('contact')">Contact</button>
-                <DownloadResumeBtn />
+                <button @click="routeStore.toRoute('contact')" class="cta-button">Contact</button>
+                <a href="files/blank-resume.pdf" download="files/blank-resume.pdf" class="cta-button">
+                    Resume/CV
+                    <DownloadIcon />
+                </a>
             </div>
         </div>
         <div class="site-nav">
@@ -31,8 +34,8 @@
 
 <script setup>
 import { useRouteStore } from '../stores/routeStore.js';
-import DownloadResumeBtn from '../components/DownloadResumeBtn.vue';
 import BlogIcon from '../components/SVGs/BlogIcon.vue';
+import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
 
 const routeStore = useRouteStore();
 </script>
@@ -146,9 +149,9 @@ const routeStore = useRouteStore();
             gap: $size-4;
             margin-top: $size-2;
 
-            button {
+            .cta-button {
                 display: flex;
-                gap: $size-2;
+                gap: 0.3em;
                 align-items: center;
                 justify-content: center;
                 padding: $size-2 $size-4;
@@ -206,7 +209,7 @@ const routeStore = useRouteStore();
                 }
             }
 
-            button:first-child {
+            .cta-button:first-child {
                 color: $color-bg-primary;
 
                 @include theme-dark {
@@ -218,7 +221,7 @@ const routeStore = useRouteStore();
                 }
             }
 
-            button:last-child {
+            .cta-button:last-child {
                 // Fix for odd spacing effect happening with icon
                 padding-right: 0.95em;
             }
