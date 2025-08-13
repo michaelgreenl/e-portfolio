@@ -13,7 +13,7 @@
                 english now.
             </p>
             <div class="cta">
-                <button>Contact</button>
+                <button @click="routeStore.toRoute('contact')">Contact</button>
                 <DownloadResumeBtn />
             </div>
         </div>
@@ -158,7 +158,8 @@ const routeStore = useRouteStore();
                 padding: $size-2 $size-4;
                 font-family: $primary-font-stack;
                 font-size: 1em;
-                font-weight: 500;
+                font-weight: 400;
+                letter-spacing: 0.1ch;
                 background: transparent;
                 border-radius: 12px;
 
