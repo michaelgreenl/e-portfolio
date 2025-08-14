@@ -1,6 +1,11 @@
 <template>
     <div class="home-container">
-        <div class="hero-content">
+        <div
+            class="hero-content"
+            v-motion
+            :initial="{ x: -100, opacity: 0 }"
+            :enter="{ x: 0, opacity: 1, transition: { duration: 100, ease: 'easeOut' } }"
+        >
             <h3>Hi 👋, my name is</h3>
             <h1>
                 Michael
@@ -21,10 +26,21 @@
             </div>
         </div>
         <div class="site-nav">
-            <hr class="nav-line" />
-            <div v-for="(route, key) in routeStore.routes" :key="key">
+            <hr
+                class="nav-line"
+                v-motion
+                :initial="{ opacity: 0, scaleX: 0 }"
+                :enter="{ opacity: 1, scaleX: 1, transition: { duration: 200, easing: 'easeIn', delay: 50 } }"
+            />
+            <div
+                v-for="(route, key, i) in routeStore.routes"
+                :key="key"
+                v-motion
+                :initial="{ opacity: 0, x: 50 }"
+                :enter="{ opacity: 1, x: 0, scale: 1, transition: { duration: 100, easing: 'easeIn', delay: 100 * i } }"
+            >
                 <button v-if="key !== 'home'" @click="routeStore.toRoute(key)">
-                    <component :is="route.meta.iconFill" class="icon" />
+                    <component :is="route.meta.icon" class="icon" />
                     <span>{{ route.meta.title }}</span>
                 </button>
             </div>
@@ -33,8 +49,8 @@
 </template>
 
 <script setup>
+import { useMotions } from '@vueuse/motion';
 import { useRouteStore } from '../stores/routeStore.js';
-import BlogIcon from '../components/SVGs/BlogIcon.vue';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
 
 const routeStore = useRouteStore();
