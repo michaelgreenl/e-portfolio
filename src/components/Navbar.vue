@@ -1,19 +1,42 @@
 <template>
     <header>
-        <Logo />
-        <nav v-if="routeStore.activePath !== 'home'" class="nav-desktop">
+        <Logo
+            v-motion
+            :initial="{ opacity: 0 }"
+            :enter="{
+                opacity: 1,
+                transition: { duration: 200, easing: 'easeIn' },
+            }"
+        />
+        <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
-                v-for="(route, key) in routeStore.routes"
+                v-for="(route, key, i) in routeStore.routes"
                 :key="key"
                 @click="routeStore.toRoute(key)"
                 :class="{ active: routeStore.currentRoute.base === key }"
+                v-motion
+                :initial="{ opacity: 0, x: -50, scaleX: 0.5 }"
+                :enter="{
+                    opacity: 1,
+                    x: 0,
+                    scaleX: 1,
+                    transition: { duration: 100, easing: 'easeIn', delay: 100 * i },
+                }"
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.meta.title }}
             </button>
         </nav>
-        <label class="theme-toggle">
+        <label
+            class="theme-toggle"
+            v-motion
+            :initial="{ opacity: 0 }"
+            :enter="{
+                opacity: 1,
+                transition: { duration: 100, easing: 'easeIn' },
+            }"
+        >
             <input
                 class="toggle-input"
                 type="checkbox"
@@ -36,7 +59,7 @@
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
                 @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.routeStore.currentRoute.base === key }"
+                :class="{ active: routeStore.currentRoute.base === key }"
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <span>{{ route.meta.title }}</span>
@@ -46,9 +69,10 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
 import { useThemeStore } from '../stores/themeStore.js';
-import { ref, onMounted } from 'vue';
+import { useMotions } from '@vueuse/motion';
 
 import MoonIcon from '../components/SVGs/MoonIcon.vue';
 import SunIcon from '../components/SVGs/SunIcon.vue';
