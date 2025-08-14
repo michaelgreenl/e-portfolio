@@ -6,9 +6,9 @@
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
                 @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.activePath === key }"
+                :class="{ active: routeStore.currentRoute.base === key }"
             >
-                <component :is="route.meta.iconFill" v-if="routeStore.activePath === key" class="icon" />
+                <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.meta.title }}
             </button>
@@ -36,9 +36,9 @@
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
                 @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.activePath === key }"
+                :class="{ active: routeStore.routeStore.currentRoute.base === key }"
             >
-                <component :is="route.meta.iconFill" v-if="routeStore.activePath === key" class="icon" />
+                <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <span>{{ route.meta.title }}</span>
             </button>
         </nav>
