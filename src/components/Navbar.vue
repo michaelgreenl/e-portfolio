@@ -53,7 +53,12 @@
             </div>
         </label>
     </header>
-    <nav class="nav-mobile">
+    <nav
+        class="nav-mobile"
+        v-motion
+        :initial="{ y: 150, scaleX: 0 }"
+        :enter="{ y: 0, scaleX: 1, transition: { duration: 100, easing: 'easeIn' } }"
+    >
         <button
             v-for="(route, key) in routeStore.routes"
             :key="key"
