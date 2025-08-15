@@ -12,8 +12,8 @@
             <button
                 v-for="(route, key, i) in routeStore.routes"
                 :key="key"
-                @click="routeStore.toRoute(key)"
                 :class="{ active: routeStore.currentRoute.base === key }"
+                @click="routeStore.toRoute(key)"
                 v-motion
                 :initial="{ opacity: 0, x: -50, scaleX: 0.5 }"
                 :enter="{
@@ -53,23 +53,21 @@
             </div>
         </label>
     </header>
-    <Transition name="slide-up">
-        <nav v-if="showMobileNav" class="nav-mobile">
-            <button
-                v-for="(route, key) in routeStore.routes"
-                :key="key"
-                @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.currentRoute.base === key }"
-            >
-                <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
-                <span>{{ route.meta.title }}</span>
-            </button>
-        </nav>
-    </Transition>
+    <nav class="nav-mobile">
+        <button
+            v-for="(route, key) in routeStore.routes"
+            :key="key"
+            @click="routeStore.toRoute(key)"
+            :class="{ active: routeStore.currentRoute.base === key }"
+        >
+            <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
+            <span>{{ route.meta.title }}</span>
+        </button>
+    </nav>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
 import { useThemeStore } from '../stores/themeStore.js';
 import { useMotions } from '@vueuse/motion';
@@ -80,22 +78,6 @@ import Logo from '../components/Logo.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
-
-const showMobileNav = ref(false);
-
-onMounted(() => {
-    let theme = localStorage.getItem('THEME');
-
-    if (theme === null) {
-        localStorage.setItem('THEME', 'dark');
-        theme = 'dark';
-    }
-
-    themeStore.theme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-
-    showMobileNav.value = true;
-});
 </script>
 
 <style lang="scss" scoped>
@@ -116,17 +98,6 @@ onMounted(() => {
 .icon-leave-from {
     opacity: 1;
     transform: rotate(0deg);
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-    transition: all 0.3s ease;
-}
-
-.slide-up-enter-from,
-.slide-up-leave-to {
-    opacity: 0;
-    transform: translateY(100px);
 }
 
 .nav-mobile {
