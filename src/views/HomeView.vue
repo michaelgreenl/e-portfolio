@@ -88,10 +88,7 @@ const routeStore = useRouteStore();
 
         h1 {
             font-size: 5.1em;
-            font-family: $primary-font-stack;
-            font-weight: 600;
             line-height: 0.8ch;
-            color: $color-primary-darker;
             padding-bottom: $size-1;
 
             span {
@@ -105,26 +102,13 @@ const routeStore = useRouteStore();
                     color: $color-primary;
                 }
             }
-
-            @include theme-light {
-                text-shadow: 0px 3px 5px #00000025;
-            }
         }
 
         h2 {
             font-size: 1.9em;
-            font-weight: 400;
             border-right: solid 2px $color-text-primary;
             width: fit-content;
             margin: 0 auto;
-
-            @include theme-dark {
-                color: $color-primary-light;
-            }
-
-            @include theme-light {
-                color: $color-primary-darker;
-            }
         }
 
         h2,
@@ -133,17 +117,12 @@ const routeStore = useRouteStore();
         }
 
         h3 {
-            color: $color-primary-darker;
-            font-family: $primary-font-stack;
-            font-weight: 400;
             margin: 0 2px $size-2;
         }
 
         p {
             font-size: 1.1em;
             max-width: 45ch;
-            color: $color-text-secondary;
-            font-family: $secondary-font-stack;
             margin: 0 auto;
         }
 

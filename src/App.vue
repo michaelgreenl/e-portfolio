@@ -29,6 +29,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+@use './assets/styles/_variables.scss';
 @use './assets/styles/_base.scss';
 
 * {
@@ -58,5 +59,38 @@ body,
 .page-leave-to {
     opacity: 0;
     transform: translateX(-30px);
+}
+
+h1 {
+    font-family: $primary-font-stack;
+    font-weight: 600;
+    color: $color-primary-darker;
+
+    @include theme-light {
+        text-shadow: 0px 3px 5px #00000025;
+    }
+}
+
+h2 {
+    font-weight: 400;
+
+    @include theme-dark {
+        color: $color-primary-light;
+    }
+
+    @include theme-light {
+        color: $color-primary-darker;
+    }
+}
+
+h3 {
+    color: $color-primary-darker;
+    font-family: $primary-font-stack;
+    font-weight: 400;
+}
+
+p {
+    color: $color-text-secondary;
+    font-family: $secondary-font-stack;
 }
 </style>
