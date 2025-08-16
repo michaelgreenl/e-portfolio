@@ -18,10 +18,17 @@
                 english now.
             </p>
             <div class="cta">
-                <button @click="routeStore.toRoute('contact')" class="cta-button">Contact</button>
-                <a href="files/blank-resume.pdf" download="files/blank-resume.pdf" class="cta-button">
-                    Resume/CV
-                    <DownloadIcon />
+                <Button
+                    :onClick="
+                        () => {
+                            routeStore.toRoute('contact');
+                        }
+                    "
+                    text="Contact"
+                    type="secondary"
+                />
+                <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
+                    <Button text="Resume/CV" :iconRight="DownloadIcon" />
                 </a>
             </div>
         </div>
@@ -55,6 +62,7 @@
 <script setup>
 import { useMotions } from '@vueuse/motion';
 import { useRouteStore } from '../stores/routeStore.js';
+import Button from '../components/Button.vue';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
 
 const routeStore = useRouteStore();
@@ -147,83 +155,6 @@ const routeStore = useRouteStore();
             justify-content: center;
             gap: $size-4;
             margin-top: $size-2;
-
-            .cta-button {
-                display: flex;
-                gap: 0.3em;
-                align-items: center;
-                justify-content: center;
-                padding: $size-2 $size-4;
-                font-family: $primary-font-stack;
-                font-size: 1em;
-                font-weight: 400;
-                letter-spacing: 0.1ch;
-                background: transparent;
-                border-radius: 12px;
-
-                svg {
-                    height: $size-4;
-                }
-
-                @include theme-dark {
-                    color: $color-text-primary;
-                    border: solid 2px $color-text-primary;
-
-                    svg {
-                        fill: $color-text-primary;
-                    }
-                }
-
-                @include theme-light {
-                    color: $color-primary-darker;
-                    border: solid 2px $color-primary-darker;
-
-                    svg {
-                        fill: $color-primary-darker;
-                    }
-                }
-
-                @include interactive {
-                    color: $color-bg-primary;
-
-                    @include theme-dark {
-                        background: $color-text-primary;
-
-                        svg {
-                            fill: $color-bg-primary;
-                        }
-                    }
-
-                    @include theme-light {
-                        background: $color-primary-darker;
-
-                        svg {
-                            fill: $color-bg-primary;
-                        }
-                    }
-                }
-
-                &:active {
-                    transform: scale(0.9);
-                }
-            }
-
-            .cta-button:first-child {
-                color: $color-bg-primary;
-
-                @include theme-dark {
-                    background: $color-text-primary;
-                }
-
-                @include theme-light {
-                    background: $color-primary-darker;
-                }
-            }
-
-            .cta-button:last-child {
-                // Fix for odd spacing effect happening with icon
-                padding-right: 0.95em;
-            }
         }
     }
 
@@ -332,6 +263,7 @@ const routeStore = useRouteStore();
         h1 {
             padding: 0 !important;
         }
+
         h2,
         p {
             margin: 0 !important;
