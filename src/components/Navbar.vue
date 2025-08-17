@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
 import { useThemeStore } from '../stores/themeStore.js';
 import { useMotions } from '@vueuse/motion';
@@ -83,10 +83,6 @@ import Logo from '../components/Logo.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
-
-onMounted(() => {
-    console.log(routeStore.currentRoute);
-});
 </script>
 
 <style lang="scss" scoped>
@@ -135,7 +131,7 @@ onMounted(() => {
         color: $color-accent;
         background-color: transparent;
         border: 0;
-        border-radius: $size-3;
+        border-radius: $size-4;
 
         .icon {
             display: none;
@@ -365,18 +361,14 @@ header {
             gap: $size-2;
 
             .icon {
-                display: block;
+                display: flex;
                 height: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
             }
 
-            // span {
-            //     font-size: clamp(0.9em, 3.7vw, 1em);
-            // }
-
             span {
-                font-size: 1em;
+                font-size: clamp(0.9em, 3.7vw, 1em);
             }
 
             &.active {
