@@ -371,8 +371,12 @@ header {
                 stroke: $color-accent;
             }
 
+            // span {
+            //     font-size: clamp(0.9em, 3.7vw, 1em);
+            // }
+
             span {
-                font-size: clamp(0.9em, 3.7vw, 1em);
+                font-size: 1em;
             }
 
             &.active {
