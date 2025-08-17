@@ -18,10 +18,10 @@ defineProps({
         type: String,
     },
     iconLeft: {
-        type: Element,
+        type: Object,
     },
     iconRight: {
-        type: Element,
+        type: Object,
     },
 });
 </script>
