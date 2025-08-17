@@ -73,6 +73,18 @@ $breakpoints: (
     }
 }
 
+@mixin interactive {
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            @content;
+        }
+    }
+
+    &:active {
+        @content;
+    }
+}
+
 // Color variations
 @function lighten-color($color, $percentage) {
     $amount: $percentage;

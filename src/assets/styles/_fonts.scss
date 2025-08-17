@@ -1,13 +1,76 @@
 // ********************
-// ***** Poppins ******
+// ***** Clash Display ******
 // ********************
 
-// @font-face {
-//   font-family: Poppins;
-//   font-style: normal;
-//   font-weight: 100;
-//   src: url('~/assets/fonts/poppins/Poppins-Thin.ttf') format('truetype');
-// }
+@font-face {
+    font-family: ClashDisplay;
+    font-style: normal;
+    font-weight: 200;
+    src:
+        url('../fonts/clashdisplay/ClashDisplay-Extralight.woff2') format('woff2'),
+        url('../fonts/clashdisplay/ClashDisplay-Extralight.woff') format('woff'),
+        url('../fonts/clashdisplay/ClashDisplay-Extralight.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-style: normal;
+    font-weight: 300;
+    src:
+        url('../fonts/clashdisplay/ClashDisplay-Light.woff2') format('woff2'),
+        url('../fonts/clashdisplay/ClashDisplay-Light.woff') format('woff'),
+        url('../fonts/clashdisplay/ClashDisplay-Light.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-style: normal;
+    font-weight: 400;
+    src:
+        url('../fonts/clashdisplay/ClashDisplay-Regular.woff2') format('woff2'),
+        url('../fonts/clashdisplay/ClashDisplay-Regular.woff') format('woff'),
+        url('../fonts/clashdisplay/ClashDisplay-Regular.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-style: normal;
+    font-weight: 500;
+    src:
+        url('../fonts/clashdisplay/ClashDisplay-Medium.woff2') format('woff2'),
+        url('../fonts/clashdisplay/ClashDisplay-Medium.woff') format('woff'),
+        url('../fonts/clashdisplay/ClashDisplay-Medium.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-style: normal;
+    font-weight: 600;
+    src:
+        url('../fonts/clashdisplay/ClashDisplay-Semibold.woff2') format('woff2'),
+        url('../fonts/clashdisplay/ClashDisplay-Semibold.woff') format('woff'),
+        url('../fonts/clashdisplay/ClashDisplay-Semibold.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-style: normal;
+    font-weight: 700;
+    src:
+        url('../fonts/clashdisplay/ClashDisplay-Bold.woff2') format('woff2'),
+        url('../fonts/clashdisplay/ClashDisplay-Bold.woff') format('woff'),
+        url('../fonts/clashdisplay/ClashDisplay-Bold.ttf') format('truetype');
+    font-display: swap;
+}
+
+// ********************
+// ***** Poppins ******
+// ********************
 
 @font-face {
     font-family: Poppins;
@@ -119,15 +182,4 @@
     font-style: italic;
     font-weight: 800;
     src: url('../fonts/poppins/Poppins-BlackItalic.ttf') format('truetype');
-}
-
-// ********************
-// ***** Michroma ******
-// ********************
-
-@font-face {
-    font-family: Michroma;
-    font-style: normal;
-    font-weight: 400;
-    src: url('../fonts/michroma/Michroma-Regular.ttf') format('truetype');
 }

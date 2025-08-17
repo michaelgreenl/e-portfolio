@@ -1,18 +1,42 @@
 <template>
     <header>
-        <nav class="nav-desktop">
+        <Logo
+            v-motion
+            :initial="{ opacity: 0 }"
+            :enter="{
+                opacity: 1,
+                transition: { duration: 200, easing: 'easeIn' },
+            }"
+        />
+        <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
-                v-for="(route, key) in routeStore.routes"
+                v-for="(route, key, i) in routeStore.routes"
                 :key="key"
+                :class="{ active: routeStore.currentRoute.base === key }"
                 @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.activeRoute === key }"
+                v-motion
+                :initial="{ opacity: 0, x: -50, scaleX: 0.5 }"
+                :enter="{
+                    opacity: 1,
+                    x: 0,
+                    scaleX: 1,
+                    transition: { duration: 100, easing: 'easeIn', delay: 100 * i },
+                }"
             >
-                <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
+                <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.meta.title }}
             </button>
         </nav>
-        <label class="theme-toggle">
+        <label
+            class="theme-toggle"
+            v-motion
+            :initial="{ opacity: 0 }"
+            :enter="{
+                opacity: 1,
+                transition: { duration: 100, easing: 'easeIn' },
+            }"
+        >
             <input
                 class="toggle-input"
                 type="checkbox"
@@ -29,47 +53,36 @@
             </div>
         </label>
     </header>
-    <Transition name="slide-up">
-        <nav v-if="showMobileNav" class="nav-mobile">
-            <button
-                v-for="(route, key) in routeStore.routes"
-                :key="key"
-                @click="routeStore.toRoute(key)"
-                :class="{ active: routeStore.activeRoute === key }"
-            >
-                <component :is="route.meta.iconFill" v-if="routeStore.activeRoute === key" class="icon" />
-                <span>{{ route.meta.title }}</span>
-            </button>
-        </nav>
-    </Transition>
+    <nav
+        class="nav-mobile"
+        v-motion
+        :initial="{ y: 150, scaleX: 0 }"
+        :enter="{ y: 0, scaleX: 1, transition: { duration: 100, easing: 'easeIn' } }"
+    >
+        <button
+            v-for="(route, key) in routeStore.routes"
+            :key="key"
+            @click="routeStore.toRoute(key)"
+            :class="{ active: routeStore.currentRoute.base === key }"
+        >
+            <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
+            <span>{{ route.meta.title }}</span>
+        </button>
+    </nav>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
 import { useThemeStore } from '../stores/themeStore.js';
-import { ref, onMounted } from 'vue';
+import { useMotions } from '@vueuse/motion';
 
 import MoonIcon from '../components/SVGs/MoonIcon.vue';
 import SunIcon from '../components/SVGs/SunIcon.vue';
+import Logo from '../components/Logo.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
-
-const showMobileNav = ref(false);
-
-onMounted(() => {
-    let theme = localStorage.getItem('THEME');
-
-    if (theme === null) {
-        localStorage.setItem('THEME', 'dark');
-        theme = 'dark';
-    }
-
-    themeStore.theme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-
-    showMobileNav.value = true;
-});
 </script>
 
 <style lang="scss" scoped>
@@ -88,64 +101,119 @@ onMounted(() => {
 
 .icon-enter-to,
 .icon-leave-from {
-    transform: rotate(0deg);
     opacity: 1;
+    transform: rotate(0deg);
 }
 
-.slide-up-enter-active,
-.slide-up-leave-active {
-    transition: all 0.3s ease;
-}
+.nav-mobile {
+    position: fixed;
+    z-index: 1;
+    right: $size-2;
+    bottom: $size-2;
+    left: $size-2;
+    display: flex;
+    justify-content: space-between;
+    max-width: 335px;
+    height: $size-10;
+    padding: $size-2;
+    margin: 0 auto;
+    background-color: $color-bg-secondary;
+    border-radius: $size-4;
+    box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
 
-.slide-up-enter-from,
-.slide-up-leave-to {
-    transform: translateY(100px);
-    opacity: 0;
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: $size-2 $size-3;
+        font-family: $primary-font-stack;
+        font-weight: 600;
+        color: $color-accent;
+        background-color: transparent;
+        border: 0;
+        border-radius: $size-3;
+
+        .icon {
+            display: none;
+        }
+
+        span {
+            font-size: clamp(0.4em, 4vw, 1em);
+        }
+
+        &.active {
+            @include theme-dark {
+                color: $color-primary-light;
+            }
+
+            @include theme-light {
+                color: $color-gray2;
+            }
+        }
+
+        &.active,
+        &:active {
+            background-color: lighten-color($color-bg-secondary, 10%);
+            box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+        }
+    }
 }
 
 .nav-desktop {
     display: none;
-    gap: 0.8em;
+    gap: $size-3;
 
     button {
         position: relative;
-        display: flex;
-        align-items: center;
-        gap: 0.6em;
-        font-weight: 500;
+        font-size: 0.85em;
         font-family: $primary-font-stack;
+        font-weight: 500;
+        display: flex;
+        gap: $size-3;
+        align-items: center;
+        padding: $size-3 $size-5;
         background-color: transparent;
         border: 0;
-        font-size: 0.85em;
-        color: $color-text-primary;
-        padding: 0.75em 1.1em;
-        border-radius: 12px;
+        border-radius: $size-3;
 
         @include theme-dark {
             color: $color-text-primary;
         }
 
         @include theme-light {
-            font-weight: 600;
-            color: $color-primary;
+            color: $color-primary-darker;
         }
 
-        &::after {
-            content: '';
-            position: absolute;
-            left: 0.5em;
-            bottom: 0;
-            width: 0;
-            height: 2px;
-            transition: width 0.15s ease-in-out;
-            border-radius: 16px;
+        .icon {
+            height: $size-6;
 
             @include theme-dark {
-                background-color: $color-text-primary;
+                fill: $color-text-secondary;
+                stroke: $color-text-secondary;
             }
 
             @include theme-light {
-                background-color: $color-primary;
+                fill: $color-primary-darker;
+                stroke: $color-primary-darker;
+            }
+        }
+
+        &::after {
+            position: absolute;
+            bottom: 0;
+            left: $size-2;
+            width: 0;
+            height: 1px;
+            content: '';
+            border-radius: $size-4;
+            transition: width 0.15s ease-in-out;
+
+            @include theme-dark {
+                background-color: $color-text-secondary;
+            }
+
+            @include theme-light {
+                background-color: $color-primary-darker;
             }
         }
 
@@ -155,7 +223,7 @@ onMounted(() => {
             }
 
             @include theme-light {
-                background-color: lighten-color($color-primary-light, 28%);
+                background-color: #ced8de;
             }
         }
 
@@ -164,49 +232,41 @@ onMounted(() => {
         }
 
         &.active {
-            &:hover {
-                background-color: transparent;
+            .icon {
+                height: $size-6;
+
+                @include theme-dark {
+                    fill: $color-text-secondary;
+                    stroke: $color-text-secondary;
+                }
+
+                @include theme-light {
+                    fill: $color-primary-darker;
+                    stroke: $color-primary-darker;
+                }
             }
 
             &::after {
                 width: 88%;
             }
 
-            .icon {
-                height: 1.4em;
-
-                @include theme-dark {
-                    fill: $color-text-primary;
-                    stroke: $color-text-primary;
-                }
-
-                @include theme-light {
-                    fill: $color-primary;
-                    stroke: $color-primary;
-                }
-            }
-        }
-
-        .icon {
-            height: 1.4em;
-
-            @include theme-dark {
-                fill: $color-text-secondary;
-                stroke: $color-text-secondary;
-            }
-
-            @include theme-light {
-                fill: $color-primary;
-                stroke: $color-primary;
+            &:hover {
+                background-color: transparent;
             }
         }
     }
 }
 
 header {
-    height: 4.5em;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    height: $size-13;
+    padding: 0 $size-2;
 
     @include theme-dark {
         border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
@@ -218,14 +278,21 @@ header {
 
     .theme-toggle {
         display: inline-flex;
+        width: $size-11;
+        height: $size-8;
         padding-left: 0.4em;
-        margin: 1em;
-        width: 3.5em;
-        height: 2em;
-        border-radius: 100px;
-        box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
+        margin: $size-4;
         cursor: pointer;
-        background-color: $color-bg-secondary;
+        border-radius: 100px;
+        box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+
+        @include theme-dark {
+            background-color: $color-bg-secondary;
+        }
+
+        @include theme-light {
+            background-color: $color-primary-darker;
+        }
 
         .toggle-input {
             /* Hide the native checkbox visually but keep it accessible */
@@ -249,9 +316,9 @@ header {
                 position: relative;
 
                 @include theme-dark {
-                    height: 1.25em;
-                    stroke: $color-bg-secondary;
+                    height: $size-5;
                     fill: $color-bg-secondary;
+                    stroke: $color-bg-secondary;
                 }
 
                 @include theme-light {
@@ -266,13 +333,13 @@ header {
             }
 
             &::before {
-                content: '';
                 position: absolute;
-                width: 1.5em;
-                height: 1.5em;
+                content: '';
+                width: $size-6;
+                height: $size-6;
                 border-radius: 100%;
+                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
-                box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
 
                 @include theme-dark {
                     background-color: $color-gray4;
@@ -286,80 +353,29 @@ header {
     }
 }
 
-.nav-mobile {
-    position: fixed;
-    bottom: 0.5em;
-    right: 0.5em;
-    left: 0.5em;
-    max-width: 335px;
-    display: flex;
-    justify-content: space-between;
-    height: 3em;
-    padding: 0.4em;
-    margin: 0 auto;
-    background-color: $color-bg-secondary;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px 5px rgba(0, 0, 0, 0.333);
-
-    button {
-        font-family: $primary-font-stack;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
-        padding: 0.5em 0.8em;
-        border-radius: 12px;
-        background-color: transparent;
-        color: $color-accent;
-
-        .icon {
-            display: none;
-        }
-
-        span {
-            font-size: clamp(0.4em, 3.5vw, 1em);
-        }
-
-        &.active {
-            @include theme-dark {
-                color: $color-primary;
-            }
-
-            @include theme-light {
-                color: $color-gray2;
-            }
-        }
-
-        &.active,
-        &:active {
-            background-color: lighten-color($color-bg-secondary, 10%);
-            box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.333);
-        }
-    }
-}
-
 @include bp-xsm-phone {
     .nav-mobile {
+        font-size: 1.2em;
+
         button {
-            gap: 0.4em;
+            gap: $size-2;
 
             .icon {
                 display: block;
-                height: 100%;
+                height: 69%;
                 fill: $color-accent;
                 stroke: $color-accent;
             }
 
             span {
-                font-size: clamp(0.9em, 3.6vw, 1em);
+                font-size: clamp(0.9em, 3.7vw, 1em);
             }
 
             &.active {
                 .icon {
                     @include theme-dark {
-                        fill: $color-primary;
-                        stroke: $color-primary;
+                        fill: $color-primary-light;
+                        stroke: $color-primary-light;
                     }
 
                     @include theme-light {
@@ -378,9 +394,6 @@ header {
     }
 
     header {
-        padding-left: 1em;
-        justify-content: space-between;
-
         .nav-desktop {
             display: flex;
         }

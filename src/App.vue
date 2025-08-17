@@ -2,18 +2,34 @@
     <Navbar />
 
     <transition name="page" mode="out-in">
-        <component :is="routeStore.routes[`${routeStore.activeRoute}`].component" :key="routeStore.activeRoute" />
+        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
     </transition>
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
+import { useThemeStore } from './stores/themeStore.js';
 import Navbar from './components/Navbar.vue';
 
 const routeStore = useRouteStore();
+const themeStore = useThemeStore();
+
+onMounted(() => {
+    let theme = localStorage.getItem('THEME');
+
+    if (theme === null) {
+        localStorage.setItem('THEME', 'dark');
+        theme = 'dark';
+    }
+
+    themeStore.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+});
 </script>
 
 <style lang="scss">
+@use './assets/styles/_variables.scss';
 @use './assets/styles/_base.scss';
 
 * {
@@ -23,11 +39,11 @@ const routeStore = useRouteStore();
 html,
 body,
 #app {
-    font-family: $primary-font-stack;
     height: 100%;
     padding: 0;
     margin: 0;
-    background-color: var(--color-bg-primary);
+    font-family: $primary-font-stack;
+    background-color: $color-bg-primary;
 }
 
 .page-enter-active,
@@ -43,5 +59,38 @@ body,
 .page-leave-to {
     opacity: 0;
     transform: translateX(-30px);
+}
+
+h1 {
+    font-family: $primary-font-stack;
+    font-weight: 600;
+    color: $color-primary-darker;
+
+    @include theme-light {
+        text-shadow: 0px 3px 5px #00000025;
+    }
+}
+
+h2 {
+    font-weight: 400;
+
+    @include theme-dark {
+        color: $color-primary-light;
+    }
+
+    @include theme-light {
+        color: $color-primary-darker;
+    }
+}
+
+h3 {
+    color: $color-primary-darker;
+    font-family: $primary-font-stack;
+    font-weight: 400;
+}
+
+p {
+    color: $color-text-secondary;
+    font-family: $secondary-font-stack;
 }
 </style>
