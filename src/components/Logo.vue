@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p>
+        <h1>
             <span>M</span>
             <span>G</span>
-        </p>
+        </h1>
     </div>
 </template>
 
@@ -13,7 +13,7 @@ div {
     padding-left: 1em;
     font-family: $primary-font-stack;
 
-    p {
+    h1 {
         position: relative;
         font-size: 2em;
         font-weight: 600;
@@ -37,6 +37,7 @@ div {
             z-index: 1;
 
             @include theme-dark {
+                // color: $color-gray5;
                 color: $color-primary-light;
             }
 
