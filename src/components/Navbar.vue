@@ -356,11 +356,10 @@ header {
 @include bp-xsm-phone {
     .nav-mobile {
         font-size: 1.2em;
-        line-height: 1;
 
         button {
+            font-size: 0.7em;
             gap: $size-2;
-            line-height: 1;
 
             .icon {
                 display: inline-block;
