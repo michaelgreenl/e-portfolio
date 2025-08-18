@@ -46,7 +46,7 @@ button {
 
     @include theme-dark {
         color: $color-text-primary;
-        border: solid 2px $color-text-primary;
+        border: solid 1px $color-text-primary;
 
         svg {
             fill: $color-text-primary;
@@ -55,7 +55,7 @@ button {
 
     @include theme-light {
         color: $color-primary-darker;
-        border: solid 2px $color-primary-darker;
+        border: solid 1px $color-primary-darker;
 
         svg {
             fill: $color-primary-darker;
