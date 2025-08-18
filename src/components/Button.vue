@@ -55,10 +55,13 @@ button {
 
     @include theme-light {
         color: $color-primary-darker;
-        border: solid 1px $color-primary-darker;
+        border: solid 2px $color-primary-darker;
+        font-weight: 500;
 
         svg {
             fill: $color-primary-darker;
+            stroke-width: 1px;
+            stroke: $color-primary-darker;
         }
     }
 
@@ -78,6 +81,7 @@ button {
 
             svg {
                 fill: $color-bg-primary;
+                stroke: $color-bg-primary;
             }
         }
     }
