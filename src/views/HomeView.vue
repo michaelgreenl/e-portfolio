@@ -1,3 +1,12 @@
+<script setup>
+import { useMotions } from '@vueuse/motion';
+import { useRouteStore } from '../stores/routeStore.js';
+import Button from '../components/Button.vue';
+import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
+
+const routeStore = useRouteStore();
+</script>
+
 <template>
     <div class="home-container">
         <div
@@ -11,7 +20,12 @@
                 Michael
                 <span> Green </span>
             </h1>
-            <hr class="hero-line" />
+            <hr
+                class="hero-line"
+                v-motion
+                :initial="{ opacity: 0, scaleX: 0 }"
+                :enter="{ opacity: 1, scaleX: 1, transition: { duration: 200, easing: 'easeIn', delay: 50 } }"
+            />
             <h2>Full-Stack Developer</h2>
             <p>
                 Hello, I am a software engineer with a passion for solving problems. I am writing this in normal a a
@@ -25,10 +39,10 @@
                         }
                     "
                     text="Contact"
-                    type="secondary"
+                    preset="primary primary-accent"
                 />
                 <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
-                    <Button text="Resume/CV" :iconRight="DownloadIcon" />
+                    <Button text="Resume/CV" :iconRight="DownloadIcon" preset="primary" />
                 </a>
             </div>
         </div>
@@ -50,23 +64,22 @@
                     transition: { duration: 100, easing: 'easeIn', delay: 100 * i },
                 }"
             >
-                <button v-if="key !== 'home'" @click="routeStore.toRoute(key)">
-                    <component :is="route.meta.icon" class="icon" />
-                    <span>{{ route.meta.title }}</span>
-                </button>
+                <Button
+                    v-if="key !== 'home'"
+                    :onClick="
+                        () => {
+                            routeStore.toRoute(key);
+                        }
+                    "
+                    :text="route.meta.title"
+                    :iconLeft="route.meta.icon"
+                    :iconLeftFill="route.meta.iconFill"
+                    preset="secondary"
+                />
             </div>
         </div>
     </div>
 </template>
-
-<script setup>
-import { useMotions } from '@vueuse/motion';
-import { useRouteStore } from '../stores/routeStore.js';
-import Button from '../components/Button.vue';
-import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
-
-const routeStore = useRouteStore();
-</script>
 
 <style lang="scss" scoped>
 .home-container {
@@ -75,7 +88,8 @@ const routeStore = useRouteStore();
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    width: 100%;
+    flex-grow: 1;
     padding: 0 $size-4;
     max-width: 400px;
     margin: 0 auto;
@@ -175,59 +189,8 @@ const routeStore = useRouteStore();
         }
 
         button {
-            position: relative;
             font-size: 1.2em;
-            font-family: $primary-font-stack;
-            display: flex;
-            align-items: center;
-            gap: $size-2;
-            background: transparent;
-            border: 0;
-            border-radius: 12px;
-
-            @include theme-dark {
-                color: $color-text-primary;
-            }
-
-            @include theme-light {
-                color: $color-primary-darker;
-            }
-
-            .icon {
-                height: $size-5;
-
-                @include theme-dark {
-                    fill: lighten-color($color-text-muted, 10%);
-                }
-
-                @include theme-light {
-                    fill: $color-primary-darker;
-                }
-            }
-
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: -6px;
-                left: 1.9em;
-                right: 100%;
-                height: 1px;
-                transition: all 0.3s ease;
-
-                @include theme-dark {
-                    background-color: $color-text-secondary;
-                }
-
-                @include theme-light {
-                    background-color: $color-primary-darker;
-                }
-            }
-
-            @include interactive {
-                &::after {
-                    right: 0;
-                }
-            }
+            padding: 0 $size-1;
         }
     }
 
@@ -258,7 +221,7 @@ const routeStore = useRouteStore();
 
     @include bp-md-tablet {
         align-items: flex-start;
-        padding: $size-13 $size-12 0;
+        padding: 0 $size-12;
 
         h1 {
             padding: 0 !important;
