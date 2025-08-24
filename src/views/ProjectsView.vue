@@ -134,7 +134,7 @@ const activeProject = computed(() => {
     align-items: center;
     flex-grow: 1;
     width: 100%;
-    padding: 4em 1em 1em;
+    padding: 4em 0 1em;
     color: $color-text-primary;
 
     h1,
@@ -192,7 +192,7 @@ const activeProject = computed(() => {
         flex-direction: column;
         height: 100%;
         width: 100%;
-        padding: $size-4;
+        padding: $size-5;
 
         .project-card {
             cursor: pointer;
@@ -200,7 +200,7 @@ const activeProject = computed(() => {
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: $size-8 0;
+            padding: $size-8;
 
             @include theme-dark {
                 border-top: solid 1px lighten-color($color-bg-primary, 2.5%);
