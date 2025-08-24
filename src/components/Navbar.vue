@@ -131,7 +131,7 @@ const themeStore = useThemeStore();
         color: $color-accent;
         background-color: transparent;
         border: 0;
-        border-radius: $size-3;
+        border-radius: $size-4;
 
         .icon {
             display: none;
@@ -354,11 +354,13 @@ header {
         font-size: 1.2em;
 
         button {
+            font-size: 0.7em;
             gap: $size-2;
 
             .icon {
-                display: block;
-                height: 69%;
+                display: inline-block;
+                height: $size-6;
+                width: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
             }

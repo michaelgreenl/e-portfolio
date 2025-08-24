@@ -74,6 +74,7 @@ $secondary-font-stack:
     --color-primary: #6b8f9e;
     --color-primary-light: #b2cfd7;
     --color-primary-dark: #5a6a70;
+    --color-primary-darker: var(--color-gray4);
 
     // accent
     --color-accent: var(--color-gray5);
