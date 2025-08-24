@@ -170,16 +170,6 @@ const activeProject = computed(() => {
         padding: 0 1em;
         margin: 6em 0 8em;
 
-        // a {
-        //     position: absolute;
-        //     top: 2em;
-        //     right: 2em;
-        //     svg {
-        //         height: 2.5em;
-        //         fill: $color-text-muted;
-        //     }
-        // }
-
         p {
             max-width: 37ch;
             font-size: 1.5em;
@@ -316,7 +306,7 @@ const activeProject = computed(() => {
                         gap: $size-4;
 
                         a {
-                            &::v-deep button {
+                            &:deep(button) {
                                 span {
                                     display: none;
                                 }
@@ -338,7 +328,7 @@ const activeProject = computed(() => {
                             }
 
                             &:nth-child(3) {
-                                &::v-deep button svg {
+                                &:deep(button) svg {
                                     stroke-width: 0 !important;
 
                                     @include theme-dark {
@@ -351,7 +341,7 @@ const activeProject = computed(() => {
                                 }
                             }
 
-                            &:hover ::v-deep button svg {
+                            &:hover :deep(button) svg {
                                 @include theme-dark {
                                     fill: lighten-color($color-text-muted, 15%);
                                 }
@@ -446,7 +436,7 @@ const activeProject = computed(() => {
                 }
             }
 
-            .card-footer .external-links a ::v-deep button {
+            .card-footer .external-links a :deep(button) {
                 gap: $size-2;
 
                 span {
@@ -468,15 +458,8 @@ const activeProject = computed(() => {
             max-width: 138em;
 
             .project-card .card-body {
-                // gap: 0.8em;
-
-                p {
-                    // font-size: 1.25em;
-                }
-
                 .card-footer {
-                    .external-links a ::v-deep button {
-                        // font-size: 1.2em;
+                    .external-links a :deep(button) {
                         gap: $size-2;
 
                         span {
