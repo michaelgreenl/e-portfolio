@@ -1,0 +1,58 @@
+[
+    {
+        "title": "Reaction",
+        "slug": "reaction",
+        "stack": ["vue", "pinia", "sass", "node", "express", "mysql", "sequelize"],
+        "date": "05/32/2025",
+        "description": {
+            "short": "This is temporary text I am typing right now. I recently started to ponder about thinking through something",
+            "long": [
+                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead",
+                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead"
+            ]
+        },
+        "img": "reaction.png",
+        "externalLinks": {
+            "github": { "href": "", "text": "Github" },
+            "demoVideo": { "href": "", "text": "Demo Video" },
+            "liveSite": { "href": "", "text": "Live Site" }
+        }
+    },
+    {
+        "title": "Game Lobby",
+        "slug": "game-lobby",
+        "stack": ["vue", "pinia", "sass", "node", "socket", "postgres", "prisma"],
+        "date": "05/32/2025",
+        "description": {
+            "short": "This is temporary text I am typing right now. I recently started to ponder about thinking through something ",
+            "long": [
+                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead",
+                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead"
+            ]
+        },
+        "img": "game-lobby.png",
+        "externalLinks": {
+            "github": { "href": "", "text": "Github" },
+            "demoVideo": { "href": "", "text": "Demo Video" },
+            "liveSite": { "href": "", "text": "Live Site" }
+        }
+    },
+    {
+        "title": "AlgoVisualizer",
+        "slug": "algo-visualizer",
+        "stack": ["vue", "nuxt", "pinia", "sass", "gsap"],
+        "date": "05/32/2025",
+        "description": {
+            "short": "This is temporary text I am typing right now. I recently started to ponder about thinking through something ",
+            "long": [
+                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead",
+                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead"
+            ]
+        },
+        "img": "algo-visualizer.png",
+        "externalLinks": {
+            "github": { "href": "", "text": "Github" },
+            "demoVideo": { "href": "", "text": "Demo Video" }
+        }
+    }
+]
