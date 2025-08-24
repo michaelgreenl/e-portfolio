@@ -2,7 +2,7 @@
     <Navbar />
 
     <transition name="page" mode="out-in">
-        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page-wrapper" />
     </transition>
 </template>
 
@@ -44,6 +44,21 @@ body,
     margin: 0;
     font-family: $primary-font-stack;
     background-color: $color-bg-primary;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+}
+
+.page-wrapper {
+    padding-bottom: 5em !important;
+}
+
+@include bp-md-tablet {
+    .page-wrapper {
+        padding-bottom: 1em !important;
+    }
 }
 
 .page-enter-active,

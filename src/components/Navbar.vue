@@ -167,7 +167,7 @@ const themeStore = useThemeStore();
         position: relative;
         font-size: 0.85em;
         font-family: $primary-font-stack;
-        font-weight: 500;
+        font-weight: 400;
         display: flex;
         gap: $size-3;
         align-items: center;
@@ -258,10 +258,6 @@ const themeStore = useThemeStore();
 }
 
 header {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
