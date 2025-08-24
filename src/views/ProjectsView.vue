@@ -31,7 +31,7 @@ const activeProject = computed(() => {
 
 <template>
     <div class="projects-container">
-        <div class="page-header">
+        <div class="page-header" v-if="!activeProject">
             <h1
                 v-motion
                 :initial="{ opacity: 0 }"
