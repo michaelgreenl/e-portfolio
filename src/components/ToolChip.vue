@@ -1,0 +1,91 @@
+<script setup>
+import { markRaw } from 'vue';
+import { useThemeStore } from '../stores/themeStore.js';
+import VueIcon from '../components/SVGs/Tools/VueIcon.vue';
+import GitIcon from '../components/SVGs/Tools/GitIcon.vue';
+import NuxtIcon from '../components/SVGs/Tools/NuxtIcon.vue';
+import GsapIcon from '../components/SVGs/Tools/GsapIcon.vue';
+import PiniaIcon from '../components/SVGs/Tools/PiniaIcon.vue';
+import SassIcon from '../components/SVGs/Tools/SassIcon.vue';
+import NodeIcon from '../components/SVGs/Tools/NodeIcon.vue';
+import SocketIcon from '../components/SVGs/Tools/SocketIcon.vue';
+import ExpressIcon from '../components/SVGs/Tools/ExpressIcon.vue';
+import PostgresIcon from '../components/SVGs/Tools/PostgresIcon.vue';
+import PrismaIcon from '../components/SVGs/Tools/PrismaIcon.vue';
+import SequelizeIcon from '../components/SVGs/Tools/SequelizeIcon.vue';
+import MySQLIcon from '../components/SVGs/Tools/MySQLIcon.vue';
+
+defineProps({
+    tool: {
+        type: String,
+    },
+});
+
+const themeStore = useThemeStore();
+
+const tools = {
+    vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883' },
+    git: { text: 'Git', icon: markRaw(GitIcon), lightColor: '#DE4C36', darkColor: '#DE4C36' },
+    nuxt: { text: 'Nuxt', icon: markRaw(NuxtIcon), lightColor: '#00AC65', darkColor: '#00DC82' },
+    gsap: { text: 'Gsap', icon: markRaw(GsapIcon), lightColor: '#00AC65', darkColor: '#00DC82' },
+    pinia: { text: 'Pinia', icon: markRaw(PiniaIcon), lightColor: '#CFA900', darkColor: '#FFE56C' },
+    sass: { text: 'Sass', icon: markRaw(SassIcon), lightColor: '#CD6799', darkColor: '#CD6799' },
+    node: { text: 'Node', icon: markRaw(NodeIcon), lightColor: '#78B537', darkColor: '#8CC84B' },
+    socket: { text: 'Socket.io', icon: markRaw(SocketIcon), lightColor: '#111111', darkColor: '#ffffff' },
+    express: { text: 'Express', icon: markRaw(ExpressIcon), lightColor: '#111111', darkColor: '#ffffff' },
+    postgres: { text: 'Postgres', icon: markRaw(PostgresIcon), lightColor: '#336791', darkColor: '#4789BE' },
+    prisma: { text: 'Prisma', icon: markRaw(PrismaIcon), lightColor: '#586C8D', darkColor: '#7588A9' },
+    sequelize: { text: 'Sequelize', icon: markRaw(SequelizeIcon), lightColor: '#027099', darkColor: '#03afef' },
+    mysql: { text: 'MySQL', icon: markRaw(MySQLIcon), lightColor: '#0081A5', darkColor: '#0081A5' },
+};
+</script>
+
+<template>
+    <div
+        class="chip-container"
+        :style="{
+            backgroundColor:
+                themeStore.theme === 'light' ? `${tools[tool].lightColor}30` : `${tools[tool].darkColor}30`,
+        }"
+    >
+        <div class="icon-container">
+            <component :is="tools[tool].icon" class="icon" />
+        </div>
+        <span :style="{ color: themeStore.theme === 'light' ? tools[tool].lightColor : tools[tool].darkColor }">{{
+            tools[tool].text
+        }}</span>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+.chip-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $size-2;
+    height: 100%;
+    padding: 0.85em 1em;
+    border-radius: 7px;
+
+    .icon {
+        display: flex;
+        align-items: center;
+        height: $size-4;
+        width: $size-4;
+
+        @include theme-light {
+            fill: $color-text-primary;
+            stroke: $color-text-primary;
+        }
+    }
+
+    span {
+        font-size: 1em;
+        font-family: $secondary-font-stack;
+
+        @include theme-light {
+            color: $color-text-primary;
+        }
+    }
+}
+</style>
