@@ -61,9 +61,7 @@ const activeProject = computed(() => {
                 class="project-card"
                 v-motion
                 :initial="{ opacity: 0 }"
-                :enter="{ opacity: 1, transition: { duration: 300, easing: 'easeInOut', delay: 200 * i } }"
-                whileInView="visible"
-                :inViewOptions="{ once: true }"
+                :visibleOnce="{ opacity: 1, transition: { duration: 200, easing: 'easeInOut' } }"
             >
                 <div class="img-container">
                     <PlayIcon />
