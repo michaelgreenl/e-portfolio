@@ -57,6 +57,7 @@ const activeProject = computed(() => {
             <div
                 v-for="(project, i) in projects"
                 :key="project.title"
+                @click="routeStore.toRoute(`projects/${project.slug}`)"
                 :class="`project-card-${i + 1}`"
                 class="project-card"
                 v-motion
