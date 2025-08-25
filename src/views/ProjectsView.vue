@@ -135,7 +135,7 @@ const activeProject = computed(() => {
     align-items: center;
     flex-grow: 1;
     width: 100%;
-    padding: 4em 0 1em;
+    padding: $size-12 0 $size-4;
     color: $color-text-primary;
 
     h1,
@@ -168,8 +168,8 @@ const activeProject = computed(() => {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 0 1em;
-        margin: 6em 0 8em;
+        padding: 0 $size-4;
+        margin: $size-16 0 $size-20;
 
         p {
             max-width: 37ch;
@@ -299,7 +299,7 @@ const activeProject = computed(() => {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-top: 1em;
+                    margin-top: $size-4;
 
                     .external-links {
                         font-size: 1.1em;
@@ -403,7 +403,7 @@ const activeProject = computed(() => {
 
             .project-card {
                 gap: $size-6;
-                padding: 1em 2em;
+                padding: $size-4 $size-8;
                 flex-direction: row;
 
                 .img-container {
@@ -463,7 +463,7 @@ const activeProject = computed(() => {
 
         .page-header {
             font-size: 1.2em;
-            margin: 4em 0 8em;
+            margin: $size-12 0 $size-20;
         }
 
         .cards {
