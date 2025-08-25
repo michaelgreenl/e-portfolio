@@ -365,7 +365,7 @@ const activeProject = computed(() => {
 
     @include bp-xsm-phone {
         .cards {
-            max-width: 42em;
+            max-width: 50em;
 
             .project-card {
                 .card-body {
@@ -373,6 +373,10 @@ const activeProject = computed(() => {
                         h2 {
                             font-size: 2.5em !important;
                         }
+                    }
+
+                    .description {
+                        font-size: 1.6em;
                     }
                 }
             }
@@ -383,7 +387,14 @@ const activeProject = computed(() => {
         margin: 0 auto;
 
         .page-header {
-            margin: 8em 0 12em;
+            h1 {
+                font-size: 7em;
+            }
+
+            p {
+                max-width: 56ch;
+                font-size: 1.6em;
+            }
         }
 
         .cards {
@@ -451,7 +462,7 @@ const activeProject = computed(() => {
 
         .page-header {
             font-size: 1.2em;
-            margin: 8em 0 12em;
+            margin: 4em 0 8em;
         }
 
         .cards {
