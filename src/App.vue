@@ -1,9 +1,6 @@
 <template>
     <Navbar />
-
-    <transition name="page" mode="out-in">
-        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page-wrapper" />
-    </transition>
+    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page-wrapper" />
 </template>
 
 <script setup>
@@ -61,19 +58,13 @@ body,
     }
 }
 
-.page-enter-active,
-.page-leave-active {
-    transition: all 0.2s ease;
-}
-
-.page-enter-from {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-.page-leave-to {
-    opacity: 0;
-    transform: translateX(-30px);
+.no-scroll {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 h1 {
