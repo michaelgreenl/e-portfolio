@@ -1,37 +1,52 @@
 <script setup>
-import { computed } from 'vue';
-import { useRouteStore } from '../stores/routeStore.js';
+// tool chip options
+// ['vue', 'sass', 'pinia', 'gsap', 'node', 'express', 'git', 'sequelize', 'mysql', 'postgres', 'prisma', 'socket'],
+
+import { computed, ref } from 'vue';
 import { useMotion } from '@vueuse/motion';
-import projects from '../assets/data/projects.json';
+import projectsData from '../assets/data/projects.json';
 import Button from '../components/Button.vue';
 import ToolChip from '../components/ToolChip.vue';
 import GithubIcon from '../components/SVGs/GithubIcon.vue';
 import CalendarIcon from '../components/SVGs/CalendarIcon.vue';
 import VideoIcon from '../components/SVGs/VideoIcon.vue';
-import WebsiteIcon from '../components/SVGs/WebsiteIcon.vue';
 import BoxArrowIcon from '../components/SVGs/BoxArrowIcon.vue';
 import PlayIcon from '../components/SVGs/PlayIcon.vue';
-
-const routeStore = useRouteStore();
+import CloseIcon from '../components/SVGs/CloseIcon.vue';
 
 const getURL = (img) => {
     return new URL(`../assets/images/${img}`, import.meta.url).href;
 };
 
-const activeProject = computed(() => {
-    if (routeStore.currentRoute.base !== 'projects') return null;
-    const id = routeStore.currentRoute.params.id;
-    if (!id) return null;
-    return projects.find((p) => p.slug === id) || null;
-});
+const externalIcons = {
+    github: GithubIcon,
+    demoVideo: VideoIcon,
+    liveSite: BoxArrowIcon,
+};
 
-// tool chip options
-// ['vue', 'sass', 'pinia', 'gsap', 'node', 'express', 'git', 'sequelize', 'mysql', 'postgres', 'prisma', 'socket'],
+const activeProject = ref();
+const scrollPosition = ref();
+
+function openProject(project) {
+    activeProject.value = project;
+
+    scrollPosition.value = window.scrollY;
+    document.body.classList.add('no-scroll');
+    document.body.style.top = `-${scrollPosition.value}px`;
+}
+
+function closeProject() {
+    activeProject.value = null;
+
+    document.body.classList.remove('no-scroll');
+    document.body.style.top = '';
+    window.scrollTo(0, scrollPosition.value);
+}
 </script>
 
 <template>
     <div class="projects-container">
-        <div class="page-header" v-if="!activeProject">
+        <div class="page-header">
             <h1
                 v-motion
                 :initial="{ opacity: 0 }"
@@ -53,12 +68,11 @@ const activeProject = computed(() => {
                 something about a thing
             </p>
         </div>
-        <div v-if="!activeProject" class="cards">
+        <div class="cards">
             <div
-                v-for="(project, i) in projects"
+                v-for="(project, i) in projectsData"
                 :key="project.title"
-                @click="routeStore.toRoute(`projects/${project.slug}`)"
-                :class="`project-card-${i + 1}`"
+                @click="openProject(project)"
                 class="project-card"
                 v-motion
                 :initial="{ opacity: 0 }"
@@ -83,24 +97,7 @@ const activeProject = computed(() => {
                     <div class="card-footer">
                         <div class="external-links">
                             <a v-for="(link, key) in project.externalLinks" :key="link" :href="link.href">
-                                <Button
-                                    v-if="key === 'github'"
-                                    :text="link.text"
-                                    :iconLeft="GithubIcon"
-                                    preset="secondary"
-                                />
-                                <Button
-                                    v-if="key === 'demoVideo'"
-                                    :text="link.text"
-                                    :iconLeft="VideoIcon"
-                                    preset="secondary"
-                                />
-                                <Button
-                                    v-if="key === 'liveSite'"
-                                    :text="link.text"
-                                    :iconLeft="BoxArrowIcon"
-                                    preset="secondary"
-                                />
+                                <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                             </a>
                         </div>
                         <Button
@@ -118,9 +115,60 @@ const activeProject = computed(() => {
                 </div>
             </div>
         </div>
-        <div v-else class="project-view">
-            <button @click="routeStore.toRoute('projects')">Close</button>
-            <h2>{{ activeProject.title }}</h2>
+        <div
+            v-if="activeProject"
+            class="selected-container"
+            v-motion
+            :initial="{ opacity: 0 }"
+            :enter="{ opacity: 1, transition: { duration: 100, easing: 'easeInOut' } }"
+        >
+            <div class="selected-project">
+                <div class="selected-header">
+                    <div>
+                        <CalendarIcon />
+                        <p>{{ activeProject.dateRange }}</p>
+                    </div>
+                    <Button
+                        :onClick="() => closeProject()"
+                        preset="secondary"
+                        :iconRight="CloseIcon"
+                        class="close-button"
+                    />
+                </div>
+                <div class="selected-body">
+                    <div class="img-container">
+                        <PlayIcon />
+                        <img :src="getURL(activeProject.img)" alt="project image" class="project-img" />
+                    </div>
+                    <div class="selected-info">
+                        <div class="info-header">
+                            <h2>{{ activeProject.title }}</h2>
+                            <div class="external-links">
+                                <a v-for="(link, key) in activeProject.externalLinks" :key="link" :href="link.href">
+                                    <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                                </a>
+                            </div>
+                        </div>
+                        <!-- <p class="description-short">{{ activeProject.description.short }}</p> -->
+                        <div class="tool-chips">
+                            <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
+                        </div>
+                        <ul class="description">
+                            <li v-for="description in activeProject.description.long" :key="description">
+                                {{ description }}
+                            </li>
+                        </ul>
+                        <div class="info-footer"></div>
+                    </div>
+                </div>
+            </div>
+            <div
+                @click="closeProject()"
+                class="overlay"
+                v-motion
+                :initial="{ opacity: 0 }"
+                :enter="{ opacity: 1, transition: { duration: 100, easing: 'easeInOut' } }"
+            ></div>
         </div>
     </div>
 </template>
@@ -208,10 +256,32 @@ const activeProject = computed(() => {
 
                 @include theme-dark {
                     background: lighten-color($color-bg-primary, 2.5%);
+
+                    .card-footer {
+                        :deep(.see-more) {
+                            background: $color-text-primary;
+                            color: $color-bg-primary !important;
+
+                            .icon {
+                                fill: $color-bg-primary;
+                            }
+                        }
+                    }
                 }
 
                 @include theme-light {
                     background: darken-color($color-bg-primary, 2%);
+
+                    .card-footer {
+                        :deep(.see-more) {
+                            background: $color-primary-darker;
+                            color: $color-bg-primary !important;
+
+                            .icon {
+                                fill: $color-bg-primary !important;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -253,7 +323,7 @@ const activeProject = computed(() => {
 
                 .description {
                     font-size: 1.35em;
-                    max-width: 48ch;
+                    max-width: 63ch;
                 }
 
                 .card-header {
@@ -288,9 +358,11 @@ const activeProject = computed(() => {
                     gap: $size-6;
                     height: $size-8;
                     margin-top: $size-2;
+                    max-width: 65em;
 
                     .chip {
                         font-size: 1.2em;
+                        flex: 1;
                     }
                 }
 
@@ -364,6 +436,232 @@ const activeProject = computed(() => {
         }
     }
 
+    .overlay {
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    .selected-container {
+        position: fixed;
+        z-index: 2;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+
+        .selected-project {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            max-width: 61em;
+            padding: $size-8;
+            margin: 0 $size-4;
+            border-radius: 20px;
+            background-color: $color-bg-primary;
+
+            .selected-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                div {
+                    display: flex;
+                    align-items: center;
+                    gap: $size-2;
+                    font-size: 1.45em;
+
+                    svg {
+                        height: 1.1em;
+                        stroke: $color-text-secondary;
+                    }
+                }
+
+                .close-button {
+                    font-size: 1.2em;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0;
+                    padding: $size-3;
+                    border-radius: 100%;
+
+                    svg {
+                        @include theme-dark {
+                            fill: lighten-color($color-text-muted, 15%);
+                        }
+
+                        @include theme-light {
+                            fill: darken-color($color-text-muted, 15%);
+                        }
+                    }
+
+                    @include interactive {
+                        @include theme-dark {
+                            background-color: #49505730;
+                        }
+
+                        @include theme-light {
+                            background-color: #49505710;
+                        }
+                    }
+
+                    &::after {
+                        display: none !important;
+                    }
+                }
+            }
+
+            .img-container {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: $size-2 0;
+
+                svg {
+                    cursor: pointer;
+                    position: absolute;
+                    z-index: 1;
+                    height: $size-16;
+                    fill: $color-gray3;
+
+                    @include interactive {
+                        transform: scale(1.1);
+                    }
+
+                    &:active {
+                        transform: scale(0.9);
+                    }
+                }
+
+                .project-img {
+                    position: relative;
+                    z-index: 0;
+                    width: 90%;
+                    filter: blur(2px);
+                }
+            }
+
+            .selected-info {
+                display: flex;
+                flex-direction: column;
+                margin-top: -$size-3;
+
+                .info-header {
+                    font-size: 1.35em;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    h2 {
+                        font-size: 2em;
+                        margin: 0 !important;
+                    }
+
+                    .external-links {
+                        font-size: 1.1em;
+                        display: flex;
+                        gap: $size-4;
+
+                        a {
+                            &:deep(button) {
+                                span {
+                                    display: none;
+                                }
+
+                                svg {
+                                    height: $size-6;
+                                    stroke-width: 2;
+                                    transition: fill 0.3s ease-in-out;
+                                    fill: rgba(0, 0, 0, 0);
+
+                                    @include theme-dark {
+                                        stroke: lighten-color($color-text-muted, 15%);
+                                    }
+
+                                    @include theme-light {
+                                        stroke: darken-color($color-text-muted, 15%);
+                                    }
+                                }
+                            }
+
+                            &:nth-child(3) {
+                                &:deep(button) svg {
+                                    stroke-width: 0 !important;
+
+                                    @include theme-dark {
+                                        fill: lighten-color($color-text-muted, 15%);
+                                    }
+
+                                    @include theme-light {
+                                        fill: darken-color($color-text-muted, 15%);
+                                    }
+                                }
+                            }
+
+                            &:hover :deep(button) svg {
+                                @include theme-dark {
+                                    fill: lighten-color($color-text-muted, 15%);
+                                }
+
+                                @include theme-light {
+                                    fill: darken-color($color-text-muted, 15%);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .tool-chips {
+                    font-size: 1.1em;
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    overflow: hidden;
+                    gap: $size-6;
+                    height: $size-10;
+                    margin-top: $size-1;
+
+                    .chip {
+                        font-size: 1.2em;
+                        flex: 1;
+                        height: 1.8em;
+                    }
+                }
+
+                .description {
+                    font-family: $secondary-font-stack;
+                    font-size: 1.5em;
+                    display: flex;
+                    flex-direction: column;
+                    gap: $size-2;
+                    color: $color-text-secondary;
+                    padding: $size-3 $size-5 $size-2;
+                    margin: $size-2 0;
+                    border-top: solid 1px $color-text-muted;
+                }
+
+                .info-footer {
+                    font-size: 1.3em;
+                    display: flex;
+                }
+            }
+        }
+    }
+
     @include bp-xsm-phone {
         .cards {
             max-width: 50em;
@@ -420,6 +718,26 @@ const activeProject = computed(() => {
                 }
             }
         }
+
+        .selected-container {
+            .selected-project {
+                max-width: 78em;
+                padding: $size-8 $size-12;
+                margin: 0 $size-10;
+
+                .selected-info {
+                    .img-container {
+                        margin: 0;
+                    }
+
+                    .info-header {
+                        h2 {
+                            font-size: 2.4em !important;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @include bp-md-tablet {
@@ -459,7 +777,7 @@ const activeProject = computed(() => {
     }
 
     @include bp-lg-laptop {
-        max-width: 138em;
+        max-width: 126em;
 
         .page-header {
             font-size: 1.2em;
@@ -467,7 +785,7 @@ const activeProject = computed(() => {
         }
 
         .cards {
-            max-width: 138em;
+            max-width: 126em;
 
             .project-card .card-body {
                 .card-footer {
