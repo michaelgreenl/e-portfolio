@@ -1,6 +1,7 @@
 <template>
     <Navbar />
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page-wrapper" />
+    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+    <Footer />
 </template>
 
 <script setup>
@@ -8,6 +9,7 @@ import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
 import { useThemeStore } from './stores/themeStore.js';
 import Navbar from './components/Navbar.vue';
+import Footer from './components/Footer.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -46,16 +48,6 @@ body,
 #app {
     display: flex;
     flex-direction: column;
-}
-
-.page-wrapper {
-    padding-bottom: 5em !important;
-}
-
-@include bp-md-tablet {
-    .page-wrapper {
-        padding-bottom: 1em !important;
-    }
 }
 
 .no-scroll {
