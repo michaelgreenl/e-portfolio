@@ -10,7 +10,7 @@
             "long": [
                 "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
                 "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
-                "Integrated a PostgreSQL database via the Prisma ORM to store user accounts and game history."
+                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
         "img": "reaction.png",
@@ -31,7 +31,7 @@
             "long": [
                 "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
                 "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
-                "Integrated a PostgreSQL database via the Prisma ORM to store user accounts and game history."
+                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
         "img": "game-lobby.png",
@@ -52,7 +52,7 @@
             "long": [
                 "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
                 "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
-                "Integrated a PostgreSQL database via the Prisma ORM to store user accounts and game history."
+                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
         "img": "algo-visualizer.png",
