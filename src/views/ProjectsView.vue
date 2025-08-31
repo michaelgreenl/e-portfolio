@@ -243,34 +243,36 @@ function closeProject() {
                 border-bottom: solid 1px darken-color($color-bg-primary, 2.5%);
             }
 
-            @include interactive(false) {
-                transform: scale(1.01) !important;
+            @media (hover: hover) and (pointer: fine) {
+                &:hover {
+                    transform: scale(1.01) !important;
 
-                @include theme-dark {
-                    background: lighten-color($color-bg-primary, 2.5%);
+                    @include theme-dark {
+                        background: lighten-color($color-bg-primary, 2.5%);
 
-                    .card-footer {
-                        :deep(.see-more) {
-                            background: $color-text-primary;
-                            color: $color-bg-primary !important;
+                        .card-footer {
+                            :deep(.see-more) {
+                                background: $color-text-primary;
+                                color: $color-bg-primary !important;
 
-                            .icon {
-                                fill: $color-bg-primary;
+                                .icon {
+                                    fill: $color-bg-primary;
+                                }
                             }
                         }
                     }
-                }
 
-                @include theme-light {
-                    background: darken-color($color-bg-primary, 2%);
+                    @include theme-light {
+                        background: darken-color($color-bg-primary, 2%);
 
-                    .card-footer {
-                        :deep(.see-more) {
-                            background: $color-primary-darker;
-                            color: $color-bg-primary !important;
+                        .card-footer {
+                            :deep(.see-more) {
+                                background: $color-primary-darker;
+                                color: $color-bg-primary !important;
 
-                            .icon {
-                                fill: $color-bg-primary !important;
+                                .icon {
+                                    fill: $color-bg-primary !important;
+                                }
                             }
                         }
                     }
