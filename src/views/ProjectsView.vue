@@ -206,8 +206,16 @@ function closeProject() {
         font-size: 6em;
     }
 
-    h2 {
-        color: $color-gray3;
+    @include theme-dark {
+        h2 {
+            color: $color-gray3;
+        }
+    }
+
+    @include theme-light {
+        h2 {
+            color: $color-primary-darker;
+        }
     }
 
     hr {
@@ -350,6 +358,14 @@ function closeProject() {
                         display: flex;
                         align-items: center;
                         height: 2.8em;
+
+                        @include theme-dark {
+                            fill: $color-gray3;
+                        }
+
+                        @include theme-light {
+                            fill: $color-primary-darker;
+                        }
                     }
 
                     h2 {
