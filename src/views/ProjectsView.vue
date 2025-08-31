@@ -747,6 +747,12 @@ function closeProject() {
                 }
 
                 .card-body {
+                    .card-header {
+                        div {
+                            margin-bottom: 1em;
+                        }
+                    }
+
                     .description {
                         font-size: 1.45em !important;
                     }
@@ -790,6 +796,10 @@ function closeProject() {
                     h2 {
                         font-size: 2.9em !important;
                     }
+
+                    div {
+                        margin-bottom: 1.5em;
+                    }
                 }
 
                 .description {
@@ -823,6 +833,12 @@ function closeProject() {
             max-width: 126em;
 
             .project-card .card-body {
+                .card-header {
+                    div {
+                        margin-bottom: 2em;
+                    }
+                }
+
                 .card-footer {
                     .external-links a :deep(button) {
                         gap: $size-2;
