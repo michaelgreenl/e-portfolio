@@ -4,13 +4,16 @@
         "slug": "reaction",
         "stack": ["vue", "pinia", "sass", "node", "express", "mysql", "sequelize"],
         "date": "05/32/2025",
+        "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
-            "short": "This is temporary text I am typing right now. I recently started to ponder about thinking through something",
+            "short": "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
             "long": [
-                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead",
-                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead"
+                "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
+                "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
+                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
+        "fontFamily": "Poppins",
         "img": "reaction.png",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
@@ -19,17 +22,20 @@
         }
     },
     {
-        "title": "Game Lobby",
+        "title": "GameLobby",
         "slug": "game-lobby",
         "stack": ["vue", "pinia", "sass", "node", "socket", "postgres", "prisma"],
         "date": "05/32/2025",
+        "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
-            "short": "This is temporary text I am typing right now. I recently started to ponder about thinking through something ",
+            "short": "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
             "long": [
-                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead",
-                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead"
+                "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
+                "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
+                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
+        "fontFamily": "BitCount",
         "img": "game-lobby.png",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
@@ -42,13 +48,16 @@
         "slug": "algo-visualizer",
         "stack": ["vue", "nuxt", "pinia", "sass", "gsap"],
         "date": "05/32/2025",
+        "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
-            "short": "This is temporary text I am typing right now. I recently started to ponder about thinking through something ",
+            "short": "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
             "long": [
-                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead",
-                "This is temporary text I am typing right now. I recently started to ponder about thinking through something like coming up with an idea to write real english instead"
+                "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
+                "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
+                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
+        "fontFamily": "Futura",
         "img": "algo-visualizer.png",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },

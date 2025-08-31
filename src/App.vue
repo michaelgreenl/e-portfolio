@@ -1,16 +1,9 @@
-<template>
-    <Navbar />
-
-    <transition name="page" mode="out-in">
-        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page-wrapper" />
-    </transition>
-</template>
-
 <script setup>
 import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
 import { useThemeStore } from './stores/themeStore.js';
 import Navbar from './components/Navbar.vue';
+import Footer from './components/Footer.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -27,6 +20,12 @@ onMounted(() => {
     document.documentElement.setAttribute('data-theme', theme);
 });
 </script>
+
+<template>
+    <Navbar />
+    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+    <Footer />
+</template>
 
 <style lang="scss">
 @use './assets/styles/_variables.scss';
@@ -51,29 +50,13 @@ body,
     flex-direction: column;
 }
 
-.page-wrapper {
-    padding-bottom: 5em !important;
-}
-
-@include bp-md-tablet {
-    .page-wrapper {
-        padding-bottom: 1em !important;
-    }
-}
-
-.page-enter-active,
-.page-leave-active {
-    transition: all 0.2s ease;
-}
-
-.page-enter-from {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-.page-leave-to {
-    opacity: 0;
-    transform: translateX(-30px);
+.no-scroll {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 h1 {

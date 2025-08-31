@@ -9,23 +9,13 @@ const routeStore = useRouteStore();
 
 <template>
     <div class="home-container">
-        <div
-            class="hero-content"
-            v-motion
-            :initial="{ x: -150, opacity: 0 }"
-            :enter="{ x: 0, opacity: 1, transition: { duration: 100, ease: 'easeOut' } }"
-        >
+        <div class="hero-content" v-motion-fade-slide-right>
             <h3>Hi 👋, my name is</h3>
             <h1>
                 Michael
                 <span> Green </span>
             </h1>
-            <hr
-                class="hero-line"
-                v-motion
-                :initial="{ opacity: 0, scaleX: 0 }"
-                :enter="{ opacity: 1, scaleX: 1, transition: { duration: 200, easing: 'easeIn', delay: 50 } }"
-            />
+            <hr class="hero-line" v-motion-fade-in-scalex />
             <h2>Full-Stack Developer</h2>
             <p>
                 Hello, I am a software engineer with a passion for solving problems. I am writing this in normal a a
@@ -47,23 +37,8 @@ const routeStore = useRouteStore();
             </div>
         </div>
         <div class="site-nav">
-            <hr
-                class="nav-line"
-                v-motion
-                :initial="{ opacity: 0, scaleX: 0 }"
-                :enter="{ opacity: 1, scaleX: 1, transition: { duration: 200, easing: 'easeIn', delay: 50 } }"
-            />
-            <div
-                v-for="(route, key, i) in routeStore.routes"
-                :key="key"
-                v-motion
-                :initial="{ opacity: 0, x: 50 }"
-                :enter="{
-                    opacity: 1,
-                    x: 0,
-                    transition: { duration: 100, easing: 'easeIn', delay: 100 * i },
-                }"
-            >
+            <hr class="nav-line" v-motion-fade-in-scalex />
+            <div v-for="(route, key, i) in routeStore.routes" :key="key" v-motion-fade-slide-left :delay="100 * i">
                 <Button
                     v-if="key !== 'home'"
                     :onClick="

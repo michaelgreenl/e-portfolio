@@ -1,42 +1,35 @@
+<script setup>
+import { ref } from 'vue';
+import { useRouteStore } from '../stores/routeStore.js';
+import { useThemeStore } from '../stores/themeStore.js';
+import { useMotions } from '@vueuse/motion';
+
+import MoonIcon from '../components/SVGs/MoonIcon.vue';
+import SunIcon from '../components/SVGs/SunIcon.vue';
+import Logo from '../components/Logo.vue';
+
+const routeStore = useRouteStore();
+const themeStore = useThemeStore();
+</script>
+
 <template>
     <header>
-        <Logo
-            v-motion
-            :initial="{ opacity: 0 }"
-            :enter="{
-                opacity: 1,
-                transition: { duration: 200, easing: 'easeIn' },
-            }"
-        />
+        <Logo v-motion-fade-in />
         <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
                 v-for="(route, key, i) in routeStore.routes"
                 :key="key"
                 :class="{ active: routeStore.currentRoute.base === key }"
                 @click="routeStore.toRoute(key)"
-                v-motion
-                :initial="{ opacity: 0, x: -50, scaleX: 0.5 }"
-                :enter="{
-                    opacity: 1,
-                    x: 0,
-                    scaleX: 1,
-                    transition: { duration: 100, easing: 'easeIn', delay: 100 * i },
-                }"
+                v-motion-fade-slide-in-scalex
+                :delay="100 * i"
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.meta.title }}
             </button>
         </nav>
-        <label
-            class="theme-toggle"
-            v-motion
-            :initial="{ opacity: 0 }"
-            :enter="{
-                opacity: 1,
-                transition: { duration: 100, easing: 'easeIn' },
-            }"
-        >
+        <label class="theme-toggle" v-motion-fade-in>
             <input
                 class="toggle-input"
                 type="checkbox"
@@ -53,12 +46,7 @@
             </div>
         </label>
     </header>
-    <nav
-        class="nav-mobile"
-        v-motion
-        :initial="{ y: 150, scaleX: 0 }"
-        :enter="{ y: 0, scaleX: 1, transition: { duration: 100, easing: 'easeIn' } }"
-    >
+    <nav class="nav-mobile" v-motion-slide-up-scalex>
         <button
             v-for="(route, key) in routeStore.routes"
             :key="key"
@@ -70,20 +58,6 @@
         </button>
     </nav>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import { useRouteStore } from '../stores/routeStore.js';
-import { useThemeStore } from '../stores/themeStore.js';
-import { useMotions } from '@vueuse/motion';
-
-import MoonIcon from '../components/SVGs/MoonIcon.vue';
-import SunIcon from '../components/SVGs/SunIcon.vue';
-import Logo from '../components/Logo.vue';
-
-const routeStore = useRouteStore();
-const themeStore = useThemeStore();
-</script>
 
 <style lang="scss" scoped>
 .icon-enter-active,
