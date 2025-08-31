@@ -97,11 +97,7 @@ function closeProject() {
                         </div>
                         <Button
                             class="see-more"
-                            :onClick="
-                                () => {
-                                    routeStore.toRoute(`projects/${project.slug}`);
-                                }
-                            "
+                            :onClick="() => openProject(project)"
                             text="See More"
                             :iconRight="BoxArrowIcon"
                             preset="primary"
