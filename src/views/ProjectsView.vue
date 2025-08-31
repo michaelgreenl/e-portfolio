@@ -56,23 +56,9 @@ function closeProject() {
 <template>
     <div class="projects-container">
         <div class="page-header">
-            <h1
-                v-motion
-                :initial="{ opacity: 0 }"
-                :enter="{ opacity: 1, transition: { duration: 100, easing: 'easeInOut' } }"
-            >
-                Projects
-            </h1>
-            <hr
-                v-motion
-                :initial="{ opacity: 0, scaleX: 0 }"
-                :enter="{ opacity: 1, scaleX: 1, transition: { duration: 200, easing: 'easeInOut', delay: 50 } }"
-            />
-            <p
-                v-motion
-                :initial="{ opacity: 0 }"
-                :enter="{ opacity: 1, transition: { duration: 100, easing: 'easeInOut', delay: 100 } }"
-            >
+            <h1 v-motion-fade-in>Projects</h1>
+            <hr v-motion-fade-in-scalex />
+            <p v-motion-fade-in :delay="100">
                 This is temporary text I am typing right now. I recently started to ponder about thinking through
                 something about a thing
             </p>
@@ -83,9 +69,8 @@ function closeProject() {
                 :key="project.title"
                 @click="openProject(project)"
                 class="project-card"
-                v-motion
-                :initial="{ opacity: 0 }"
-                :visibleOnce="{ opacity: 1, transition: { duration: 200, easing: 'easeInOut' } }"
+                v-motion-fade-in-once
+                :delay="100 * i"
             >
                 <div class="img-container">
                     <PlayIcon />
@@ -125,13 +110,7 @@ function closeProject() {
                 </div>
             </div>
         </div>
-        <div
-            v-if="activeProject"
-            class="selected-container"
-            v-motion
-            :initial="{ opacity: 0 }"
-            :enter="{ opacity: 1, transition: { duration: 100, easing: 'easeInOut' } }"
-        >
+        <div v-if="activeProject" class="selected-container" v-motion-fade-in>
             <div class="selected-project">
                 <div class="selected-header">
                     <div>
@@ -172,13 +151,7 @@ function closeProject() {
                     </div>
                 </div>
             </div>
-            <div
-                @click="closeProject()"
-                class="overlay"
-                v-motion
-                :initial="{ opacity: 0 }"
-                :enter="{ opacity: 1, transition: { duration: 100, easing: 'easeInOut' } }"
-            ></div>
+            <div @click="closeProject()" class="overlay" v-motion-fade-in></div>
         </div>
     </div>
 </template>
