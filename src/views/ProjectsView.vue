@@ -247,7 +247,7 @@ function closeProject() {
                 border-bottom: solid 1px darken-color($color-bg-primary, 2.5%);
             }
 
-            @include interactive {
+            @include interactive(false) {
                 transform: scale(1.01) !important;
 
                 @include theme-dark {

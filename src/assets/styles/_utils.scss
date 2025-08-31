@@ -73,15 +73,17 @@ $breakpoints: (
     }
 }
 
-@mixin interactive {
+@mixin interactive($active: true) {
     @media (hover: hover) and (pointer: fine) {
         &:hover {
             @content;
         }
     }
 
-    &:active {
-        @content;
+    @if acitve {
+        &:active {
+            @content;
+        }
     }
 }
 
