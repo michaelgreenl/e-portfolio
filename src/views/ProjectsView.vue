@@ -582,6 +582,14 @@ function closeProject() {
                         display: flex;
                         align-items: center;
                         height: 2.8em;
+
+                        @include theme-dark {
+                            fill: $color-gray3;
+                        }
+
+                        @include theme-light {
+                            fill: $color-primary-darker;
+                        }
                     }
 
                     h2 {
