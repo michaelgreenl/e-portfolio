@@ -7,6 +7,9 @@ import { useMotion } from '@vueuse/motion';
 import projectsData from '../assets/data/projects.json';
 import Button from '../components/Button.vue';
 import ToolChip from '../components/ToolChip.vue';
+import ReactionLogo from '../components/SVGs/ProjectLogos/ReactionLogo.vue';
+import AlgoVisualizerLogo from '../components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
+import GameLobbyLogo from '../components/SVGs/ProjectLogos/GameLobbyLogo.vue';
 import GithubIcon from '../components/SVGs/GithubIcon.vue';
 import CalendarIcon from '../components/SVGs/CalendarIcon.vue';
 import VideoIcon from '../components/SVGs/VideoIcon.vue';
@@ -16,6 +19,12 @@ import CloseIcon from '../components/SVGs/CloseIcon.vue';
 
 const getURL = (img) => {
     return new URL(`../assets/images/${img}`, import.meta.url).href;
+};
+
+const projectLogos = {
+    reaction: ReactionLogo,
+    'game-lobby': GameLobbyLogo,
+    'algo-visualizer': AlgoVisualizerLogo,
 };
 
 const externalIcons = {
@@ -84,7 +93,8 @@ function closeProject() {
                 </div>
                 <div class="card-body">
                     <div class="card-header">
-                        <h2>{{ project.title }}</h2>
+                        <component :is="projectLogos[project.slug]" class="project-logo" />
+                        <h2 :style="{ fontFamily: project.fontFamily }">{{ project.title }}</h2>
                         <div>
                             <CalendarIcon />
                             <p>{{ project.date }}</p>
@@ -142,14 +152,14 @@ function closeProject() {
                     </div>
                     <div class="selected-info">
                         <div class="info-header">
-                            <h2>{{ activeProject.title }}</h2>
+                            <component :is="projectLogos[activeProject.slug]" class="project-logo" />
+                            <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
                             <div class="external-links">
                                 <a v-for="(link, key) in activeProject.externalLinks" :key="link" :href="link.href">
                                     <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                                 </a>
                             </div>
                         </div>
-                        <!-- <p class="description-short">{{ activeProject.description.short }}</p> -->
                         <div class="tool-chips">
                             <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
                         </div>
@@ -196,6 +206,10 @@ function closeProject() {
         font-size: 6em;
     }
 
+    h2 {
+        color: $color-gray3;
+    }
+
     hr {
         border: 0;
         width: 100%;
@@ -240,6 +254,7 @@ function closeProject() {
             align-items: center;
             justify-content: space-between;
             padding: $size-8;
+            border-radius: 12px;
 
             @include theme-dark {
                 border-top: solid 1px lighten-color($color-bg-primary, 2.5%);
@@ -328,8 +343,14 @@ function closeProject() {
 
                 .card-header {
                     display: flex;
-                    justify-content: space-between;
                     align-items: center;
+                    gap: $size-2;
+
+                    .project-logo {
+                        display: flex;
+                        align-items: center;
+                        height: 2.8em;
+                    }
 
                     h2 {
                         font-size: 2em;
@@ -341,6 +362,7 @@ function closeProject() {
                         align-items: center;
                         gap: $size-2;
                         font-size: 1.4em;
+                        margin-left: auto;
 
                         svg {
                             height: 1.1em;
@@ -467,7 +489,7 @@ function closeProject() {
             display: flex;
             flex-direction: column;
             max-width: 61em;
-            padding: $size-8;
+            padding: $size-5 $size-8;
             margin: 0 $size-4;
             border-radius: 20px;
             background-color: $color-bg-primary;
@@ -561,10 +583,17 @@ function closeProject() {
                 margin-top: -$size-3;
 
                 .info-header {
-                    font-size: 1.35em;
+                    font-size: 1.25em;
                     display: flex;
-                    justify-content: space-between;
                     align-items: center;
+                    gap: $size-1;
+                    margin-top: $size-4;
+
+                    .project-logo {
+                        display: flex;
+                        align-items: center;
+                        height: 2.8em;
+                    }
 
                     h2 {
                         font-size: 2em;
@@ -572,6 +601,7 @@ function closeProject() {
                     }
 
                     .external-links {
+                        margin-left: auto;
                         font-size: 1.1em;
                         display: flex;
                         gap: $size-4;
@@ -633,7 +663,7 @@ function closeProject() {
                     overflow: hidden;
                     gap: $size-6;
                     height: $size-10;
-                    margin-top: $size-1;
+                    margin-top: $size-3;
 
                     .chip {
                         font-size: 1.2em;
@@ -676,6 +706,16 @@ function closeProject() {
 
                     .description {
                         font-size: 1.6em;
+                    }
+                }
+            }
+        }
+
+        .selected-container {
+            .selected-project {
+                .selected-info {
+                    .info-header {
+                        margin-top: 0;
                     }
                 }
             }

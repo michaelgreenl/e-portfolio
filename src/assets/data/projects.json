@@ -13,6 +13,7 @@
                 "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
+        "fontFamily": "Poppins",
         "img": "reaction.png",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
@@ -21,7 +22,7 @@
         }
     },
     {
-        "title": "Game Lobby",
+        "title": "GameLobby",
         "slug": "game-lobby",
         "stack": ["vue", "pinia", "sass", "node", "socket", "postgres", "prisma"],
         "date": "05/32/2025",
@@ -34,6 +35,7 @@
                 "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
+        "fontFamily": "BitCount",
         "img": "game-lobby.png",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
@@ -55,6 +57,7 @@
                 "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
+        "fontFamily": "Futura",
         "img": "algo-visualizer.png",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
