@@ -1,9 +1,3 @@
-<template>
-    <Navbar />
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
-    <Footer />
-</template>
-
 <script setup>
 import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
@@ -26,6 +20,12 @@ onMounted(() => {
     document.documentElement.setAttribute('data-theme', theme);
 });
 </script>
+
+<template>
+    <Navbar />
+    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+    <Footer />
+</template>
 
 <style lang="scss">
 @use './assets/styles/_variables.scss';

@@ -1,3 +1,17 @@
+<script setup>
+import { ref } from 'vue';
+import { useRouteStore } from '../stores/routeStore.js';
+import { useThemeStore } from '../stores/themeStore.js';
+import { useMotions } from '@vueuse/motion';
+
+import MoonIcon from '../components/SVGs/MoonIcon.vue';
+import SunIcon from '../components/SVGs/SunIcon.vue';
+import Logo from '../components/Logo.vue';
+
+const routeStore = useRouteStore();
+const themeStore = useThemeStore();
+</script>
+
 <template>
     <header>
         <Logo
@@ -70,20 +84,6 @@
         </button>
     </nav>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import { useRouteStore } from '../stores/routeStore.js';
-import { useThemeStore } from '../stores/themeStore.js';
-import { useMotions } from '@vueuse/motion';
-
-import MoonIcon from '../components/SVGs/MoonIcon.vue';
-import SunIcon from '../components/SVGs/SunIcon.vue';
-import Logo from '../components/Logo.vue';
-
-const routeStore = useRouteStore();
-const themeStore = useThemeStore();
-</script>
 
 <style lang="scss" scoped>
 .icon-enter-active,
