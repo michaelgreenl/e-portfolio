@@ -23,9 +23,23 @@ onMounted(() => {
 
 <template>
     <Navbar />
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+
+    <transition name="page" mode="out-in">
+        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+    </transition>
     <Footer />
 </template>
+
+<style>
+.page-leave-active {
+    transition: all 0.3s ease;
+}
+
+.page-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+</style>
 
 <style lang="scss">
 @use './assets/styles/_variables.scss';
