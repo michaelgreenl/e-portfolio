@@ -197,7 +197,7 @@ const themeStore = useThemeStore();
             }
 
             @include theme-light {
-                background-color: #ced8de;
+                background-color: #8ba7b340;
             }
         }
 
