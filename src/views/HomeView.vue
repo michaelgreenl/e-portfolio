@@ -103,7 +103,6 @@ const routeStore = useRouteStore();
 
         h2 {
             font-size: 1.9em;
-            border-right: solid 2px $color-text-primary;
             width: fit-content;
             margin: 0 auto;
         }
