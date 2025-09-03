@@ -1,9 +1,8 @@
 <script setup>
-// tool chip options
-// ['vue', 'sass', 'pinia', 'gsap', 'node', 'express', 'git', 'sequelize', 'mysql', 'postgres', 'prisma', 'socket'],
-
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useRouteStore } from '../stores/routeStore.js';
 import { useMotion } from '@vueuse/motion';
+import { Motions } from '../utils/motions.js';
 import projectsData from '../assets/data/projects.json';
 import Button from '../components/Button.vue';
 import ToolChip from '../components/ToolChip.vue';
@@ -36,6 +35,42 @@ const externalIcons = {
 const activeProject = ref();
 const scrollPosition = ref();
 
+const header = ref(null);
+const headerLine = ref(null);
+const headerText = ref(null);
+const projectItems = ref([]);
+const selectedProject = ref(null);
+
+const headerMotion = useMotion(header, Motions.directives['fade-in']);
+const headerLineMotion = useMotion(headerLine, Motions.directives['fade-in-scalex']);
+const headerTextMotion = useMotion(headerText, Motions.directives['fade-in']);
+const projectItemMotions = ref([]);
+const selectedProjectMotion = useMotion(selectedProject, Motions.directives['fade-in-leave']);
+
+const routeStore = useRouteStore();
+watch(
+    () => routeStore.isLeaving,
+    (newVal) => {
+        if (newVal) {
+            // The fix was janky but adding a different motion from the directive ("...-leave") works
+            projectItemMotions.value = projectItems.value.map((el) => {
+                if (!el) return null;
+                return useMotion(el, Motions.directives['fade-in-leave']);
+            });
+
+            headerMotion.set('leave');
+            headerLineMotion.set('leave');
+            headerTextMotion.set('leave');
+
+            projectItemMotions.value.forEach((motion, i) => {
+                setTimeout(() => {
+                    motion.set('leave');
+                }, 100 * i);
+            });
+        }
+    },
+);
+
 function openProject(project) {
     activeProject.value = project;
 
@@ -45,20 +80,23 @@ function openProject(project) {
 }
 
 function closeProject() {
-    activeProject.value = null;
+    selectedProjectMotion.set('leave');
+    setTimeout(() => {
+        activeProject.value = null;
 
-    document.body.classList.remove('no-scroll');
-    document.body.style.top = '';
-    window.scrollTo(0, scrollPosition.value);
+        document.body.classList.remove('no-scroll');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollPosition.value);
+    }, 100);
 }
 </script>
 
 <template>
     <div class="projects-container">
         <div class="page-header">
-            <h1 v-motion-fade-in>Projects</h1>
-            <hr v-motion-fade-in-scalex />
-            <p v-motion-fade-in :delay="100">
+            <h1 ref="header" v-motion-fade-in>Projects</h1>
+            <hr ref="headerLine" v-motion-fade-in-scalex />
+            <p ref="headerText" v-motion-fade-in :delay="100">
                 This is temporary text I am typing right now. I recently started to ponder about thinking through
                 something about a thing
             </p>
@@ -69,6 +107,11 @@ function closeProject() {
                 :key="project.title"
                 @click="openProject(project)"
                 class="project-card"
+                :ref="
+                    (el) => {
+                        if (el) projectItems[i] = el;
+                    }
+                "
                 v-motion-fade-in-once
                 :delay="100 * i"
             >
@@ -106,7 +149,7 @@ function closeProject() {
                 </div>
             </div>
         </div>
-        <div v-if="activeProject" class="selected-container" v-motion-fade-in>
+        <div v-if="activeProject" ref="selectedProject" class="selected-container" v-motion-fade-in>
             <div class="selected-project">
                 <div class="selected-header">
                     <div>

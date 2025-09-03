@@ -51,6 +51,8 @@ export const useRouteStore = defineStore('router', () => {
     }
 
     const activePath = ref(getInitialPath());
+    const isLeaving = ref(false);
+    const leaveDuration = 300;
 
     // Computed current route details
     const currentRoute = computed(() => {
@@ -64,11 +66,20 @@ export const useRouteStore = defineStore('router', () => {
     });
 
     // Navigate to a new path
-    function toRoute(to) {
+    async function toRoute(to) {
         const { base } = parsePath(to);
         if (!routes[base]) {
             to = 'home'; // Redirect invalid routes
         }
+
+        // Trigger leave animations in current view
+        isLeaving.value = true;
+
+        // Wait for leave animation to complete
+        await new Promise((resolve) => setTimeout(resolve, leaveDuration));
+
+        // Reset flag and proceed with route change
+        isLeaving.value = false;
         activePath.value = to;
         window.location.hash = to;
 
@@ -98,5 +109,5 @@ export const useRouteStore = defineStore('router', () => {
         window.location.hash = activePath.value;
     }
 
-    return { routes, activePath, currentRoute, toRoute };
+    return { routes, activePath, currentRoute, toRoute, isLeaving, leaveDuration };
 });
