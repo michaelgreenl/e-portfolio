@@ -52,6 +52,7 @@ export const useRouteStore = defineStore('router', () => {
 
     const activePath = ref(getInitialPath());
     const isLeaving = ref(false);
+    const toPath = ref();
     const leaveDuration = 300;
 
     // Computed current route details
@@ -74,13 +75,14 @@ export const useRouteStore = defineStore('router', () => {
 
         // Trigger leave animations in current view
         isLeaving.value = true;
+        toPath.value = to;
 
         // Wait for leave animation to complete
         await new Promise((resolve) => setTimeout(resolve, leaveDuration));
 
         // Reset flag and proceed with route change
-        isLeaving.value = false;
         activePath.value = to;
+        isLeaving.value = false;
         window.location.hash = to;
 
         let title = DEFAULT_TITLE;
@@ -109,5 +111,5 @@ export const useRouteStore = defineStore('router', () => {
         window.location.hash = activePath.value;
     }
 
-    return { routes, activePath, currentRoute, toRoute, isLeaving, leaveDuration };
+    return { routes, activePath, currentRoute, toRoute, isLeaving, leaveDuration, toPath };
 });

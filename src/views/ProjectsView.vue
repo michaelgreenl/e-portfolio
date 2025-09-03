@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
-import { useMotion } from '@vueuse/motion';
+import { useMotions, useMotion } from '@vueuse/motion';
 import { Motions } from '../utils/motions.js';
 import projectsData from '../assets/data/projects.json';
 import Button from '../components/Button.vue';

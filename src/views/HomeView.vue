@@ -1,8 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { useMotions } from '@vueuse/motion';
-import { useMotion } from '@vueuse/motion';
 import { useRouteStore } from '../stores/routeStore.js';
+import { useMotions, useMotion } from '@vueuse/motion';
 import { Motions } from '../utils/motions.js';
 import Button from '../components/Button.vue';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
