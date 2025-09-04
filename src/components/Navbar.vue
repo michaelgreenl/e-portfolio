@@ -28,8 +28,6 @@ watch(
                 return useMotion(el, Motions.directives['fade-in-leave']);
             });
 
-            logoMotions.set('leave');
-
             navItemMotions.value.reverse().forEach((motion, i) => {
                 setTimeout(() => {
                     motion.set('leave');
@@ -79,6 +77,7 @@ watch(
             </div>
         </label>
     </header>
+    <hr v-motion-fade-in-scalex />
     <nav class="nav-mobile" v-motion-slide-up-scalex>
         <button
             v-for="(route, key) in routeStore.routes"
@@ -271,14 +270,6 @@ header {
     height: $size-13;
     padding: 0 $size-2;
 
-    @include theme-dark {
-        border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
-    }
-
-    @include theme-light {
-        border-bottom: 1px solid darken-color($color-bg-primary, 5%);
-    }
-
     .theme-toggle {
         display: inline-flex;
         width: $size-11;
@@ -353,6 +344,21 @@ header {
                 }
             }
         }
+    }
+}
+
+hr {
+    border: 0;
+    width: 100%;
+    margin: 0;
+    min-height: 1px;
+
+    @include theme-dark {
+        background-color: lighten-color($color-bg-primary, 5%);
+    }
+
+    @include theme-light {
+        background-color: darken-color($color-bg-primary, 5%);
     }
 }
 
