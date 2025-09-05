@@ -15,7 +15,7 @@ export const Motions = {
         },
         'fade-in-scalex': {
             initial: { opacity: 0, scaleX: 0 },
-            enter: { opacity: 1, scaleX: 1, transition: { duration: 200, easing: 'easeInOut' } },
+            enter: { opacity: 1, scaleX: 1, transition: { type: 'spring', stiffness: 250, damping: 25, mass: 0.5 } },
             leave: { opacity: 0, scaleX: 0, transition: { duration: 200, easing: 'easeInOut' } },
         },
         'slide-up-scalex': {
