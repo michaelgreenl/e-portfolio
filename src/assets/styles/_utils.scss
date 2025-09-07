@@ -54,7 +54,7 @@ $breakpoints: (
     }
 }
 
-@mixin bp-xxl-desktop-large {
+@mixin bp-xxl-desktop {
     @media (min-width: map.get($breakpoints, 'xxl')) {
         @content;
     }

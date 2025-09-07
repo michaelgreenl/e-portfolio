@@ -49,6 +49,10 @@ body,
 #app {
     display: flex;
     flex-direction: column;
+
+    @include bp-xxl-desktop {
+        font-size: 1.2em;
+    }
 }
 
 .no-scroll {
