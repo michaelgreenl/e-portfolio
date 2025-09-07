@@ -274,7 +274,6 @@ function closeProject() {
             align-items: center;
             justify-content: space-between;
             padding: $size-8;
-            border-radius: 12px;
 
             @include theme-dark {
                 border-top: solid 1px lighten-color($color-bg-primary, 2.5%);
@@ -289,6 +288,8 @@ function closeProject() {
             @media (hover: hover) and (pointer: fine) {
                 &:hover {
                     transform: scale(1.01) !important;
+
+                    border-radius: 12px;
 
                     @include theme-dark {
                         background: lighten-color($color-bg-primary, 2.5%);
