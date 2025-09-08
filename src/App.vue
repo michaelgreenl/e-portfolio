@@ -86,7 +86,8 @@ h2 {
     }
 }
 
-h3 {
+h3,
+h4 {
     color: $color-primary-darker;
     font-family: $primary-font-stack;
     font-weight: 400;

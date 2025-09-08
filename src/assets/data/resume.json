@@ -1,0 +1,57 @@
+{
+    "education": {
+        "cmu": {
+            "title": "Central Michigan University",
+            "location": "Mount Pleasant MI",
+            "dates": "Graduation: August 2023",
+            "major": "Bachelor of Science in Computer Science",
+            "minor": "Minor in Mathematics",
+            "info": [
+                "Led the development of a full-stack web application using React, Node.js, and MongoDB, resulting in a 20% improvement in data processing efficiency for the user.",
+                "Completed advanced coursework in Data Structures, Algorithms, and Machine Learning, with a specialized focus on neural networks and natural language processing.",
+                "Maintained a 3.9 GPA while earning a place on the Dean's List for four consecutive semesters and receiving the Grace Hopper Scholarship for women in computing."
+            ]
+        },
+        "springboard": {
+            "title": "Springboard Cybersecurity Career Track",
+            "dates": "Completion: June 2025",
+            "info": [
+                "Developed an adversarial mindset by learning to identify common web application vulnerabilities (OWASP Top 10) and implementing secure coding practices to prevent them.",
+                "Gained hands-on experience in vulnerability assessment and threat modeling through 50+ technical labs, providing critical context for building secure back-end services and defending against common attack vectors.",
+                "Completed an intensive, project-based curriculum focused on defensive security principles, application security, secure coding practices, and cloud security fundamentals."
+            ]
+        }
+    },
+    "experience": {
+        "24g": {
+            "title": "Software Development Intern",
+            "company": "24g",
+            "location": "Troy MI",
+            "dates": "January 2022 - August 2022",
+            "info": [
+                "Gained hands-on experience working with REST APIs, including making requests, handling responses, and integrating them into applications.",
+                "Developed skills in Vue, NodeJS, and SCSS, demonstrating proficiency by accurately developing client-specified front-end applications.",
+                "Implemented precise UI/UX when translating mockups into accessible and responsive front-end applications.",
+                "Engaged in effective communication and collaboration with team members to complete project objectives.",
+                "Adaptively managed and incorporated client revisions while maintaining adherence to project deadlines.",
+                "Intuitively enhanced user experience by implementing seamless transitions, micro-interactions, and engaging loading animations, leading to a client-favorite convention application.",
+                "Became proficient in adapting and understanding different codebases of various sizes.",
+                "Used Git to effectively manage code versions, collaborate with team members, and track project progress."
+            ]
+        }
+    },
+    "skills": [
+        "vue",
+        "sass",
+        "pinia",
+        "gsap",
+        "node",
+        "express",
+        "git",
+        "sequelize",
+        "mysql",
+        "postgres",
+        "prisma",
+        "socket"
+    ]
+}
