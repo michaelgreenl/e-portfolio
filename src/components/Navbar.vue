@@ -229,7 +229,7 @@ watch(
             }
 
             @include theme-light {
-                background-color: #c8d5e5;
+                background-color: lighten-color($color-gray4, 10%);
             }
         }
 

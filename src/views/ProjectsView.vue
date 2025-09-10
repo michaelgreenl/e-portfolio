@@ -288,6 +288,7 @@ function closeProject() {
                 &:first-child {
                     border-top: solid 1px $color-text-muted;
                 }
+
                 border-bottom: solid 1px $color-text-muted;
             }
 
@@ -518,9 +519,12 @@ function closeProject() {
         height: 100vh;
         width: 100vw;
 
-        background-color: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
+
+        @include theme-dark {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
 
         .selected-project {
             position: relative;
@@ -533,15 +537,13 @@ function closeProject() {
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
 
             @include theme-dark {
-                background: linear-gradient(0deg, #212529cc 30%, #21252955 60%, #212529cc 90%);
+                background: linear-gradient(0deg, #212529aa 30%, #21252955 60%, #212529aa 90%);
             }
 
             @include theme-light {
-                background: $color-bg-primary;
+                background: linear-gradient(0deg, #dee2e6ef 40%, #dee2e655 60%, #dee2e6ef 90%);
             }
 
             .selected-header {
