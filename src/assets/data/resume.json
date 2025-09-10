@@ -5,12 +5,7 @@
             "location": "Mount Pleasant MI",
             "dates": "Graduation: August 2023",
             "major": "Bachelor of Science in Computer Science",
-            "minor": "Minor in Mathematics",
-            "info": [
-                "Led the development of a full-stack web application using React, Node.js, and MongoDB, resulting in a 20% improvement in data processing efficiency for the user.",
-                "Completed advanced coursework in Data Structures, Algorithms, and Machine Learning, with a specialized focus on neural networks and natural language processing.",
-                "Maintained a 3.9 GPA while earning a place on the Dean's List for four consecutive semesters and receiving the Grace Hopper Scholarship for women in computing."
-            ]
+            "minor": "Minor in Mathematics"
         },
         "springboard": {
             "title": "Springboard Cybersecurity Career Track",
