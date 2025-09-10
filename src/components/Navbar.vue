@@ -113,7 +113,7 @@ watch(
 
 .nav-mobile {
     position: fixed;
-    z-index: 1;
+    z-index: 9;
     right: $size-2;
     bottom: $size-2;
     left: $size-2;
@@ -229,7 +229,7 @@ watch(
             }
 
             @include theme-light {
-                background-color: #8ba7b340;
+                background-color: #c8d5e5;
             }
         }
 
@@ -264,6 +264,8 @@ watch(
 }
 
 header {
+    position: relative;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -348,17 +350,19 @@ header {
 }
 
 hr {
+    position: relative;
+    z-index: 3;
     border: 0;
     width: 100%;
     margin: 0;
     min-height: 1px;
 
     @include theme-dark {
-        background-color: lighten-color($color-bg-primary, 5%);
+        background-color: #575e6455;
     }
 
     @include theme-light {
-        background-color: darken-color($color-bg-primary, 5%);
+        background-color: #3d505c33;
     }
 }
 

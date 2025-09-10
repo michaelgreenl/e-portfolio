@@ -6,6 +6,8 @@
 
 <style lang="scss" scoped>
 footer {
+    position: relative;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: flex-end;

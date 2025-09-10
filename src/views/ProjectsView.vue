@@ -113,7 +113,7 @@ function closeProject() {
                     }
                 "
                 v-motion-fade-in-once
-                :delay="100 * i"
+                :delay="50"
             >
                 <div class="img-container">
                     <PlayIcon />
@@ -237,11 +237,11 @@ function closeProject() {
         height: 1px;
 
         @include theme-dark {
-            background-color: lighten-color($color-bg-primary, 5%);
+            background-color: $color-gray6;
         }
 
         @include theme-light {
-            background-color: darken-color($color-bg-primary, 5%);
+            background-color: $color-primary-darker;
         }
     }
 
@@ -257,6 +257,7 @@ function closeProject() {
             max-width: 37ch;
             font-size: 1.5em;
             text-align: center;
+            color: $color-text-secondary;
         }
     }
 
@@ -276,23 +277,30 @@ function closeProject() {
             padding: $size-8;
 
             @include theme-dark {
-                border-top: solid 1px lighten-color($color-bg-primary, 2.5%);
-                border-bottom: solid 1px lighten-color($color-bg-primary, 2.5%);
+                &:first-child {
+                    border-top: solid 1px $color-bg-secondary;
+                }
+
+                border-bottom: solid 1px $color-bg-secondary;
             }
 
             @include theme-light {
-                border-top: solid 1px darken-color($color-bg-primary, 2.5%);
-                border-bottom: solid 1px darken-color($color-bg-primary, 2.5%);
+                &:first-child {
+                    border-top: solid 1px $color-text-muted;
+                }
+                border-bottom: solid 1px $color-text-muted;
             }
 
             @media (hover: hover) and (pointer: fine) {
                 &:hover {
                     transform: scale(1.01) !important;
-
                     border-radius: 12px;
+                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+                    backdrop-filter: blur(2px);
+                    -webkit-backdrop-filter: blur(2px);
 
                     @include theme-dark {
-                        background: lighten-color($color-bg-primary, 2.5%);
+                        background: linear-gradient(90deg, #21252922, #21252900);
 
                         .card-footer {
                             :deep(.see-more) {
@@ -307,7 +315,7 @@ function closeProject() {
                     }
 
                     @include theme-light {
-                        background: darken-color($color-bg-primary, 2%);
+                        background: linear-gradient(90deg, #dee2e622, #dee2e600);
 
                         .card-footer {
                             :deep(.see-more) {
@@ -511,8 +519,8 @@ function closeProject() {
         width: 100vw;
 
         background-color: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
 
         .selected-project {
             position: relative;
@@ -523,9 +531,18 @@ function closeProject() {
             padding: $size-5 $size-8;
             margin: 0 $size-4;
             border-radius: 20px;
-            background-color: $color-bg-primary;
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            @include theme-dark {
+                background: linear-gradient(0deg, #212529cc 30%, #21252955 60%, #212529cc 90%);
+            }
+
+            @include theme-light {
+                background: $color-bg-primary;
+            }
 
             .selected-header {
                 display: flex;
@@ -544,7 +561,7 @@ function closeProject() {
                     }
                 }
 
-                .close-button {
+                :deep(.close-button) {
                     font-size: 1.2em;
                     display: flex;
                     align-items: center;
@@ -559,7 +576,7 @@ function closeProject() {
                         }
 
                         @include theme-light {
-                            fill: darken-color($color-text-muted, 15%);
+                            fill: darken-color($color-text-muted, 40%);
                         }
                     }
 

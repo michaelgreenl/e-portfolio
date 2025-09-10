@@ -154,11 +154,11 @@ watch(
         height: 1px;
 
         @include theme-dark {
-            background-color: lighten-color($color-bg-primary, 5%);
+            background-color: $color-gray6;
         }
 
         @include theme-light {
-            background-color: darken-color($color-bg-primary, 5%);
+            background-color: $color-gray5;
         }
     }
 
@@ -174,6 +174,10 @@ watch(
 
         a {
             font-size: 0.85em;
+
+            :deep(button) {
+                border-width: 1px;
+            }
         }
     }
 

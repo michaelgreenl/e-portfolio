@@ -169,16 +169,16 @@ watch(
 
         .hero-line {
             border: 0;
-            width: 90%;
+            width: 100%;
             margin: 0 auto $size-2;
             height: 1px;
 
             @include theme-dark {
-                background-color: lighten-color($color-bg-primary, 5%);
+                background-color: $color-gray6;
             }
 
             @include theme-light {
-                background-color: darken-color($color-bg-primary, 5%);
+                background-color: $color-gray5;
             }
         }
 
@@ -204,12 +204,23 @@ watch(
             border: 0;
             height: 1px;
             flex-grow: 1;
-            background-color: $color-text-muted !important;
+
+            @include theme-dark {
+                background-color: $color-gray6;
+            }
+
+            @include theme-light {
+                background-color: $color-primary-darker;
+            }
         }
 
-        button {
+        :deep(button) {
             font-size: 1.2em;
             padding: 0 $size-1;
+
+            &::after {
+                height: 2px;
+            }
         }
     }
 

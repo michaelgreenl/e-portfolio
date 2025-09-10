@@ -126,7 +126,7 @@ button {
             width: $size-5;
 
             @include theme-dark {
-                fill: lighten-color($color-text-muted, 10%);
+                fill: $color-gray6;
             }
 
             @include theme-light {
@@ -144,7 +144,7 @@ button {
             transition: all 0.3s ease;
 
             @include theme-dark {
-                background-color: $color-text-secondary;
+                background-color: $color-gray6;
             }
 
             @include theme-light {
