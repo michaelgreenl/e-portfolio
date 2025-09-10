@@ -548,6 +548,7 @@ function closeProject() {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                padding-left: 0.75em;
 
                 div {
                     display: flex;
