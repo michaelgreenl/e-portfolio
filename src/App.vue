@@ -2,8 +2,10 @@
 import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
 import { useThemeStore } from './stores/themeStore.js';
+import { useMotions } from '@vueuse/motion';
 import Navbar from './components/Navbar.vue';
 import Footer from './components/Footer.vue';
+import BgSVG from './components/SVGs/BgSVG.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -22,9 +24,10 @@ onMounted(() => {
 </script>
 
 <template>
+    <BgSVG class="bg-svg" />
     <Navbar />
 
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
+    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
     <Footer />
 </template>
 
@@ -47,6 +50,7 @@ body,
 }
 
 #app {
+    position: relative;
     display: flex;
     flex-direction: column;
 
@@ -62,6 +66,11 @@ body,
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+
+.page {
+    position: relative;
+    z-index: 3;
 }
 
 h1 {
