@@ -296,7 +296,7 @@ function closeProject() {
                 &:hover {
                     transform: scale(1.01) !important;
                     border-radius: 12px;
-                    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+                    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
                     backdrop-filter: blur(2px);
                     -webkit-backdrop-filter: blur(2px);
 

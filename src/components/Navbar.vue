@@ -287,7 +287,7 @@ header {
         }
 
         @include theme-light {
-            background-color: $color-primary-darker;
+            background-color: $color-primary;
         }
 
         .toggle-input {

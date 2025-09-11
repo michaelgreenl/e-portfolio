@@ -169,7 +169,7 @@ watch(
 
         .hero-line {
             border: 0;
-            width: 100%;
+            width: 95%;
             margin: 0 auto $size-2;
             height: 1px;
 
