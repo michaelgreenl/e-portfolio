@@ -2,8 +2,10 @@
 import { onMounted } from 'vue';
 import { useRouteStore } from './stores/routeStore.js';
 import { useThemeStore } from './stores/themeStore.js';
+import { useMotions } from '@vueuse/motion';
 import Navbar from './components/Navbar.vue';
 import Footer from './components/Footer.vue';
+import BgSVG from './components/SVGs/BgSVG.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -22,24 +24,12 @@ onMounted(() => {
 </script>
 
 <template>
+    <BgSVG class="bg-svg" />
     <Navbar />
 
-    <transition name="page" mode="out-in">
-        <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" />
-    </transition>
+    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
     <Footer />
 </template>
-
-<style>
-.page-leave-active {
-    transition: all 0.3s ease;
-}
-
-.page-leave-to {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-</style>
 
 <style lang="scss">
 @use './assets/styles/_variables.scss';
@@ -60,8 +50,13 @@ body,
 }
 
 #app {
+    position: relative;
     display: flex;
     flex-direction: column;
+
+    @include bp-xxl-desktop {
+        font-size: 1.2em;
+    }
 }
 
 .no-scroll {
@@ -71,6 +66,11 @@ body,
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+
+.page {
+    position: relative;
+    z-index: 3;
 }
 
 h1 {
@@ -95,7 +95,8 @@ h2 {
     }
 }
 
-h3 {
+h3,
+h4 {
     color: $color-primary-darker;
     font-family: $primary-font-stack;
     font-weight: 400;

@@ -1,21 +1,56 @@
 <script setup>
-import { useMotions } from '@vueuse/motion';
+import { ref, watch } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
+import { useMotions, useMotion } from '@vueuse/motion';
+import { Motions } from '../utils/motions.js';
 import Button from '../components/Button.vue';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
 
 const routeStore = useRouteStore();
+
+const heroContent = ref(null);
+const heroLine = ref(null);
+const navLine = ref(null);
+const navItems = ref([]);
+
+const heroContentMotion = useMotion(heroContent, Motions.directives['fade-slide-right']);
+const heroLineMotion = useMotion(heroLine, Motions.directives['fade-in-scalex']);
+const navLineMotion = useMotion(navLine, Motions.directives['fade-in-scalex']);
+const navItemMotions = ref([]);
+
+watch(
+    () => routeStore.isLeaving,
+    (newVal) => {
+        if (newVal) {
+            // The fix was janky but adding a different motion from the directive ("...-leave") works
+            navItemMotions.value = navItems.value.map((el) => {
+                if (!el) return null;
+                return useMotion(el, Motions.directives['fade-slide-left-leave']);
+            });
+
+            heroContentMotion.set('leave');
+            heroLineMotion.set('leave');
+            navLineMotion.set('leave');
+
+            navItemMotions.value.reverse().forEach((motion, i) => {
+                setTimeout(() => {
+                    motion.set('leave');
+                }, 100 * i);
+            });
+        }
+    },
+);
 </script>
 
 <template>
     <div class="home-container">
-        <div class="hero-content" v-motion-fade-slide-right>
+        <div class="hero-content" ref="heroContent" v-motion-fade-slide-right>
             <h3>Hi 👋, my name is</h3>
             <h1>
                 Michael
                 <span> Green </span>
             </h1>
-            <hr class="hero-line" v-motion-fade-in-scalex />
+            <hr class="hero-line" ref="heroLine" v-motion-fade-in-scalex />
             <h2>Full-Stack Developer</h2>
             <p>
                 Hello, I am a software engineer with a passion for solving problems. I am writing this in normal a a
@@ -37,8 +72,18 @@ const routeStore = useRouteStore();
             </div>
         </div>
         <div class="site-nav">
-            <hr class="nav-line" v-motion-fade-in-scalex />
-            <div v-for="(route, key, i) in routeStore.routes" :key="key" v-motion-fade-slide-left :delay="100 * i">
+            <hr class="nav-line" ref="navLine" v-motion-fade-in-scalex />
+            <div
+                v-for="(route, key, i) in routeStore.routes"
+                :key="key"
+                v-motion-fade-slide-left
+                :delay="100 * i"
+                :ref="
+                    (el) => {
+                        if (el) navItems[i] = el;
+                    }
+                "
+            >
                 <Button
                     v-if="key !== 'home'"
                     :onClick="
@@ -103,7 +148,6 @@ const routeStore = useRouteStore();
 
         h2 {
             font-size: 1.9em;
-            border-right: solid 2px $color-text-primary;
             width: fit-content;
             margin: 0 auto;
         }
@@ -125,16 +169,16 @@ const routeStore = useRouteStore();
 
         .hero-line {
             border: 0;
-            width: 90%;
+            width: 95%;
             margin: 0 auto $size-2;
             height: 1px;
 
             @include theme-dark {
-                background-color: lighten-color($color-bg-primary, 5%);
+                background-color: $color-gray6;
             }
 
             @include theme-light {
-                background-color: darken-color($color-bg-primary, 5%);
+                background-color: $color-gray5;
             }
         }
 
@@ -160,12 +204,23 @@ const routeStore = useRouteStore();
             border: 0;
             height: 1px;
             flex-grow: 1;
-            background-color: $color-text-muted !important;
+
+            @include theme-dark {
+                background-color: $color-gray6;
+            }
+
+            @include theme-light {
+                background-color: $color-primary-darker;
+            }
         }
 
-        button {
+        :deep(button) {
             font-size: 1.2em;
             padding: 0 $size-1;
+
+            &::after {
+                height: 2px;
+            }
         }
     }
 

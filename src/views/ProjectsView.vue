@@ -1,9 +1,8 @@
 <script setup>
-// tool chip options
-// ['vue', 'sass', 'pinia', 'gsap', 'node', 'express', 'git', 'sequelize', 'mysql', 'postgres', 'prisma', 'socket'],
-
-import { computed, ref } from 'vue';
-import { useMotion } from '@vueuse/motion';
+import { computed, ref, watch } from 'vue';
+import { useRouteStore } from '../stores/routeStore.js';
+import { useMotions, useMotion } from '@vueuse/motion';
+import { Motions } from '../utils/motions.js';
 import projectsData from '../assets/data/projects.json';
 import Button from '../components/Button.vue';
 import ToolChip from '../components/ToolChip.vue';
@@ -36,6 +35,42 @@ const externalIcons = {
 const activeProject = ref();
 const scrollPosition = ref();
 
+const header = ref(null);
+const headerLine = ref(null);
+const headerText = ref(null);
+const projectItems = ref([]);
+const selectedProject = ref(null);
+
+const headerMotion = useMotion(header, Motions.directives['fade-in']);
+const headerLineMotion = useMotion(headerLine, Motions.directives['fade-in-scalex']);
+const headerTextMotion = useMotion(headerText, Motions.directives['fade-in']);
+const projectItemMotions = ref([]);
+const selectedProjectMotion = useMotion(selectedProject, Motions.directives['fade-in-leave']);
+
+const routeStore = useRouteStore();
+watch(
+    () => routeStore.isLeaving,
+    (newVal) => {
+        if (newVal) {
+            // The fix was janky but adding a different motion from the directive ("...-leave") works
+            projectItemMotions.value = projectItems.value.map((el) => {
+                if (!el) return null;
+                return useMotion(el, Motions.directives['fade-in-leave']);
+            });
+
+            headerMotion.set('leave');
+            headerLineMotion.set('leave');
+            headerTextMotion.set('leave');
+
+            projectItemMotions.value.forEach((motion, i) => {
+                setTimeout(() => {
+                    motion.set('leave');
+                }, 100 * i);
+            });
+        }
+    },
+);
+
 function openProject(project) {
     activeProject.value = project;
 
@@ -45,20 +80,23 @@ function openProject(project) {
 }
 
 function closeProject() {
-    activeProject.value = null;
+    selectedProjectMotion.set('leave');
+    setTimeout(() => {
+        activeProject.value = null;
 
-    document.body.classList.remove('no-scroll');
-    document.body.style.top = '';
-    window.scrollTo(0, scrollPosition.value);
+        document.body.classList.remove('no-scroll');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollPosition.value);
+    }, 100);
 }
 </script>
 
 <template>
     <div class="projects-container">
         <div class="page-header">
-            <h1 v-motion-fade-in>Projects</h1>
-            <hr v-motion-fade-in-scalex />
-            <p v-motion-fade-in :delay="100">
+            <h1 ref="header" v-motion-fade-in>Projects</h1>
+            <hr ref="headerLine" v-motion-fade-in-scalex />
+            <p ref="headerText" v-motion-fade-in :delay="100">
                 This is temporary text I am typing right now. I recently started to ponder about thinking through
                 something about a thing
             </p>
@@ -69,8 +107,13 @@ function closeProject() {
                 :key="project.title"
                 @click="openProject(project)"
                 class="project-card"
+                :ref="
+                    (el) => {
+                        if (el) projectItems[i] = el;
+                    }
+                "
                 v-motion-fade-in-once
-                :delay="100 * i"
+                :delay="50"
             >
                 <div class="img-container">
                     <PlayIcon />
@@ -106,7 +149,7 @@ function closeProject() {
                 </div>
             </div>
         </div>
-        <div v-if="activeProject" class="selected-container" v-motion-fade-in>
+        <div v-if="activeProject" ref="selectedProject" class="selected-container" v-motion-fade-in>
             <div class="selected-project">
                 <div class="selected-header">
                     <div>
@@ -194,11 +237,11 @@ function closeProject() {
         height: 1px;
 
         @include theme-dark {
-            background-color: lighten-color($color-bg-primary, 5%);
+            background-color: $color-gray6;
         }
 
         @include theme-light {
-            background-color: darken-color($color-bg-primary, 5%);
+            background-color: $color-primary-darker;
         }
     }
 
@@ -214,6 +257,7 @@ function closeProject() {
             max-width: 37ch;
             font-size: 1.5em;
             text-align: center;
+            color: $color-text-secondary;
         }
     }
 
@@ -231,24 +275,33 @@ function closeProject() {
             align-items: center;
             justify-content: space-between;
             padding: $size-8;
-            border-radius: 12px;
 
             @include theme-dark {
-                border-top: solid 1px lighten-color($color-bg-primary, 2.5%);
-                border-bottom: solid 1px lighten-color($color-bg-primary, 2.5%);
+                &:first-child {
+                    border-top: solid 1px $color-bg-secondary;
+                }
+
+                border-bottom: solid 1px $color-bg-secondary;
             }
 
             @include theme-light {
-                border-top: solid 1px darken-color($color-bg-primary, 2.5%);
-                border-bottom: solid 1px darken-color($color-bg-primary, 2.5%);
+                &:first-child {
+                    border-top: solid 1px $color-text-muted;
+                }
+
+                border-bottom: solid 1px $color-text-muted;
             }
 
             @media (hover: hover) and (pointer: fine) {
                 &:hover {
                     transform: scale(1.01) !important;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
+                    backdrop-filter: blur(2px);
+                    -webkit-backdrop-filter: blur(2px);
 
                     @include theme-dark {
-                        background: lighten-color($color-bg-primary, 2.5%);
+                        background: linear-gradient(90deg, #21252922, #21252900);
 
                         .card-footer {
                             :deep(.see-more) {
@@ -263,7 +316,7 @@ function closeProject() {
                     }
 
                     @include theme-light {
-                        background: darken-color($color-bg-primary, 2%);
+                        background: linear-gradient(90deg, #dee2e622, #dee2e600);
 
                         .card-footer {
                             :deep(.see-more) {
@@ -466,9 +519,12 @@ function closeProject() {
         height: 100vh;
         width: 100vw;
 
-        background-color: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+
+        @include theme-dark {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
 
         .selected-project {
             position: relative;
@@ -479,12 +535,22 @@ function closeProject() {
             padding: $size-5 $size-8;
             margin: 0 $size-4;
             border-radius: 20px;
-            background-color: $color-bg-primary;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+            @include theme-dark {
+                background: linear-gradient(0deg, #212529aa 30%, #21252955 60%, #212529aa 90%);
+            }
+
+            @include theme-light {
+                background: linear-gradient(0deg, #dee2e6ef 40%, #dee2e655 60%, #dee2e6ef 90%);
+            }
 
             .selected-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                padding-left: 0.75em;
 
                 div {
                     display: flex;
@@ -498,7 +564,7 @@ function closeProject() {
                     }
                 }
 
-                .close-button {
+                :deep(.close-button) {
                     font-size: 1.2em;
                     display: flex;
                     align-items: center;
@@ -513,7 +579,7 @@ function closeProject() {
                         }
 
                         @include theme-light {
-                            fill: darken-color($color-text-muted, 15%);
+                            fill: darken-color($color-text-muted, 40%);
                         }
                     }
 
@@ -688,6 +754,12 @@ function closeProject() {
     }
 
     @include bp-xsm-phone {
+        .page-header {
+            h1 {
+                font-size: 7em;
+            }
+        }
+
         .cards {
             max-width: 50em;
 
@@ -721,10 +793,6 @@ function closeProject() {
         margin: 0 auto;
 
         .page-header {
-            h1 {
-                font-size: 7em;
-            }
-
             p {
                 max-width: 56ch;
                 font-size: 1.6em;

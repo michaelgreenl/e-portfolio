@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouteStore } from '../stores/routeStore.js';
 import { useThemeStore } from '../stores/themeStore.js';
-import { useMotions } from '@vueuse/motion';
+import { useMotions, useMotion } from '@vueuse/motion';
+import { Motions } from '../utils/motions.js';
 
 import MoonIcon from '../components/SVGs/MoonIcon.vue';
 import SunIcon from '../components/SVGs/SunIcon.vue';
@@ -10,11 +11,36 @@ import Logo from '../components/Logo.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+
+const logo = ref(null);
+const navItems = ref([]);
+
+const logoMotions = useMotion(logo, Motions.directives['fade-in']);
+const navItemMotions = ref([]);
+
+watch(
+    () => routeStore.isLeaving,
+    (newVal) => {
+        if (routeStore.toPath === 'home' && newVal) {
+            // The fix was janky but adding a different motion from the directive ("...-leave") works
+            navItemMotions.value = navItems.value.map((el) => {
+                if (!el) return null;
+                return useMotion(el, Motions.directives['fade-in-leave']);
+            });
+
+            navItemMotions.value.reverse().forEach((motion, i) => {
+                setTimeout(() => {
+                    motion.set('leave');
+                }, 100 * i);
+            });
+        }
+    },
+);
 </script>
 
 <template>
     <header>
-        <Logo v-motion-fade-in />
+        <Logo ref="logo" v-motion-fade-in />
         <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
                 v-for="(route, key, i) in routeStore.routes"
@@ -23,6 +49,11 @@ const themeStore = useThemeStore();
                 @click="routeStore.toRoute(key)"
                 v-motion-fade-slide-in-scalex
                 :delay="100 * i"
+                :ref="
+                    (el) => {
+                        if (el) navItems[i] = el;
+                    }
+                "
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
@@ -46,6 +77,7 @@ const themeStore = useThemeStore();
             </div>
         </label>
     </header>
+    <hr v-motion-fade-in-scalex />
     <nav class="nav-mobile" v-motion-slide-up-scalex>
         <button
             v-for="(route, key) in routeStore.routes"
@@ -81,7 +113,7 @@ const themeStore = useThemeStore();
 
 .nav-mobile {
     position: fixed;
-    z-index: 1;
+    z-index: 9;
     right: $size-2;
     bottom: $size-2;
     left: $size-2;
@@ -197,7 +229,7 @@ const themeStore = useThemeStore();
             }
 
             @include theme-light {
-                background-color: #8ba7b340;
+                background-color: lighten-color($color-gray4, 10%);
             }
         }
 
@@ -232,19 +264,13 @@ const themeStore = useThemeStore();
 }
 
 header {
+    position: relative;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: $size-13;
     padding: 0 $size-2;
-
-    @include theme-dark {
-        border-bottom: 1px solid lighten-color($color-bg-primary, 5%);
-    }
-
-    @include theme-light {
-        border-bottom: 1px solid darken-color($color-bg-primary, 5%);
-    }
 
     .theme-toggle {
         display: inline-flex;
@@ -261,7 +287,7 @@ header {
         }
 
         @include theme-light {
-            background-color: $color-primary-darker;
+            background-color: $color-primary;
         }
 
         .toggle-input {
@@ -320,6 +346,23 @@ header {
                 }
             }
         }
+    }
+}
+
+hr {
+    position: relative;
+    z-index: 3;
+    border: 0;
+    width: 100%;
+    margin: 0;
+    min-height: 1px;
+
+    @include theme-dark {
+        background-color: #575e6455;
+    }
+
+    @include theme-light {
+        background-color: #3d505c33;
     }
 }
 
