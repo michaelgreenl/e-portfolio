@@ -6,6 +6,7 @@ import { useMotion, useMotions } from '@vueuse/motion';
 import { Motions } from '../utils/motions.js';
 import Button from '../components/Button.vue';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
+import CalendarIcon from '../components/SVGs/CalendarIcon.vue';
 
 const routeStore = useRouteStore();
 
@@ -39,7 +40,10 @@ watch(
                         <h3 class="segment-title">
                             {{ education.title }}<span v-if="education.location">, {{ education.location }}</span>
                         </h3>
-                        <h3>{{ education.dates }}</h3>
+                        <div class="segment-dates">
+                            <CalendarIcon />
+                            <h3>{{ education.dates }}</h3>
+                        </div>
                     </div>
                     <div v-if="education.major" class="segment-details">
                         <h3>{{ education.major }}</h3>
@@ -58,7 +62,10 @@ watch(
                 <div v-for="experience in resumeData.experience" :key="experience.title" class="section-segment">
                     <div class="segment-header">
                         <h3 class="segment-title">{{ experience.title }}</h3>
-                        <h3>{{ experience.dates }}</h3>
+                        <div class="segment-dates">
+                            <CalendarIcon />
+                            <h3>{{ experience.dates }}</h3>
+                        </div>
                     </div>
                     <div class="segment-details">
                         <h3>
@@ -90,18 +97,19 @@ watch(
 <style lang="scss" scoped>
 .resume-container {
     position: relative;
+    font-size: 0.7em;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
     width: 100%;
-    max-width: 69em;
+    max-width: 45em;
     margin: 0 auto;
     padding: $size-4;
     color: $color-text-primary;
 
     h1 {
-        font-size: 4em;
+        font-size: 3em;
         margin: $size-1 0;
     }
 
@@ -138,7 +146,7 @@ watch(
     }
 
     ul {
-        margin: $size-2 0;
+        margin: $size-1 0;
         padding: 0 $size-5;
     }
 
@@ -162,18 +170,15 @@ watch(
         }
     }
 
-    .segment-title {
-        font-weight: 600;
-    }
-
     .page-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        padding-right: $size-2;
 
         a {
-            font-size: 0.85em;
+            font-size: 0.9em;
 
             :deep(button) {
                 border-width: 1px;
@@ -183,6 +188,15 @@ watch(
 
     .section-segment {
         padding: $size-2;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .segment-details {
+            gap: 2px;
+            display: flex;
+            flex-direction: column;
+        }
 
         &-skills {
             padding-top: 0.1em !important;
@@ -192,7 +206,44 @@ watch(
     .segment-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        flex-wrap: wrap-reverse;
+        gap: 3px;
+
+        .segment-title {
+            font-weight: 600;
+            font-size: 1.3em;
+        }
+
+        .segment-dates {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: $size-2;
+
+            :deep(svg) {
+                height: 1em;
+                stroke: $color-text-primary;
+                margin-bottom: 4px;
+            }
+        }
+    }
+
+    @include bp-xsm-phone {
+        font-size: clamp(0.75em, 3.5vw, 0.95em);
+
+        .page-header {
+            a {
+                font-size: 1em;
+            }
+        }
+    }
+
+    @include bp-sm-phone {
+        font-size: 1em;
+    }
+
+    @include bp-lg-laptop {
+        max-width: 71em;
     }
 }
 </style>
