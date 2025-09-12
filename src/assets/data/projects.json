@@ -46,7 +46,7 @@
     {
         "title": "AlgoVisualizer",
         "slug": "algo-visualizer",
-        "stack": ["vue", "nuxt", "pinia", "sass", "gsap"],
+        "stack": ["vue", "nuxt", "pinia", "node", "sass", "gsap"],
         "date": "05/32/2025",
         "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
