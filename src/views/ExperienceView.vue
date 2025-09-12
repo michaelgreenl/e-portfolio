@@ -103,7 +103,7 @@ watch(
     align-items: center;
     flex-grow: 1;
     width: 100%;
-    max-width: 45em;
+    max-width: 32em;
     margin: 0 auto;
     padding: $size-4;
     color: $color-text-primary;
@@ -229,7 +229,7 @@ watch(
     }
 
     @include bp-xsm-phone {
-        font-size: clamp(0.75em, 3.5vw, 0.95em);
+        font-size: clamp(0.75em, 3.5vw, 1.05em);
 
         .page-header {
             a {
@@ -238,11 +238,11 @@ watch(
         }
     }
 
-    @include bp-sm-phone {
-        font-size: 1em;
+    @include bp-custom-min(730) {
+        max-width: 48em;
     }
 
-    @include bp-lg-laptop {
+    @include bp-xl-desktop {
         max-width: 71em;
     }
 }
