@@ -169,7 +169,7 @@ function closeProject() {
                         <img :src="getURL(activeProject.img)" alt="project image" class="project-img" />
                     </div>
                     <div class="selected-info">
-                        <div class="info-header">
+                        <div class="info-header" :class="`info-header-${activeProject.slug}`">
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
                             <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
                             <div class="external-links">
@@ -178,7 +178,7 @@ function closeProject() {
                                 </a>
                             </div>
                         </div>
-                        <div class="tool-chips">
+                        <div class="tool-chips" :class="`tool-chips-${activeProject.slug}`">
                             <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
                         </div>
                         <ul class="description">
@@ -275,6 +275,12 @@ function closeProject() {
             align-items: center;
             justify-content: space-between;
             padding: $size-8;
+
+            &:last-child {
+                .card-body .card-header {
+                    gap: $size-1;
+                }
+            }
 
             @include theme-dark {
                 &:first-child {
@@ -376,7 +382,7 @@ function closeProject() {
                 .card-header {
                     display: flex;
                     align-items: center;
-                    gap: $size-2;
+                    gap: $size-3;
 
                     .project-logo {
                         display: flex;
@@ -393,7 +399,7 @@ function closeProject() {
                     }
 
                     h2 {
-                        font-size: 2em;
+                        font-size: 2.1em;
                         margin: 0 !important;
                     }
 
@@ -518,7 +524,6 @@ function closeProject() {
         justify-content: center;
         height: 100vh;
         width: 100vw;
-
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
 
@@ -533,17 +538,17 @@ function closeProject() {
             flex-direction: column;
             max-width: 61em;
             padding: $size-5 $size-8;
-            margin: 0 $size-4;
+            margin: 0 $size-4 $size-12;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
             @include theme-dark {
-                background: linear-gradient(0deg, #212529aa 30%, #21252955 60%, #212529aa 90%);
+                background: linear-gradient(0deg, #212529ea 30%, #212529aa 60%, #212529ea 90%);
             }
 
             @include theme-light {
-                background: linear-gradient(0deg, #dee2e6ef 40%, #dee2e655 60%, #dee2e6ef 90%);
+                background: linear-gradient(0deg, #dee2e6ea 40%, #dee2e6aa 60%, #dee2e6ea 90%);
             }
 
             .selected-header {
@@ -626,6 +631,7 @@ function closeProject() {
                     position: relative;
                     z-index: 0;
                     width: 90%;
+                    max-width: 65em;
                     filter: blur(2px);
                 }
             }
@@ -636,16 +642,20 @@ function closeProject() {
                 margin-top: -$size-3;
 
                 .info-header {
-                    font-size: 1.25em;
+                    font-size: 1.35em;
                     display: flex;
                     align-items: center;
-                    gap: $size-1;
+                    gap: $size-2;
                     margin-top: $size-4;
+
+                    &-algo-visualizer {
+                        gap: $size-1 !important;
+                    }
 
                     .project-logo {
                         display: flex;
                         align-items: center;
-                        height: 2.8em;
+                        height: 2.2em;
 
                         @include theme-dark {
                             fill: $color-gray3;
@@ -722,7 +732,7 @@ function closeProject() {
                     align-items: center;
                     flex-wrap: wrap;
                     overflow: hidden;
-                    gap: $size-6;
+                    gap: $size-4;
                     height: $size-10;
                     margin-top: $size-3;
 
@@ -730,6 +740,12 @@ function closeProject() {
                         font-size: 1.2em;
                         flex: 1;
                         height: 1.8em;
+                    }
+
+                    &-algo-visualizer {
+                        :deep(.chip-container) {
+                            max-width: none !important;
+                        }
                     }
                 }
 
@@ -761,7 +777,7 @@ function closeProject() {
         }
 
         .cards {
-            max-width: 50em;
+            max-width: 53em;
 
             .project-card {
                 .card-body {
@@ -783,6 +799,22 @@ function closeProject() {
                 .selected-info {
                     .info-header {
                         margin-top: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    @include bp-custom-min(450) {
+        .selected-container {
+            .selected-project {
+                padding: $size-8 $size-10;
+
+                .selected-info {
+                    .info-header {
+                        h2 {
+                            font-size: 2.2em;
+                        }
                     }
                 }
             }
@@ -830,10 +862,6 @@ function closeProject() {
 
         .selected-container {
             .selected-project {
-                max-width: 78em;
-                padding: $size-8 $size-12;
-                margin: 0 $size-10;
-
                 .selected-info {
                     .img-container {
                         margin: 0;
@@ -885,6 +913,13 @@ function closeProject() {
                 span {
                     display: block !important;
                 }
+            }
+        }
+
+        .selected-container {
+            .selected-project {
+                max-width: 72em;
+                margin: $size-8 0;
             }
         }
     }
