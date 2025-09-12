@@ -7,7 +7,7 @@
 <style lang="scss" scoped>
 footer {
     position: relative;
-    z-index: 3;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: flex-end;
