@@ -27,12 +27,68 @@ const errors = reactive({
     message: '',
 });
 
+// Track which fields have been touched (user has typed something)
+const touched = reactive({
+    email: false,
+    subject: false,
+    message: false,
+});
+
 const isSubmitting = ref(false);
 const submitStatus = ref(''); // 'success', 'error', or ''
 
 const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+};
+
+// Generic field validation function
+const validateField = (fieldName) => {
+    if (!touched[fieldName]) return; // Only validate if field has been touched
+    
+    const value = form[fieldName];
+    let errorMessage = '';
+    
+    switch (fieldName) {
+        case 'email':
+            if (!value) {
+                errorMessage = 'Email is required';
+            } else if (!validateEmail(value)) {
+                errorMessage = 'Please enter a valid email address';
+            }
+            break;
+            
+        case 'subject':
+            if (!value.trim()) {
+                errorMessage = 'Subject is required';
+            } else if (value.trim().length < 3) {
+                errorMessage = 'Subject must be at least 3 characters long';
+            }
+            break;
+            
+        case 'message':
+            if (!value.trim()) {
+                errorMessage = 'Message is required';
+            } else if (value.trim().length < 10) {
+                errorMessage = 'Message must be at least 10 characters long';
+            }
+            break;
+    }
+    
+    errors[fieldName] = errorMessage;
+};
+
+// Generic event handlers
+const handleFieldInput = (fieldName) => {
+    touched[fieldName] = true;
+};
+
+const handleFieldBlur = (fieldName) => {
+    validateField(fieldName);
+};
+
+const handleFieldFocus = (fieldName) => {
+    errors[fieldName] = '';
 };
 
 const validateForm = () => {
@@ -83,9 +139,13 @@ const handleSubmit = async () => {
                 submitStatus.value = 'success';
                 isSubmitting.value = false;
 
+                // Reset form and touched state
                 form.email = '';
                 form.subject = '';
                 form.message = '';
+                touched.email = false;
+                touched.subject = false;
+                touched.message = false;
             }
         },
         (error) => {
@@ -143,6 +203,9 @@ watch(
                     :class="{ error: errors.email }"
                     placeholder="your.email@example.com"
                     required
+                    @input="handleFieldInput('email')"
+                    @blur="handleFieldBlur('email')"
+                    @focus="handleFieldFocus('email')"
                     v-motion-fade-in
                     :delay="200"
                     :duration="200"
@@ -159,6 +222,9 @@ watch(
                     :class="{ error: errors.subject }"
                     placeholder="What's this about?"
                     required
+                    @input="handleFieldInput('subject')"
+                    @blur="handleFieldBlur('subject')"
+                    @focus="handleFieldFocus('subject')"
                     v-motion-fade-in
                     :delay="300"
                     :duration="200"
@@ -175,6 +241,9 @@ watch(
                     placeholder="What's up?"
                     rows="6"
                     required
+                    @input="handleFieldInput('message')"
+                    @blur="handleFieldBlur('message')"
+                    @focus="handleFieldFocus('message')"
                     v-motion-fade-in
                     :delay="400"
                     :duration="200"
