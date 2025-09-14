@@ -770,53 +770,35 @@ function closeProject() {
     }
 
     @include bp-xsm-phone {
-        .page-header {
-            h1 {
-                font-size: 7em;
-            }
+        .page-header h1 {
+            font-size: 7em;
         }
 
         .cards {
             max-width: 53em;
 
-            .project-card {
-                .card-body {
-                    .card-header {
-                        h2 {
-                            font-size: 2.5em !important;
-                        }
-                    }
+            .project-card .card-body {
+                .card-header h2 {
+                    font-size: 2.5em !important;
+                }
 
-                    .description {
-                        font-size: 1.6em;
-                    }
+                .description {
+                    font-size: 1.6em;
                 }
             }
         }
 
-        .selected-container {
-            .selected-project {
-                .selected-info {
-                    .info-header {
-                        margin-top: 0;
-                    }
-                }
-            }
+        .selected-container .selected-project .selected-info .info-header {
+            margin-top: 0;
         }
     }
 
     @include bp-custom-min(450) {
-        .selected-container {
-            .selected-project {
-                padding: $size-8 $size-10;
+        .selected-container .selected-project {
+            padding: $size-8 $size-10;
 
-                .selected-info {
-                    .info-header {
-                        h2 {
-                            font-size: 2.2em;
-                        }
-                    }
-                }
+            .selected-info .info-header h2 {
+                font-size: 2.2em;
             }
         }
     }
@@ -824,11 +806,9 @@ function closeProject() {
     @include bp-sm-phone {
         margin: 0 auto;
 
-        .page-header {
-            p {
-                max-width: 56ch;
-                font-size: 1.6em;
-            }
+        .page-header p {
+            max-width: 56ch;
+            font-size: 1.6em;
         }
 
         .cards {
@@ -839,18 +819,14 @@ function closeProject() {
                 padding: $size-4 $size-8;
                 flex-direction: row;
 
-                .img-container {
-                    .project-img {
-                        height: 16em;
-                        width: auto;
-                    }
+                .img-container .project-img {
+                    height: 16em;
+                    width: auto;
                 }
 
                 .card-body {
-                    .card-header {
-                        div {
-                            margin-bottom: 1em;
-                        }
+                    .card-header div {
+                        margin-bottom: 1em;
                     }
 
                     .description {
@@ -860,19 +836,13 @@ function closeProject() {
             }
         }
 
-        .selected-container {
-            .selected-project {
-                .selected-info {
-                    .img-container {
-                        margin: 0;
-                    }
+        .selected-container .selected-project .selected-info {
+            .img-container {
+                margin: 0;
+            }
 
-                    .info-header {
-                        h2 {
-                            font-size: 2.4em !important;
-                        }
-                    }
-                }
+            .info-header h2 {
+                font-size: 2.4em !important;
             }
         }
     }
@@ -881,10 +851,8 @@ function closeProject() {
         max-width: 110em;
 
         .cards .project-card {
-            .img-container {
-                .project-img {
-                    height: 19em;
-                }
+            .img-container .project-img {
+                height: 19em;
             }
 
             .card-body {
@@ -916,11 +884,9 @@ function closeProject() {
             }
         }
 
-        .selected-container {
-            .selected-project {
-                max-width: 72em;
-                margin: $size-8 0;
-            }
+        .selected-container .selected-project {
+            max-width: 72em;
+            margin: $size-8 0;
         }
     }
 
@@ -936,10 +902,8 @@ function closeProject() {
             max-width: 126em;
 
             .project-card .card-body {
-                .card-header {
-                    div {
-                        margin-bottom: 2em;
-                    }
+                .card-header div {
+                    margin-bottom: 2em;
                 }
 
                 .card-footer {

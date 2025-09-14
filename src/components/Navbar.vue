@@ -173,7 +173,6 @@ watch(
         position: relative;
         font-size: 0.85em;
         font-family: $primary-font-stack;
-        font-weight: 400;
         display: flex;
         gap: $size-3;
         align-items: center;
@@ -184,10 +183,12 @@ watch(
 
         @include theme-dark {
             color: $color-text-primary;
+            font-weight: 400;
         }
 
         @include theme-light {
             color: $color-primary-darker;
+            font-weight: 500;
         }
 
         .icon {
@@ -205,12 +206,12 @@ watch(
         }
 
         &::after {
+            content: '';
             position: absolute;
             bottom: 0;
             left: $size-2;
             width: 0;
             height: 1px;
-            content: '';
             border-radius: $size-4;
             transition: width 0.15s ease-in-out;
 

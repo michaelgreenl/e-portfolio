@@ -63,6 +63,7 @@ button {
         @include theme-light {
             color: $color-primary-darker;
             border: solid 2px $color-primary-darker;
+            font-weight: 500;
 
             .icon {
                 fill: $color-primary-darker;
