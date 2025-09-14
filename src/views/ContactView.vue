@@ -147,24 +147,6 @@ watch(
 
 <template>
     <div class="contact-container">
-        <div class="contact-links">
-            <Button
-                ref="contactBtn1"
-                :iconLeft="GithubFillIcon"
-                preset="secondary"
-                v-motion-fade-in
-                :delay="50"
-                :duration="200"
-            />
-            <Button
-                ref="contactBtn2"
-                :iconLeft="LinkedInIcon"
-                preset="secondary"
-                v-motion-fade-in
-                :delay="100"
-                :duration="200"
-            />
-        </div>
         <div class="contact-header">
             <h1 ref="headerTitle" v-motion-fade-in :duration="200">Get In Touch!</h1>
             <hr ref="headerLine" v-motion-fade-in-scalex />
@@ -231,6 +213,24 @@ watch(
                 <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
             </div>
             <div class="form-actions">
+                <div class="contact-links">
+                    <Button
+                        ref="contactBtn1"
+                        :iconLeft="GithubFillIcon"
+                        preset="secondary"
+                        v-motion-fade-in
+                        :delay="450"
+                        :duration="200"
+                    />
+                    <Button
+                        ref="contactBtn2"
+                        :iconLeft="LinkedInIcon"
+                        preset="secondary"
+                        v-motion-fade-in
+                        :delay="500"
+                        :duration="200"
+                    />
+                </div>
                 <Button
                     ref="submitBtn"
                     preset="primary"
@@ -268,17 +268,6 @@ watch(
     padding: $size-8 $size-4;
     width: 100%;
     flex-grow: 1;
-
-    .contact-links {
-        font-size: 1.5em;
-        align-self: flex-end;
-        display: flex;
-        margin-top: -$size-2;
-
-        :deep(button) .icon:hover {
-            fill: $color-primary;
-        }
-    }
 
     .contact-header {
         max-width: 27em;
@@ -422,8 +411,19 @@ watch(
         .form-actions {
             font-size: 0.95em;
             display: flex;
-            justify-content: center;
-            margin-left: auto;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 $size-3;
+
+            .contact-links {
+                font-size: 1.5em;
+                display: flex;
+                gap: $size-1;
+
+                :deep(button) .icon:hover {
+                    fill: $color-primary;
+                }
+            }
 
             :deep(button) {
                 gap: $size-2;
