@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, watch } from 'vue';
+import emailjs from '@emailjs/browser';
 import { useRouteStore } from '../stores/routeStore.js';
 import { useMotions, useMotion } from '@vueuse/motion';
 import { Motions } from '../utils/motions.js';
@@ -7,6 +8,12 @@ import Button from '../components/Button.vue';
 import MailIcon from '../components/SVGs/MailIcon.vue';
 import GithubFillIcon from '../components/SVGs/GithubFillIcon.vue';
 import LinkedInIcon from '../components/SVGs/LinkedInIcon.vue';
+
+const SERVICE_ID = import.meta.env.VITE_SERVICE_ID;
+const TEMPLATE_ID = import.meta.env.VITE_TEMPLATE_ID;
+const PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY;
+
+const formElement = ref(null);
 
 const form = reactive({
     email: '',
@@ -70,24 +77,23 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
     submitStatus.value = '';
 
-    try {
-        // TODO: Use a backend service
-        const mailtoLink = `mailto:greenmichael5000@gmail.com?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(`From: ${form.email}\n\n${form.message}`)}`;
-        window.location.href = mailtoLink;
+    emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formElement.value, PUBLIC_KEY).then(
+        (res) => {
+            if (res.text === 'OK') {
+                submitStatus.value = 'success';
+                isSubmitting.value = false;
 
-        setTimeout(() => {
-            submitStatus.value = 'success';
+                form.email = '';
+                form.subject = '';
+                form.message = '';
+            }
+        },
+        (error) => {
+            console.error(error);
+            submitStatus.value = 'error';
             isSubmitting.value = false;
-
-            form.email = '';
-            form.subject = '';
-            form.message = '';
-        }, 1000);
-    } catch (error) {
-        console.error('Error sending email:', error);
-        submitStatus.value = 'error';
-        isSubmitting.value = false;
-    }
+        },
+    );
 };
 
 const clearStatus = () => {
@@ -98,69 +104,38 @@ const clearStatus = () => {
 
 const routeStore = useRouteStore();
 
-const contactBtn1 = ref(null);
-const contactBtn2 = ref(null);
-const headerTitle = ref(null);
 const headerLine = ref(null);
-const headerText = ref(null);
-const emailLabel = ref(null);
-const emailInput = ref(null);
-const subjectLabel = ref(null);
-const subjectInput = ref(null);
-const messageLabel = ref(null);
-const messageInput = ref(null);
-const submitBtn = ref(null);
+const pageElement = ref(null);
 
-const contactBtn1Motion = useMotion(contactBtn1, Motions.directives['fade-in-leave']);
-const contactBtn2Motion = useMotion(contactBtn2, Motions.directives['fade-in-leave']);
-const headerTitleMotion = useMotion(headerTitle, Motions.directives['fade-in-leave']);
 const headerLineMotion = useMotion(headerLine, Motions.directives['fade-in-scalex']);
-const headerTextMotion = useMotion(headerText, Motions.directives['fade-in-leave']);
-const emailLabelMotion = useMotion(emailLabel, Motions.directives['fade-in-leave']);
-const emailInputMotion = useMotion(emailInput, Motions.directives['fade-in-leave']);
-const subjectLabelMotion = useMotion(subjectLabel, Motions.directives['fade-in-leave']);
-const subjectInputMotion = useMotion(subjectInput, Motions.directives['fade-in-leave']);
-const messageLabelMotion = useMotion(messageLabel, Motions.directives['fade-in-leave']);
-const messageInputMotion = useMotion(messageInput, Motions.directives['fade-in-leave']);
-const submitBtnMotion = useMotion(submitBtn, Motions.directives['fade-in-leave']);
+const pageElementMotion = useMotion(pageElement, Motions.directives['fade-in-leave']);
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            contactBtn1Motion.set('leave');
-            contactBtn2Motion.set('leave');
-            headerTitleMotion.set('leave');
+            pageElementMotion.set('leave');
             headerLineMotion.set('leave');
-            headerTextMotion.set('leave');
-            emailLabelMotion.set('leave');
-            emailInputMotion.set('leave');
-            subjectLabelMotion.set('leave');
-            subjectInputMotion.set('leave');
-            messageLabelMotion.set('leave');
-            messageInputMotion.set('leave');
-            submitBtnMotion.set('leave');
         }
     },
 );
 </script>
 
 <template>
-    <div class="contact-container">
+    <div ref="pageElement" class="contact-container">
         <div class="contact-header">
-            <h1 ref="headerTitle" v-motion-fade-in :duration="200">Get In Touch!</h1>
+            <h1 v-motion-fade-in :duration="200">Get In Touch!</h1>
             <hr ref="headerLine" v-motion-fade-in-scalex />
-            <p ref="headerText" v-motion-fade-in :delay="50" :duration="200">
+            <p v-motion-fade-in :delay="50" :duration="200">
                 It'd be great to hear from you. Send me a message and I'll respond as soon as I can!
             </p>
         </div>
-        <form @submit.prevent="handleSubmit" class="contact-form">
+        <form ref="formElement" @submit.prevent="handleSubmit" class="contact-form">
             <div class="form-group">
-                <label ref="emailLabel" for="email" class="form-label" v-motion-fade-in :delay="150" :duration="200"
+                <label for="email" class="form-label" v-motion-fade-in :delay="150" :duration="200"
                     >Email Address</label
                 >
                 <input
-                    ref="emailInput"
                     id="email"
                     v-model="form.email"
                     type="email"
@@ -175,11 +150,8 @@ watch(
                 <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
             </div>
             <div class="form-group">
-                <label ref="subjectLabel" for="subject" class="form-label" v-motion-fade-in :delay="250" :duration="200"
-                    >Subject</label
-                >
+                <label for="subject" class="form-label" v-motion-fade-in :delay="250" :duration="200">Subject</label>
                 <input
-                    ref="subjectInput"
                     id="subject"
                     v-model="form.subject"
                     type="text"
@@ -194,11 +166,8 @@ watch(
                 <span v-if="errors.subject" class="error-message">{{ errors.subject }}</span>
             </div>
             <div class="form-group">
-                <label ref="messageLabel" for="message" class="form-label" v-motion-fade-in :delay="350" :duration="200"
-                    >Message</label
-                >
+                <label for="message" class="form-label" v-motion-fade-in :delay="350" :duration="200">Message</label>
                 <textarea
-                    ref="messageInput"
                     id="message"
                     v-model="form.message"
                     class="form-textarea"
@@ -215,21 +184,13 @@ watch(
             <div class="form-actions">
                 <div class="contact-links">
                     <Button
-                        ref="contactBtn1"
                         :iconLeft="GithubFillIcon"
                         preset="secondary"
                         v-motion-fade-in
                         :delay="450"
                         :duration="200"
                     />
-                    <Button
-                        ref="contactBtn2"
-                        :iconLeft="LinkedInIcon"
-                        preset="secondary"
-                        v-motion-fade-in
-                        :delay="500"
-                        :duration="200"
-                    />
+                    <Button :iconLeft="LinkedInIcon" preset="secondary" v-motion-fade-in :delay="500" :duration="200" />
                 </div>
                 <Button
                     ref="submitBtn"
