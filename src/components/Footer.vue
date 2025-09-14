@@ -1,6 +1,10 @@
+<script setup>
+import { useMotions } from '@vueuse/motion';
+</script>
+
 <template>
     <footer>
-        <p>© 2025 M.G.</p>
+        <p v-motion-fade-in-once :delay="300">© 2025 M.G.</p>
     </footer>
 </template>
 
@@ -11,10 +15,9 @@ footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 2em;
     width: 100%;
-    padding-right: $size-8;
-    padding-bottom: 5em !important;
+    padding: 0 $size-8 5em;
+    margin-top: auto;
 
     p {
         font-family: $primary-font-stack !important;
