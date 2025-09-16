@@ -90,10 +90,11 @@ watch(
                 <h2 class="section-header">Skills</h2>
                 <hr />
                 <div class="section-segment section-segment-skills">
-                    <p><span>Languages</span> - Javascript, HTML/CSS, Sass, SQL, Python</p>
-                    <p><span>Frameworks & Libraries</span> - Node, Vue, React, Express, Socket.IO</p>
+                    <p><span>Languages:</span>&nbsp; Javascript, HTML/CSS, Sass, SQL, Python</p>
+                    <p><span>Frameworks:</span>&nbsp; Node, Vue, React, Express, Socket.IO</p>
                     <p>
-                        <span>Tools & Databases</span> - Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma, Sequelize
+                        <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma ,
+                        Sequelize
                     </p>
                 </div>
             </div>
@@ -202,6 +203,7 @@ watch(
         }
 
         &-skills {
+            font-size: 0.94em;
             padding-top: 0.1em !important;
         }
     }
