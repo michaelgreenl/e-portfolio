@@ -27,7 +27,6 @@ const errors = reactive({
     message: '',
 });
 
-// Track which fields have been touched (user has typed something)
 const touched = reactive({
     email: false,
     subject: false,
@@ -42,13 +41,12 @@ const validateEmail = (email) => {
     return emailRegex.test(email);
 };
 
-// Generic field validation function
 const validateField = (fieldName) => {
-    if (!touched[fieldName]) return; // Only validate if field has been touched
-    
+    if (!touched[fieldName]) return;
+
     const value = form[fieldName];
     let errorMessage = '';
-    
+
     switch (fieldName) {
         case 'email':
             if (!value) {
@@ -57,7 +55,6 @@ const validateField = (fieldName) => {
                 errorMessage = 'Please enter a valid email address';
             }
             break;
-            
         case 'subject':
             if (!value.trim()) {
                 errorMessage = 'Subject is required';
@@ -65,7 +62,6 @@ const validateField = (fieldName) => {
                 errorMessage = 'Subject must be at least 3 characters long';
             }
             break;
-            
         case 'message':
             if (!value.trim()) {
                 errorMessage = 'Message is required';
@@ -74,11 +70,10 @@ const validateField = (fieldName) => {
             }
             break;
     }
-    
+
     errors[fieldName] = errorMessage;
 };
 
-// Generic event handlers
 const handleFieldInput = (fieldName) => {
     touched[fieldName] = true;
 };
@@ -139,7 +134,6 @@ const handleSubmit = async () => {
                 submitStatus.value = 'success';
                 isSubmitting.value = false;
 
-                // Reset form and touched state
                 form.email = '';
                 form.subject = '';
                 form.message = '';
@@ -250,8 +244,10 @@ watch(
                 ></textarea>
                 <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
             </div>
-            <div class="form-actions">
-                <div class="contact-links">
+        </form>
+        <div class="form-actions">
+            <div class="contact-links">
+                <a href="https://github.com/michaelgreenl" target="_blank">
                     <Button
                         :iconLeft="GithubFillIcon"
                         preset="secondary"
@@ -259,30 +255,33 @@ watch(
                         :delay="450"
                         :duration="200"
                     />
+                </a>
+                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
                     <Button :iconLeft="LinkedInIcon" preset="secondary" v-motion-fade-in :delay="500" :duration="200" />
-                </div>
-                <Button
-                    ref="submitBtn"
-                    preset="primary"
-                    :text="isSubmitting ? 'Sending...' : 'Send'"
-                    :onClick="handleSubmit"
-                    :styles="{
-                        opacity: isSubmitting ? 0.7 : 1,
-                        pointerEvents: isSubmitting ? 'none' : 'auto',
-                    }"
-                    :iconRight="MailIcon"
-                    v-motion-fade-in
-                    :delay="450"
-                    :duration="200"
-                />
+                </a>
             </div>
-            <div v-if="submitStatus === 'success'" class="status-message success" @click="clearStatus">
-                <p>✓ Message sent successfully! I'll get back to you soon.</p>
-            </div>
-            <div v-if="submitStatus === 'error'" class="status-message error" @click="clearStatus">
-                <p>✗ There was an error sending your message. Please try again.</p>
-            </div>
-        </form>
+            <Button
+                type="submit"
+                ref="submitBtn"
+                preset="primary"
+                :text="isSubmitting ? 'Sending...' : 'Send'"
+                :onClick="handleSubmit"
+                :styles="{
+                    opacity: isSubmitting ? 0.7 : 1,
+                    pointerEvents: isSubmitting ? 'none' : 'auto',
+                }"
+                :iconRight="MailIcon"
+                v-motion-fade-in
+                :delay="450"
+                :duration="200"
+            />
+        </div>
+        <div v-if="submitStatus === 'success'" class="status-message success" @click="clearStatus">
+            <p>✓ Message sent successfully! I'll get back to you soon.</p>
+        </div>
+        <div v-if="submitStatus === 'error'" class="status-message error" @click="clearStatus">
+            <p>✗ There was an error sending your message. Please try again.</p>
+        </div>
     </div>
 </template>
 
@@ -437,59 +436,57 @@ watch(
                 margin-top: $size-1;
             }
         }
+    }
 
-        .form-actions {
-            font-size: 0.95em;
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            padding: 0 $size-3;
+    .status-message {
+        padding: $size-4;
+        border-radius: 8px;
+        text-align: center;
+        font-family: $secondary-font-stack;
+        font-weight: 500;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
 
-            .contact-links {
-                font-size: 1.5em;
-                display: flex;
-                gap: $size-1;
-
-                :deep(button) .icon:hover {
-                    fill: $color-primary;
-                }
-            }
-
-            :deep(button) {
-                gap: $size-2;
-                font-weight: 500;
-            }
+        &:hover {
+            opacity: 0.8;
         }
 
-        .status-message {
-            padding: $size-4;
-            border-radius: 8px;
-            text-align: center;
-            font-family: $secondary-font-stack;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
+        &.success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #27ae60;
+        }
 
-            &:hover {
-                opacity: 0.8;
-            }
+        &.error {
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
 
-            &.success {
-                background-color: rgba(46, 204, 113, 0.1);
-                border: 1px solid rgba(46, 204, 113, 0.3);
-                color: #27ae60;
-            }
+        p {
+            margin: 0;
+            font-size: 0.95em;
+        }
+    }
+    .form-actions {
+        font-size: 0.95em;
+        display: flex;
+        width: 52%;
+        justify-content: space-between;
+        padding: $size-5 $size-3;
 
-            &.error {
-                background-color: rgba(231, 76, 60, 0.1);
-                border: 1px solid rgba(231, 76, 60, 0.3);
-                color: #e74c3c;
-            }
+        .contact-links {
+            font-size: 1.5em;
+            display: flex;
+            gap: $size-1;
 
-            p {
-                margin: 0;
-                font-size: 0.95em;
+            a :deep(button) .icon:hover {
+                fill: $color-primary;
             }
+        }
+        :deep(button) {
+            gap: $size-2;
+            // font-weight: 500;
         }
     }
 
