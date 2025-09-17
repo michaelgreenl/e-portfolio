@@ -468,10 +468,12 @@ watch(
             font-size: 0.95em;
         }
     }
+
     .form-actions {
         font-size: 0.95em;
         display: flex;
-        width: 52%;
+        width: 100%;
+        max-width: 33em;
         justify-content: space-between;
         padding: $size-5 $size-3;
 
@@ -508,6 +510,10 @@ watch(
         .contact-header h1 {
             font-size: 3.2em;
         }
+
+        .form-actions {
+            // width: 52%;
+        }
     }
 
     @include bp-lg-laptop {
@@ -515,7 +521,8 @@ watch(
             font-size: 1.25em;
         }
 
-        .contact-form {
+        .contact-form,
+        .form-actions {
             max-width: 40em;
         }
     }
