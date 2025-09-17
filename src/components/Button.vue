@@ -19,10 +19,20 @@ defineProps({
         type: Object,
     },
 });
+
+const emit = defineEmits(['click']);
+
+function handleClick(evt) {
+    emit('click', evt);
+
+    if (typeof onClick === 'function') {
+        onClick(evt);
+    }
+}
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }" @click="onClick()">
+    <button :class="preset" :style="{ ...styles }" @click="handleClick">
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}

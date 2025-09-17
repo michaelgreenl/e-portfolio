@@ -71,7 +71,10 @@ watch(
     },
 );
 
-function openProject(project) {
+const autoplayVideo = ref(false);
+
+function openProject(project, autoplay = false) {
+    autoplayVideo.value = autoplay;
     activeProject.value = project;
 
     scrollPosition.value = window.scrollY;
@@ -116,7 +119,8 @@ function closeProject() {
                 :delay="50"
             >
                 <div class="img-container">
-                    <PlayIcon />
+                    <!-- TODO: Make the play button start the video -->
+                    <Button @click.stop="() => openProject(project, true)" :iconRight="PlayIcon" />
                     <img :src="getURL(project.img)" alt="project image" class="project-img" />
                 </div>
                 <div class="card-body">
@@ -135,12 +139,19 @@ function closeProject() {
                     <div class="card-footer">
                         <div class="external-links">
                             <a v-for="(link, key) in project.externalLinks" :key="link" :href="link.href">
-                                <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                                <Button
+                                    v-if="key === 'demoVideo'"
+                                    @click.stop="() => openProject(project, true)"
+                                    :text="link.text"
+                                    :iconLeft="externalIcons[key]"
+                                    preset="secondary"
+                                />
+                                <Button v-else :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                             </a>
                         </div>
                         <Button
                             class="see-more"
-                            :onClick="() => openProject(project)"
+                            @click.stop="() => openProject(project)"
                             text="See More"
                             :iconRight="BoxArrowIcon"
                             preset="primary"
@@ -165,8 +176,15 @@ function closeProject() {
                 </div>
                 <div class="selected-body">
                     <div class="img-container">
-                        <PlayIcon />
-                        <img :src="getURL(activeProject.img)" alt="project image" class="project-img" />
+                        <!-- :poster="getURL(activeProject.img)" -->
+                        <video
+                            ref="activeVideo"
+                            class="project-video"
+                            :src="activeProject.video"
+                            controls
+                            preload="metadata"
+                            :autoplay="autoplayVideo"
+                        />
                     </div>
                     <div class="selected-info">
                         <div class="info-header" :class="`info-header-${activeProject.slug}`">
@@ -344,12 +362,12 @@ function closeProject() {
                 justify-content: center;
                 align-items: center;
 
-                svg {
+                :deep(button) {
                     cursor: pointer;
                     position: absolute;
                     z-index: 1;
-                    height: $size-13;
-                    fill: $color-gray3;
+                    background: transparent;
+                    border: none;
 
                     @include interactive {
                         transform: scale(1.1);
@@ -357,6 +375,11 @@ function closeProject() {
 
                     &:active {
                         transform: scale(0.9);
+                    }
+
+                    svg {
+                        height: $size-12;
+                        fill: $color-gray3;
                     }
                 }
 
@@ -611,28 +634,13 @@ function closeProject() {
                 align-items: center;
                 margin: $size-2 0;
 
-                svg {
-                    cursor: pointer;
-                    position: absolute;
-                    z-index: 1;
-                    height: $size-16;
-                    fill: $color-gray3;
-
-                    @include interactive {
-                        transform: scale(1.1);
-                    }
-
-                    &:active {
-                        transform: scale(0.9);
-                    }
-                }
-
-                .project-img {
-                    position: relative;
-                    z-index: 0;
+                video {
                     width: 90%;
                     max-width: 65em;
-                    filter: blur(2px);
+                    margin: $size-6 0;
+                    border-radius: 12px;
+                    border: 1px solid $color-bg-secondary;
+                    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
                 }
             }
 
