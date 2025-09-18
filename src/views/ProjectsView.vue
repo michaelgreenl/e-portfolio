@@ -119,7 +119,6 @@ function closeProject() {
                 :delay="50"
             >
                 <div class="img-container">
-                    <!-- TODO: Make the play button start the video -->
                     <Button @click.stop="() => openProject(project, true)" :iconRight="PlayIcon" />
                     <img :src="getURL(project.img)" alt="project image" class="project-img" />
                 </div>
@@ -151,7 +150,7 @@ function closeProject() {
                         </div>
                         <Button
                             class="see-more"
-                            @click.stop="() => openProject(project)"
+                            @click.stop="() => openProject(project, true)"
                             text="See More"
                             :iconRight="BoxArrowIcon"
                             preset="primary"
@@ -176,15 +175,13 @@ function closeProject() {
                 </div>
                 <div class="selected-body">
                     <div class="img-container">
-                        <!-- :poster="getURL(activeProject.img)" -->
-                        <video
-                            ref="activeVideo"
-                            class="project-video"
-                            :src="activeProject.video"
-                            controls
-                            preload="metadata"
-                            :autoplay="autoplayVideo"
-                        />
+                        <iframe
+                            :src="`https://player.vimeo.com/video/1119895851?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            title="game-lobby-demo-vid"
+                        ></iframe>
                     </div>
                     <div class="selected-info">
                         <div class="info-header" :class="`info-header-${activeProject.slug}`">
@@ -634,10 +631,11 @@ function closeProject() {
                 align-items: center;
                 margin: $size-2 0;
 
-                video {
+                iframe {
                     width: 90%;
+                    aspect-ratio: 2/1.1;
                     max-width: 65em;
-                    margin: $size-6 0;
+                    margin: $size-4 0 $size-8;
                     border-radius: 12px;
                     border: 1px solid $color-bg-secondary;
                     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
