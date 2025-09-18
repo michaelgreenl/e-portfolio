@@ -500,19 +500,9 @@ watch(
         }
     }
 
-    @include bp-xsm-phone {
+    @include bp-sm-phone {
         .contact-header h1 {
             font-size: 3.2em;
-        }
-    }
-
-    @include bp-md-tablet {
-        .contact-header h1 {
-            font-size: 3.2em;
-        }
-
-        .form-actions {
-            // width: 52%;
         }
     }
 
