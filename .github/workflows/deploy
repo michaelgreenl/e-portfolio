@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+on:
+    push:
+        branches: [ main ]
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build
+              env:
+                  VITE_SERVICE_ID: ${{ vars.VITE_SERVICE_ID }}
+                  VITE_TEMPLATE_ID: ${{ vars.VITE_TEMPLATE_ID }}
+                  VITE_PUBLIC_KEY: ${{ vars.VITE_PUBLIC_KEY }}
+              run: |
+                  npm run build
+                  npm run deploy
+
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: dist
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
