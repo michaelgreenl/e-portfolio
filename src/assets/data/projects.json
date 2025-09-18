@@ -15,7 +15,7 @@
         },
         "fontFamily": "Poppins",
         "img": "reaction.png",
-        "video": "videos/game-lobby-demo-vid.mp4",
+        "video": "1119895851",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
             "demoVideo": { "href": null, "text": "Demo Video" },
@@ -38,7 +38,7 @@
         },
         "fontFamily": "BitCount",
         "img": "game-lobby.png",
-        "video": "videos/game-lobby-demo-vid.mp4",
+        "video": "1119895851",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
             "demoVideo": { "href": null, "text": "Demo Video" },
@@ -61,7 +61,7 @@
         },
         "fontFamily": "Futura",
         "img": "algo-visualizer.png",
-        "video": "videos/game-lobby-demo-vid.mp4",
+        "video": "1119895851",
         "externalLinks": {
             "github": { "href": "", "text": "Github" },
             "demoVideo": { "href": null, "text": "Demo Video" }
