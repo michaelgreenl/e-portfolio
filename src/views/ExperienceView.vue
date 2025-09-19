@@ -2,13 +2,16 @@
 import { ref, watch } from 'vue';
 import resumeData from '../assets/data/resume.json';
 import { useRouteStore } from '../stores/routeStore.js';
+import { useThemeStore } from '../stores/themeStore.js';
 import { useMotion, useMotions } from '@vueuse/motion';
 import { Motions } from '../utils/motions.js';
 import Button from '../components/Button.vue';
+import DownloadThickIcon from '../components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
 import CalendarIcon from '../components/SVGs/CalendarIcon.vue';
 
 const routeStore = useRouteStore();
+const themeStore = useThemeStore();
 
 const page = ref(null);
 const pageMotions = useMotion(page, Motions.directives['fade-in-leave']);
@@ -28,7 +31,11 @@ watch(
         <div class="page-header">
             <h1>Resume</h1>
             <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
-                <Button text="Download PDF" :iconRight="DownloadIcon" preset="primary" />
+                <Button
+                    text="Download PDF"
+                    :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
+                    preset="primary"
+                />
             </a>
         </div>
         <div class="resume-body">
@@ -83,10 +90,11 @@ watch(
                 <h2 class="section-header">Skills</h2>
                 <hr />
                 <div class="section-segment section-segment-skills">
-                    <p><span>Languages</span> - Javascript, HTML/CSS, Sass, SQL, Python</p>
-                    <p><span>Frameworks & Libraries</span> - Node, Vue, React, Express, Socket.IO</p>
+                    <p><span>Languages:</span>&nbsp; Javascript, HTML/CSS, Sass, SQL, Python</p>
+                    <p><span>Frameworks:</span>&nbsp; Node, Vue, React, Express, Socket.IO</p>
                     <p>
-                        <span>Tools & Databases</span> - Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma, Sequelize
+                        <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma ,
+                        Sequelize
                     </p>
                 </div>
             </div>
@@ -179,10 +187,6 @@ watch(
 
         a {
             font-size: 0.9em;
-
-            :deep(button) {
-                border-width: 1px;
-            }
         }
     }
 
@@ -199,6 +203,7 @@ watch(
         }
 
         &-skills {
+            font-size: 0.94em;
             padding-top: 0.1em !important;
         }
     }
@@ -231,10 +236,8 @@ watch(
     @include bp-xsm-phone {
         font-size: clamp(0.75em, 3.5vw, 1.05em);
 
-        .page-header {
-            a {
-                font-size: 1em;
-            }
+        .page-header a {
+            font-size: 1em;
         }
     }
 

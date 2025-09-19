@@ -19,10 +19,20 @@ defineProps({
         type: Object,
     },
 });
+
+const emit = defineEmits(['click']);
+
+function handleClick(evt) {
+    emit('click', evt);
+
+    if (typeof onClick === 'function') {
+        onClick(evt);
+    }
+}
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }" @click="onClick()">
+    <button :class="preset" :style="{ ...styles }" @click="handleClick">
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}
@@ -63,6 +73,7 @@ button {
         @include theme-light {
             color: $color-primary-darker;
             border: solid 2px $color-primary-darker;
+            font-weight: 500;
 
             .icon {
                 fill: $color-primary-darker;

@@ -71,7 +71,10 @@ watch(
     },
 );
 
-function openProject(project) {
+const autoplayVideo = ref(false);
+
+function openProject(project, autoplay = false) {
+    autoplayVideo.value = autoplay;
     activeProject.value = project;
 
     scrollPosition.value = window.scrollY;
@@ -116,7 +119,7 @@ function closeProject() {
                 :delay="50"
             >
                 <div class="img-container">
-                    <PlayIcon />
+                    <Button @click.stop="() => openProject(project, true)" :iconRight="PlayIcon" />
                     <img :src="getURL(project.img)" alt="project image" class="project-img" />
                 </div>
                 <div class="card-body">
@@ -135,12 +138,19 @@ function closeProject() {
                     <div class="card-footer">
                         <div class="external-links">
                             <a v-for="(link, key) in project.externalLinks" :key="link" :href="link.href">
-                                <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                                <Button
+                                    v-if="key === 'demoVideo'"
+                                    @click.stop="() => openProject(project, true)"
+                                    :text="link.text"
+                                    :iconLeft="externalIcons[key]"
+                                    preset="secondary"
+                                />
+                                <Button v-else :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                             </a>
                         </div>
                         <Button
                             class="see-more"
-                            :onClick="() => openProject(project)"
+                            @click.stop="() => openProject(project, true)"
                             text="See More"
                             :iconRight="BoxArrowIcon"
                             preset="primary"
@@ -165,8 +175,13 @@ function closeProject() {
                 </div>
                 <div class="selected-body">
                     <div class="img-container">
-                        <PlayIcon />
-                        <img :src="getURL(activeProject.img)" alt="project image" class="project-img" />
+                        <iframe
+                            :src="`https://player.vimeo.com/video/${activeProject.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            title="game-lobby-demo-vid"
+                        ></iframe>
                     </div>
                     <div class="selected-info">
                         <div class="info-header" :class="`info-header-${activeProject.slug}`">
@@ -344,12 +359,12 @@ function closeProject() {
                 justify-content: center;
                 align-items: center;
 
-                svg {
+                :deep(button) {
                     cursor: pointer;
                     position: absolute;
                     z-index: 1;
-                    height: $size-13;
-                    fill: $color-gray3;
+                    background: transparent;
+                    border: none;
 
                     @include interactive {
                         transform: scale(1.1);
@@ -357,6 +372,11 @@ function closeProject() {
 
                     &:active {
                         transform: scale(0.9);
+                    }
+
+                    svg {
+                        height: $size-12;
+                        fill: $color-gray3;
                     }
                 }
 
@@ -611,28 +631,14 @@ function closeProject() {
                 align-items: center;
                 margin: $size-2 0;
 
-                svg {
-                    cursor: pointer;
-                    position: absolute;
-                    z-index: 1;
-                    height: $size-16;
-                    fill: $color-gray3;
-
-                    @include interactive {
-                        transform: scale(1.1);
-                    }
-
-                    &:active {
-                        transform: scale(0.9);
-                    }
-                }
-
-                .project-img {
-                    position: relative;
-                    z-index: 0;
+                iframe {
                     width: 90%;
+                    aspect-ratio: 2/1.1;
                     max-width: 65em;
-                    filter: blur(2px);
+                    margin: $size-4 0 $size-8;
+                    border-radius: 12px;
+                    border: 1px solid $color-bg-secondary;
+                    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
                 }
             }
 
@@ -770,53 +776,35 @@ function closeProject() {
     }
 
     @include bp-xsm-phone {
-        .page-header {
-            h1 {
-                font-size: 7em;
-            }
+        .page-header h1 {
+            font-size: 7em;
         }
 
         .cards {
             max-width: 53em;
 
-            .project-card {
-                .card-body {
-                    .card-header {
-                        h2 {
-                            font-size: 2.5em !important;
-                        }
-                    }
+            .project-card .card-body {
+                .card-header h2 {
+                    font-size: 2.5em !important;
+                }
 
-                    .description {
-                        font-size: 1.6em;
-                    }
+                .description {
+                    font-size: 1.6em;
                 }
             }
         }
 
-        .selected-container {
-            .selected-project {
-                .selected-info {
-                    .info-header {
-                        margin-top: 0;
-                    }
-                }
-            }
+        .selected-container .selected-project .selected-info .info-header {
+            margin-top: 0;
         }
     }
 
     @include bp-custom-min(450) {
-        .selected-container {
-            .selected-project {
-                padding: $size-8 $size-10;
+        .selected-container .selected-project {
+            padding: $size-8 $size-10;
 
-                .selected-info {
-                    .info-header {
-                        h2 {
-                            font-size: 2.2em;
-                        }
-                    }
-                }
+            .selected-info .info-header h2 {
+                font-size: 2.2em;
             }
         }
     }
@@ -824,11 +812,9 @@ function closeProject() {
     @include bp-sm-phone {
         margin: 0 auto;
 
-        .page-header {
-            p {
-                max-width: 56ch;
-                font-size: 1.6em;
-            }
+        .page-header p {
+            max-width: 56ch;
+            font-size: 1.6em;
         }
 
         .cards {
@@ -839,18 +825,14 @@ function closeProject() {
                 padding: $size-4 $size-8;
                 flex-direction: row;
 
-                .img-container {
-                    .project-img {
-                        height: 16em;
-                        width: auto;
-                    }
+                .img-container .project-img {
+                    height: 16em;
+                    width: auto;
                 }
 
                 .card-body {
-                    .card-header {
-                        div {
-                            margin-bottom: 1em;
-                        }
+                    .card-header div {
+                        margin-bottom: 1em;
                     }
 
                     .description {
@@ -860,19 +842,13 @@ function closeProject() {
             }
         }
 
-        .selected-container {
-            .selected-project {
-                .selected-info {
-                    .img-container {
-                        margin: 0;
-                    }
+        .selected-container .selected-project .selected-info {
+            .img-container {
+                margin: 0;
+            }
 
-                    .info-header {
-                        h2 {
-                            font-size: 2.4em !important;
-                        }
-                    }
-                }
+            .info-header h2 {
+                font-size: 2.4em !important;
             }
         }
     }
@@ -881,10 +857,8 @@ function closeProject() {
         max-width: 110em;
 
         .cards .project-card {
-            .img-container {
-                .project-img {
-                    height: 19em;
-                }
+            .img-container .project-img {
+                height: 19em;
             }
 
             .card-body {
@@ -916,11 +890,9 @@ function closeProject() {
             }
         }
 
-        .selected-container {
-            .selected-project {
-                max-width: 72em;
-                margin: $size-8 0;
-            }
+        .selected-container .selected-project {
+            max-width: 72em;
+            margin: $size-8 0;
         }
     }
 
@@ -936,10 +908,8 @@ function closeProject() {
             max-width: 126em;
 
             .project-card .card-body {
-                .card-header {
-                    div {
-                        margin-bottom: 2em;
-                    }
+                .card-header div {
+                    margin-bottom: 2em;
                 }
 
                 .card-footer {

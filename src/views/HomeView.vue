@@ -146,15 +146,15 @@ watch(
             }
         }
 
+        h2,
+        p {
+            text-align: center;
+        }
+
         h2 {
             font-size: 1.9em;
             width: fit-content;
             margin: 0 auto;
-        }
-
-        h2,
-        p {
-            text-align: center;
         }
 
         h3 {
@@ -188,6 +188,10 @@ watch(
             justify-content: center;
             gap: $size-4;
             margin-top: $size-2;
+
+            :deep(button) {
+                font-weight: 400;
+            }
         }
     }
 
