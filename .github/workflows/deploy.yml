@@ -35,9 +35,9 @@ jobs:
         run: |
           npm run build
         env:
-          VITE_SERVICE_ID: ${{ vars.VITE_SERVICE_ID }}
-          VITE_TEMPLATE_ID: ${{ vars.VITE_TEMPLATE_ID }}
-          VITE_PUBLIC_KEY: ${{ vars.VITE_PUBLIC_KEY }}
+          VITE_SERVICE_ID: ${{ secrets.VITE_SERVICE_ID }}
+          VITE_TEMPLATE_ID: ${{ secrets.VITE_TEMPLATE_ID }}
+          VITE_PUBLIC_KEY: ${{ secrets.VITE_PUBLIC_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
