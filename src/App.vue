@@ -33,10 +33,17 @@ onMounted(() => {
 
 <style lang="scss">
 @use './assets/styles/_variables.scss';
-@use './assets/styles/_base.scss';
 
 * {
     box-sizing: border-box;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        fill 0.3s ease,
+        opacity 0.3s ease,
+        transform 0.3s ease;
 }
 
 html,
@@ -105,5 +112,17 @@ h4 {
 p {
     color: $color-text-secondary;
     font-family: $secondary-font-stack;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible {
+    outline: none;
+}
+
+a {
+    text-decoration: none;
 }
 </style>
