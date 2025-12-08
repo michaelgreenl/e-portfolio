@@ -116,137 +116,8 @@ watch(
     gap: $size-17;
     color: $color-text-primary;
 
-    .hero-content {
-        display: flex;
-        flex-direction: column;
-        gap: $size-2;
-
-        h1,
-        h2,
-        h3,
-        p {
-            margin: 0;
-        }
-
-        h1 {
-            font-size: 5.1em;
-            line-height: 0.8ch;
-            padding-bottom: $size-1;
-
-            span {
-                margin-left: 1.4em;
-
-                @include theme-dark {
-                    color: $color-primary-light;
-                }
-
-                @include theme-light {
-                    color: $color-primary;
-                }
-            }
-        }
-
-        h2,
-        p {
-            text-align: center;
-        }
-
-        h2 {
-            font-size: 1.9em;
-            width: fit-content;
-            margin: 0 auto;
-        }
-
-        h3 {
-            margin: 0 2px $size-2;
-        }
-
-        p {
-            font-size: 1.1em;
-            max-width: 45ch;
-            margin: 0 auto;
-        }
-
-        .hero-line {
-            border: 0;
-            width: 95%;
-            margin: 0 auto $size-2;
-            height: 1px;
-
-            @include theme-dark {
-                background-color: $color-gray6;
-            }
-
-            @include theme-light {
-                background-color: $color-gray5;
-            }
-        }
-
-        .cta {
-            font-size: 1.1em;
-            display: flex;
-            justify-content: center;
-            gap: $size-4;
-            margin-top: $size-2;
-
-            :deep(button) {
-                font-weight: 400;
-            }
-        }
-    }
-
-    .site-nav {
-        display: none;
-        gap: $size-4;
-        align-self: flex-end;
-        justify-content: flex-end;
-        align-items: center;
-        flex-wrap: wrap-reverse;
-        width: 80%;
-
-        .nav-line {
-            border: 0;
-            height: 1px;
-            flex-grow: 1;
-
-            @include theme-dark {
-                background-color: $color-gray6;
-            }
-
-            @include theme-light {
-                background-color: $color-primary-darker;
-            }
-        }
-
-        :deep(button) {
-            font-size: 1.2em;
-            padding: 0 $size-1;
-
-            &::after {
-                height: 2px;
-            }
-        }
-    }
-
     @include bp-custom-min(612) {
         max-width: 100vw;
-
-        h1 {
-            font-size: clamp(5.1em, 12vw, 5.5em) !important;
-            line-height: 1ch !important;
-            max-width: 100vw !important;
-            margin: 0 auto !important;
-            padding-bottom: $size-1 !important;
-
-            span {
-                margin-left: 0 !important;
-            }
-        }
-
-        h3 {
-            font-size: 1.25em !important;
-            margin: 0 2px 0 !important;
-        }
     }
 
     @include bp-custom-min(750) {
@@ -256,31 +127,6 @@ watch(
     @include bp-md-tablet {
         align-items: flex-start;
         padding: 0 $size-12;
-
-        h1 {
-            padding: 0 !important;
-        }
-
-        h2,
-        p {
-            margin: 0 !important;
-        }
-
-        p {
-            text-align: left !important;
-        }
-
-        .hero-line {
-            display: none;
-        }
-
-        .cta {
-            justify-content: flex-start !important;
-        }
-
-        .site-nav {
-            display: flex;
-        }
     }
 
     @include bp-lg-laptop {
@@ -291,6 +137,151 @@ watch(
     @include bp-xl-desktop {
         font-size: 1.2em;
         max-width: 1600px;
+    }
+}
+
+h1 {
+    font-size: 5.1em;
+    line-height: 0.8ch;
+    padding-bottom: $size-1;
+    margin: 0;
+
+    @include bp-custom-min(612) {
+        font-size: clamp(5.1em, 12vw, 5.5em) !important;
+        line-height: 1ch !important;
+        max-width: 100vw !important;
+        margin: 0 auto !important;
+        padding-bottom: $size-1 !important;
+    }
+
+    @include bp-md-tablet {
+        padding: 0 !important;
+    }
+
+    span {
+        margin-left: 1.4em;
+
+        @include bp-custom-min(612) {
+            margin-left: 0 !important;
+        }
+
+        @include theme-dark {
+            color: $color-primary-light;
+        }
+
+        @include theme-light {
+            color: $color-primary;
+        }
+    }
+}
+
+h2 {
+    font-size: 1.9em;
+    width: fit-content;
+    margin: 0 auto;
+    text-align: center;
+
+    @include bp-md-tablet {
+        margin: 0 !important;
+    }
+}
+
+h3 {
+    margin: 0 2px $size-2;
+
+    @include bp-custom-min(612) {
+        font-size: 1.25em !important;
+        margin: 0 2px 0 !important;
+    }
+}
+
+p {
+    font-size: 1.1em;
+    max-width: 45ch;
+    margin: 0 auto;
+    text-align: center;
+
+    @include bp-md-tablet {
+        margin: 0 !important;
+        text-align: left !important;
+    }
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+}
+
+.hero-line {
+    border: 0;
+    width: 95%;
+    margin: 0 auto $size-2;
+    height: 1px;
+
+    @include bp-md-tablet {
+        display: none;
+    }
+
+    @include theme-dark {
+        background-color: $color-gray6;
+    }
+
+    @include theme-light {
+        background-color: $color-gray5;
+    }
+}
+
+.cta {
+    font-size: 1.1em;
+    display: flex;
+    justify-content: center;
+    gap: $size-4;
+    margin-top: $size-2;
+
+    @include bp-md-tablet {
+        justify-content: flex-start !important;
+    }
+
+    :deep(button) {
+        font-weight: 400;
+    }
+}
+
+.site-nav {
+    display: none;
+    gap: $size-4;
+    align-self: flex-end;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap-reverse;
+    width: 80%;
+
+    @include bp-md-tablet {
+        display: flex;
+    }
+
+    :deep(button) {
+        font-size: 1.2em;
+        padding: 0 $size-1;
+
+        &::after {
+            height: 2px;
+        }
+    }
+}
+
+.nav-line {
+    border: 0;
+    height: 1px;
+    flex-grow: 1;
+
+    @include theme-dark {
+        background-color: $color-gray6;
+    }
+
+    @include theme-light {
+        background-color: $color-primary-darker;
     }
 }
 </style>

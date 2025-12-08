@@ -298,223 +298,221 @@ watch(
     width: 100%;
     flex-grow: 1;
 
-    .contact-header {
-        max-width: 27em;
-        text-align: center;
-        margin-bottom: $size-8;
-        margin: $size-6 0 $size-10;
-
-        h1,
-        p {
-            margin: 0;
-        }
-
-        h1 {
-            font-size: 2.6em;
-        }
-
-        hr {
-            border: 0;
-            width: 100%;
-            margin: $size-1 auto $size-2;
-            height: 1px;
-
-            @include theme-dark {
-                background-color: $color-gray6;
-            }
-
-            @include theme-light {
-                background-color: $color-primary-darker;
-            }
-        }
-
-        p {
-            line-height: 1.6;
-            max-width: 42ch;
-            color: $color-text-secondary;
-        }
-    }
-
-    .contact-form {
-        display: flex;
-        flex-direction: column;
-        gap: $size-6;
-        width: 100%;
-        max-width: 33em;
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: $size-2;
-
-            .form-label {
-                font-family: $primary-font-stack;
-                font-weight: 500;
-                font-size: 1em;
-
-                @include theme-dark {
-                    color: $color-text-primary;
-                }
-
-                @include theme-light {
-                    color: $color-primary-darker;
-                }
-            }
-
-            .form-input,
-            .form-textarea {
-                font-family: $secondary-font-stack;
-                font-size: 1em;
-                padding: $size-3 $size-4;
-                border-radius: 8px;
-                border: 2px solid transparent;
-                background-color: transparent;
-                transition: all 0.3s ease;
-                resize: vertical;
-
-                @include theme-dark {
-                    color: $color-text-primary;
-                    border-color: $color-gray6;
-                    background-color: rgba($color-gray8, 0.3);
-
-                    &::placeholder {
-                        color: $color-gray6;
-                    }
-
-                    &:focus {
-                        outline: none;
-                        border-color: $color-primary;
-                        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
-                        background: linear-gradient(90deg, #21252922, #21252900);
-                        backdrop-filter: blur(4px);
-                        -webkit-backdrop-filter: blur(4px);
-                    }
-                }
-
-                @include theme-light {
-                    color: $color-primary-darker;
-                    border-color: $color-gray5;
-                    background-color: rgba($color-white, 0.7);
-
-                    &::placeholder {
-                        color: darken-color($color-gray5, 10%);
-                    }
-
-                    &:focus {
-                        outline: none;
-                        border-color: $color-primary;
-                        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
-                        background: linear-gradient(90deg, #dee2e622, #dee2e600);
-                        backdrop-filter: blur(4px);
-                        -webkit-backdrop-filter: blur(4px);
-                    }
-                }
-
-                &.error {
-                    border-color: #e74c3c;
-
-                    @include theme-dark {
-                        background-color: rgba(231, 76, 60, 0.1);
-                    }
-
-                    @include theme-light {
-                        background-color: rgba(231, 76, 60, 0.05);
-                    }
-                }
-            }
-
-            .form-textarea {
-                min-height: 120px;
-                font-family: $secondary-font-stack;
-                line-height: 1.5;
-            }
-
-            .error-message {
-                font-size: 0.9em;
-                color: #e74c3c;
-                font-family: $secondary-font-stack;
-                margin-top: $size-1;
-            }
-        }
-    }
-
-    .status-message {
-        padding: $size-4;
-        border-radius: 8px;
-        text-align: center;
-        font-family: $secondary-font-stack;
-        font-weight: 500;
-        cursor: pointer;
-        transition: opacity 0.3s ease;
-
-        &:hover {
-            opacity: 0.8;
-        }
-
-        &.success {
-            background-color: rgba(46, 204, 113, 0.1);
-            border: 1px solid rgba(46, 204, 113, 0.3);
-            color: #27ae60;
-        }
-
-        &.error {
-            background-color: rgba(231, 76, 60, 0.1);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-            color: #e74c3c;
-        }
-
-        p {
-            margin: 0;
-            font-size: 0.95em;
-        }
-    }
-
-    .form-actions {
-        font-size: 0.95em;
-        display: flex;
-        width: 100%;
-        max-width: 33em;
-        justify-content: space-between;
-        padding: $size-5 $size-3;
-
-        .contact-links {
-            font-size: 1.5em;
-            display: flex;
-            gap: $size-1;
-
-            a :deep(button) .icon:hover {
-                fill: $color-primary;
-            }
-        }
-        :deep(button) {
-            gap: $size-2;
-            // font-weight: 500;
-        }
-    }
-
     @include bp-xsm-phone {
         font-size: clamp(0.9em, 3.5vw, 1em);
+    }
+}
 
-        .contact-header h1 {
-            font-size: 3em;
-        }
+.contact-header {
+    max-width: 27em;
+    text-align: center;
+    margin-bottom: $size-8;
+    margin: $size-6 0 $size-10;
+
+    @include bp-lg-laptop {
+        font-size: 1.25em;
     }
 
-    @include bp-sm-phone {
-        .contact-header h1 {
+    h1,
+    p {
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 2.6em;
+
+        @include bp-xsm-phone {
+            font-size: 3em;
+        }
+
+        @include bp-sm-phone {
             font-size: 3.2em;
         }
     }
 
-    @include bp-lg-laptop {
-        .contact-header {
-            font-size: 1.25em;
+    hr {
+        border: 0;
+        width: 100%;
+        margin: $size-1 auto $size-2;
+        height: 1px;
+
+        @include theme-dark {
+            background-color: $color-gray6;
         }
 
-        .contact-form,
-        .form-actions {
-            max-width: 40em;
+        @include theme-light {
+            background-color: $color-primary-darker;
         }
+    }
+
+    p {
+        line-height: 1.6;
+        max-width: 42ch;
+        color: $color-text-secondary;
+    }
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: $size-6;
+    width: 100%;
+    max-width: 33em;
+
+    @include bp-lg-laptop {
+        max-width: 40em;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+}
+
+.form-label {
+    font-family: $primary-font-stack;
+    font-weight: 500;
+    font-size: 1em;
+
+    @include theme-dark {
+        color: $color-text-primary;
+    }
+
+    @include theme-light {
+        color: $color-primary-darker;
+    }
+}
+
+.form-input,
+.form-textarea {
+    font-family: $secondary-font-stack;
+    font-size: 1em;
+    padding: $size-3 $size-4;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    resize: vertical;
+
+    @include theme-dark {
+        color: $color-text-primary;
+        border-color: $color-gray6;
+        background-color: rgba($color-gray8, 0.3);
+
+        &::placeholder {
+            color: $color-gray6;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $color-primary;
+            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+            background: linear-gradient(90deg, #21252922, #21252900);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    }
+
+    @include theme-light {
+        color: $color-primary-darker;
+        border-color: $color-gray5;
+        background-color: rgba($color-white, 0.7);
+
+        &::placeholder {
+            color: darken-color($color-gray5, 10%);
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $color-primary;
+            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+            background: linear-gradient(90deg, #dee2e622, #dee2e600);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    }
+
+    &.error {
+        border-color: $color-error;
+
+        @include theme-dark {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        @include theme-light {
+            background-color: rgba(231, 76, 60, 0.05);
+        }
+    }
+}
+
+.form-textarea {
+    min-height: 120px;
+    font-family: $secondary-font-stack;
+    line-height: 1.5;
+}
+
+.error-message {
+    font-size: 0.9em;
+    color: $color-error;
+    font-family: $secondary-font-stack;
+    margin-top: $size-1;
+}
+
+.status-message {
+    padding: $size-4;
+    border-radius: 8px;
+    text-align: center;
+    font-family: $secondary-font-stack;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &.success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid rgba(46, 204, 113, 0.3);
+        color: $color-success;
+    }
+
+    &.error {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid rgba(231, 76, 60, 0.3);
+        color: $color-error;
+    }
+
+    p {
+        font-size: 0.95em;
+    }
+}
+
+.form-actions {
+    font-size: 0.95em;
+    display: flex;
+    width: 100%;
+    max-width: 33em;
+    justify-content: space-between;
+    padding: $size-5 $size-3;
+
+    @include bp-lg-laptop {
+        max-width: 40em;
+    }
+
+    .contact-links {
+        font-size: 1.5em;
+        display: flex;
+        gap: $size-1;
+
+        a :deep(button) .icon:hover {
+            fill: $color-primary;
+        }
+    }
+
+    :deep(button) {
+        gap: $size-2;
     }
 }
 </style>

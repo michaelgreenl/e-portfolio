@@ -19,13 +19,13 @@ footer {
     padding: 0 $size-8 5em;
     margin-top: auto;
 
-    p {
-        font-family: $primary-font-stack !important;
-        color: $color-text-muted;
-    }
-
     @include bp-md-tablet {
         padding-bottom: 0 !important;
     }
+}
+
+p {
+    font-family: $primary-font-stack !important;
+    color: $color-text-muted;
 }
 </style>

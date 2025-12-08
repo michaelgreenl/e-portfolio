@@ -99,26 +99,26 @@ const tools = {
     height: 100%;
     padding: 0.85em 1em;
     border-radius: 7px;
+}
 
-    .icon {
-        display: flex;
-        align-items: center;
-        height: $size-4;
-        width: $size-4;
+.icon {
+    display: flex;
+    align-items: center;
+    height: $size-4;
+    width: $size-4;
 
-        @include theme-light {
-            fill: $color-text-primary;
-            stroke: $color-text-primary;
-        }
+    @include theme-light {
+        fill: $color-text-primary;
+        stroke: $color-text-primary;
     }
+}
 
-    span {
-        font-size: 1em;
-        font-family: $secondary-font-stack;
+span {
+    font-size: 1em;
+    font-family: $secondary-font-stack;
 
-        @include theme-light {
-            color: $color-text-primary;
-        }
+    @include theme-light {
+        color: $color-text-primary;
     }
 }
 </style>
