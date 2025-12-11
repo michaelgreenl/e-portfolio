@@ -1,11 +1,10 @@
 <script setup>
 import { onMounted } from 'vue';
-import { useRouteStore } from './stores/routeStore.js';
-import { useThemeStore } from './stores/themeStore.js';
-import { useMotions } from '@vueuse/motion';
-import Navbar from './components/Navbar.vue';
-import Footer from './components/Footer.vue';
-import BgSVG from './components/SVGs/BgSVG.vue';
+import { useRouteStore } from '@/stores/routeStore.js';
+import { useThemeStore } from '@/stores/themeStore.js';
+import Navbar from '@/components/Navbar.vue';
+import Footer from '@/components/Footer.vue';
+import BgSVG from '@/components/SVGs/BgSVG.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -41,9 +40,7 @@ onMounted(() => {
         color 0.3s ease,
         border-color 0.3s ease,
         box-shadow 0.3s ease,
-        fill 0.3s ease,
-        opacity 0.3s ease,
-        transform 0.3s ease;
+        fill 0.3s ease;
 }
 
 html,

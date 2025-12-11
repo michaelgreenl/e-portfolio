@@ -1,10 +1,17 @@
 <script setup>
-import { useMotions } from '@vueuse/motion';
+import { onMounted } from 'vue';
+import { useUtilAnimations } from '@/composables/animations/useUtilAnimations.js';
+
+const { fadeIn } = useUtilAnimations();
+
+onMounted(() => {
+    fadeIn({ selector: '.footer-text', opts: { delay: 0.3 } });
+});
 </script>
 
 <template>
     <footer>
-        <p v-motion-fade-in-once :delay="300">© 2025 M.G.</p>
+        <p class="footer-text">© 2025 M.G.</p>
     </footer>
 </template>
 

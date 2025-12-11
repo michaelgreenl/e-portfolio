@@ -1,96 +1,62 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { useRouteStore } from '../stores/routeStore.js';
-import { useMotions, useMotion } from '@vueuse/motion';
-import { Motions } from '../utils/motions.js';
-import Button from '../components/Button.vue';
-import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRouteStore } from '@/stores/routeStore.js';
+import { useThemeStore } from '@/stores/themeStore.js';
+import { useHomeAnimations } from '@/composables/animations/useHomeAnimations.js';
+import Button from '@/components/Button.vue';
+import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
+import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 
 const routeStore = useRouteStore();
+const themeStore = useThemeStore();
 
-const heroContent = ref(null);
-const heroLine = ref(null);
-const navLine = ref(null);
-const navItems = ref([]);
-
-const heroContentMotion = useMotion(heroContent, Motions.directives['fade-slide-right']);
-const heroLineMotion = useMotion(heroLine, Motions.directives['fade-in-scalex']);
-const navLineMotion = useMotion(navLine, Motions.directives['fade-in-scalex']);
-const navItemMotions = ref([]);
+const { enterPageAnim, exitPageAnim } = useHomeAnimations();
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            // The fix was janky but adding a different motion from the directive ("...-leave") works
-            navItemMotions.value = navItems.value.map((el) => {
-                if (!el) return null;
-                return useMotion(el, Motions.directives['fade-slide-left-leave']);
-            });
-
-            heroContentMotion.set('leave');
-            heroLineMotion.set('leave');
-            navLineMotion.set('leave');
-
-            navItemMotions.value.reverse().forEach((motion, i) => {
-                setTimeout(() => {
-                    motion.set('leave');
-                }, 100 * i);
-            });
+            exitPageAnim();
         }
     },
 );
+
+onMounted(() => {
+    enterPageAnim();
+});
 </script>
 
 <template>
     <div class="home-container">
-        <div class="hero-content" ref="heroContent" v-motion-fade-slide-right>
+        <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
             <h1>
                 Michael
                 <span> Green </span>
             </h1>
-            <hr class="hero-line" ref="heroLine" v-motion-fade-in-scalex />
+            <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
                 Hello, I am a software engineer with a passion for solving problems. I am writing this in normal a a
                 english now.
             </p>
             <div class="cta">
-                <Button
-                    :onClick="
-                        () => {
-                            routeStore.toRoute('contact');
-                        }
-                    "
-                    text="Contact"
-                    preset="primary primary-accent"
-                />
+                <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
                 <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
-                    <Button text="Resume/CV" :iconRight="DownloadIcon" preset="primary" />
+                    <Button
+                        text="Resume/CV"
+                        :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
+                        preset="primary"
+                    />
                 </a>
             </div>
         </div>
         <div class="site-nav">
-            <hr class="nav-line" ref="navLine" v-motion-fade-in-scalex />
-            <div
-                v-for="(route, key, i) in routeStore.routes"
-                :key="key"
-                v-motion-fade-slide-left
-                :delay="100 * i"
-                :ref="
-                    (el) => {
-                        if (el) navItems[i] = el;
-                    }
-                "
-            >
+            <hr class="nav-links-line" />
+            <div v-for="(route, key, i) in routeStore.routes" :key="key" class="nav-link">
                 <Button
                     v-if="key !== 'home'"
-                    :onClick="
-                        () => {
-                            routeStore.toRoute(key);
-                        }
-                    "
+                    :onClick="() => routeStore.toRoute(key)"
                     :text="route.meta.title"
                     :iconLeft="route.meta.icon"
                     :iconLeftFill="route.meta.iconFill"
@@ -271,7 +237,7 @@ p {
     }
 }
 
-.nav-line {
+.nav-links-line {
     border: 0;
     height: 1px;
     flex-grow: 1;

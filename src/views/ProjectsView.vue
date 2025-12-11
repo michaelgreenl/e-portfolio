@@ -1,20 +1,22 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
-import { useRouteStore } from '../stores/routeStore.js';
-import { useMotions, useMotion } from '@vueuse/motion';
-import { Motions } from '../utils/motions.js';
-import projectsData from '../assets/data/projects.json';
-import Button from '../components/Button.vue';
-import ToolChip from '../components/ToolChip.vue';
-import ReactionLogo from '../components/SVGs/ProjectLogos/ReactionLogo.vue';
-import AlgoVisualizerLogo from '../components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
-import GameLobbyLogo from '../components/SVGs/ProjectLogos/GameLobbyLogo.vue';
-import GithubIcon from '../components/SVGs/GithubIcon.vue';
-import CalendarIcon from '../components/SVGs/CalendarIcon.vue';
-import VideoIcon from '../components/SVGs/VideoIcon.vue';
-import BoxArrowIcon from '../components/SVGs/BoxArrowIcon.vue';
-import PlayIcon from '../components/SVGs/PlayIcon.vue';
-import CloseIcon from '../components/SVGs/CloseIcon.vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { useRouteStore } from '@/stores/routeStore.js';
+import { useProjectsAnimations } from '@/composables/animations/useProjectsAnimations.js';
+import projectsData from '@/assets/data/projects.json';
+import Button from '@/components/Button.vue';
+import ToolChip from '@/components/ToolChip.vue';
+import ReactionLogo from '@/components/SVGs/ProjectLogos/ReactionLogo.vue';
+import AlgoVisualizerLogo from '@/components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
+import GameLobbyLogo from '@/components/SVGs/ProjectLogos/GameLobbyLogo.vue';
+import GithubIcon from '@/components/SVGs/GithubIcon.vue';
+import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
+import VideoIcon from '@/components/SVGs/VideoIcon.vue';
+import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
+import PlayIcon from '@/components/SVGs/PlayIcon.vue';
+import CloseIcon from '@/components/SVGs/CloseIcon.vue';
+
+const routeStore = useRouteStore();
+const { pageEnter, pageExit, showSelectedProject, hideSelectedProject } = useProjectsAnimations();
 
 const getURL = (img) => {
     return new URL(`../assets/images/${img}`, import.meta.url).href;
@@ -34,72 +36,52 @@ const externalIcons = {
 
 const activeProject = ref();
 const scrollPosition = ref();
+const autoplayVideo = ref(false);
 
-const header = ref(null);
-const headerLine = ref(null);
-const headerText = ref(null);
-const projectItems = ref([]);
-const selectedProject = ref(null);
-
-const headerMotion = useMotion(header, Motions.directives['fade-in']);
-const headerLineMotion = useMotion(headerLine, Motions.directives['fade-in-scalex']);
-const headerTextMotion = useMotion(headerText, Motions.directives['fade-in']);
-const projectItemMotions = ref([]);
-const selectedProjectMotion = useMotion(selectedProject, Motions.directives['fade-in-leave']);
-
-const routeStore = useRouteStore();
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            // The fix was janky but adding a different motion from the directive ("...-leave") works
-            projectItemMotions.value = projectItems.value.map((el) => {
-                if (!el) return null;
-                return useMotion(el, Motions.directives['fade-in-leave']);
-            });
-
-            headerMotion.set('leave');
-            headerLineMotion.set('leave');
-            headerTextMotion.set('leave');
-
-            projectItemMotions.value.forEach((motion, i) => {
-                setTimeout(() => {
-                    motion.set('leave');
-                }, 100 * i);
-            });
+            pageExit();
         }
     },
 );
 
-const autoplayVideo = ref(false);
+onMounted(() => {
+    pageEnter();
+});
 
-function openProject(project, autoplay = false) {
+async function openProject(project, autoplay = false) {
     autoplayVideo.value = autoplay;
     activeProject.value = project;
 
     scrollPosition.value = window.scrollY;
     document.body.classList.add('no-scroll');
     document.body.style.top = `-${scrollPosition.value}px`;
+
+    await nextTick();
+    showSelectedProject();
 }
 
 function closeProject() {
-    selectedProjectMotion.set('leave');
-    setTimeout(() => {
-        activeProject.value = null;
+    document.body.classList.remove('no-scroll');
+    document.body.style.top = '';
+    window.scrollTo(0, scrollPosition.value);
 
-        document.body.classList.remove('no-scroll');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollPosition.value);
-    }, 100);
+    hideSelectedProject({
+        onComplete: () => {
+            activeProject.value = null;
+        },
+    });
 }
 </script>
 
 <template>
     <div class="projects-container">
         <div class="page-header">
-            <h1 ref="header" v-motion-fade-in>Projects</h1>
-            <hr ref="headerLine" v-motion-fade-in-scalex />
-            <p ref="headerText" v-motion-fade-in :delay="100">
+            <h1>Projects</h1>
+            <hr />
+            <p>
                 This is temporary text I am typing right now. I recently started to ponder about thinking through
                 something about a thing
             </p>
@@ -108,15 +90,8 @@ function closeProject() {
             <div
                 v-for="(project, i) in projectsData"
                 :key="project.title"
-                @click="openProject(project)"
                 class="project-card"
-                :ref="
-                    (el) => {
-                        if (el) projectItems[i] = el;
-                    }
-                "
-                v-motion-fade-in-once
-                :delay="50"
+                @click="openProject(project)"
             >
                 <div class="card-img-container">
                     <Button @click.stop="() => openProject(project, true)" :iconRight="PlayIcon" />
@@ -159,7 +134,7 @@ function closeProject() {
                 </div>
             </div>
         </div>
-        <div v-if="activeProject" ref="selectedProject" class="selected-container" v-motion-fade-in>
+        <div v-if="activeProject" class="selected-container">
             <div class="selected-project">
                 <div class="selected-header">
                     <div>
@@ -199,7 +174,7 @@ function closeProject() {
                     </div>
                 </div>
             </div>
-            <div @click="closeProject()" class="overlay" v-motion-fade-in></div>
+            <div class="overlay" @click="closeProject()"></div>
         </div>
     </div>
 </template>
