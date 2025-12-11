@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
 import { ref, markRaw, computed } from 'vue';
-import HomeView from '../views/HomeView.vue';
-import ProjectsView from '../views/ProjectsView.vue';
-import ExperienceView from '../views/ExperienceView.vue';
-import ContactView from '../views/ContactView.vue';
-import HomeIcon from '../components/SVGs/HomeIcon.vue';
-import HomeIconFill from '../components/SVGs/HomeIconFill.vue';
-import ProjectsIcon from '../components/SVGs/ProjectsIcon.vue';
-import ResumeIcon from '../components/SVGs/ResumeIcon.vue';
-import ResumeIconFill from '../components/SVGs/ResumeIconFill.vue';
-import ContactIcon from '../components/SVGs/ContactIcon.vue';
-import ContactIconFill from '../components/SVGs/ContactIconFill.vue';
+import HomeView from '@/views/HomeView.vue';
+import ProjectsView from '@/views/ProjectsView.vue';
+import ExperienceView from '@/views/ExperienceView.vue';
+import ContactView from '@/views/ContactView.vue';
+import HomeIcon from '@/components/SVGs/HomeIcon.vue';
+import HomeIconFill from '@/components/SVGs/HomeIconFill.vue';
+import ProjectsIcon from '@/components/SVGs/ProjectsIcon.vue';
+import ResumeIcon from '@/components/SVGs/ResumeIcon.vue';
+import ResumeIconFill from '@/components/SVGs/ResumeIconFill.vue';
+import ContactIcon from '@/components/SVGs/ContactIcon.vue';
+import ContactIconFill from '@/components/SVGs/ContactIconFill.vue';
 
 export const useRouteStore = defineStore('router', () => {
     const routes = {
@@ -32,7 +32,7 @@ export const useRouteStore = defineStore('router', () => {
         },
     };
 
-    const DEFAULT_TITLE = 'M. Green';
+    const DEFAULT_TITLE = 'M.G.';
 
     // Helper to parse a path string into base and params
     function parsePath(path) {
@@ -53,7 +53,7 @@ export const useRouteStore = defineStore('router', () => {
     const activePath = ref(getInitialPath());
     const isLeaving = ref(false);
     const toPath = ref();
-    const leaveDuration = 300;
+    const leaveDuration = 350;
 
     // Computed current route details
     const currentRoute = computed(() => {
@@ -66,11 +66,10 @@ export const useRouteStore = defineStore('router', () => {
         };
     });
 
-    // Navigate to a new path
     async function toRoute(to) {
         const { base } = parsePath(to);
         if (!routes[base]) {
-            to = 'home'; // Redirect invalid routes
+            to = 'home';
         }
 
         // Trigger leave animations in current view
