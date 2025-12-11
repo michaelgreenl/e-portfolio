@@ -1,20 +1,20 @@
 <script setup>
 import { markRaw } from 'vue';
-import { useThemeStore } from '../stores/themeStore.js';
+import { useThemeStore } from '@/stores/themeStore.js';
 import { useMediaQuery } from '@vueuse/core';
-import VueIcon from '../components/SVGs/Tools/VueIcon.vue';
-import GitIcon from '../components/SVGs/Tools/GitIcon.vue';
-import NuxtIcon from '../components/SVGs/Tools/NuxtIcon.vue';
-import GsapIcon from '../components/SVGs/Tools/GsapIcon.vue';
-import PiniaIcon from '../components/SVGs/Tools/PiniaIcon.vue';
-import SassIcon from '../components/SVGs/Tools/SassIcon.vue';
-import NodeIcon from '../components/SVGs/Tools/NodeIcon.vue';
-import SocketIcon from '../components/SVGs/Tools/SocketIcon.vue';
-import ExpressIcon from '../components/SVGs/Tools/ExpressIcon.vue';
-import PostgresIcon from '../components/SVGs/Tools/PostgresIcon.vue';
-import PrismaIcon from '../components/SVGs/Tools/PrismaIcon.vue';
-import SequelizeIcon from '../components/SVGs/Tools/SequelizeIcon.vue';
-import MySQLIcon from '../components/SVGs/Tools/MySQLIcon.vue';
+import VueIcon from '@/components/SVGs/Tools/VueIcon.vue';
+import GitIcon from '@/components/SVGs/Tools/GitIcon.vue';
+import NuxtIcon from '@/components/SVGs/Tools/NuxtIcon.vue';
+import GsapIcon from '@/components/SVGs/Tools/GsapIcon.vue';
+import PiniaIcon from '@/components/SVGs/Tools/PiniaIcon.vue';
+import SassIcon from '@/components/SVGs/Tools/SassIcon.vue';
+import NodeIcon from '@/components/SVGs/Tools/NodeIcon.vue';
+import SocketIcon from '@/components/SVGs/Tools/SocketIcon.vue';
+import ExpressIcon from '@/components/SVGs/Tools/ExpressIcon.vue';
+import PostgresIcon from '@/components/SVGs/Tools/PostgresIcon.vue';
+import PrismaIcon from '@/components/SVGs/Tools/PrismaIcon.vue';
+import SequelizeIcon from '@/components/SVGs/Tools/SequelizeIcon.vue';
+import MySQLIcon from '@/components/SVGs/Tools/MySQLIcon.vue';
 
 defineProps({
     tool: {
