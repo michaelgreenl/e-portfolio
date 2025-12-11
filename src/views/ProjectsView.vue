@@ -95,7 +95,7 @@ function closeProject() {
             >
                 <div class="card-img-container">
                     <Button @click.stop="() => openProject(project, true)" :iconRight="PlayIcon" />
-                    <img :src="getURL(project.img)" alt="project image" class="project-img" />
+                    <img :src="getURL(project.img)" alt="project image" loading="eager" class="project-img" />
                 </div>
                 <div class="card-body">
                     <div class="card-header">
