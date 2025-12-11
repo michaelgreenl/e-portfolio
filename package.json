@@ -17,7 +17,7 @@
     "dependencies": {
         "@emailjs/browser": "^4.4.1",
         "@vueuse/core": "^13.8.0",
-        "@vueuse/motion": "^3.0.3",
+        "gsap": "^3.14.1",
         "pinia": "^3.0.3",
         "vue": "^3.5.17"
     },

@@ -13,7 +13,7 @@
                 "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
             ]
         },
-        "fontFamily": "Poppins",
+        "fontFamily": "Autowide",
         "img": "reaction.png",
         "video": "1119895851",
         "externalLinks": {

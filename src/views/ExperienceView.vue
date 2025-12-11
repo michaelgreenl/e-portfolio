@@ -1,33 +1,34 @@
 <script setup>
-import { ref, watch } from 'vue';
-import resumeData from '../assets/data/resume.json';
-import { useRouteStore } from '../stores/routeStore.js';
-import { useThemeStore } from '../stores/themeStore.js';
-import { useMotion, useMotions } from '@vueuse/motion';
-import { Motions } from '../utils/motions.js';
-import Button from '../components/Button.vue';
-import DownloadThickIcon from '../components/SVGs/DownloadThickIcon.vue';
-import DownloadIcon from '../components/SVGs/DownloadIcon.vue';
-import CalendarIcon from '../components/SVGs/CalendarIcon.vue';
+import { ref, onMounted, watch } from 'vue';
+import resumeData from '@/assets/data/resume.json';
+import { useRouteStore } from '@/stores/routeStore.js';
+import { useThemeStore } from '@/stores/themeStore.js';
+import { useUtilAnimations } from '@/composables/animations/useUtilAnimations.js';
+import Button from '@/components/Button.vue';
+import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
+import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
+import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+const { fadeIn, fadeOut } = useUtilAnimations();
 
-const page = ref(null);
-const pageMotions = useMotion(page, Motions.directives['fade-in-leave']);
+onMounted(() => {
+    fadeIn({ selector: '.resume-container' });
+});
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            pageMotions.set('leave');
+            fadeOut({ selector: '.resume-container' });
         }
     },
 );
 </script>
 
 <template>
-    <div ref="page" class="resume-container" v-motion-fade-in>
+    <div class="resume-container">
         <div class="page-header">
             <h1>Resume</h1>
             <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
@@ -93,8 +94,8 @@ watch(
                     <p><span>Languages:</span>&nbsp; Javascript, HTML/CSS, Sass, SQL, Python</p>
                     <p><span>Frameworks:</span>&nbsp; Node, Vue, React, Express, Socket.IO</p>
                     <p>
-                        <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma ,
-                        Sequelize
+                        <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma,
+                        Sequelize, GSAP
                     </p>
                 </div>
             </div>
@@ -116,137 +117,137 @@ watch(
     padding: $size-4;
     color: $color-text-primary;
 
-    h1 {
-        font-size: 3em;
-        margin: $size-1 0;
-    }
-
-    h2,
-    h3,
-    h4,
-    p {
-        margin: 0;
-    }
-
-    h2 {
-        font-size: 1.8em;
-        font-family: $primary-font-stack;
-    }
-
-    h3 {
-        font-family: $ternary-font-stack;
-    }
-
-    h3 span {
-        font-weight: 400;
-        font-size: 0.9em;
-        color: $color-text-secondary;
-    }
-
-    p {
-        margin: $size-1 0;
-
-        span {
-            font-size: 1.15em;
-            font-family: $ternary-font-stack;
-            font-weight: 600;
-        }
-    }
-
-    ul {
-        margin: $size-1 0;
-        padding: 0 $size-5;
-    }
-
-    li {
-        font-family: $secondary-font-stack;
-        color: $color-text-secondary;
-    }
-
-    hr {
-        border: 0;
-        width: 100%;
-        margin: $size-2 auto;
-        height: 1px;
-
-        @include theme-dark {
-            background-color: $color-gray6;
-        }
-
-        @include theme-light {
-            background-color: $color-gray5;
-        }
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding-right: $size-2;
-
-        a {
-            font-size: 0.9em;
-        }
-    }
-
-    .section-segment {
-        padding: $size-2;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-
-        .segment-details {
-            gap: 2px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        &-skills {
-            font-size: 0.94em;
-            padding-top: 0.1em !important;
-        }
-    }
-
-    .segment-header {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap-reverse;
-        gap: 3px;
-
-        .segment-title {
-            font-weight: 600;
-            font-size: 1.3em;
-        }
-
-        .segment-dates {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: $size-2;
-
-            :deep(svg) {
-                height: 1em;
-                stroke: $color-text-primary;
-                margin-bottom: 4px;
-            }
-        }
-    }
-
-    @include bp-xsm-phone {
-        font-size: clamp(0.75em, 3.5vw, 1.05em);
-
-        .page-header a {
-            font-size: 1em;
-        }
-    }
-
     @include bp-custom-min(730) {
         max-width: 48em;
     }
 
     @include bp-xl-desktop {
         max-width: 71em;
+    }
+
+    @include bp-xsm-phone {
+        font-size: clamp(0.75em, 3.5vw, 1.05em);
+    }
+}
+
+h1 {
+    font-size: 3em;
+    margin: $size-1 0;
+}
+
+h2,
+h3,
+h4,
+p {
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.8em;
+    font-family: $primary-font-stack;
+}
+
+h3 {
+    font-family: $ternary-font-stack;
+}
+
+h3 span {
+    font-weight: 400;
+    font-size: 0.9em;
+    color: $color-text-secondary;
+}
+
+p {
+    margin: $size-1 0;
+
+    span {
+        font-size: 1.15em;
+        font-family: $ternary-font-stack;
+        font-weight: 600;
+    }
+}
+
+ul {
+    margin: $size-1 0;
+    padding: 0 $size-5;
+}
+
+li {
+    font-family: $secondary-font-stack;
+    color: $color-text-secondary;
+}
+
+hr {
+    border: 0;
+    width: 100%;
+    margin: $size-2 auto;
+    height: 1px;
+
+    @include theme-dark {
+        background-color: $color-gray6;
+    }
+
+    @include theme-light {
+        background-color: $color-gray5;
+    }
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-right: $size-2;
+
+    a {
+        font-size: 0.9em;
+
+        @include bp-xsm-phone {
+            font-size: 1em;
+        }
+    }
+}
+
+.section-segment {
+    padding: $size-2;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    &-skills {
+        font-size: 0.94em;
+        padding-top: 0.1em !important;
+    }
+}
+
+.segment-details {
+    gap: 2px;
+    display: flex;
+    flex-direction: column;
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap-reverse;
+    gap: 3px;
+}
+
+.segment-title {
+    font-weight: 600;
+    font-size: 1.3em;
+}
+
+.segment-dates {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+
+    :deep(svg) {
+        height: 1em;
+        stroke: $color-text-primary;
+        margin-bottom: 4px;
     }
 }
 </style>

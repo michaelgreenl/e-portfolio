@@ -1,10 +1,17 @@
 <script setup>
-import { useMotions } from '@vueuse/motion';
+import { onMounted } from 'vue';
+import { useUtilAnimations } from '@/composables/animations/useUtilAnimations.js';
+
+const { fadeIn } = useUtilAnimations();
+
+onMounted(() => {
+    fadeIn({ selector: '.footer-text', opts: { delay: 0.3 } });
+});
 </script>
 
 <template>
     <footer>
-        <p v-motion-fade-in-once :delay="300">© 2025 M.G.</p>
+        <p class="footer-text">© 2025 M.G.</p>
     </footer>
 </template>
 
@@ -19,13 +26,13 @@ footer {
     padding: 0 $size-8 5em;
     margin-top: auto;
 
-    p {
-        font-family: $primary-font-stack !important;
-        color: $color-text-muted;
-    }
-
     @include bp-md-tablet {
         padding-bottom: 0 !important;
     }
+}
+
+p {
+    font-family: $primary-font-stack !important;
+    color: $color-text-muted;
 }
 </style>

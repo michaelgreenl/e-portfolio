@@ -1,38 +1,41 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { useRouteStore } from '../stores/routeStore.js';
-import { useThemeStore } from '../stores/themeStore.js';
-import { useMotions, useMotion } from '@vueuse/motion';
-import { Motions } from '../utils/motions.js';
-
-import MoonIcon from '../components/SVGs/MoonIcon.vue';
-import SunIcon from '../components/SVGs/SunIcon.vue';
-import Logo from '../components/Logo.vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
+import { gsap } from 'gsap';
+import { useRouteStore } from '@/stores/routeStore.js';
+import { useThemeStore } from '@/stores/themeStore.js';
+import { useNavbarAnimations } from '@/composables/animations/useNavbarAnimations.js';
+import MoonIcon from '@/components/SVGs/MoonIcon.vue';
+import SunIcon from '@/components/SVGs/SunIcon.vue';
+import Logo from '@/components/Logo.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
-const logo = ref(null);
-const navItems = ref([]);
+const { enterPageAnim, enterNavItemAnim, exitNavItemAnim } = useNavbarAnimations();
 
-const logoMotions = useMotion(logo, Motions.directives['fade-in']);
-const navItemMotions = ref([]);
+const fromHome = ref(false);
+
+onMounted(() => {
+    if (routeStore.activePath !== 'home') {
+        const tl = gsap.timeline();
+        enterPageAnim({ tl, isHomePage: false });
+    } else {
+        enterPageAnim({ isHomePage: true });
+        fromHome.value = true;
+    }
+});
 
 watch(
     () => routeStore.isLeaving,
-    (newVal) => {
-        if (routeStore.toPath === 'home' && newVal) {
-            // The fix was janky but adding a different motion from the directive ("...-leave") works
-            navItemMotions.value = navItems.value.map((el) => {
-                if (!el) return null;
-                return useMotion(el, Motions.directives['fade-in-leave']);
-            });
-
-            navItemMotions.value.reverse().forEach((motion, i) => {
-                setTimeout(() => {
-                    motion.set('leave');
-                }, 100 * i);
-            });
+    async (newVal) => {
+        if (routeStore.activePath !== 'home' && fromHome.value) {
+            await nextTick();
+            enterNavItemAnim();
+            fromHome.value = false;
+        } else if (routeStore.toPath === 'home' && newVal) {
+            exitNavItemAnim();
+        } else if (routeStore.activePath === 'home') {
+            fromHome.value = true;
         }
     },
 );
@@ -40,27 +43,21 @@ watch(
 
 <template>
     <header>
-        <Logo ref="logo" v-motion-fade-in />
+        <Logo class="logo" />
         <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
                 v-for="(route, key, i) in routeStore.routes"
                 :key="key"
+                class="nav-item"
                 :class="{ active: routeStore.currentRoute.base === key }"
                 @click="routeStore.toRoute(key)"
-                v-motion-fade-slide-in-scalex
-                :delay="100 * i"
-                :ref="
-                    (el) => {
-                        if (el) navItems[i] = el;
-                    }
-                "
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.meta.title }}
             </button>
         </nav>
-        <label class="theme-toggle" v-motion-fade-in>
+        <label class="theme-toggle">
             <input
                 class="toggle-input"
                 type="checkbox"
@@ -77,8 +74,8 @@ watch(
             </div>
         </label>
     </header>
-    <hr v-motion-fade-in-scalex />
-    <nav class="nav-mobile" v-motion-slide-up-scalex>
+    <hr class="nav-line" />
+    <nav class="nav-mobile">
         <button
             v-for="(route, key) in routeStore.routes"
             :key="key"
@@ -109,6 +106,25 @@ watch(
 .icon-leave-from {
     opacity: 1;
     transform: rotate(0deg);
+}
+
+// Not setting these initial properties creates awkward flashing on page load when running enter animations.
+.logo,
+.theme-toggle {
+    opacity: 0;
+}
+
+.nav-line {
+    transform: scaleX(0);
+}
+
+.nav-desktop button {
+    opacity: 0;
+    transform: translateX(-50px) scaleX(0.5);
+}
+
+.nav-mobile {
+    transform: translateY(150px) scaleX(0);
 }
 
 .nav-mobile {
@@ -191,20 +207,6 @@ watch(
             font-weight: 500;
         }
 
-        .icon {
-            height: $size-6;
-
-            @include theme-dark {
-                fill: $color-text-secondary;
-                stroke: $color-text-secondary;
-            }
-
-            @include theme-light {
-                fill: $color-primary-darker;
-                stroke: $color-primary-darker;
-            }
-        }
-
         &::after {
             content: '';
             position: absolute;
@@ -239,6 +241,14 @@ watch(
         }
 
         &.active {
+            &::after {
+                width: 88%;
+            }
+
+            &:hover {
+                background-color: transparent;
+            }
+
             .icon {
                 height: $size-6;
 
@@ -252,13 +262,19 @@ watch(
                     stroke: $color-primary-darker;
                 }
             }
+        }
 
-            &::after {
-                width: 88%;
+        .icon {
+            height: $size-6;
+
+            @include theme-dark {
+                fill: $color-text-secondary;
+                stroke: $color-text-secondary;
             }
 
-            &:hover {
-                background-color: transparent;
+            @include theme-light {
+                fill: $color-primary-darker;
+                stroke: $color-primary-darker;
             }
         }
     }
@@ -308,6 +324,25 @@ header {
             align-items: center;
             justify-content: center;
             border-radius: 100%;
+            transition: all 0.3s ease;
+
+            &::before {
+                position: absolute;
+                content: '';
+                width: $size-6;
+                height: $size-6;
+                border-radius: 100%;
+                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+                transition: transform 0.3s;
+
+                @include theme-dark {
+                    background-color: $color-gray4;
+                }
+
+                @include theme-light {
+                    background-color: $color-bg-primary;
+                }
+            }
 
             .icon {
                 position: relative;
@@ -328,29 +363,11 @@ header {
             &.active {
                 transform: translateX(115%);
             }
-
-            &::before {
-                position: absolute;
-                content: '';
-                width: $size-6;
-                height: $size-6;
-                border-radius: 100%;
-                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
-                transition: transform 0.3s;
-
-                @include theme-dark {
-                    background-color: $color-gray4;
-                }
-
-                @include theme-light {
-                    background-color: $color-bg-primary;
-                }
-            }
         }
     }
 }
 
-hr {
+.nav-line {
     position: relative;
     z-index: 3;
     border: 0;

@@ -56,6 +56,7 @@ button {
         padding: $size-2 $size-4;
         letter-spacing: 0.1ch;
         border-radius: 12px;
+        transition: transform 0.3s ease;
 
         .icon {
             height: $size-4;

@@ -34,19 +34,5 @@
                 "Used Git to effectively manage code versions, collaborate with team members, and track project progress."
             ]
         }
-    },
-    "skills": [
-        "vue",
-        "sass",
-        "pinia",
-        "gsap",
-        "node",
-        "express",
-        "git",
-        "sequelize",
-        "mysql",
-        "postgres",
-        "prisma",
-        "socket"
-    ]
+    }
 }
