@@ -2,7 +2,7 @@
     {
         "title": "Reaction",
         "slug": "reaction",
-        "stack": ["vue", "pinia", "sass", "node", "express", "mysql", "sequelize"],
+        "stack": ["vue", "pinia", "sass", "gsap", "node", "postgres", "sequelize", "express"],
         "date": "05/32/2025",
         "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
@@ -15,17 +15,17 @@
         },
         "fontFamily": "Autowide",
         "img": "reaction.png",
-        "video": "1119895851",
+        "video": "1149531486",
         "externalLinks": {
-            "github": { "href": "", "text": "Github" },
+            "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Github" },
             "demoVideo": { "href": null, "text": "Demo Video" },
-            "liveSite": { "href": "", "text": "Live Site" }
+            "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" }
         }
     },
     {
         "title": "GameLobby",
         "slug": "game-lobby",
-        "stack": ["vue", "pinia", "sass", "node", "socket", "postgres", "prisma"],
+        "stack": ["vue", "socket", "pinia", "postgres", "prisma", "node", "sass"],
         "date": "05/32/2025",
         "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
@@ -40,15 +40,15 @@
         "img": "game-lobby.png",
         "video": "1119895851",
         "externalLinks": {
-            "github": { "href": "", "text": "Github" },
+            "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Github" },
             "demoVideo": { "href": null, "text": "Demo Video" },
-            "liveSite": { "href": "", "text": "Live Site" }
+            "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" }
         }
     },
     {
         "title": "AlgoVisualizer",
         "slug": "algo-visualizer",
-        "stack": ["vue", "nuxt", "gsap", "node", "pinia", "sass"],
+        "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
         "date": "05/32/2025",
         "dateRange": "05/32/2025 - 05/32/2025",
         "description": {
@@ -61,9 +61,9 @@
         },
         "fontFamily": "Futura",
         "img": "algo-visualizer.png",
-        "video": "1119895851",
+        "video": "1149531735",
         "externalLinks": {
-            "github": { "href": "", "text": "Github" },
+            "github": { "href": "https://github.com/michaelgreenl/AlgoVisualizer", "text": "Github" },
             "demoVideo": { "href": null, "text": "Demo Video" }
         }
     }
