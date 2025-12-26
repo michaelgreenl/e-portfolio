@@ -112,7 +112,12 @@ function closeProject() {
                     </div>
                     <div class="card-footer">
                         <div class="external-links card-external-links">
-                            <a v-for="(link, key) in project.externalLinks" :key="link" :href="link.href">
+                            <a
+                                v-for="(link, key) in project.externalLinks"
+                                :key="link"
+                                :href="link.href"
+                                target="_blank"
+                            >
                                 <Button
                                     v-if="key === 'demoVideo'"
                                     @click.stop="() => openProject(project, true)"
@@ -158,7 +163,12 @@ function closeProject() {
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
                             <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
                             <div class="external-links selected-external-links">
-                                <a v-for="(link, key) in activeProject.externalLinks" :key="link" :href="link.href">
+                                <a
+                                    v-for="(link, key) in activeProject.externalLinks"
+                                    :key="link"
+                                    :href="link.href"
+                                    target="_blank"
+                                >
                                     <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                                 </a>
                             </div>
@@ -255,7 +265,7 @@ function closeProject() {
 
     h1 {
         @include bp-xsm-phone {
-            font-size: 7em;
+            font-size: 6.5em;
         }
     }
 
