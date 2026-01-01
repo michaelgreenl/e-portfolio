@@ -49,6 +49,13 @@ watch(
 
 onMounted(() => {
     pageEnter();
+
+    const query = routeStore.currentRoute.query;
+    const projectToOpen = projectsData.find((p) => p.slug === query.slug);
+
+    if (query && projectToOpen) {
+        openProject(projectToOpen, query.autoplay === 'true');
+    }
 });
 
 async function openProject(project, autoplay = false) {
@@ -111,11 +118,11 @@ function closeProject() {
                         <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
                     </div>
                     <div class="card-footer">
-                        <div class="external-links card-external-links">
+                        <div class="external-links external-links-card">
                             <a
                                 v-for="(link, key) in project.externalLinks"
                                 :key="link"
-                                :href="link.href"
+                                :href="key === 'demoVideo' ? null : link.href"
                                 target="_blank"
                             >
                                 <Button
@@ -162,22 +169,19 @@ function closeProject() {
                         <div class="selected-info-header" :class="`info-header-${activeProject.slug}`">
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
                             <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
-                            <div class="external-links selected-external-links">
-                                <a
-                                    v-for="(link, key) in activeProject.externalLinks"
-                                    :key="link"
-                                    :href="link.href"
-                                    target="_blank"
-                                >
-                                    <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
-                                </a>
+                            <div class="external-links external-links-selected">
+                                <template v-for="(link, key) in activeProject.externalLinks" :key="link">
+                                    <a v-if="key !== 'demoVideo'" :href="link.href" target="_blank">
+                                        <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                                    </a>
+                                </template>
                             </div>
                         </div>
                         <div class="selected-tool-chips" :class="`tool-chips-${activeProject.slug}`">
                             <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
                         </div>
                         <ul class="selected-description">
-                            <li v-for="description in activeProject.description.long" :key="description">
+                            <li v-for="description in activeProject.description?.long" :key="description">
                                 {{ description }}
                             </li>
                         </ul>
@@ -282,40 +286,79 @@ function closeProject() {
     }
 }
 
-.external-links a {
-    &:deep(button) {
-        @include bp-md-tablet {
-            gap: $size-2;
-        }
+.external-links {
+    &-card {
+        font-size: 1.1em;
+        display: flex;
+        gap: $size-4;
 
-        span {
-            display: none;
+        a:nth-child(3) {
+            &:deep(button) svg {
+                stroke-width: 0 !important;
 
-            @include bp-md-tablet {
-                display: block !important;
-            }
-        }
+                @include theme-dark {
+                    fill: lighten-color($color-text-muted, 15%) !important;
+                }
 
-        svg {
-            height: $size-6;
-            stroke-width: 2;
-            transition: fill 0.3s ease-in-out;
-            fill: rgba(0, 0, 0, 0) !important;
-
-            @include theme-dark {
-                stroke: lighten-color($color-text-muted, 15%);
-            }
-
-            @include theme-light {
-                stroke: darken-color($color-text-muted, 15%);
+                @include theme-light {
+                    fill: darken-color($color-text-muted, 15%) !important;
+                }
             }
         }
     }
 
-    &:nth-child(3) {
-        &:deep(button) svg {
-            stroke-width: 0 !important;
+    &-selected {
+        margin-left: auto;
+        font-size: 1.1em;
+        display: flex;
+        gap: $size-4;
 
+        a:nth-child(2) {
+            &:deep(button) svg {
+                stroke-width: 0 !important;
+
+                @include theme-dark {
+                    fill: lighten-color($color-text-muted, 15%) !important;
+                }
+
+                @include theme-light {
+                    fill: darken-color($color-text-muted, 15%) !important;
+                }
+            }
+        }
+    }
+
+    a {
+        &:deep(button) {
+            @include bp-md-tablet {
+                gap: $size-2;
+            }
+
+            span {
+                display: none;
+
+                @include bp-md-tablet {
+                    display: block !important;
+                }
+            }
+
+            svg {
+                height: $size-6;
+                stroke-width: 2;
+                transition: fill 0.3s ease-in-out;
+                fill: rgba(0, 0, 0, 0) !important;
+
+                @include theme-dark {
+                    stroke: lighten-color($color-text-muted, 15%);
+                }
+
+                @include theme-light {
+                    stroke: darken-color($color-text-muted, 15%);
+                }
+            }
+        }
+
+        &:hover :deep(button) svg {
             @include theme-dark {
                 fill: lighten-color($color-text-muted, 15%) !important;
             }
@@ -323,16 +366,6 @@ function closeProject() {
             @include theme-light {
                 fill: darken-color($color-text-muted, 15%) !important;
             }
-        }
-    }
-
-    &:hover :deep(button) svg {
-        @include theme-dark {
-            fill: lighten-color($color-text-muted, 15%) !important;
-        }
-
-        @include theme-light {
-            fill: darken-color($color-text-muted, 15%) !important;
         }
     }
 }
@@ -542,7 +575,7 @@ function closeProject() {
 
 .card-description {
     font-size: 1.35em;
-    max-width: 63ch;
+    max-width: 66ch;
 
     @include bp-xsm-phone {
         font-size: 1.6em;
@@ -584,12 +617,6 @@ function closeProject() {
     justify-content: space-between;
     align-items: center;
     margin-top: $size-4;
-}
-
-.card-external-links {
-    font-size: 1.1em;
-    display: flex;
-    gap: $size-4;
 }
 
 .see-more {
@@ -784,17 +811,9 @@ function closeProject() {
     }
 }
 
-.selected-external-links {
-    margin-left: auto;
-    font-size: 1.1em;
-    display: flex;
-    gap: $size-4;
-}
-
 .selected-tool-chips {
+    @include flexCenterAll;
     font-size: 1.1em;
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     overflow: hidden;
     gap: $size-4;
