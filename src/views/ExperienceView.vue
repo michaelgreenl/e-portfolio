@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import projectsData from '@/assets/data/projects.json';
 import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useUtilAnimations } from '@/composables/animations/useUtilAnimations.js';
 import Button from '@/components/Button.vue';
-import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
+import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 
 const routeStore = useRouteStore();
@@ -65,7 +66,7 @@ watch(
                 </div>
             </div>
             <div class="section">
-                <h2 class="section-header">Relavant Experience</h2>
+                <h2 class="section-header">Relevant Experience</h2>
                 <hr />
                 <div v-for="experience in resumeData.experience" :key="experience.title" class="section-segment">
                     <div class="segment-header">
@@ -88,15 +89,63 @@ watch(
                 </div>
             </div>
             <div class="section">
-                <h2 class="section-header">Skills</h2>
+                <h2 class="section-header">Projects</h2>
+                <hr />
+                <div v-for="project in projectsData" :key="project.title" class="section-segment">
+                    <div class="segment-header">
+                        <h3 class="segment-title segment-title-projects">
+                            <a :href="project.externalLinks.porfolioLink.href" class="project-link">
+                                {{ project.title }}
+                            </a>
+                            <span> - </span>
+                            <span v-if="project.externalLinks.liveSite">
+                                <a class="external-link" :href="project.externalLinks.liveSite.href" target="_blank">
+                                    Live Site</a
+                                >
+                                |
+                            </span>
+                            <span>
+                                <a class="external-link" :href="project.externalLinks.demoVideo.href"> Demo Video</a>
+                                |
+                            </span>
+                            <span>
+                                <a class="external-link" :href="project.externalLinks.github.href" target="_blank">
+                                    Repository</a
+                                >
+                            </span>
+                        </h3>
+                        <div class="segment-dates">
+                            <CalendarIcon />
+                            <h3>{{ project.dateRange }}</h3>
+                        </div>
+                    </div>
+                    <div class="segment-details">
+                        <h3>
+                            Stack
+                            <span> - </span>
+                            <span v-for="(tool, i) in project.stackText" :key="tool"
+                                >{{ tool }}<span v-if="i !== project.stack.length - 1">, </span>
+                            </span>
+                        </h3>
+                    </div>
+                    <ul class="segment-info">
+                        <li>
+                            {{ project.description.short }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="section">
+                <h2 class="section-header">Technical Skills</h2>
                 <hr />
                 <div class="section-segment section-segment-skills">
-                    <p><span>Languages:</span>&nbsp; Javascript, HTML/CSS, Sass, SQL, Python</p>
+                    <p><span>Languages:</span>&nbsp; Javascript, HTML/CSS, Sass, SQL</p>
                     <p><span>Frameworks:</span>&nbsp; Node, Vue, React, Express, Socket.IO</p>
                     <p>
                         <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma,
                         Sequelize, GSAP
                     </p>
+                    <p><span>Infrastructure:</span>&nbsp; Docker, Github, Vercel, Render</p>
                 </div>
             </div>
         </div>
@@ -122,7 +171,7 @@ watch(
     }
 
     @include bp-xl-desktop {
-        max-width: 71em;
+        max-width: 61em;
     }
 
     @include bp-xsm-phone {
@@ -236,9 +285,33 @@ hr {
 .segment-title {
     font-weight: 600;
     font-size: 1.3em;
+
+    &-projects {
+        .project-link {
+            color: $color-text-primary;
+
+            @include interactive {
+                text-decoration: underline;
+            }
+        }
+
+        .external-link {
+            text-decoration: underline;
+            color: $color-text-secondary;
+
+            @include interactive {
+                color: $color-primary-darker;
+            }
+        }
+
+        span {
+            font-size: 0.8em;
+        }
+    }
 }
 
 .segment-dates {
+    font-size: 0.9em;
     margin-left: auto;
     display: flex;
     align-items: center;
@@ -249,5 +322,11 @@ hr {
         stroke: $color-text-primary;
         margin-bottom: 4px;
     }
+}
+
+.segment-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 </style>
