@@ -57,9 +57,13 @@ body,
     position: relative;
     display: flex;
     flex-direction: column;
-    font-size: 0.9em;
+    font-size: 0.85em;
 
     @include bp-xsm-phone {
+        font-size: 0.9em;
+    }
+
+    @include bp-sm-phone {
         font-size: 1em;
     }
 
@@ -116,6 +120,7 @@ p {
     font-family: $secondary-font-stack;
 }
 
+a,
 button {
     cursor: pointer;
 }
