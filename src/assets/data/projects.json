@@ -20,12 +20,12 @@
         "externalLinks": {
             "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Repository" },
             "demoVideo": {
-                "href": "http://localhost:5174/#projects?slug=reaction&autoplay=true",
+                "href": "https://michaelgreenl.net/#projects?slug=reaction&autoplay=true",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" },
             "porfolioLink": {
-                "href": "http://localhost:5174/#projects?slug=reaction&autoplay=false"
+                "href": "https://michaelgreenl.net/#projects?slug=reaction&autoplay=false"
             }
         }
     },
@@ -50,12 +50,12 @@
         "externalLinks": {
             "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Repository" },
             "demoVideo": {
-                "href": "http://localhost:5174/#projects?slug=game-lobby&autoplay=true",
+                "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=true",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" },
             "porfolioLink": {
-                "href": "http://localhost:5174/#projects?slug=game-lobby&autoplay=false"
+                "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=false"
             }
         }
     },
@@ -83,11 +83,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "http://localhost:5174/#projects?slug=algo-visualizer&autoplay=true",
+                "href": "https://michaelgreenl.net/#projects?slug=algo-visualizer&autoplay=true",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "http://localhost:5174/#projects?slug=algo-visualizer&autoplay=false"
+                "href": "https://michaelgreenl.net#projects?slug=algo-visualizer&autoplay=false"
             }
         }
     }
