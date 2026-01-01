@@ -2,69 +2,93 @@
     {
         "title": "Reaction",
         "slug": "reaction",
-        "stack": ["vue", "pinia", "sass", "gsap", "node", "postgres", "sequelize", "express"],
-        "date": "05/32/2025",
-        "dateRange": "05/32/2025 - 05/32/2025",
+        "stackText": ["Vue", "Pinia", "Sass", "GSAP", "Node", "Sequelize", "Express", "Postgres"],
+        "stack": ["vue", "pinia", "sass", "gsap", "node", "sequelize", "express", "postgres"],
+        "date": "September 2025",
+        "dateRange": "September 2025 - Present",
         "description": {
-            "short": "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
+            "short": "A full-stack application engineered with a decoupled architecture, utilizing the Repository Pattern to securely manage authentication, game metrics, and user persistence.",
             "long": [
-                "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
-                "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
-                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
+                "Architected a reactive Vue 3 frontend utilizing Pinia for modular state management and GSAP for high-fidelity timeline animations, significantly enhancing user engagement through intuitive visual feedback.",
+                "Developed backend services adhering to the Repository Pattern, creating a clean separation of concerns and improving maintainability.",
+                "Engineered a defense-in-depth security strategy, utilizing HTTP-only cookies for XSS-proof JWT storage and implementing rate-limiting middleware to mitigate brute-force attacks."
             ]
         },
         "fontFamily": "Autowide",
         "img": "reaction.png",
         "video": "1149531486",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Github" },
-            "demoVideo": { "href": null, "text": "Demo Video" },
-            "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" }
+            "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Repository" },
+            "demoVideo": {
+                "href": "http://localhost:5174/#projects?slug=reaction&autoplay=true",
+                "text": "Demo Video"
+            },
+            "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" },
+            "porfolioLink": {
+                "href": "http://localhost:5174/#projects?slug=reaction&autoplay=false"
+            }
         }
     },
     {
         "title": "GameLobby",
         "slug": "game-lobby",
-        "stack": ["vue", "socket", "pinia", "postgres", "prisma", "node", "sass"],
-        "date": "05/32/2025",
-        "dateRange": "05/32/2025 - 05/32/2025",
+        "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Sass"],
+        "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "sass"],
+        "date": "June 2025",
+        "dateRange": "June 2025 - July 2025",
         "description": {
-            "short": "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
+            "short": "A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by JWTs and supported by Prisma for persistent match history.",
             "long": [
-                "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
-                "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
-                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
+                "Architected a server-authoritative Node.js backend to centralize game logic, preventing client-side state manipulation and ensuring fair play for multiplayer sessions.",
+                "Orchestrated real-time data synchronization between a Vue.js client and server using Socket.IO, implementing fault-tolerant reconnection strategies via JWTs to preserve user sessions.",
+                "Engineered a real-time lobby system to manage concurrent user connections, enabling dynamic matchmaking and live player status updates."
             ]
         },
         "fontFamily": "BitCount",
         "img": "game-lobby.png",
         "video": "1119895851",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Github" },
-            "demoVideo": { "href": null, "text": "Demo Video" },
-            "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" }
+            "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Repository" },
+            "demoVideo": {
+                "href": "http://localhost:5174/#projects?slug=game-lobby&autoplay=true",
+                "text": "Demo Video"
+            },
+            "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" },
+            "porfolioLink": {
+                "href": "http://localhost:5174/#projects?slug=game-lobby&autoplay=false"
+            }
         }
     },
     {
         "title": "AlgoVisualizer",
         "slug": "algo-visualizer",
+        "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "date": "05/32/2025",
-        "dateRange": "05/32/2025 - 05/32/2025",
+        "date": "May 2022",
+        "dateRange": "May 2022 - July 2025",
         "description": {
-            "short": "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
+            "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
             "long": [
-                "Engineered a full-stack, real-time multiplayer application with a server-authoritative Node.js backend that manages all game logic.",
-                "Utilized Socket.IO to push instantaneous state updates to a reactive Vue.js frontend, and implemented persistent user sessions with JWTs for graceful reconnections.",
-                "Integrated a PostgreSQL database using Prisma ORM to store user accounts and game history."
+                "Constructed a modular algorithm visualization platform using Nuxt 3 and Vue 3, utilizing dynamic component loading to seamlessly scale from 1 to 50+ algorithm visualizations without bundle size bloat.",
+                "Created an interactive explanation system using gsap.TextPlugin to type out context-aware, step-by-step textual descriptions synchronized perfectly with the visual elements of the algorithm.",
+                "Optimized animation performance by using Vue's markRaw to exclude heavy GSAP timeline objects from reactivity tracking, preventing unnecessary re-renders and memory leaks."
             ]
         },
         "fontFamily": "Futura",
         "img": "algo-visualizer.png",
         "video": "1149531735",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/AlgoVisualizer", "text": "Github" },
-            "demoVideo": { "href": null, "text": "Demo Video" }
+            "github": {
+                "href": "https://github.com/michaelgreenl/AlgoVisualizer",
+                "text": "Repository"
+            },
+            "demoVideo": {
+                "href": "http://localhost:5174/#projects?slug=algo-visualizer&autoplay=true",
+                "text": "Demo Video"
+            },
+            "porfolioLink": {
+                "href": "http://localhost:5174/#projects?slug=algo-visualizer&autoplay=false"
+            }
         }
     }
 ]

@@ -24,14 +24,10 @@
             "location": "Troy MI",
             "dates": "January 2022 - August 2022",
             "info": [
-                "Gained hands-on experience working with REST APIs, including making requests, handling responses, and integrating them into applications.",
-                "Developed skills in Vue, NodeJS, and SCSS, demonstrating proficiency by accurately developing client-specified front-end applications.",
-                "Implemented precise UI/UX when translating mockups into accessible and responsive front-end applications.",
-                "Engaged in effective communication and collaboration with team members to complete project objectives.",
-                "Adaptively managed and incorporated client revisions while maintaining adherence to project deadlines.",
-                "Intuitively enhanced user experience by implementing seamless transitions, micro-interactions, and engaging loading animations, leading to a client-favorite convention application.",
-                "Became proficient in adapting and understanding different codebases of various sizes.",
-                "Used Git to effectively manage code versions, collaborate with team members, and track project progress."
+                "Served as the primary frontend developer for multiple client projects, rigorously translating UI/UX mockups into fully functional, pixel-perfect Vue.js interfaces.",
+                "Independently executed the frontend logic for smaller-scale applications, delivering interactive and bug-free components ready for integration.",
+                "Collaborated with backend teams to consume RESTful APIs, ensuring accurate data rendering and seamless user interactions.",
+                "Implemented complex UI animations and micro-interactions for convention applications, directly translating client requests into working code."
             ]
         }
     }
