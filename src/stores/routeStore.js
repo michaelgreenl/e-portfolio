@@ -34,20 +34,28 @@ export const useRouteStore = defineStore('router', () => {
 
     const DEFAULT_TITLE = 'M.G.';
 
-    // Helper to parse a path string into base and params
-    function parsePath(path) {
-        const parts = path.split('/');
+    function parsePath(fullPath) {
+        const [pathString, queryString] = fullPath.split('?');
+
+        const parts = pathString.split('/');
         const base = parts[0] || 'home';
-        const params = { id: parts[1] || null }; // Assumes one param (id) for simplicity
-        return { base, params };
+        const params = { id: parts[1] || null };
+
+        const query = {};
+        if (queryString) {
+            new URLSearchParams(queryString).forEach((val, key) => {
+                query[key] = val;
+            });
+        }
+
+        return { base, params, query };
     }
 
-    // Get initial path from hash, default to 'home'
     function getInitialPath() {
         const hash = window.location.hash.slice(1);
         if (!hash) return 'home';
         const { base } = parsePath(hash);
-        return routes[base] ? hash : 'home'; // Redirect invalid base to home
+        return routes[base] ? hash : 'home';
     }
 
     const activePath = ref(getInitialPath());
@@ -55,12 +63,12 @@ export const useRouteStore = defineStore('router', () => {
     const toPath = ref();
     const leaveDuration = 350;
 
-    // Computed current route details
     const currentRoute = computed(() => {
-        const { base, params } = parsePath(activePath.value);
+        const { base, params, query } = parsePath(activePath.value);
         return {
             base,
             params,
+            query,
             component: routes[base]?.component,
             meta: routes[base]?.meta,
         };
@@ -72,14 +80,11 @@ export const useRouteStore = defineStore('router', () => {
             to = 'home';
         }
 
-        // Trigger leave animations in current view
         isLeaving.value = true;
         toPath.value = to;
 
-        // Wait for leave animation to complete
         await new Promise((resolve) => setTimeout(resolve, leaveDuration));
 
-        // Reset flag and proceed with route change
         activePath.value = to;
         isLeaving.value = false;
         window.location.hash = to;
@@ -91,7 +96,6 @@ export const useRouteStore = defineStore('router', () => {
         document.title = title;
     }
 
-    // Listen for browser back/forward buttons
     window.addEventListener('hashchange', () => {
         const newPath = getInitialPath();
         if (newPath !== activePath.value) {
@@ -105,7 +109,6 @@ export const useRouteStore = defineStore('router', () => {
         }
     });
 
-    // Set initial hash if missing
     if (!window.location.hash) {
         window.location.hash = activePath.value;
     }
