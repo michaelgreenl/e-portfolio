@@ -263,10 +263,8 @@ const clearStatus = () => {
 .contact-container {
     position: relative;
     font-size: 0.9em;
-    display: flex;
+    @include flexCenterAll;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     margin: 0 auto;
     padding: $size-8 $size-4;
     width: 100%;

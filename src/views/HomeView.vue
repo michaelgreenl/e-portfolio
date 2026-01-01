@@ -70,10 +70,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 .home-container {
     font-size: clamp(10px, 4vw, 16px);
-    display: flex;
+    @include flexCenterAll;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     width: 100%;
     flex-grow: 1;
     padding: 0 $size-4;

@@ -85,6 +85,12 @@ $breakpoints: (
     }
 }
 
+@mixin flexCenterAll {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 // Color variations
 @function lighten-color($color, $percentage) {
     $amount: $percentage;

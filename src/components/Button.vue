@@ -43,9 +43,7 @@ function handleClick(evt) {
 
 <style lang="scss" scoped>
 button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flexCenterAll;
     font-family: $primary-font-stack;
     font-size: 1em;
     font-weight: 400;

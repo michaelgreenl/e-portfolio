@@ -144,9 +144,7 @@ watch(
     box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
 
     button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        @include flexCenterAll;
         padding: $size-2 $size-3;
         font-family: $primary-font-stack;
         font-weight: 600;
@@ -320,9 +318,7 @@ header {
 
         .toggle-thumb {
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            @include flexCenterAll;
             border-radius: 100%;
             transition: all 0.3s ease;
 

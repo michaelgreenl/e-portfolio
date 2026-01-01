@@ -92,9 +92,7 @@ const tools = {
 
 <style lang="scss" scoped>
 .chip-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flexCenterAll;
     gap: $size-2;
     height: 100%;
     padding: 0.85em 1em;

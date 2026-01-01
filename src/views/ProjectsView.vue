@@ -197,10 +197,8 @@ function closeProject() {
 .projects-container {
     position: relative;
     font-size: 0.6em;
-    display: flex;
+    @include flexCenterAll;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     flex-grow: 1;
     width: 100%;
     padding: $size-12 0 $size-4;
@@ -255,10 +253,8 @@ function closeProject() {
 }
 
 .page-header {
-    display: flex;
+    @include flexCenterAll;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     padding: 0 $size-4;
     margin: $size-16 0 $size-20;
 
@@ -467,9 +463,7 @@ function closeProject() {
 
 .card-img-container {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flexCenterAll;
 
     :deep(button) {
         position: absolute;
@@ -644,9 +638,7 @@ function closeProject() {
     position: fixed;
     z-index: 2;
     top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flexCenterAll;
     height: 100vh;
     width: 100vw;
     backdrop-filter: blur(5px);
@@ -707,9 +699,7 @@ function closeProject() {
 
     :deep(button) {
         font-size: 1.2em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        @include flexCenterAll;
         gap: 0;
         padding: $size-3;
         border-radius: 100%;
@@ -742,9 +732,7 @@ function closeProject() {
 
 .selected-img-container {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flexCenterAll;
     margin: $size-2 0;
 
     @include bp-sm-phone {
