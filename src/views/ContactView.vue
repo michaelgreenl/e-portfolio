@@ -16,23 +16,10 @@ const routeStore = useRouteStore();
 
 const { enterPageAnim, exitPageAnim } = useContactAnimations();
 
-const form = reactive({
-    email: '',
-    subject: '',
-    message: '',
-});
-
-const errors = reactive({
-    email: '',
-    subject: '',
-    message: '',
-});
-
-const touched = reactive({
-    email: false,
-    subject: false,
-    message: false,
-});
+const formElement = ref(null);
+const form = reactive({ email: '', subject: '', message: '' });
+const errors = reactive({ email: '', subject: '', message: '' });
+const touched = reactive({ email: false, subject: false, message: false });
 
 const isSubmitting = ref(false);
 const submitStatus = ref(''); // 'success', 'error', or ''
