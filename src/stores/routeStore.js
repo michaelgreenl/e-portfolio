@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, markRaw, computed } from 'vue';
 import HomeView from '@/views/HomeView.vue';
 import ProjectsView from '@/views/ProjectsView.vue';
-import ExperienceView from '@/views/ExperienceView.vue';
+import ResumeView from '@/views/ResumeView.vue';
 import ContactView from '@/views/ContactView.vue';
 import HomeIcon from '@/components/SVGs/HomeIcon.vue';
 import HomeIconFill from '@/components/SVGs/HomeIconFill.vue';
@@ -22,8 +22,8 @@ export const useRouteStore = defineStore('router', () => {
             component: markRaw(ProjectsView),
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
-        experience: {
-            component: markRaw(ExperienceView),
+        resume: {
+            component: markRaw(ResumeView),
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
