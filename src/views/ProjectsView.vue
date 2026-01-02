@@ -98,11 +98,20 @@ function closeProject() {
                 v-for="(project, i) in projectsData"
                 :key="project.title"
                 class="project-card"
+                role="button"
+                tabindex="0"
                 @click="openProject(project)"
+                @keydown.enter="openProject(project)"
+                @keydown.space.prevent="openProject(project)"
             >
                 <div class="card-img-container">
                     <Button @click.stop="() => openProject(project, true)" :iconRight="PlayIcon" />
-                    <img :src="getURL(project.img)" alt="project image" loading="eager" class="project-img" />
+                    <img
+                        :src="getURL(project.img)"
+                        :alt="'Screenshot of ' + project.title"
+                        loading="eager"
+                        class="project-img"
+                    />
                 </div>
                 <div class="card-body">
                     <div class="card-header">
@@ -146,7 +155,14 @@ function closeProject() {
                 </div>
             </div>
         </div>
-        <div v-if="activeProject" class="selected-container">
+        <div
+            v-if="activeProject"
+            class="selected-container"
+            role="dialog"
+            aria-modal="true"
+            :aria-label="activeProject.title"
+            @keydown.esc="closeProject()"
+        >
             <div class="selected-project">
                 <div class="selected-header">
                     <div>

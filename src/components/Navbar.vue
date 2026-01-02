@@ -64,6 +64,7 @@ watch(
                 id="theme"
                 true-value="dark"
                 false-value="light"
+                aria-label="Toggle theme"
                 @click="themeStore.toggleTheme()"
             />
             <div class="toggle-thumb" :class="{ active: themeStore.theme === 'dark' }">
@@ -185,33 +186,33 @@ watch(
 
     button {
         position: relative;
-        font-size: 0.85em;
-        font-family: $primary-font-stack;
         display: flex;
         gap: $size-3;
         align-items: center;
         padding: $size-3 $size-5;
+        font-family: $primary-font-stack;
+        font-size: 0.85em;
         background-color: transparent;
         border: 0;
         border-radius: $size-3;
 
         @include theme-dark {
-            color: $color-text-primary;
             font-weight: 400;
+            color: $color-text-primary;
         }
 
         @include theme-light {
-            color: $color-primary-darker;
             font-weight: 500;
+            color: $color-primary-darker;
         }
 
         &::after {
-            content: '';
             position: absolute;
             bottom: 0;
             left: $size-2;
             width: 0;
             height: 1px;
+            content: '';
             border-radius: $size-4;
             transition: width 0.15s ease-in-out;
 

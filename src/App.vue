@@ -92,7 +92,7 @@ h1 {
     color: $color-primary-darker;
 
     @include theme-light {
-        text-shadow: 0px 3px 5px #00000025;
+        text-shadow: 0 3px 5px #00000025;
     }
 }
 
@@ -110,23 +110,19 @@ h2 {
 
 h3,
 h4 {
-    color: $color-primary-darker;
     font-family: $primary-font-stack;
     font-weight: 400;
+    color: $color-primary-darker;
 }
 
 p {
-    color: $color-text-secondary;
     font-family: $secondary-font-stack;
+    color: $color-text-secondary;
 }
 
 a,
 button {
     cursor: pointer;
-}
-
-button:focus-visible {
-    outline: none;
 }
 
 a {
