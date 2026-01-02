@@ -288,13 +288,13 @@ function closeProject() {
 
     p {
         max-width: 37ch;
-        font-size: 1.5em;
+        font-size: 1.7em;
         color: $color-text-secondary;
         text-align: center;
 
         @include bp-sm-phone {
             max-width: 56ch;
-            font-size: 1.6em;
+            font-size: 1.8em;
         }
     }
 }
