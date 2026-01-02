@@ -1,5 +1,8 @@
 import { gsap } from 'gsap';
+import Flip from 'gsap/Flip';
 import { useGsap } from '@/composables/useGsap.js';
+
+gsap.registerPlugin(Flip);
 
 export function useUtilAnimations() {
     const { registerAnim } = useGsap();

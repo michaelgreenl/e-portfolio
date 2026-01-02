@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useProjectsAnimations } from '@/composables/animations/useProjectsAnimations.js';
 import projectsData from '@/assets/data/projects.json';
@@ -95,7 +95,7 @@ function closeProject() {
         </div>
         <div class="cards">
             <div
-                v-for="(project, i) in projectsData"
+                v-for="project in projectsData"
                 :key="project.title"
                 class="project-card"
                 role="button"
@@ -212,13 +212,13 @@ function closeProject() {
 <style lang="scss" scoped>
 .projects-container {
     position: relative;
-    font-size: 0.6em;
-    @include flexCenterAll;
     flex-direction: column;
     flex-grow: 1;
     width: 100%;
     padding: $size-12 0 $size-4;
+    font-size: 0.6em;
     color: $color-text-primary;
+    @include flexCenterAll;
 
     @include bp-sm-phone {
         margin: 0 auto;
@@ -253,10 +253,10 @@ function closeProject() {
     }
 
     hr {
-        border: 0;
         width: 100%;
-        margin: $size-2 auto $size-6;
         height: 1px;
+        margin: $size-2 auto $size-6;
+        border: 0;
 
         @include theme-dark {
             background-color: $color-gray6;
@@ -270,13 +270,14 @@ function closeProject() {
 
 .page-header {
     @include flexCenterAll;
+
     flex-direction: column;
     padding: 0 $size-4;
     margin: $size-16 0 $size-20;
 
     @include bp-lg-laptop {
-        font-size: 1.2em;
         margin: $size-12 0 $size-20;
+        font-size: 1.2em;
     }
 
     h1 {
@@ -288,8 +289,8 @@ function closeProject() {
     p {
         max-width: 37ch;
         font-size: 1.5em;
-        text-align: center;
         color: $color-text-secondary;
+        text-align: center;
 
         @include bp-sm-phone {
             max-width: 56ch;
@@ -300,9 +301,9 @@ function closeProject() {
 
 .external-links {
     &-card {
-        font-size: 1.1em;
         display: flex;
         gap: $size-4;
+        font-size: 1.1em;
 
         a:nth-child(3) {
             &:deep(button) svg {
@@ -320,10 +321,10 @@ function closeProject() {
     }
 
     &-selected {
-        margin-left: auto;
-        font-size: 1.1em;
         display: flex;
         gap: $size-4;
+        margin-left: auto;
+        font-size: 1.1em;
 
         a:nth-child(2) {
             &:deep(button) svg {
@@ -356,9 +357,9 @@ function closeProject() {
 
             svg {
                 height: $size-6;
+                fill: rgb(0 0 0 / 0%) !important;
                 stroke-width: 2;
                 transition: fill 0.3s ease-in-out;
-                fill: rgba(0, 0, 0, 0) !important;
 
                 @include theme-dark {
                     stroke: lighten-color($color-text-muted, 15%);
@@ -385,8 +386,8 @@ function closeProject() {
 .cards {
     display: flex;
     flex-direction: column;
-    height: 100%;
     width: 100%;
+    height: 100%;
     padding: $size-5;
 
     @include bp-xsm-phone {
@@ -403,12 +404,12 @@ function closeProject() {
 }
 
 .project-card {
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     padding: $size-8;
+    cursor: pointer;
 
     &:last-child {
         .card-body .card-header {
@@ -433,19 +434,19 @@ function closeProject() {
     }
 
     @include interactive {
-        transform: scale(1.01) !important;
         border-radius: 12px;
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
+        box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
+        transform: scale(1.01) !important;
         backdrop-filter: blur(2px);
-        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
 
         @include theme-dark {
             background: linear-gradient(90deg, #21252922, #21252900);
 
             .card-footer {
                 :deep(.see-more) {
-                    background: $color-text-primary;
                     color: $color-bg-primary !important;
+                    background: $color-text-primary;
 
                     .icon {
                         fill: $color-bg-primary;
@@ -459,8 +460,8 @@ function closeProject() {
 
             .card-footer {
                 :deep(.see-more) {
-                    background: $color-primary-darker;
                     color: $color-bg-primary !important;
+                    background: $color-primary-darker;
 
                     .icon {
                         fill: $color-bg-primary !important;
@@ -471,9 +472,9 @@ function closeProject() {
     }
 
     @include bp-sm-phone {
+        flex-direction: row;
         gap: $size-6;
         padding: $size-4 $size-8;
-        flex-direction: row;
     }
 }
 
@@ -509,8 +510,8 @@ function closeProject() {
     filter: blur(2px);
 
     @include bp-sm-phone {
-        height: 16em;
         width: auto;
+        height: 16em;
     }
 
     @include bp-md-tablet {
@@ -527,8 +528,8 @@ function closeProject() {
 
 .card-header {
     display: flex;
-    align-items: center;
     gap: $size-3;
+    align-items: center;
 
     .project-logo {
         display: flex;
@@ -545,8 +546,8 @@ function closeProject() {
     }
 
     h2 {
-        font-size: 2.1em;
         margin: 0 !important;
+        font-size: 2.1em;
 
         @include bp-xsm-phone {
             font-size: 2.5em !important;
@@ -559,10 +560,10 @@ function closeProject() {
 
     div {
         display: flex;
-        align-items: center;
         gap: $size-2;
-        font-size: 1.4em;
+        align-items: center;
         margin-left: auto;
+        font-size: 1.4em;
 
         @include bp-sm-phone {
             margin-bottom: 1em;
@@ -584,8 +585,8 @@ function closeProject() {
 }
 
 .card-description {
-    font-size: 1.35em;
     max-width: 66ch;
+    font-size: 1.35em;
 
     @include bp-xsm-phone {
         font-size: 1.6em;
@@ -601,38 +602,38 @@ function closeProject() {
 }
 
 .card-tool-chips {
-    font-size: 1.1em;
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    overflow: hidden;
     gap: $size-6;
+    align-items: center;
+    max-width: 65em;
     height: $size-8;
     margin-top: $size-2;
-    max-width: 65em;
+    overflow: hidden;
+    font-size: 1.1em;
 
     @include bp-md-tablet {
         font-size: 1.2em;
     }
 
     .chip {
-        font-size: 1.2em;
         flex: 1;
+        font-size: 1.2em;
     }
 }
 
 .card-footer {
-    font-size: 1.3em;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     margin-top: $size-4;
+    font-size: 1.3em;
 }
 
 .see-more {
+    gap: 0.6em;
     border-width: 1px;
     border-radius: 7px;
-    gap: 0.6em;
 
     @include bp-lg-laptop {
         font-size: 1.1em;
@@ -641,27 +642,27 @@ function closeProject() {
 
 .overlay {
     position: fixed;
-    z-index: 1;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    height: 100vh;
+    z-index: 1;
     width: 100vw;
+    height: 100vh;
 }
 
 .selected-container {
     position: fixed;
-    z-index: 2;
     top: 0;
-    @include flexCenterAll;
-    height: 100vh;
+    z-index: 2;
     width: 100vw;
+    height: 100vh;
     backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    @include flexCenterAll;
 
     @include theme-dark {
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: rgb(0 0 0 / 40%);
     }
 }
 
@@ -673,9 +674,9 @@ function closeProject() {
     max-width: 61em;
     padding: $size-5 $size-8;
     margin: 0 $size-4 $size-12;
+    border: 1px solid rgb(255 255 255 / 12%);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
 
     @include bp-custom-min(450) {
         padding: $size-8 $size-10;
@@ -697,14 +698,14 @@ function closeProject() {
 
 .selected-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     padding-left: 0.75em;
 
     div {
         display: flex;
-        align-items: center;
         gap: $size-2;
+        align-items: center;
         font-size: 1.45em;
 
         svg {
@@ -714,11 +715,11 @@ function closeProject() {
     }
 
     :deep(button) {
-        font-size: 1.2em;
-        @include flexCenterAll;
         gap: 0;
         padding: $size-3;
+        font-size: 1.2em;
         border-radius: 100%;
+        @include flexCenterAll;
 
         svg {
             @include theme-dark {
@@ -749,6 +750,7 @@ function closeProject() {
 .selected-img-container {
     position: relative;
     @include flexCenterAll;
+
     margin: $size-2 0;
 
     @include bp-sm-phone {
@@ -757,12 +759,12 @@ function closeProject() {
 
     iframe {
         width: 90%;
-        aspect-ratio: 2/1.1;
         max-width: 65em;
+        aspect-ratio: 2/1.1;
         margin: $size-4 0 $size-8;
-        border-radius: 12px;
         border: 1px solid $color-bg-secondary;
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.37);
+        border-radius: 12px;
+        box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
     }
 }
 
@@ -773,11 +775,11 @@ function closeProject() {
 }
 
 .selected-info-header {
-    font-size: 1.35em;
     display: flex;
-    align-items: center;
     gap: $size-2;
+    align-items: center;
     margin-top: $size-4;
+    font-size: 1.35em;
 
     @include bp-xsm-phone {
         margin-top: 0;
@@ -802,8 +804,8 @@ function closeProject() {
     }
 
     h2 {
-        font-size: 2em;
         margin: 0 !important;
+        font-size: 2em;
 
         @include bp-custom-min(450) {
             font-size: 2.2em;
@@ -817,17 +819,18 @@ function closeProject() {
 
 .selected-tool-chips {
     @include flexCenterAll;
-    font-size: 1.1em;
+
     flex-wrap: wrap;
-    overflow: hidden;
     gap: $size-4;
     height: $size-10;
     margin-top: $size-3;
+    overflow: hidden;
+    font-size: 1.1em;
 
     .chip {
-        font-size: 1.2em;
         flex: 1;
         height: 1.8em;
+        font-size: 1.2em;
     }
 
     &-algo-visualizer {
@@ -838,14 +841,14 @@ function closeProject() {
 }
 
 .selected-description {
-    font-family: $secondary-font-stack;
-    font-size: 1.5em;
     display: flex;
     flex-direction: column;
     gap: $size-2;
-    color: $color-text-secondary;
     padding: $size-3 $size-5 $size-2;
     margin: $size-2 0;
+    font-family: $secondary-font-stack;
+    font-size: 1.5em;
+    color: $color-text-secondary;
     border-top: solid 1px $color-text-muted;
 }
 </style>

@@ -2,7 +2,7 @@
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 440 500"
-        style="transform: rotate(25deg); margin-bottom: 0.5em"
+        style=" margin-bottom: 0.5em;transform: rotate(25deg)"
     >
         <path
             fill="#877587"

@@ -13,9 +13,8 @@ $primary-font-stack:
     'Apple Color Emoji',
     'Segoe UI Emoji',
     'Segoe UI Symbol';
-
 $secondary-font-stack:
-    Inter,
+    inter,
     'Poppins',
     -apple-system,
     blinkmacsystemfont,
@@ -27,7 +26,6 @@ $secondary-font-stack:
     'Apple Color Emoji',
     'Segoe UI Emoji',
     'Segoe UI Symbol';
-
 $ternary-font-stack:
     'Spartan',
     -apple-system,
@@ -56,7 +54,6 @@ $ternary-font-stack:
     --color-gray8: #343a40;
     --color-gray9: #212529;
     --color-black: #000;
-
     --color-success: #27ae60;
     --color-error: #e74c3c;
 }
@@ -118,22 +115,17 @@ $color-gray7: var(--color-gray7);
 $color-gray8: var(--color-gray8);
 $color-gray9: var(--color-gray9);
 $color-black: var(--color-black);
-
 $color-success: var(--color-success);
 $color-error: var(--color-error);
-
 $color-primary: var(--color-primary);
 $color-primary-light: var(--color-primary-light);
 $color-primary-dark: var(--color-primary-dark);
 $color-primary-darker: var(--color-primary-darker);
-
 $color-accent: var(--color-accent);
 $color-accent-light: var(--color-accent-light);
 $color-accent-dark: var(--color-accent-dark);
-
 $color-bg-primary: var(--color-bg-primary);
 $color-bg-secondary: var(--color-bg-secondary);
-
 $color-text-primary: var(--color-text-primary);
 $color-text-secondary: var(--color-text-secondary);
 $color-text-muted: var(--color-text-muted);

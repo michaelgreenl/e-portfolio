@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import projectsData from '@/assets/data/projects.json';
 import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
@@ -155,15 +155,15 @@ watch(
 <style lang="scss" scoped>
 .resume-container {
     position: relative;
-    font-size: 0.7em;
     display: flex;
     flex-direction: column;
-    align-items: center;
     flex-grow: 1;
+    align-items: center;
     width: 100%;
     max-width: 32em;
-    margin: 0 auto;
     padding: $size-4;
+    margin: 0 auto;
+    font-size: 0.7em;
     color: $color-text-primary;
 
     @include bp-custom-min(730) {
@@ -180,8 +180,8 @@ watch(
 }
 
 h1 {
-    font-size: 3em;
     margin: $size-1 0;
+    font-size: 3em;
 }
 
 h2,
@@ -192,8 +192,8 @@ p {
 }
 
 h2 {
-    font-size: 1.8em;
     font-family: $primary-font-stack;
+    font-size: 1.8em;
 }
 
 h3 {
@@ -201,8 +201,8 @@ h3 {
 }
 
 h3 span {
-    font-weight: 400;
     font-size: 0.9em;
+    font-weight: 400;
     color: $color-text-secondary;
 }
 
@@ -210,15 +210,15 @@ p {
     margin: $size-1 0;
 
     span {
-        font-size: 1.15em;
         font-family: $ternary-font-stack;
+        font-size: 1.15em;
         font-weight: 600;
     }
 }
 
 ul {
-    margin: $size-1 0;
     padding: 0 $size-5;
+    margin: $size-1 0;
 }
 
 li {
@@ -227,10 +227,10 @@ li {
 }
 
 hr {
-    border: 0;
     width: 100%;
-    margin: $size-2 auto;
     height: 1px;
+    margin: $size-2 auto;
+    border: 0;
 
     @include theme-dark {
         background-color: $color-gray6;
@@ -243,8 +243,8 @@ hr {
 
 .page-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     padding-right: $size-2;
 
@@ -258,33 +258,33 @@ hr {
 }
 
 .section-segment {
-    padding: $size-2;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    padding: $size-2;
 
     &-skills {
-        font-size: 0.94em;
         padding-top: 0.1em !important;
+        font-size: 0.94em;
     }
 }
 
 .segment-details {
-    gap: 2px;
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 .segment-header {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap-reverse;
     gap: 3px;
+    justify-content: space-between;
 }
 
 .segment-title {
-    font-weight: 600;
     font-size: 1.3em;
+    font-weight: 600;
 
     &-projects {
         .project-link {
@@ -296,8 +296,8 @@ hr {
         }
 
         .external-link {
-            text-decoration: underline;
             color: $color-text-secondary;
+            text-decoration: underline;
 
             @include interactive {
                 color: $color-primary-darker;
@@ -311,16 +311,16 @@ hr {
 }
 
 .segment-dates {
-    font-size: 0.9em;
-    margin-left: auto;
     display: flex;
-    align-items: center;
     gap: $size-2;
+    align-items: center;
+    margin-left: auto;
+    font-size: 0.9em;
 
     :deep(svg) {
         height: 1em;
-        stroke: $color-text-primary;
         margin-bottom: 4px;
+        stroke: $color-text-primary;
     }
 }
 

@@ -249,13 +249,13 @@ const clearStatus = () => {
 <style lang="scss" scoped>
 .contact-container {
     position: relative;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    padding: $size-8 $size-4;
+    margin: 0 auto;
     font-size: 0.9em;
     @include flexCenterAll;
-    flex-direction: column;
-    margin: 0 auto;
-    padding: $size-8 $size-4;
-    width: 100%;
-    flex-grow: 1;
 
     @include bp-xsm-phone {
         font-size: clamp(0.9em, 3.5vw, 1em);
@@ -264,9 +264,9 @@ const clearStatus = () => {
 
 .contact-header {
     max-width: 27em;
-    text-align: center;
-    margin-bottom: $size-8;
     margin: $size-6 0 $size-10;
+    margin-bottom: $size-8;
+    text-align: center;
 
     @include bp-lg-laptop {
         font-size: 1.25em;
@@ -290,10 +290,10 @@ const clearStatus = () => {
     }
 
     hr {
-        border: 0;
         width: 100%;
-        margin: $size-1 auto $size-2;
         height: 1px;
+        margin: $size-1 auto $size-2;
+        border: 0;
 
         @include theme-dark {
             background-color: $color-gray6;
@@ -305,8 +305,8 @@ const clearStatus = () => {
     }
 
     p {
-        line-height: 1.6;
         max-width: 42ch;
+        line-height: 1.6;
         color: $color-text-secondary;
     }
 }
@@ -331,8 +331,8 @@ const clearStatus = () => {
 
 .form-label {
     font-family: $primary-font-stack;
-    font-weight: 500;
     font-size: 1em;
+    font-weight: 500;
 
     @include theme-dark {
         color: $color-text-primary;
@@ -345,49 +345,49 @@ const clearStatus = () => {
 
 .form-input,
 .form-textarea {
+    padding: $size-3 $size-4;
     font-family: $secondary-font-stack;
     font-size: 1em;
-    padding: $size-3 $size-4;
-    border-radius: 8px;
-    border: 2px solid transparent;
-    background-color: transparent;
     resize: vertical;
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 8px;
 
     @include theme-dark {
         color: $color-text-primary;
-        border-color: $color-gray6;
         background-color: rgba($color-gray8, 0.3);
+        border-color: $color-gray6;
 
         &::placeholder {
             color: $color-gray6;
         }
 
         &:focus {
-            outline: none;
-            border-color: $color-primary;
-            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
             background: linear-gradient(90deg, #21252922, #21252900);
+            border-color: $color-primary;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
         }
     }
 
     @include theme-light {
         color: $color-primary-darker;
-        border-color: $color-gray5;
         background-color: rgba($color-white, 0.7);
+        border-color: $color-gray5;
 
         &::placeholder {
             color: darken-color($color-gray5, 10%);
         }
 
         &:focus {
-            outline: none;
-            border-color: $color-primary;
-            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
             background: linear-gradient(90deg, #dee2e622, #dee2e600);
+            border-color: $color-primary;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
         }
     }
 
@@ -395,11 +395,11 @@ const clearStatus = () => {
         border-color: $color-error;
 
         @include theme-dark {
-            background-color: rgba(231, 76, 60, 0.1);
+            background-color: rgb(231 76 60 / 10%);
         }
 
         @include theme-light {
-            background-color: rgba(231, 76, 60, 0.05);
+            background-color: rgb(231 76 60 / 5%);
         }
     }
 }
@@ -411,19 +411,19 @@ const clearStatus = () => {
 }
 
 .error-message {
+    margin-top: $size-1;
+    font-family: $secondary-font-stack;
     font-size: 0.9em;
     color: $color-error;
-    font-family: $secondary-font-stack;
-    margin-top: $size-1;
 }
 
 .status-message {
     padding: $size-4;
-    border-radius: 8px;
-    text-align: center;
     font-family: $secondary-font-stack;
     font-weight: 500;
+    text-align: center;
     cursor: pointer;
+    border-radius: 8px;
     transition: opacity 0.3s ease;
 
     &:hover {
@@ -431,15 +431,15 @@ const clearStatus = () => {
     }
 
     &.success {
-        background-color: rgba(46, 204, 113, 0.1);
-        border: 1px solid rgba(46, 204, 113, 0.3);
         color: $color-success;
+        background-color: rgb(46 204 113 / 10%);
+        border: 1px solid rgb(46 204 113 / 30%);
     }
 
     &.error {
-        background-color: rgba(231, 76, 60, 0.1);
-        border: 1px solid rgba(231, 76, 60, 0.3);
         color: $color-error;
+        background-color: rgb(231 76 60 / 10%);
+        border: 1px solid rgb(231 76 60 / 30%);
     }
 
     p {
@@ -448,21 +448,21 @@ const clearStatus = () => {
 }
 
 .form-actions {
-    font-size: 0.95em;
     display: flex;
+    justify-content: space-between;
     width: 100%;
     max-width: 33em;
-    justify-content: space-between;
     padding: $size-5 $size-3;
+    font-size: 0.95em;
 
     @include bp-lg-laptop {
         max-width: 40em;
     }
 
     .contact-links {
-        font-size: 1.5em;
         display: flex;
         gap: $size-1;
+        font-size: 1.5em;
 
         a :deep(button) .icon:hover {
             fill: $color-primary;

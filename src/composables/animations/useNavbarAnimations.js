@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import { useGsap } from '@/composables/useGsap.js';
 
 export function useNavbarAnimations() {

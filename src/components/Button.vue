@@ -1,5 +1,5 @@
 <script setup>
-defineProps({
+const props = defineProps({
     preset: {
         type: String, // primary, primary-accent, secondary
     },
@@ -26,7 +26,7 @@ function handleClick(evt) {
     emit('click', evt);
 
     if (typeof onClick === 'function') {
-        onClick(evt);
+        props.onClick(evt);
     }
 }
 </script>
@@ -44,6 +44,7 @@ function handleClick(evt) {
 <style lang="scss" scoped>
 button {
     @include flexCenterAll;
+
     font-family: $primary-font-stack;
     font-size: 1em;
     font-weight: 400;
@@ -70,9 +71,9 @@ button {
         }
 
         @include theme-light {
+            font-weight: 500;
             color: $color-primary-darker;
             border: solid 2px $color-primary-darker;
-            font-weight: 500;
 
             .icon {
                 fill: $color-primary-darker;
@@ -120,8 +121,8 @@ button {
     &.secondary {
         position: relative;
         gap: $size-2;
-        border: 0;
         padding: 0;
+        border: 0;
 
         @include theme-dark {
             color: $color-text-primary;
@@ -132,8 +133,8 @@ button {
         }
 
         .icon {
-            height: $size-5;
             width: $size-5;
+            height: $size-5;
 
             @include theme-dark {
                 fill: $color-gray6;
@@ -145,12 +146,12 @@ button {
         }
 
         &::after {
-            content: '';
             position: absolute;
+            right: 100%;
             bottom: -6px;
             left: 1.9em;
-            right: 100%;
             height: 1px;
+            content: '';
             transition: all 0.3s ease;
 
             @include theme-dark {

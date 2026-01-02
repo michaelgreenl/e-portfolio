@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useHomeAnimations } from '@/composables/animations/useHomeAnimations.js';
@@ -50,7 +50,7 @@ onMounted(() => {
         </div>
         <div class="site-nav">
             <hr class="nav-links-line" />
-            <div v-for="(route, key, i) in routeStore.routes" :key="key" class="nav-link">
+            <div v-for="(route, key) in routeStore.routes" :key="key" class="nav-link">
                 <Button
                     v-if="key !== 'home'"
                     :onClick="() => routeStore.toRoute(key)"
@@ -66,16 +66,16 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .home-container {
-    font-size: clamp(10px, 4vw, 16px);
-    @include flexCenterAll;
     flex-direction: column;
-    width: 100%;
     flex-grow: 1;
-    padding: 0 $size-4;
-    max-width: 400px;
-    margin: 0 auto;
     gap: $size-17;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 $size-4;
+    margin: 0 auto;
+    font-size: clamp(10px, 4vw, 16px);
     color: $color-text-primary;
+    @include flexCenterAll;
 
     @include bp-custom-min(612) {
         max-width: 100vw;
@@ -96,23 +96,23 @@ onMounted(() => {
     }
 
     @include bp-xl-desktop {
-        font-size: 1.2em;
         max-width: 1600px;
+        font-size: 1.2em;
     }
 }
 
 h1 {
-    font-size: 5.1em;
-    line-height: 0.8ch;
     padding-bottom: $size-1;
     margin: 0;
+    font-size: 5.1em;
+    line-height: 0.8ch;
 
     @include bp-custom-min(612) {
+        max-width: 100vw !important;
+        padding-bottom: $size-1 !important;
+        margin: 0 auto !important;
         font-size: clamp(5.1em, 12vw, 5.5em) !important;
         line-height: 1ch !important;
-        max-width: 100vw !important;
-        margin: 0 auto !important;
-        padding-bottom: $size-1 !important;
     }
 
     @include bp-md-tablet {
@@ -137,9 +137,9 @@ h1 {
 }
 
 h2 {
-    font-size: 1.9em;
     width: fit-content;
     margin: 0 auto;
+    font-size: 1.9em;
     text-align: center;
 
     @include bp-md-tablet {
@@ -151,15 +151,15 @@ h3 {
     margin: 0 2px $size-2;
 
     @include bp-custom-min(612) {
+        margin: 0 2px !important;
         font-size: 1.25em !important;
-        margin: 0 2px 0 !important;
     }
 }
 
 p {
-    font-size: 1.1em;
     max-width: 45ch;
     margin: 0 auto;
+    font-size: 1.1em;
     text-align: center;
 
     @include bp-md-tablet {
@@ -175,10 +175,10 @@ p {
 }
 
 .hero-line {
-    border: 0;
     width: 95%;
-    margin: 0 auto $size-2;
     height: 1px;
+    margin: 0 auto $size-2;
+    border: 0;
 
     @include bp-md-tablet {
         display: none;
@@ -194,11 +194,11 @@ p {
 }
 
 .cta {
-    font-size: 1.1em;
     display: flex;
-    justify-content: center;
     gap: $size-4;
+    justify-content: center;
     margin-top: $size-2;
+    font-size: 1.1em;
 
     @include bp-md-tablet {
         justify-content: flex-start !important;
@@ -211,11 +211,11 @@ p {
 
 .site-nav {
     display: none;
+    flex-wrap: wrap-reverse;
     gap: $size-4;
+    align-items: center;
     align-self: flex-end;
     justify-content: flex-end;
-    align-items: center;
-    flex-wrap: wrap-reverse;
     width: 80%;
 
     @include bp-md-tablet {
@@ -223,8 +223,8 @@ p {
     }
 
     :deep(button) {
-        font-size: 1.2em;
         padding: 0 $size-1;
+        font-size: 1.2em;
 
         &::after {
             height: 2px;
@@ -233,9 +233,9 @@ p {
 }
 
 .nav-links-line {
-    border: 0;
-    height: 1px;
     flex-grow: 1;
+    height: 1px;
+    border: 0;
 
     @include theme-dark {
         background-color: $color-gray6;

@@ -46,7 +46,7 @@ watch(
         <Logo class="logo" />
         <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
-                v-for="(route, key, i) in routeStore.routes"
+                v-for="(route, key) in routeStore.routes"
                 :key="key"
                 class="nav-item"
                 :class="{ active: routeStore.currentRoute.base === key }"
@@ -130,10 +130,10 @@ watch(
 
 .nav-mobile {
     position: fixed;
-    z-index: 9;
     right: $size-2;
     bottom: $size-2;
     left: $size-2;
+    z-index: 9;
     display: flex;
     justify-content: space-between;
     max-width: 335px;
@@ -146,6 +146,7 @@ watch(
 
     button {
         @include flexCenterAll;
+
         padding: $size-2 $size-3;
         font-family: $primary-font-stack;
         font-weight: 600;
@@ -320,14 +321,15 @@ header {
         .toggle-thumb {
             position: relative;
             @include flexCenterAll;
+
             border-radius: 100%;
             transition: all 0.3s ease;
 
             &::before {
                 position: absolute;
-                content: '';
                 width: $size-6;
                 height: $size-6;
+                content: '';
                 border-radius: 100%;
                 box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
@@ -367,10 +369,10 @@ header {
 .nav-line {
     position: relative;
     z-index: 3;
-    border: 0;
     width: 100%;
-    margin: 0;
     min-height: 1px;
+    margin: 0;
+    border: 0;
 
     @include theme-dark {
         background-color: #575e6455;
@@ -386,13 +388,13 @@ header {
         font-size: 1.2em;
 
         button {
-            font-size: 0.7em;
             gap: $size-2;
+            font-size: 0.7em;
 
             .icon {
                 display: inline-block;
-                height: $size-6;
                 width: $size-6;
+                height: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
             }

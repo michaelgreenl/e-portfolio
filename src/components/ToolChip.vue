@@ -93,6 +93,7 @@ const tools = {
 <style lang="scss" scoped>
 .chip-container {
     @include flexCenterAll;
+
     gap: $size-2;
     height: 100%;
     padding: 0.85em 1em;
@@ -102,8 +103,8 @@ const tools = {
 .icon {
     display: flex;
     align-items: center;
-    height: $size-4;
     width: $size-4;
+    height: $size-4;
 
     @include theme-light {
         fill: $color-text-primary;
@@ -112,8 +113,8 @@ const tools = {
 }
 
 span {
-    font-size: 1em;
     font-family: $secondary-font-stack;
+    font-size: 1em;
 
     @include theme-light {
         color: $color-text-primary;
