@@ -34,8 +34,8 @@ onMounted(() => {
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                Hello, I am a software engineer with a passion for solving problems. I am writing this in normal a a
-                english now.
+                I am a software engineer with a drive to create and a passion for turning complex problems into elegant
+                solutions.
             </p>
             <div class="cta">
                 <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />

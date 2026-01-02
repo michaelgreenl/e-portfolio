@@ -89,8 +89,8 @@ function closeProject() {
             <h1>Projects</h1>
             <hr />
             <p>
-                This is temporary text I am typing right now. I recently started to ponder about thinking through
-                something about a thing
+                Here are a few projects I’ve built recently, including real-time full-stack systems and complex frontend
+                visualizations.
             </p>
         </div>
         <div class="cards">
