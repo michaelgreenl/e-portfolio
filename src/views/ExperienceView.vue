@@ -32,7 +32,7 @@ watch(
     <div class="resume-container">
         <div class="page-header">
             <h1>Resume</h1>
-            <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
+            <a href="/files/resume.pdf" download="Michael-Green-Resume.pdf">
                 <Button
                     text="Download PDF"
                     :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"

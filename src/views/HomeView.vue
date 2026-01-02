@@ -30,10 +30,7 @@ onMounted(() => {
     <div class="home-container">
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
-            <h1>
-                Michael
-                <span> Green </span>
-            </h1>
+            <h1>Michael <span> Green </span></h1>
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
@@ -42,7 +39,7 @@ onMounted(() => {
             </p>
             <div class="cta">
                 <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
-                <a href="files/blank-resume.pdf" download="files/blank-resume.pdf">
+                <a href="/files/resume.pdf" download="Michael-Green-Resume.pdf">
                     <Button
                         text="Resume/CV"
                         :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
