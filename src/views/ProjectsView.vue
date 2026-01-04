@@ -109,7 +109,7 @@ function closeProject() {
                     <img
                         :src="getURL(project.img)"
                         :alt="'Screenshot of ' + project.title"
-                        loading="eager"
+                        loading="lazy"
                         class="project-img"
                     />
                 </div>
