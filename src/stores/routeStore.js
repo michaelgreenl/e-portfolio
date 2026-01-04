@@ -85,6 +85,8 @@ export const useRouteStore = defineStore('router', () => {
 
         await new Promise((resolve) => setTimeout(resolve, leaveDuration));
 
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
         activePath.value = to;
         isLeaving.value = false;
         window.location.hash = to;
