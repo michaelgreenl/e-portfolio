@@ -438,7 +438,6 @@ function closeProject() {
         box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
         transform: scale(1.01) !important;
         backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
 
         @include theme-dark {
             background: linear-gradient(90deg, #21252922, #21252900);
