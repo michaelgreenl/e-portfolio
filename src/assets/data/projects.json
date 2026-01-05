@@ -15,7 +15,7 @@
             ]
         },
         "fontFamily": "Autowide",
-        "img": "reaction.webp",
+        "img": "reaction_blurred.webp",
         "video": "1149531486",
         "externalLinks": {
             "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Repository" },
@@ -45,7 +45,7 @@
             ]
         },
         "fontFamily": "BitCount",
-        "img": "game-lobby.webp",
+        "img": "game-lobby_blurred.webp",
         "video": "1119895851",
         "externalLinks": {
             "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Repository" },
@@ -75,7 +75,7 @@
             ]
         },
         "fontFamily": "Futura",
-        "img": "algo-visualizer.webp",
+        "img": "algo-visualizer_blurred.webp",
         "video": "1149531735",
         "externalLinks": {
             "github": {

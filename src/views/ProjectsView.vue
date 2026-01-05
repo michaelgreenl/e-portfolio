@@ -433,37 +433,40 @@ function closeProject() {
         border-bottom: solid 1px $color-text-muted;
     }
 
-    @include interactive {
-        border-radius: 12px;
-        box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
-        transform: scale(1.01) !important;
-        backdrop-filter: blur(2px);
+    @media (hover: hover) and (pointer: fine) {
+        &:hover,
+        &:active {
+            border-radius: 12px;
+            box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
+            transform: scale(1.01) !important;
+            backdrop-filter: blur(2px);
 
-        @include theme-dark {
-            background: linear-gradient(90deg, #21252922, #21252900);
+            @include theme-dark {
+                background: linear-gradient(90deg, #21252922, #21252900);
 
-            .card-footer {
-                :deep(.see-more) {
-                    color: $color-bg-primary !important;
-                    background: $color-text-primary;
+                .card-footer {
+                    :deep(.see-more) {
+                        color: $color-bg-primary !important;
+                        background: $color-text-primary;
 
-                    .icon {
-                        fill: $color-bg-primary;
+                        .icon {
+                            fill: $color-bg-primary;
+                        }
                     }
                 }
             }
-        }
 
-        @include theme-light {
-            background: linear-gradient(90deg, #dee2e622, #dee2e600);
+            @include theme-light {
+                background: linear-gradient(90deg, #dee2e622, #dee2e600);
 
-            .card-footer {
-                :deep(.see-more) {
-                    color: $color-bg-primary !important;
-                    background: $color-primary-darker;
+                .card-footer {
+                    :deep(.see-more) {
+                        color: $color-bg-primary !important;
+                        background: $color-primary-darker;
 
-                    .icon {
-                        fill: $color-bg-primary !important;
+                        .icon {
+                            fill: $color-bg-primary !important;
+                        }
                     }
                 }
             }
@@ -480,12 +483,18 @@ function closeProject() {
 .card-img-container {
     position: relative;
     @include flexCenterAll;
+    padding: $size-7;
+
+    @include bp-sm-phone {
+        padding: $size-4;
+    }
 
     :deep(button) {
         position: absolute;
         z-index: 1;
         background: transparent;
         border: none;
+        transition: transform 0.2s ease;
 
         @include interactive {
             transform: scale(1.1);
@@ -498,6 +507,16 @@ function closeProject() {
         svg {
             height: $size-12;
             fill: $color-gray3;
+
+            @include bp-xsm-phone {
+                height: $size-15;
+                margin-top: $size-8;
+            }
+
+            @include bp-sm-phone {
+                height: $size-12;
+                margin-top: 0;
+            }
         }
     }
 }
@@ -505,8 +524,16 @@ function closeProject() {
 .project-img {
     position: relative;
     z-index: 0;
-    width: 107%;
-    filter: blur(2px);
+    border-radius: 10px;
+    width: 105%;
+    mask-image:
+        linear-gradient(to bottom, transparent, black 10%, black 90%, transparent),
+        linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-composite: intersect;
+    -webkit-mask-image:
+        linear-gradient(to bottom, transparent, black 0%, black 98%, transparent),
+        linear-gradient(to right, transparent, black 1%, black 98%, transparent);
+    -webkit-mask-composite: source-in;
 
     @include bp-sm-phone {
         width: auto;
