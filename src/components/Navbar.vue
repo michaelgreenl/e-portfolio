@@ -83,6 +83,7 @@ watch(
             :key="key"
             @click="routeStore.toRoute(key)"
             :class="{ active: routeStore.currentRoute.base === key }"
+            :disabled="routeStore.currentRoute.base === key"
         >
             <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
             <span>{{ route.meta.title }}</span>
