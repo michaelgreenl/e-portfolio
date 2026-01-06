@@ -78,12 +78,7 @@ export const useRouteStore = defineStore('router', () => {
         };
     });
 
-    async function toRoute(to) {
-        const { base } = parsePath(to);
-        if (!routes[base]) {
-            to = 'home';
-        }
-
+    async function changeRoute(to) {
         isLeaving.value = true;
         toPath.value = to;
 
@@ -96,10 +91,19 @@ export const useRouteStore = defineStore('router', () => {
         window.location.hash = to;
     }
 
-    window.addEventListener('hashchange', () => {
+    function toRoute(to) {
+        const { base } = parsePath(to);
+        if (!routes[base]) {
+            to = 'home';
+        }
+
+        changeRoute(to);
+    }
+
+    window.addEventListener('hashchange', async () => {
         const newPath = getInitialPath();
         if (newPath !== activePath.value) {
-            activePath.value = newPath;
+            changeRoute(newPath);
         }
     });
 
