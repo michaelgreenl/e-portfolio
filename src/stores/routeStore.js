@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, markRaw, computed } from 'vue';
+import { ref, markRaw, computed, watch } from 'vue';
 import HomeView from '@/views/HomeView.vue';
 import ProjectsView from '@/views/ProjectsView.vue';
 import ResumeView from '@/views/ResumeView.vue';
@@ -16,23 +16,30 @@ export const useRouteStore = defineStore('router', () => {
     const routes = {
         home: {
             component: markRaw(HomeView),
-            meta: { title: 'Home', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
+            name: 'Home',
+            meta: { title: 'E-portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
             component: markRaw(ProjectsView),
+            name: 'Resume',
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         resume: {
             component: markRaw(ResumeView),
+            name: 'Projects',
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
             component: markRaw(ContactView),
+            name: 'Contact',
             meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
         },
     };
 
-    const DEFAULT_TITLE = 'M.G.';
+    const activePath = ref(getInitialPath());
+    const isLeaving = ref(false);
+    const toPath = ref();
+    const leaveDuration = 350;
 
     function parsePath(fullPath) {
         const [pathString, queryString] = fullPath.split('?');
@@ -54,14 +61,11 @@ export const useRouteStore = defineStore('router', () => {
     function getInitialPath() {
         const hash = window.location.hash.slice(1);
         if (!hash) return 'home';
+
         const { base } = parsePath(hash);
+
         return routes[base] ? hash : 'home';
     }
-
-    const activePath = ref(getInitialPath());
-    const isLeaving = ref(false);
-    const toPath = ref();
-    const leaveDuration = 350;
 
     const currentRoute = computed(() => {
         const { base, params, query } = parsePath(activePath.value);
@@ -90,26 +94,29 @@ export const useRouteStore = defineStore('router', () => {
         activePath.value = to;
         isLeaving.value = false;
         window.location.hash = to;
-
-        let title = DEFAULT_TITLE;
-        if (routes[base]?.meta?.title) {
-            title += ' | ' + routes[base].meta.title;
-        }
-        document.title = title;
     }
 
     window.addEventListener('hashchange', () => {
         const newPath = getInitialPath();
         if (newPath !== activePath.value) {
             activePath.value = newPath;
+        }
+    });
+
+    watch(
+        activePath,
+        (newPath) => {
             const { base } = parsePath(newPath);
-            let title = DEFAULT_TITLE;
+
+            let title = 'M. Green';
             if (routes[base]?.meta?.title) {
                 title += ' | ' + routes[base].meta.title;
             }
+
             document.title = title;
-        }
-    });
+        },
+        { immediate: true },
+    );
 
     if (!window.location.hash) {
         window.location.hash = activePath.value;

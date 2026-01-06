@@ -55,7 +55,7 @@ watch(
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
-                {{ route.meta.title }}
+                {{ route.name }}
             </button>
         </nav>
         <label class="theme-toggle">
@@ -86,7 +86,7 @@ watch(
             :disabled="routeStore.currentRoute.base === key"
         >
             <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
-            <span>{{ route.meta.title }}</span>
+            <span>{{ route.name }}</span>
         </button>
     </nav>
 </template>
