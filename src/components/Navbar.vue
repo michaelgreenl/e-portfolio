@@ -50,6 +50,7 @@ watch(
                 :key="key"
                 class="nav-item"
                 :class="{ active: routeStore.currentRoute.base === key }"
+                :disabled="routeStore.currentRoute.base === key"
                 @click="routeStore.toRoute(key)"
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
