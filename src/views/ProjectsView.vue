@@ -42,6 +42,10 @@ watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
+            if (activeProject.value) {
+                closeProject();
+            }
+
             pageExit();
         }
     },
