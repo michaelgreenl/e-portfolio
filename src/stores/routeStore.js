@@ -21,12 +21,12 @@ export const useRouteStore = defineStore('router', () => {
         },
         projects: {
             component: markRaw(ProjectsView),
-            name: 'Resume',
+            name: 'Projects',
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         resume: {
             component: markRaw(ResumeView),
-            name: 'Projects',
+            name: 'Resume',
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
