@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onBeforeMount } from 'vue';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import Navbar from '@/components/Navbar.vue';
@@ -9,7 +9,7 @@ import BgSVG from '@/components/SVGs/BgSVG.vue';
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
-onMounted(() => {
+onBeforeMount(() => {
     let theme = localStorage.getItem('THEME');
 
     if (theme === null) {
