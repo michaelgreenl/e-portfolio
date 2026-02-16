@@ -9,17 +9,16 @@ import BgSVG from '@/components/SVGs/BgSVG.vue';
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
-onBeforeMount(() => {
-    let theme = localStorage.getItem('THEME');
+// Getting theme immediately to prevent flashing on inital loads
+let theme = localStorage.getItem('THEME');
 
-    if (theme === null) {
-        localStorage.setItem('THEME', 'dark');
-        theme = 'dark';
-    }
+if (theme === null) {
+    localStorage.setItem('THEME', 'dark');
+    theme = 'dark';
+}
 
-    themeStore.theme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-});
+themeStore.theme = theme;
+document.documentElement.setAttribute('data-theme', theme);
 </script>
 
 <template>
