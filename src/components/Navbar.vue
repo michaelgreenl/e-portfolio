@@ -132,10 +132,10 @@ watch(
 
 .nav-mobile {
     position: fixed;
+    z-index: 9;
     right: $size-2;
     bottom: $size-2;
     left: $size-2;
-    z-index: 9;
     display: flex;
     justify-content: space-between;
     max-width: 335px;
@@ -146,9 +146,18 @@ watch(
     border-radius: $size-4;
     box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
 
-    button {
-        @include flexCenterAll;
+    @include bp-xsm-phone {
+        font-size: 1.2em;
+    }
 
+    @include bp-md-tablet {
+        display: none;
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: $size-2 $size-3;
         font-family: $primary-font-stack;
         font-weight: 600;
@@ -157,12 +166,29 @@ watch(
         border: 0;
         border-radius: $size-4;
 
+        @include bp-xsm-phone {
+            font-size: 0.7em;
+            gap: $size-2;
+        }
+
         .icon {
             display: none;
+
+            @include bp-xsm-phone {
+                display: inline-block;
+                height: $size-6;
+                width: $size-6;
+                fill: $color-accent;
+                stroke: $color-accent;
+            }
         }
 
         span {
             font-size: clamp(0.4em, 4vw, 1em);
+
+            @include bp-xsm-phone {
+                font-size: clamp(0.9em, 3.7vw, 1em);
+            }
         }
 
         &.active {
@@ -172,6 +198,20 @@ watch(
 
             @include theme-light {
                 color: $color-gray2;
+            }
+
+            .icon {
+                @include bp-xsm-phone {
+                    @include theme-dark {
+                        fill: $color-primary-light;
+                        stroke: $color-primary-light;
+                    }
+
+                    @include theme-light {
+                        fill: $color-gray2;
+                        stroke: $color-gray2;
+                    }
+                }
             }
         }
 
@@ -187,35 +227,39 @@ watch(
     display: none;
     gap: $size-3;
 
+    @include bp-md-tablet {
+        display: flex;
+    }
+
     button {
         position: relative;
+        font-size: 0.85em;
+        font-family: $primary-font-stack;
         display: flex;
         gap: $size-3;
         align-items: center;
         padding: $size-3 $size-5;
-        font-family: $primary-font-stack;
-        font-size: 0.85em;
         background-color: transparent;
         border: 0;
         border-radius: $size-3;
 
         @include theme-dark {
-            font-weight: 400;
             color: $color-text-primary;
+            font-weight: 400;
         }
 
         @include theme-light {
-            font-weight: 500;
             color: $color-primary-darker;
+            font-weight: 500;
         }
 
         &::after {
+            content: '';
             position: absolute;
             bottom: 0;
             left: $size-2;
             width: 0;
             height: 1px;
-            content: '';
             border-radius: $size-4;
             transition: width 0.15s ease-in-out;
 
@@ -322,16 +366,17 @@ header {
 
         .toggle-thumb {
             position: relative;
-            @include flexCenterAll;
-
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 100%;
             transition: all 0.3s ease;
 
             &::before {
                 position: absolute;
+                content: '';
                 width: $size-6;
                 height: $size-6;
-                content: '';
                 border-radius: 100%;
                 box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
@@ -371,10 +416,10 @@ header {
 .nav-line {
     position: relative;
     z-index: 3;
-    width: 100%;
-    min-height: 1px;
-    margin: 0;
     border: 0;
+    width: 100%;
+    margin: 0;
+    min-height: 1px;
 
     @include theme-dark {
         background-color: #575e6455;
@@ -382,55 +427,6 @@ header {
 
     @include theme-light {
         background-color: #3d505c33;
-    }
-}
-
-@include bp-xsm-phone {
-    .nav-mobile {
-        font-size: 1.2em;
-
-        button {
-            gap: $size-2;
-            font-size: 0.7em;
-
-            .icon {
-                display: inline-block;
-                width: $size-6;
-                height: $size-6;
-                fill: $color-accent;
-                stroke: $color-accent;
-            }
-
-            span {
-                font-size: clamp(0.9em, 3.7vw, 1em);
-            }
-
-            &.active {
-                .icon {
-                    @include theme-dark {
-                        fill: $color-primary-light;
-                        stroke: $color-primary-light;
-                    }
-
-                    @include theme-light {
-                        fill: $color-gray2;
-                        stroke: $color-gray2;
-                    }
-                }
-            }
-        }
-    }
-}
-
-@include bp-md-tablet {
-    .nav-mobile {
-        display: none;
-    }
-
-    header {
-        .nav-desktop {
-            display: flex;
-        }
     }
 }
 </style>
