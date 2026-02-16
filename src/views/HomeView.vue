@@ -1,8 +1,9 @@
 <script setup>
 import { onMounted, watch } from 'vue';
+import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useHomeAnimations } from '@/composables/animations/useHomeAnimations.js';
+import { homeAnimations } from '@/animations/page/home.js';
 import Button from '@/components/Button.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
@@ -10,19 +11,24 @@ import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
-const { enterPageAnim, exitPageAnim } = useHomeAnimations();
+const { registerAnim } = useGsap();
+
+const anims = {
+    enterPage: registerAnim(homeAnimations.enterPage),
+    exitPage: registerAnim(homeAnimations.exitPage),
+};
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            exitPageAnim();
+            anims.exitPage();
         }
     },
 );
 
 onMounted(() => {
-    enterPageAnim();
+    anims.enterPage();
 });
 </script>
 

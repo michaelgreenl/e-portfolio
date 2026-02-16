@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, markRaw, computed, watch } from 'vue';
+import { LEAVE_DURATION } from '@/animations/constants/timing';
 import HomeView from '@/views/HomeView.vue';
 import ProjectsView from '@/views/ProjectsView.vue';
 import ResumeView from '@/views/ResumeView.vue';
@@ -39,7 +40,7 @@ export const useRouteStore = defineStore('router', () => {
     const activePath = ref(getInitialPath());
     const isLeaving = ref(false);
     const toPath = ref();
-    const leaveDuration = 350;
+    const leaveDuration = LEAVE_DURATION;
 
     function parsePath(fullPath) {
         const [pathString, queryString] = fullPath.split('?');

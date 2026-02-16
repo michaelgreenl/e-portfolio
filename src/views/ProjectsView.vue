@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
+import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
-import { useProjectsAnimations } from '@/composables/animations/useProjectsAnimations.js';
+import { projectAnimations } from '@/animations/page/projects.js';
+import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import projectsData from '@/assets/data/projects.json';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
@@ -16,7 +18,18 @@ import PlayIcon from '@/components/SVGs/PlayIcon.vue';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
 const routeStore = useRouteStore();
-const { pageEnter, pageExit, showSelectedProject, hideSelectedProject } = useProjectsAnimations();
+const { headerReveal, headerDismiss } = useUtilAnimations();
+
+const { registerAnim } = useGsap();
+
+const anims = {
+    showSelectedProject: registerAnim(projectAnimations.showSelectedProject),
+    hideSelectedProject: registerAnim(projectAnimations.hideSelectedProject),
+};
+
+const pageHeader = ref(null);
+const overlay = ref(null);
+const selectedProject = ref(null);
 
 const getURL = (img) => {
     return new URL(`../assets/images/${img}`, import.meta.url).href;
@@ -46,13 +59,13 @@ watch(
                 closeProject();
             }
 
-            pageExit();
+            headerDismiss({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
         }
     },
 );
 
 onMounted(() => {
-    pageEnter();
+    headerReveal({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
 
     const query = routeStore.currentRoute.query;
     const projectToOpen = projectsData.find((p) => p.slug === query.slug);
@@ -71,7 +84,7 @@ async function openProject(project, autoplay = false) {
     document.body.style.top = `-${scrollPosition.value}px`;
 
     await nextTick();
-    showSelectedProject();
+    anims.showSelectedProject({ targets: [selectedProject.value, overlay.value] });
 }
 
 function closeProject() {
@@ -79,7 +92,8 @@ function closeProject() {
     document.body.style.top = '';
     window.scrollTo(0, scrollPosition.value);
 
-    hideSelectedProject({
+    anims.hideSelectedProject({
+        targets: [selectedProject.value, overlay.value],
         onComplete: () => {
             activeProject.value = null;
         },
@@ -89,11 +103,11 @@ function closeProject() {
 
 <template>
     <div class="projects-container">
-        <div class="page-header">
+        <div ref="pageHeader" class="page-header">
             <h1>Projects</h1>
             <hr />
             <p>
-                Here are a few projects I’ve built recently, including real-time full-stack systems and complex frontend
+                Here are a few projects I've built recently, including real-time full-stack systems and complex frontend
                 visualizations.
             </p>
         </div>
@@ -161,6 +175,7 @@ function closeProject() {
         </div>
         <div
             v-if="activeProject"
+            ref="selectedProject"
             class="selected-container"
             role="dialog"
             aria-modal="true"
@@ -208,7 +223,7 @@ function closeProject() {
                     </div>
                 </div>
             </div>
-            <div class="overlay" @click="closeProject()"></div>
+            <div ref="overlay" class="overlay" @click="closeProject()"></div>
         </div>
     </div>
 </template>

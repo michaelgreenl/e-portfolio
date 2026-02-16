@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
 import { gsap } from 'gsap';
+import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useNavbarAnimations } from '@/composables/animations/useNavbarAnimations.js';
+import { navbarAnimations } from '@/animations/component/navbar.js';
 import MoonIcon from '@/components/SVGs/MoonIcon.vue';
 import SunIcon from '@/components/SVGs/SunIcon.vue';
 import Logo from '@/components/Logo.vue';
@@ -11,16 +12,35 @@ import Logo from '@/components/Logo.vue';
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
-const { enterPageAnim, enterNavItemAnim, exitNavItemAnim } = useNavbarAnimations();
+const { registerAnim } = useGsap();
+
+// Register all animations with component-scoped context
+const anims = {
+    enterMobileNavbar: registerAnim(navbarAnimations.enterMobileNavbar),
+    enterLogoTheme: registerAnim(navbarAnimations.enterLogoTheme),
+    enterNavItem: registerAnim(navbarAnimations.enterNavItem),
+    exitNavItem: registerAnim(navbarAnimations.exitNavItem),
+    enterPage: registerAnim(navbarAnimations.enterPage),
+};
 
 const fromHome = ref(false);
 
 onMounted(() => {
     if (routeStore.activePath !== 'home') {
         const tl = gsap.timeline();
-        enterPageAnim({ tl, isHomePage: false });
+        anims.enterPage({
+            tl,
+            isHomePage: false,
+            enterNavItem: anims.enterNavItem,
+            enterLogoTheme: anims.enterLogoTheme,
+            enterMobileNavbar: anims.enterMobileNavbar,
+        });
     } else {
-        enterPageAnim({ isHomePage: true });
+        anims.enterPage({
+            isHomePage: true,
+            enterLogoTheme: anims.enterLogoTheme,
+            enterMobileNavbar: anims.enterMobileNavbar,
+        });
         fromHome.value = true;
     }
 });
@@ -30,10 +50,10 @@ watch(
     async (newVal) => {
         if (routeStore.activePath !== 'home' && fromHome.value) {
             await nextTick();
-            enterNavItemAnim();
+            anims.enterNavItem();
             fromHome.value = false;
         } else if (routeStore.toPath === 'home' && newVal) {
-            exitNavItemAnim();
+            anims.exitNavItem();
         } else if (routeStore.activePath === 'home') {
             fromHome.value = true;
         }

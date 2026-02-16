@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue';
 import { useRouteStore } from '@/stores/routeStore.js';
-import { useContactAnimations } from '@/composables/animations/useContactAnimations.js';
+import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import emailjs from '@emailjs/browser';
 import Button from '@/components/Button.vue';
 import MailIcon from '@/components/SVGs/MailIcon.vue';
@@ -14,7 +14,9 @@ const PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY;
 
 const routeStore = useRouteStore();
 
-const { enterPageAnim, exitPageAnim } = useContactAnimations();
+const { headerReveal, headerDismiss } = useUtilAnimations();
+
+const pageHeader = ref(null);
 
 const formElement = ref(null);
 const form = reactive({ email: '', subject: '', message: '' });
@@ -25,14 +27,20 @@ const isSubmitting = ref(false);
 const submitStatus = ref(''); // 'success', 'error', or ''
 
 onMounted(() => {
-    enterPageAnim();
+    headerReveal({
+        headerEl: pageHeader.value,
+        extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link'],
+    });
 });
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            exitPageAnim();
+            headerDismiss({
+                headerEl: pageHeader.value,
+                extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link'],
+            });
         }
     },
 );
@@ -160,7 +168,7 @@ const clearStatus = () => {
 
 <template>
     <div ref="pageElement" class="contact-container">
-        <div class="contact-header">
+        <div ref="pageHeader" class="contact-header">
             <h1>Get In Touch!</h1>
             <hr />
             <p>It'd be great to hear from you. Send me a message and I'll respond as soon as I can!</p>
