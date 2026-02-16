@@ -58,5 +58,37 @@
                 "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=false"
             }
         }
+    },
+    {
+        "title": "AlgoVisualizer",
+        "slug": "algo-visualizer",
+        "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
+        "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
+        "date": "May 2022",
+        "dateRange": "May 2022 - July 2025",
+        "description": {
+            "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
+            "long": [
+                "Constructed a modular algorithm visualization platform using Nuxt 3 and Vue 3, utilizing dynamic component loading to seamlessly scale from 1 to 50+ algorithm visualizations without bundle size bloat.",
+                "Created an interactive explanation system using gsap.TextPlugin to type out context-aware, step-by-step textual descriptions synchronized perfectly with the visual elements of the algorithm.",
+                "Optimized animation performance by using Vue's markRaw to exclude heavy GSAP timeline objects from reactivity tracking, preventing unnecessary re-renders and memory leaks."
+            ]
+        },
+        "fontFamily": "Futura",
+        "img": "algo-visualizer_blurred.webp",
+        "video": "1149531735",
+        "externalLinks": {
+            "github": {
+                "href": "https://github.com/michaelgreenl/AlgoVisualizer",
+                "text": "Repository"
+            },
+            "demoVideo": {
+                "href": "https://michaelgreenl.net/#projects?slug=algo-visualizer&autoplay=true",
+                "text": "Demo Video"
+            },
+            "porfolioLink": {
+                "href": "https://michaelgreenl.net#projects?slug=algo-visualizer&autoplay=false"
+            }
+        }
     }
 ]
