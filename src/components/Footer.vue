@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from 'vue';
-import { useUtilAnimations } from '@/composables/animations/useUtilAnimations.js';
+import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 
 const { fadeIn } = useUtilAnimations();
 

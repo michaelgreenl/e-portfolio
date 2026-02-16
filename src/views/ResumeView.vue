@@ -4,7 +4,7 @@ import projectsData from '@/assets/data/projects.json';
 import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useUtilAnimations } from '@/composables/animations/useUtilAnimations.js';
+import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import Button from '@/components/Button.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
@@ -139,13 +139,19 @@ watch(
                 <h2 class="section-header">Technical Skills</h2>
                 <hr />
                 <div class="section-segment section-segment-skills">
-                    <p><span>Languages:</span>&nbsp; Javascript, HTML/CSS, Sass, SQL</p>
-                    <p><span>Frameworks:</span>&nbsp; Node, Vue, React, Express, Socket.IO</p>
+                    <p>
+                        <span>Languages:</span>&nbsp; Typescript, JavaScript (ES6+), SQL, Python, Java, C/C++, HTML/CSS,
+                        Sass
+                    </p>
+                    <p>
+                        <span>Frameworks & Libraries:</span>&nbsp; Node, Vue, Nuxt, Ionic, React, Express, Socket.IO,
+                        GSAP
+                    </p>
                     <p>
                         <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma,
-                        Sequelize, GSAP
+                        Sequelize
                     </p>
-                    <p><span>Infrastructure:</span>&nbsp; Docker, Github, Vercel, Render</p>
+                    <p><span>Infrastructure:</span>&nbsp; Docker, Render, Github Pages, Github Actions, Vercel</p>
                 </div>
             </div>
         </div>
