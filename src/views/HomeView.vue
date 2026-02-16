@@ -34,8 +34,8 @@ onMounted(() => {
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                I am a software engineer with a drive to create and a passion for turning complex problems into elegant
-                solutions.
+                I build secure, scalable applications that combine elegant, intuitive UIs with robust, maintainable
+                backend architecture.
             </p>
             <div class="cta">
                 <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
@@ -157,7 +157,7 @@ h3 {
 }
 
 p {
-    max-width: 45ch;
+    max-width: 50ch;
     margin: 0 auto;
     font-size: 1.1em;
     text-align: center;
