@@ -65,7 +65,7 @@
         "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
         "date": "May 2022",
-        "dateRange": "May 2022 - July 2025",
+        "dateRange": "May 2022 ~ July 2025",
         "description": {
             "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
             "long": [

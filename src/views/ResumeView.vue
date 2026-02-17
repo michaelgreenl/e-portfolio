@@ -5,6 +5,7 @@ import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
+import { TIMING } from '@/animations/constants/timing.js';
 import Button from '@/components/Button.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
@@ -15,7 +16,7 @@ const themeStore = useThemeStore();
 const { fadeIn, fadeOut } = useUtilAnimations();
 
 onMounted(() => {
-    fadeIn({ selector: '.resume-container' });
+    fadeIn({ selector: '.resume-container', opts: { duration: TIMING.duration.slow } });
 });
 
 watch(
@@ -32,6 +33,7 @@ watch(
     <div class="resume-container">
         <div class="page-header">
             <h1>Resume</h1>
+
             <a href="/files/resume.pdf" download="Michael-Green-Resume.pdf">
                 <Button
                     text="Download PDF"
@@ -40,24 +42,29 @@ watch(
                 />
             </a>
         </div>
+
         <div class="resume-body">
             <div class="section">
                 <h2 class="section-header">Education</h2>
                 <hr />
+
                 <div v-for="education in resumeData.education" :key="education.title" class="section-segment">
                     <div class="segment-header">
                         <h3 class="segment-title">
                             {{ education.title }}<span v-if="education.location">, {{ education.location }}</span>
                         </h3>
+
                         <div class="segment-dates">
                             <CalendarIcon />
                             <h3>{{ education.dates }}</h3>
                         </div>
                     </div>
+
                     <div v-if="education.major" class="segment-details">
                         <h3>{{ education.major }}</h3>
                         <h3>{{ education.minor }}</h3>
                     </div>
+
                     <ul v-if="education.info" class="segment-info">
                         <li v-for="info in education.info" :key="info">
                             {{ info }}
@@ -68,19 +75,23 @@ watch(
             <div class="section">
                 <h2 class="section-header">Relevant Experience</h2>
                 <hr />
+
                 <div v-for="experience in resumeData.experience" :key="experience.title" class="section-segment">
                     <div class="segment-header">
                         <h3 class="segment-title">{{ experience.title }}</h3>
+
                         <div class="segment-dates">
                             <CalendarIcon />
                             <h3>{{ experience.dates }}</h3>
                         </div>
                     </div>
+
                     <div class="segment-details">
                         <h3>
                             {{ experience.company }}<span>, {{ experience.location }}</span>
                         </h3>
                     </div>
+
                     <ul v-if="experience.info" class="segment-info">
                         <li v-for="info in experience.info" :key="info">
                             {{ info }}
@@ -91,6 +102,7 @@ watch(
             <div class="section">
                 <h2 class="section-header">Projects</h2>
                 <hr />
+
                 <div v-for="project in projectsData" :key="project.title" class="section-segment">
                     <div class="segment-header">
                         <h3 class="segment-title segment-title-projects">
@@ -98,22 +110,26 @@ watch(
                                 {{ project.title }}
                             </a>
                             <span> - </span>
+
                             <span v-if="project.externalLinks.liveSite">
                                 <a class="external-link" :href="project.externalLinks.liveSite.href" target="_blank">
                                     Live Site</a
                                 >
                                 |
                             </span>
+
                             <span>
                                 <a class="external-link" :href="project.externalLinks.demoVideo.href"> Demo Video</a>
                                 |
                             </span>
+
                             <span>
                                 <a class="external-link" :href="project.externalLinks.github.href" target="_blank">
                                     Repository</a
                                 >
                             </span>
                         </h3>
+
                         <div class="segment-dates">
                             <CalendarIcon />
                             <h3>{{ project.dateRange }}</h3>
@@ -128,6 +144,7 @@ watch(
                             </span>
                         </h3>
                     </div>
+
                     <ul class="segment-info">
                         <li>
                             {{ project.description.short }}
@@ -138,6 +155,7 @@ watch(
             <div class="section">
                 <h2 class="section-header">Technical Skills</h2>
                 <hr />
+
                 <div class="section-segment section-segment-skills">
                     <p>
                         <span>Languages:</span>&nbsp; Typescript, JavaScript (ES6+), SQL, Python, Java, C/C++, HTML/CSS,
@@ -327,6 +345,8 @@ hr {
         height: 1em;
         margin-bottom: 4px;
         stroke: $color-text-primary;
+        // opacity: 0;
+        will-change: opacity;
     }
 }
 

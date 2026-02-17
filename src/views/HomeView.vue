@@ -43,6 +43,7 @@ onMounted(() => {
                 I build secure, scalable applications that combine elegant, intuitive UIs with robust, maintainable
                 backend architecture.
             </p>
+
             <div class="cta">
                 <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
                 <a href="/files/resume.pdf" download="Michael-Green-Resume.pdf">
@@ -54,8 +55,10 @@ onMounted(() => {
                 </a>
             </div>
         </div>
+
         <div class="site-nav">
             <hr class="nav-links-line" />
+
             <div v-for="(route, key) in routeStore.routes" :key="key" class="nav-link">
                 <Button
                     v-if="key !== 'home'"
@@ -114,11 +117,11 @@ h1 {
     line-height: 0.8ch;
 
     @include bp-custom-min(612) {
-        max-width: 100vw !important;
-        padding-bottom: $size-1 !important;
-        margin: 0 auto !important;
-        font-size: clamp(5.1em, 12vw, 5.5em) !important;
-        line-height: 1ch !important;
+        max-width: 100vw;
+        padding-bottom: $size-1;
+        margin: 0 auto;
+        font-size: clamp(5.1em, 12vw, 5.5em);
+        line-height: 1ch;
     }
 
     @include bp-md-tablet {

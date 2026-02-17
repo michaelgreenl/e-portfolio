@@ -84,6 +84,7 @@ async function openProject(project, autoplay = false) {
     document.body.style.top = `-${scrollPosition.value}px`;
 
     await nextTick();
+    selectedProject.value.focus();
     anims.showSelectedProject({ targets: [selectedProject.value, overlay.value] });
 }
 
@@ -95,6 +96,7 @@ function closeProject() {
     anims.hideSelectedProject({
         targets: [selectedProject.value, overlay.value],
         onComplete: () => {
+            selectedProject.value.blur();
             activeProject.value = null;
         },
     });
@@ -103,6 +105,66 @@ function closeProject() {
 
 <template>
     <div class="projects-container">
+        <div
+            v-if="activeProject"
+            ref="selectedProject"
+            class="selected-container"
+            tabindex="0"
+            role="dialog"
+            aria-modal="true"
+            :aria-label="activeProject.title"
+            @keydown.esc="closeProject()"
+        >
+            <div class="selected-project">
+                <div class="selected-header">
+                    <div>
+                        <CalendarIcon />
+                        <p>{{ activeProject.dateRange }}</p>
+                    </div>
+
+                    <Button :onClick="() => closeProject()" preset="secondary" :iconRight="CloseIcon" />
+                </div>
+
+                <div class="selected-body">
+                    <div class="selected-img-container">
+                        <iframe
+                            :src="`https://player.vimeo.com/video/${activeProject.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            title="game-lobby-demo-vid"
+                        ></iframe>
+                    </div>
+
+                    <div class="selected-info">
+                        <div class="selected-info-header" :class="`info-header-${activeProject.slug}`">
+                            <component :is="projectLogos[activeProject.slug]" class="project-logo" />
+                            <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
+
+                            <div class="external-links external-links-selected">
+                                <template v-for="(link, key) in activeProject.externalLinks" :key="link">
+                                    <a v-if="key !== 'demoVideo'" :href="link.href" target="_blank">
+                                        <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="selected-tool-chips" :class="`tool-chips-${activeProject.slug}`">
+                            <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
+                        </div>
+
+                        <ul class="selected-description">
+                            <li v-for="description in activeProject.description?.long" :key="description">
+                                {{ description }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div ref="overlay" class="overlay" @click="closeProject()"></div>
+        </div>
+
         <div ref="pageHeader" class="page-header">
             <h1>Projects</h1>
             <hr />
@@ -111,6 +173,7 @@ function closeProject() {
                 visualizations.
             </p>
         </div>
+
         <div class="cards">
             <div
                 v-for="project in projectsData"
@@ -131,6 +194,7 @@ function closeProject() {
                         class="project-img"
                     />
                 </div>
+
                 <div class="card-body">
                     <div class="card-header">
                         <component :is="projectLogos[project.slug]" class="project-logo" />
@@ -141,9 +205,11 @@ function closeProject() {
                         </div>
                     </div>
                     <p class="card-description">{{ project.description.short }}</p>
+
                     <div class="card-tool-chips">
                         <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
                     </div>
+
                     <div class="card-footer">
                         <div class="external-links external-links-card">
                             <a
@@ -159,9 +225,11 @@ function closeProject() {
                                     :iconLeft="externalIcons[key]"
                                     preset="secondary"
                                 />
+
                                 <Button v-else :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                             </a>
                         </div>
+
                         <Button
                             class="see-more"
                             @click.stop="() => openProject(project, true)"
@@ -172,58 +240,6 @@ function closeProject() {
                     </div>
                 </div>
             </div>
-        </div>
-        <div
-            v-if="activeProject"
-            ref="selectedProject"
-            class="selected-container"
-            role="dialog"
-            aria-modal="true"
-            :aria-label="activeProject.title"
-            @keydown.esc="closeProject()"
-        >
-            <div class="selected-project">
-                <div class="selected-header">
-                    <div>
-                        <CalendarIcon />
-                        <p>{{ activeProject.dateRange }}</p>
-                    </div>
-                    <Button :onClick="() => closeProject()" preset="secondary" :iconRight="CloseIcon" />
-                </div>
-                <div class="selected-body">
-                    <div class="selected-img-container">
-                        <iframe
-                            :src="`https://player.vimeo.com/video/${activeProject.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
-                            frameborder="0"
-                            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            title="game-lobby-demo-vid"
-                        ></iframe>
-                    </div>
-                    <div class="selected-info">
-                        <div class="selected-info-header" :class="`info-header-${activeProject.slug}`">
-                            <component :is="projectLogos[activeProject.slug]" class="project-logo" />
-                            <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
-                            <div class="external-links external-links-selected">
-                                <template v-for="(link, key) in activeProject.externalLinks" :key="link">
-                                    <a v-if="key !== 'demoVideo'" :href="link.href" target="_blank">
-                                        <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
-                                    </a>
-                                </template>
-                            </div>
-                        </div>
-                        <div class="selected-tool-chips" :class="`tool-chips-${activeProject.slug}`">
-                            <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
-                        </div>
-                        <ul class="selected-description">
-                            <li v-for="description in activeProject.description?.long" :key="description">
-                                {{ description }}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div ref="overlay" class="overlay" @click="closeProject()"></div>
         </div>
     </div>
 </template>

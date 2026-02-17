@@ -23,8 +23,8 @@ document.documentElement.setAttribute('data-theme', theme);
 
 <template>
     <BgSVG class="bg-svg" />
-    <Navbar />
 
+    <Navbar />
     <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
     <Footer />
 </template>
