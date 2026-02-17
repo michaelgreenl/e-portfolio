@@ -345,7 +345,6 @@ hr {
         height: 1em;
         margin-bottom: 4px;
         stroke: $color-text-primary;
-        // opacity: 0;
         will-change: opacity;
     }
 }
