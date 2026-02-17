@@ -64,6 +64,7 @@ watch(
 <template>
     <header>
         <Logo class="logo" />
+
         <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
             <button
                 v-for="(route, key) in routeStore.routes"
@@ -78,6 +79,7 @@ watch(
                 {{ route.name }}
             </button>
         </nav>
+
         <label class="theme-toggle">
             <input
                 class="toggle-input"
@@ -88,6 +90,7 @@ watch(
                 aria-label="Toggle theme"
                 @click="themeStore.toggleTheme()"
             />
+
             <div class="toggle-thumb" :class="{ active: themeStore.theme === 'dark' }">
                 <Transition name="icon" mode="out-in">
                     <MoonIcon v-if="themeStore.theme === 'dark'" class="icon" />
@@ -97,6 +100,7 @@ watch(
         </label>
     </header>
     <hr class="nav-line" />
+
     <nav class="nav-mobile">
         <button
             v-for="(route, key) in routeStore.routes"
@@ -106,6 +110,7 @@ watch(
             :disabled="routeStore.currentRoute.base === key"
         >
             <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
+
             <span>{{ route.name }}</span>
         </button>
     </nav>

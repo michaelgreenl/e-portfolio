@@ -173,6 +173,7 @@ const clearStatus = () => {
             <hr />
             <p>It'd be great to hear from you. Send me a message and I'll respond as soon as I can!</p>
         </div>
+
         <form ref="formElement" @submit.prevent="handleSubmit" class="contact-form">
             <div class="form-group">
                 <label for="email" class="form-label">Email Address</label>
@@ -190,6 +191,7 @@ const clearStatus = () => {
                 />
                 <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
             </div>
+
             <div class="form-group">
                 <label for="subject" class="form-label">Subject</label>
                 <input
@@ -206,6 +208,7 @@ const clearStatus = () => {
                 />
                 <span v-if="errors.subject" class="error-message">{{ errors.subject }}</span>
             </div>
+
             <div class="form-group">
                 <label for="message" class="form-label">Message</label>
                 <textarea
@@ -232,6 +235,7 @@ const clearStatus = () => {
                     <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
                 </a>
             </div>
+
             <Button
                 type="submit"
                 class="contact-link"
@@ -245,9 +249,11 @@ const clearStatus = () => {
                 :iconRight="MailIcon"
             />
         </div>
+
         <div v-if="submitStatus === 'success'" class="status-message success" @click="clearStatus">
             <p>✓ Message sent successfully! I'll get back to you soon.</p>
         </div>
+
         <div v-if="submitStatus === 'error'" class="status-message error" @click="clearStatus">
             <p>✗ There was an error sending your message. Please try again.</p>
         </div>
