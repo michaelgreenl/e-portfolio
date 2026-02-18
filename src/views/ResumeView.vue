@@ -157,19 +157,12 @@ watch(
                 <hr />
 
                 <div class="section-segment section-segment-skills">
-                    <p>
-                        <span>Languages:</span>&nbsp; Typescript, JavaScript (ES6+), SQL, Python, Java, C/C++, HTML/CSS,
-                        Sass
+                    <p v-for="skills in resumeData.skills" :key="skills.category">
+                        <span>{{ skills.category }}:</span>&nbsp;
+                        <span v-for="(skill, i) in skills.list" :key="skill"
+                            >{{ skill }}{{ i < skills.list.length - 1 ? ', ' : '' }}</span
+                        >
                     </p>
-                    <p>
-                        <span>Frameworks & Libraries:</span>&nbsp; Node, Vue, Nuxt, Ionic, React, Express, Socket.IO,
-                        GSAP
-                    </p>
-                    <p>
-                        <span>Tools & Databases:</span>&nbsp; Git, Bash, REST APIs, JWT, PostgreSQL, MySQL, Prisma,
-                        Sequelize
-                    </p>
-                    <p><span>Infrastructure:</span>&nbsp; Docker, Render, Github Pages, Github Actions, Vercel</p>
                 </div>
             </div>
         </div>
@@ -290,6 +283,14 @@ hr {
     &-skills {
         padding-top: 0.1em !important;
         font-size: 0.94em;
+
+        p span {
+            font-weight: 400;
+
+            &:first-child {
+                font-weight: 600;
+            }
+        }
     }
 }
 

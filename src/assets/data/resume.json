@@ -30,5 +30,35 @@
                 "Implemented complex UI animations and micro-interactions for convention applications, directly translating client requests into working code."
             ]
         }
+    },
+    "skills": {
+        "languages": {
+            "category": "Languages",
+            "list": ["Typescript", "JavaScript (ES6+)", "SQL", "Python", "Java", "C/C++", "HTML/CSS", "Sass"]
+        },
+        "frameworks": {
+            "category": "Frameworks & Libraries",
+            "list": [
+                "Node",
+                "Vue",
+                "Nuxt",
+                "Ionic",
+                "Capacitor",
+                "React",
+                "Express",
+                "Socket.IO",
+                "GSAP",
+                "Cypress",
+                "Vitest"
+            ]
+        },
+        "tools": {
+            "category": "Tools & Databases",
+            "list": ["Git", "Bash", "REST APIs", "JWT", "PostgreSQL", "MySQL", "Prisma", "Sequelize", "Zod"]
+        },
+        "infrastructure": {
+            "category": "Infrastructure",
+            "list": ["Docker", "Render", "Github Pages", "Github Actions", "Vercel"]
+        }
     }
 }
