@@ -15,6 +15,11 @@ import PostgresIcon from '@/components/SVGs/Tools/PostgresIcon.vue';
 import PrismaIcon from '@/components/SVGs/Tools/PrismaIcon.vue';
 import SequelizeIcon from '@/components/SVGs/Tools/SequelizeIcon.vue';
 import MySQLIcon from '@/components/SVGs/Tools/MySQLIcon.vue';
+import TypescriptIcon from '@/components/SVGs/Tools/TypescriptIcon.vue';
+import IonicIcon from '@/components/SVGs/Tools/IonicIcon.vue';
+import CypressIcon from '@/components/SVGs/Tools/CypressIcon.vue';
+import VitestIcon from '@/components/SVGs/Tools/VitestIcon.vue';
+import ZodIcon from '@/components/SVGs/Tools/ZodIcon.vue';
 
 defineProps({
     tool: {
@@ -27,6 +32,36 @@ const themeStore = useThemeStore();
 const isMobile = useMediaQuery('(min-width: 682px)');
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '6.5em' },
+    typescript: {
+        text: 'Typescript',
+        icon: markRaw(TypescriptIcon),
+        lightColor: '#017acb',
+        darkColor: '#017acb',
+        maxWidth: '8em',
+    },
+    ionic: { text: 'Ionic', icon: markRaw(IonicIcon), lightColor: '#3880ff', darkColor: '#3880ff', maxWidth: '6.5em' },
+    cypress: {
+        text: 'Cypress',
+        icon: markRaw(CypressIcon),
+        lightColor: '#3880ff',
+        darkColor: '#3880ff',
+        maxWidth: '6.5em',
+    },
+    vitest: {
+        text: 'Vitest',
+        icon: markRaw(VitestIcon),
+        lightColor: '#69d3a7',
+        darkColor: '#69d3a7',
+        maxWidth: '6.5em',
+    },
+    zod: {
+        text: 'Zod',
+        icon: markRaw(ZodIcon),
+        lightColor: '#45a9ff',
+        darkColor: '#45a9ff',
+        maxWidth: '6.5em',
+    },
+
     git: { text: 'Git', icon: markRaw(GitIcon), lightColor: '#DE4C36', darkColor: '#DE4C36', maxWidth: '6.5em' },
     nuxt: { text: 'Nuxt', icon: markRaw(NuxtIcon), lightColor: '#00AC65', darkColor: '#00DC82', maxWidth: '6.5em' },
     gsap: { text: 'GSAP', icon: markRaw(GsapIcon), lightColor: '#00AC65', darkColor: '#00DC82', maxWidth: '6.5em' },

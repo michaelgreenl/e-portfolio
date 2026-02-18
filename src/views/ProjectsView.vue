@@ -10,6 +10,7 @@ import ToolChip from '@/components/ToolChip.vue';
 import ReactionLogo from '@/components/SVGs/ProjectLogos/ReactionLogo.vue';
 import AlgoVisualizerLogo from '@/components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
 import GameLobbyLogo from '@/components/SVGs/ProjectLogos/GameLobbyLogo.vue';
+import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
@@ -39,6 +40,7 @@ const projectLogos = {
     reaction: ReactionLogo,
     'game-lobby': GameLobbyLogo,
     'algo-visualizer': AlgoVisualizerLogo,
+    tally: TallyLogo,
 };
 
 const externalIcons = {
@@ -139,7 +141,10 @@ function closeProject() {
                     <div class="selected-info">
                         <div class="selected-info-header" :class="`info-header-${activeProject.slug}`">
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
-                            <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
+                            <h2 :style="{ fontFamily: activeProject.fontFamily }">
+                                {{ activeProject.title }}
+                                <span v-if="activeProject.wip">(wip)</span>
+                            </h2>
 
                             <div class="external-links external-links-selected">
                                 <template v-for="(link, key) in activeProject.externalLinks" :key="link">
@@ -198,7 +203,10 @@ function closeProject() {
                 <div class="card-body">
                     <div class="card-header">
                         <component :is="projectLogos[project.slug]" class="project-logo" />
-                        <h2 :style="{ fontFamily: project.fontFamily }">{{ project.title }}</h2>
+                        <h2 :style="{ fontFamily: project.fontFamily }">
+                            {{ project.title }}
+                            <span v-if="project.wip">(wip)</span>
+                        </h2>
                         <div>
                             <CalendarIcon />
                             <p>{{ project.date }}</p>
@@ -278,12 +286,23 @@ function closeProject() {
     }
 
     h2 {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
         @include theme-dark {
             color: $color-gray3;
         }
 
         @include theme-light {
             color: $color-primary-darker;
+        }
+
+        span {
+            // font-family: $ternary-font-stack;
+            font-size: 0.7em;
+            color: $color-text-secondary;
+            transform: translateY(3px);
         }
     }
 
