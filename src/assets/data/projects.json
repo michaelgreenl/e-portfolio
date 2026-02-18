@@ -9,7 +9,7 @@
         "description": {
             "short": "A full-stack application engineered with a decoupled architecture, utilizing the Repository Pattern to securely manage authentication, game metrics, and user persistence.",
             "long": [
-                "Architected a reactive Vue 3 frontend utilizing Pinia for modular state management and GSAP for high-fidelity timeline animations, significantly enhancing user engagement through intuitive visual feedback.",
+                "Architected a reactive Vue 3 frontend utilizing Pinia for modular state management and GSAP for high-fidelity timeline animations, significantly enhancing user experience through intuitive visual feedback.",
                 "Developed backend services adhering to the Repository Pattern, creating a clean separation of concerns and improving maintainability.",
                 "Engineered a defense-in-depth security strategy, utilizing HTTP-only cookies for XSS-proof JWT storage and implementing rate-limiting middleware to mitigate brute-force attacks."
             ]
