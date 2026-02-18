@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount } from 'vue';
+// import { Suspense } from 'vue';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import Navbar from '@/components/Navbar.vue';
@@ -26,10 +26,19 @@ document.documentElement.setAttribute('data-theme', theme);
 
     <Navbar />
     <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
+    <!-- <Suspense> -->
+    <!--     <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" /> -->
+    <!--     <template #fallback> -->
+    <!--         <!-1- Optional: Add a loading spinner -1-> -->
+    <!--         <div class="page loading">Loading...</div> -->
+    <!--     </template> -->
+    <!-- </Suspense> -->
+
     <Footer />
 </template>
 
 <style lang="scss">
+// @use './assets/styles/_fonts.scss';
 @use './assets/styles/_variables.scss';
 
 * {

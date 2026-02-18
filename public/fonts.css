@@ -1,0 +1,82 @@
+/* public/fonts.css */
+
+@font-face {
+    font-family: ClashDisplay;
+    font-weight: 400;
+    font-style: normal;
+    src: url('/fonts/clashdisplay/ClashDisplay-Regular.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-weight: 500;
+    font-style: normal;
+    src: url('/fonts/clashdisplay/ClashDisplay-Medium.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: ClashDisplay;
+    font-weight: 600;
+    font-style: normal;
+    src: url('/fonts/clashdisplay/ClashDisplay-Semibold.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: Inter;
+    font-weight: 400;
+    font-style: normal;
+    src: url('/fonts/inter/Inter-Regular.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: Spartan;
+    font-weight: 400;
+    font-style: normal;
+    src: url('/fonts/spartan/LeagueSpartan-Regular.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: Spartan;
+    font-weight: 500;
+    font-style: normal;
+    src: url('/fonts/spartan/LeagueSpartan-Medium.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: Spartan;
+    font-weight: 600;
+    font-style: normal;
+    src: url('/fonts/spartan/LeagueSpartan-SemiBold.woff2') format('woff2');
+    font-display: block;
+}
+
+/* Project fonts */
+@font-face {
+    font-family: BitCount;
+    font-weight: 400;
+    font-style: normal;
+    src: url('/fonts/projects/BitCount-Regular.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: AudioWide;
+    font-weight: 400;
+    font-style: normal;
+    src: url('/fonts/projects/audiowide-normal-400.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
+    font-family: Futura;
+    font-weight: 400;
+    font-style: normal;
+    src: url('/fonts/projects/Futura-Regular.woff2') format('woff2');
+    font-display: block;
+}

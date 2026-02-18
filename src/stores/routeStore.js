@@ -1,10 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref, markRaw, computed, watch } from 'vue';
+import { ref, markRaw, computed, watch, defineAsyncComponent } from 'vue';
 import { LEAVE_DURATION } from '@/animations/constants/timing';
-import HomeView from '@/views/HomeView.vue';
-import ProjectsView from '@/views/ProjectsView.vue';
-import ResumeView from '@/views/ResumeView.vue';
-import ContactView from '@/views/ContactView.vue';
+
 import HomeIcon from '@/components/SVGs/HomeIcon.vue';
 import HomeIconFill from '@/components/SVGs/HomeIconFill.vue';
 import ProjectsIcon from '@/components/SVGs/ProjectsIcon.vue';
@@ -16,22 +13,22 @@ import ContactIconFill from '@/components/SVGs/ContactIconFill.vue';
 export const useRouteStore = defineStore('router', () => {
     const routes = {
         home: {
-            component: markRaw(HomeView),
+            component: defineAsyncComponent(() => import('@/views/HomeView.vue')),
             name: 'Home',
             meta: { title: 'E-portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
-            component: markRaw(ProjectsView),
+            component: defineAsyncComponent(() => import('@/views/ProjectsView.vue')),
             name: 'Projects',
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         resume: {
-            component: markRaw(ResumeView),
+            component: defineAsyncComponent(() => import('@/views/ResumeView.vue')),
             name: 'Resume',
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
-            component: markRaw(ContactView),
+            component: defineAsyncComponent(() => import('@/views/ContactView.vue')),
             name: 'Contact',
             meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
         },
@@ -44,7 +41,6 @@ export const useRouteStore = defineStore('router', () => {
 
     function parsePath(fullPath) {
         const [pathString, queryString] = fullPath.split('?');
-
         const parts = pathString.split('/');
         const base = parts[0] || 'home';
         const params = { id: parts[1] || null };
@@ -64,12 +60,12 @@ export const useRouteStore = defineStore('router', () => {
         if (!hash) return 'home';
 
         const { base } = parsePath(hash);
-
         return routes[base] ? hash : 'home';
     }
 
     const currentRoute = computed(() => {
         const { base, params, query } = parsePath(activePath.value);
+
         return {
             base,
             params,

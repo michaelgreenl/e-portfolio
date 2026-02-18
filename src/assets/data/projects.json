@@ -14,7 +14,7 @@
                 "Engineered a defense-in-depth security strategy, utilizing HTTP-only cookies for XSS-proof JWT storage and implementing rate-limiting middleware to mitigate brute-force attacks."
             ]
         },
-        "fontFamily": "Autowide",
+        "fontFamily": "AudioWide",
         "img": "reaction_blurred.webp",
         "video": "1149531486",
         "externalLinks": {
