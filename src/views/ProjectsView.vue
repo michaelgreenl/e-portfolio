@@ -174,8 +174,8 @@ function closeProject() {
             <h1>Projects</h1>
             <hr />
             <p>
-                Here are a few projects I've built recently, including real-time full-stack systems and complex frontend
-                visualizations.
+                Here are a few projects I've built recently, spanning cross-platform mobile development, real-time
+                full-stack systems, and complex frontend visualizations.
             </p>
         </div>
 
@@ -299,7 +299,6 @@ function closeProject() {
         }
 
         span {
-            // font-family: $ternary-font-stack;
             font-size: 0.7em;
             color: $color-text-secondary;
             transform: translateY(3px);
@@ -347,7 +346,7 @@ function closeProject() {
         text-align: center;
 
         @include bp-sm-phone {
-            max-width: 56ch;
+            max-width: 48ch;
             font-size: 1.8em;
         }
     }
