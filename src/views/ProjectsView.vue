@@ -195,7 +195,7 @@ function closeProject() {
                     <img
                         :src="getURL(project.img)"
                         :alt="'Screenshot of ' + project.title"
-                        loading="lazy"
+                        loading="eager"
                         class="project-img"
                     />
                 </div>
@@ -538,9 +538,18 @@ function closeProject() {
     position: relative;
     @include flexCenterAll;
     padding: $size-7;
+    aspect-ratio: 1.46/1;
+    width: 105%;
 
     @include bp-sm-phone {
         padding: $size-4;
+        width: auto;
+        height: 16em;
+        aspect-ratio: 1.54/1;
+    }
+
+    @include bp-md-tablet {
+        height: 19em;
     }
 
     :deep(button) {
@@ -579,7 +588,9 @@ function closeProject() {
     position: relative;
     z-index: 0;
     border-radius: 10px;
-    width: 105%;
+    width: 100%;
+    height: 100%;
+
     mask-image:
         linear-gradient(to bottom, transparent, black 10%, black 90%, transparent),
         linear-gradient(to right, transparent, black 10%, black 90%, transparent);
@@ -591,11 +602,6 @@ function closeProject() {
 
     @include bp-sm-phone {
         width: auto;
-        height: 16em;
-    }
-
-    @include bp-md-tablet {
-        height: 19em;
     }
 }
 
