@@ -121,7 +121,7 @@ function closeProject() {
                 <div class="selected-header">
                     <div>
                         <CalendarIcon />
-                        <p>{{ activeProject.dateRange }}</p>
+                        <p>{{ activeProject.longDate }}</p>
                     </div>
 
                     <Button :onClick="() => closeProject()" preset="secondary" :iconRight="CloseIcon" />
@@ -143,7 +143,7 @@ function closeProject() {
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
                             <h2 :style="{ fontFamily: activeProject.fontFamily }">
                                 {{ activeProject.title }}
-                                <span v-if="activeProject.wip">(wip)</span>
+                                <!-- <span v-if="activeProject.wip">(WIP)</span> -->
                             </h2>
 
                             <div class="external-links external-links-selected">
@@ -205,11 +205,11 @@ function closeProject() {
                         <component :is="projectLogos[project.slug]" class="project-logo" />
                         <h2 :style="{ fontFamily: project.fontFamily }">
                             {{ project.title }}
-                            <span v-if="project.wip">(wip)</span>
                         </h2>
-                        <div>
+                        <div class="card-date">
                             <CalendarIcon />
-                            <p>{{ project.date }}</p>
+                            <p class="short-date">{{ project.shortDate }}</p>
+                            <p class="long-date">{{ project.longDate }}</p>
                         </div>
                     </div>
                     <p class="card-description">{{ project.description.short }}</p>
@@ -299,9 +299,10 @@ function closeProject() {
         }
 
         span {
-            font-size: 0.7em;
+            font-family: $secondary-font-stack;
+            font-size: 0.3em;
             color: $color-text-secondary;
-            transform: translateY(3px);
+            transform: translateY(2px);
         }
     }
 
@@ -340,7 +341,7 @@ function closeProject() {
     }
 
     p {
-        max-width: 37ch;
+        max-width: 42ch;
         font-size: 1.7em;
         color: $color-text-secondary;
         text-align: center;
@@ -659,6 +660,22 @@ function closeProject() {
         svg {
             height: 1.1em;
             stroke: $color-text-secondary;
+        }
+
+        .short-date {
+            display: flex;
+
+            @include bp-md-tablet {
+                display: none;
+            }
+        }
+
+        .long-date {
+            display: none;
+
+            @include bp-md-tablet {
+                display: flex;
+            }
         }
     }
 }

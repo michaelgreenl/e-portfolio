@@ -34,7 +34,7 @@ watch(
         <div class="page-header">
             <h1>Resume</h1>
 
-            <a href="/files/resume.pdf" download="Michael-Green-Resume.pdf">
+            <a href="/files/Michael-L-Green-Resume.pdf" download="Michael-L-Green-Resume.pdf">
                 <Button
                     text="Download PDF"
                     :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
@@ -132,7 +132,7 @@ watch(
 
                         <div class="segment-dates">
                             <CalendarIcon />
-                            <h3>{{ project.dateRange }}</h3>
+                            <h3>{{ project.longDate }}</h3>
                         </div>
                     </div>
                     <div class="segment-details">
@@ -192,7 +192,7 @@ watch(
     }
 
     @include bp-xsm-phone {
-        font-size: clamp(0.75em, 3.5vw, 1.05em);
+        font-size: clamp(0.75em, 3.3vw, 1.05em);
     }
 }
 
