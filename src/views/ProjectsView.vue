@@ -143,7 +143,6 @@ function closeProject() {
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
                             <h2 :style="{ fontFamily: activeProject.fontFamily }">
                                 {{ activeProject.title }}
-                                <!-- <span v-if="activeProject.wip">(WIP)</span> -->
                             </h2>
 
                             <div class="external-links external-links-selected">
@@ -544,12 +543,8 @@ function closeProject() {
     @include bp-sm-phone {
         padding: $size-4;
         width: auto;
-        height: 16em;
-        aspect-ratio: 1.54/1;
-    }
-
-    @include bp-md-tablet {
         height: 19em;
+        aspect-ratio: 1.54/1;
     }
 
     :deep(button) {

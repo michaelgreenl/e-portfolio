@@ -1,5 +1,4 @@
 <script setup>
-// import { Suspense } from 'vue';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import Navbar from '@/components/Navbar.vue';
@@ -60,14 +59,6 @@ body,
 
     @include bp-xsm-phone {
         font-size: 0.9em;
-    }
-
-    @include bp-sm-phone {
-        font-size: 1em;
-    }
-
-    @include bp-xxl-desktop {
-        font-size: 1.2em;
     }
 }
 
