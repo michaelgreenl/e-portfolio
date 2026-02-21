@@ -10,6 +10,7 @@ import ToolChip from '@/components/ToolChip.vue';
 import ReactionLogo from '@/components/SVGs/ProjectLogos/ReactionLogo.vue';
 import AlgoVisualizerLogo from '@/components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
 import GameLobbyLogo from '@/components/SVGs/ProjectLogos/GameLobbyLogo.vue';
+import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
@@ -39,6 +40,7 @@ const projectLogos = {
     reaction: ReactionLogo,
     'game-lobby': GameLobbyLogo,
     'algo-visualizer': AlgoVisualizerLogo,
+    tally: TallyLogo,
 };
 
 const externalIcons = {
@@ -119,7 +121,7 @@ function closeProject() {
                 <div class="selected-header">
                     <div>
                         <CalendarIcon />
-                        <p>{{ activeProject.dateRange }}</p>
+                        <p>{{ activeProject.longDate }}</p>
                     </div>
 
                     <Button :onClick="() => closeProject()" preset="secondary" :iconRight="CloseIcon" />
@@ -139,7 +141,10 @@ function closeProject() {
                     <div class="selected-info">
                         <div class="selected-info-header" :class="`info-header-${activeProject.slug}`">
                             <component :is="projectLogos[activeProject.slug]" class="project-logo" />
-                            <h2 :style="{ fontFamily: activeProject.fontFamily }">{{ activeProject.title }}</h2>
+                            <h2 :style="{ fontFamily: activeProject.fontFamily }">
+                                {{ activeProject.title }}
+                                <!-- <span v-if="activeProject.wip">(WIP)</span> -->
+                            </h2>
 
                             <div class="external-links external-links-selected">
                                 <template v-for="(link, key) in activeProject.externalLinks" :key="link">
@@ -169,8 +174,8 @@ function closeProject() {
             <h1>Projects</h1>
             <hr />
             <p>
-                Here are a few projects I've built recently, including real-time full-stack systems and complex frontend
-                visualizations.
+                Here are a few projects I've built recently, spanning cross-platform mobile development, real-time
+                full-stack systems, and complex frontend visualizations.
             </p>
         </div>
 
@@ -190,7 +195,7 @@ function closeProject() {
                     <img
                         :src="getURL(project.img)"
                         :alt="'Screenshot of ' + project.title"
-                        loading="lazy"
+                        loading="eager"
                         class="project-img"
                     />
                 </div>
@@ -198,10 +203,13 @@ function closeProject() {
                 <div class="card-body">
                     <div class="card-header">
                         <component :is="projectLogos[project.slug]" class="project-logo" />
-                        <h2 :style="{ fontFamily: project.fontFamily }">{{ project.title }}</h2>
-                        <div>
+                        <h2 :style="{ fontFamily: project.fontFamily }">
+                            {{ project.title }}
+                        </h2>
+                        <div class="card-date">
                             <CalendarIcon />
-                            <p>{{ project.date }}</p>
+                            <p class="short-date">{{ project.shortDate }}</p>
+                            <p class="long-date">{{ project.longDate }}</p>
                         </div>
                     </div>
                     <p class="card-description">{{ project.description.short }}</p>
@@ -278,12 +286,23 @@ function closeProject() {
     }
 
     h2 {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
         @include theme-dark {
             color: $color-gray3;
         }
 
         @include theme-light {
             color: $color-primary-darker;
+        }
+
+        span {
+            font-family: $secondary-font-stack;
+            font-size: 0.3em;
+            color: $color-text-secondary;
+            transform: translateY(2px);
         }
     }
 
@@ -322,13 +341,13 @@ function closeProject() {
     }
 
     p {
-        max-width: 37ch;
+        max-width: 42ch;
         font-size: 1.7em;
         color: $color-text-secondary;
         text-align: center;
 
         @include bp-sm-phone {
-            max-width: 56ch;
+            max-width: 48ch;
             font-size: 1.8em;
         }
     }
@@ -519,9 +538,18 @@ function closeProject() {
     position: relative;
     @include flexCenterAll;
     padding: $size-7;
+    aspect-ratio: 1.46/1;
+    width: 105%;
 
     @include bp-sm-phone {
         padding: $size-4;
+        width: auto;
+        height: 16em;
+        aspect-ratio: 1.54/1;
+    }
+
+    @include bp-md-tablet {
+        height: 19em;
     }
 
     :deep(button) {
@@ -560,7 +588,10 @@ function closeProject() {
     position: relative;
     z-index: 0;
     border-radius: 10px;
-    width: 105%;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1.6/1;
+
     mask-image:
         linear-gradient(to bottom, transparent, black 10%, black 90%, transparent),
         linear-gradient(to right, transparent, black 10%, black 90%, transparent);
@@ -572,11 +603,6 @@ function closeProject() {
 
     @include bp-sm-phone {
         width: auto;
-        height: 16em;
-    }
-
-    @include bp-md-tablet {
-        height: 19em;
     }
 }
 
@@ -641,6 +667,22 @@ function closeProject() {
         svg {
             height: 1.1em;
             stroke: $color-text-secondary;
+        }
+
+        .short-date {
+            display: flex;
+
+            @include bp-md-tablet {
+                display: none;
+            }
+        }
+
+        .long-date {
+            display: none;
+
+            @include bp-md-tablet {
+                display: flex;
+            }
         }
     }
 }

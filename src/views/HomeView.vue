@@ -7,6 +7,8 @@ import { homeAnimations } from '@/animations/page/home.js';
 import Button from '@/components/Button.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
+import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
+import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -34,6 +36,14 @@ onMounted(() => {
 
 <template>
     <div class="home-container">
+        <div class="contact-links">
+            <a href="https://github.com/michaelgreenl" target="_blank">
+                <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+            </a>
+            <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
+                <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+            </a>
+        </div>
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
             <h1>Michael <span> Green </span></h1>
@@ -79,16 +89,11 @@ onMounted(() => {
     flex-grow: 1;
     gap: $size-17;
     width: 100%;
-    max-width: 400px;
     padding: 0 $size-4;
     margin: 0 auto;
     font-size: clamp(10px, 4vw, 16px);
     color: $color-text-primary;
     @include flexCenterAll;
-
-    @include bp-custom-min(612) {
-        max-width: 100vw;
-    }
 
     @include bp-custom-min(750) {
         padding: 0 $size-11;
@@ -181,6 +186,25 @@ p {
     display: flex;
     flex-direction: column;
     gap: $size-2;
+    max-width: 370px;
+
+    @include bp-custom-min(612) {
+        max-width: 100vw;
+    }
+}
+
+.contact-links {
+    position: absolute;
+    top: $size-3;
+    right: $size-2;
+    width: 100vw;
+    display: flex;
+    justify-content: flex-end;
+    font-size: 1.5em;
+
+    a :deep(button) .icon:hover {
+        fill: $color-primary;
+    }
 }
 
 .hero-line {

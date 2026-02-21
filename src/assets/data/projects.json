@@ -1,11 +1,68 @@
 [
     {
+        "title": "Tally",
+        "slug": "tally",
+        "stackText": [
+            "Vue",
+            "Typescript",
+            "Ionic",
+            "Node",
+            "Socket.IO",
+            "Prisma",
+            "Zod",
+            "Vitest",
+            "Cypress",
+            "Express",
+            "Postgres",
+            "Sass",
+            "GSAP"
+        ],
+        "stack": [
+            "vue",
+            "typescript",
+            "ionic",
+            "node",
+            "socket",
+            "prisma",
+            "zod",
+            "vitest",
+            "cypress",
+            "express",
+            "postgres",
+            "sass",
+            "gsap"
+        ],
+        "shortDate": "Jan. '25 - Present",
+        "longDate": "January 2025 - Present",
+        "description": {
+            "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
+            "long": [
+                "Architected an offline-first architecture with optimistic UI, durable command queue, background sync, and server-side idempotency to safely replay mutations after network failures/app restarts.",
+                "Designed access/refresh token auth with rotation and dual delivery (HttpOnly cookies for web, Bearer tokens for native) including automatic refresh/retry and concurrent refresh de-duplication in the API client.",
+                "Engineered a real-time collaboration layer for shared counters with server-authoritative participant resolution and client-side state reconciliation to keep multiple devices consistent during concurrent updates."
+            ]
+        },
+        "fontFamily": "ClashDisplay",
+        "img": "tally_blurred.webp",
+        "video": "1166819858",
+        "externalLinks": {
+            "github": { "href": "https://github.com/michaelgreenl/tally-tracker-client", "text": "Repository" },
+            "demoVideo": {
+                "href": "https://michaelgreenl.net/#projects?slug=tally&autoplay=true",
+                "text": "Demo Video"
+            },
+            "porfolioLink": {
+                "href": "https://michaelgreenl.net/#projects?slug=tally&autoplay=false"
+            }
+        }
+    },
+    {
         "title": "Reaction",
         "slug": "reaction",
         "stackText": ["Vue", "Pinia", "Sass", "GSAP", "Node", "Sequelize", "Express", "Postgres"],
         "stack": ["vue", "pinia", "sass", "gsap", "node", "sequelize", "express", "postgres"],
-        "date": "September 2025",
-        "dateRange": "September 2025 - December 2025",
+        "shortDate": "Sep. '25 - Dec. '25",
+        "longDate": "September 2025 - December 2025",
         "description": {
             "short": "A full-stack application engineered with a decoupled architecture, utilizing the Repository Pattern to securely manage authentication, game metrics, and user persistence.",
             "long": [
@@ -34,8 +91,8 @@
         "slug": "game-lobby",
         "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Sass"],
         "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "sass"],
-        "date": "June 2025",
-        "dateRange": "June 2025 - July 2025",
+        "shortDate": "June '25 - July '25",
+        "longDate": "June 2025 - July 2025",
         "description": {
             "short": "A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by JWTs and supported by Prisma for persistent match history.",
             "long": [
@@ -64,8 +121,8 @@
         "slug": "algo-visualizer",
         "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "date": "May 2022",
-        "dateRange": "May 2022 ~ July 2025",
+        "shortDate": "May '22 ~ July '25",
+        "longDate": "May 2022 ~ July 2025",
         "description": {
             "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
             "long": [

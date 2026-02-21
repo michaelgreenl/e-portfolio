@@ -6,6 +6,7 @@ export const homeAnimations = {
         gsap.set('.hero-content', { opacity: 0, x: -150 });
         gsap.set('.nav-link', { opacity: 0, x: 50 });
         gsap.set('.hero-line, .nav-links-line', { opacity: 0, scaleX: 0 });
+        gsap.set('.contact-link', { opacity: 0 });
 
         tl.to('.nav-link', {
             duration: TIMING.duration.normal,
@@ -31,6 +32,16 @@ export const homeAnimations = {
                     ease: TIMING.easing.bounce,
                     opacity: 1,
                     scaleX: 1,
+                },
+                0.2,
+            )
+            .to(
+                '.contact-link',
+                {
+                    duration: TIMING.duration.normal,
+                    ease: TIMING.easing.linear,
+                    opacity: 1,
+                    stagger: TIMING.stagger.normal,
                 },
                 0.2,
             );
@@ -60,6 +71,16 @@ export const homeAnimations = {
                     ease: TIMING.easing.smooth,
                     opacity: 0,
                     x: 50,
+                    stagger: TIMING.stagger.tight,
+                },
+                0,
+            )
+            .to(
+                '.contact-link',
+                {
+                    duration: TIMING.duration.normal,
+                    ease: TIMING.easing.linear,
+                    opacity: 0,
                     stagger: TIMING.stagger.tight,
                 },
                 0,
