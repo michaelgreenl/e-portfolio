@@ -590,6 +590,7 @@ function closeProject() {
     border-radius: 10px;
     width: 100%;
     height: 100%;
+    aspect-ratio: 1.6/1;
 
     mask-image:
         linear-gradient(to bottom, transparent, black 10%, black 90%, transparent),
