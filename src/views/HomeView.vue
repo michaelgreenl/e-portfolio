@@ -56,7 +56,7 @@ onMounted(() => {
 
             <div class="cta">
                 <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
-                <a href="/files/resume.pdf" download="Michael-Green-Resume.pdf">
+                <a href="/files/Michael-L-Green-Resume.pdf" download="Michael-L-Green-Resume.pdf">
                     <Button
                         text="Resume/CV"
                         :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
