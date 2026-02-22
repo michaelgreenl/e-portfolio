@@ -15,7 +15,7 @@ export const useRouteStore = defineStore('router', () => {
         home: {
             component: defineAsyncComponent(() => import('@/views/HomeView.vue')),
             name: 'Home',
-            meta: { title: 'E-portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
+            meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
             component: defineAsyncComponent(() => import('@/views/ProjectsView.vue')),
