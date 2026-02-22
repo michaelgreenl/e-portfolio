@@ -11,7 +11,7 @@ onMounted(() => {
 
 <template>
     <footer>
-        <p class="footer-text">© 2025 M.G.</p>
+        <p class="footer-text">© 2026 M.G.</p>
     </footer>
 </template>
 
