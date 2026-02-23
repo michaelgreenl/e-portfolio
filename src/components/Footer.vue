@@ -1,12 +1,25 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
+import { useRouteStore } from '@/stores/routeStore.js';
 
-const { fadeIn } = useUtilAnimations();
+const { fadeIn, fadeOut } = useUtilAnimations();
+const routeStore = useRouteStore();
 
 onMounted(() => {
     fadeIn({ selector: '.footer-text', opts: { delay: 0.3 } });
 });
+
+watch(
+    () => routeStore.isLeaving,
+    (newVal) => {
+        if (newVal) {
+            fadeOut({ selector: '.footer-text' });
+        } else {
+            fadeIn({ selector: '.footer-text', opts: { delay: 0.3 } });
+        }
+    },
+);
 </script>
 
 <template>
