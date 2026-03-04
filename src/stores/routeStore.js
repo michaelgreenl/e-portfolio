@@ -44,6 +44,18 @@ const routeFontDescriptors = {
     contact: ['400 1em "Inter"', '500 1em "ClashDisplay"', '600 1em "ClashDisplay"'],
 };
 
+const routeImages = {
+    home: null,
+    projects: [
+        'algo-visualizer_blurred.webp',
+        'game-lobby_blurred.webp',
+        'reaction_blurred.webp',
+        'tally_blurred.webp',
+    ],
+    resume: null,
+    contact: null,
+};
+
 const NEXT_ROUTE_ORDER = {
     home: ['projects', 'contact', 'resume'],
     projects: ['home', 'resume', 'contact'],
