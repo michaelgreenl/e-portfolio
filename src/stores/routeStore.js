@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, markRaw, computed, watch, defineAsyncComponent } from 'vue';
 import { LEAVE_DURATION } from '@/animations/constants/timing';
 
+import RouteLoading from '@/components/RouteLoading.vue';
 import HomeIcon from '@/components/SVGs/HomeIcon.vue';
 import HomeIconFill from '@/components/SVGs/HomeIconFill.vue';
 import ProjectsIcon from '@/components/SVGs/ProjectsIcon.vue';
@@ -20,40 +21,38 @@ const routeLoaders = {
 const asyncView = (base) =>
     markRaw(
         defineAsyncComponent({
-            loader: () => loadRouteModule(base),
+            loader: routeLoaders[`${base}`],
             loadingComponent: RouteLoading,
         }),
     );
 
-const routeFontDescriptors = {
-    home: ['400 1em "Inter"', '600 1em "ClashDisplay"'],
-    projects: [
-        '400 1em "Inter"',
-        '600 1em "ClashDisplay"',
-        '400 1em "BitCount"',
-        '400 1em "AudioWide"',
-        '400 1em "Futura"',
-    ],
-    resume: [
-        '400 1em "Inter"',
-        '600 1em "ClashDisplay"',
-        '400 1em "Spartan"',
-        '500 1em "Spartan"',
-        '600 1em "Spartan"',
-    ],
-    contact: ['400 1em "Inter"', '500 1em "ClashDisplay"', '600 1em "ClashDisplay"'],
-};
-
-const routeImages = {
-    home: null,
-    projects: [
-        'algo-visualizer_blurred.webp',
-        'game-lobby_blurred.webp',
-        'reaction_blurred.webp',
-        'tally_blurred.webp',
-    ],
-    resume: null,
-    contact: null,
+const routeAssets = {
+    home: { fonts: ['400 1em "Inter"', '600 1em "ClashDisplay"'] },
+    projects: {
+        fonts: [
+            '400 1em "Inter"',
+            '600 1em "ClashDisplay"',
+            '400 1em "BitCount"',
+            '400 1em "AudioWide"',
+            '400 1em "Futura"',
+        ],
+        images: [
+            'algo-visualizer_blurred.webp',
+            'game-lobby_blurred.webp',
+            'reaction_blurred.webp',
+            'tally_blurred.webp',
+        ],
+    },
+    resume: {
+        fonts: [
+            '400 1em "Inter"',
+            '600 1em "ClashDisplay"',
+            '400 1em "Spartan"',
+            '500 1em "Spartan"',
+            '600 1em "Spartan"',
+        ],
+    },
+    contact: { fonts: ['400 1em "Inter"', '500 1em "ClashDisplay"', '600 1em "ClashDisplay"'] },
 };
 
 const NEXT_ROUTE_ORDER = {
