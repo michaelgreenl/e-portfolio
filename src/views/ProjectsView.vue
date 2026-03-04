@@ -20,7 +20,6 @@ import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
 const routeStore = useRouteStore();
 const { headerReveal, headerDismiss } = useUtilAnimations();
-
 const { registerAnim } = useGsap();
 
 const anims = {
@@ -67,11 +66,11 @@ watch(
 );
 
 onMounted(() => {
-    headerReveal({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
+    const runHeaderReveal = headerReveal({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
+    runHeaderReveal();
 
     const query = routeStore.currentRoute.query;
     const projectToOpen = projectsData.find((p) => p.slug === query.slug);
-
     if (query && projectToOpen) {
         openProject(projectToOpen, query.autoplay === 'true');
     }

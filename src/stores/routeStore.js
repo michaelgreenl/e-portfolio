@@ -10,25 +10,66 @@ import ResumeIconFill from '@/components/SVGs/ResumeIconFill.vue';
 import ContactIcon from '@/components/SVGs/ContactIcon.vue';
 import ContactIconFill from '@/components/SVGs/ContactIconFill.vue';
 
+const routeLoaders = {
+    home: () => import('@/views/HomeView.vue'),
+    projects: () => import('@/views/ProjectsView.vue'),
+    resume: () => import('@/views/ResumeView.vue'),
+    contact: () => import('@/views/ContactView.vue'),
+};
+
+const asyncView = (base) =>
+    markRaw(
+        defineAsyncComponent({
+            loader: () => loadRouteModule(base),
+            loadingComponent: RouteLoading,
+        }),
+    );
+
+const routeFontDescriptors = {
+    home: ['400 1em "Inter"', '600 1em "ClashDisplay"'],
+    projects: [
+        '400 1em "Inter"',
+        '600 1em "ClashDisplay"',
+        '400 1em "BitCount"',
+        '400 1em "AudioWide"',
+        '400 1em "Futura"',
+    ],
+    resume: [
+        '400 1em "Inter"',
+        '600 1em "ClashDisplay"',
+        '400 1em "Spartan"',
+        '500 1em "Spartan"',
+        '600 1em "Spartan"',
+    ],
+    contact: ['400 1em "Inter"', '500 1em "ClashDisplay"', '600 1em "ClashDisplay"'],
+};
+
+const NEXT_ROUTE_ORDER = {
+    home: ['projects', 'contact', 'resume'],
+    projects: ['home', 'resume', 'contact'],
+    resume: ['home', 'projects', 'contact'],
+    contact: ['home', 'projects', 'resume'],
+};
+
 export const useRouteStore = defineStore('router', () => {
     const routes = {
         home: {
-            component: defineAsyncComponent(() => import('@/views/HomeView.vue')),
+            component: asyncView('home'),
             name: 'Home',
             meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
-            component: defineAsyncComponent(() => import('@/views/ProjectsView.vue')),
+            component: asyncView('projects'),
             name: 'Projects',
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         resume: {
-            component: defineAsyncComponent(() => import('@/views/ResumeView.vue')),
+            component: asyncView('resume'),
             name: 'Resume',
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
-            component: defineAsyncComponent(() => import('@/views/ContactView.vue')),
+            component: asyncView('contact'),
             name: 'Contact',
             meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
         },
@@ -37,7 +78,6 @@ export const useRouteStore = defineStore('router', () => {
     const activePath = ref(getInitialPath());
     const isLeaving = ref(false);
     const toPath = ref();
-    const leaveDuration = LEAVE_DURATION;
 
     function parsePath(fullPath) {
         const [pathString, queryString] = fullPath.split('?');
@@ -74,6 +114,8 @@ export const useRouteStore = defineStore('router', () => {
             meta: routes[base]?.meta,
         };
     });
+
+    const leaveDuration = LEAVE_DURATION;
 
     async function changeRoute(to) {
         isLeaving.value = true;
@@ -123,5 +165,5 @@ export const useRouteStore = defineStore('router', () => {
         window.location.hash = activePath.value;
     }
 
-    return { routes, activePath, currentRoute, toRoute, isLeaving, leaveDuration, toPath };
+    return { routes, activePath, currentRoute, toRoute, isLeaving, toPath };
 });

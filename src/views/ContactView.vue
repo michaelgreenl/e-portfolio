@@ -13,7 +13,6 @@ const TEMPLATE_ID = import.meta.env.VITE_TEMPLATE_ID;
 const PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY;
 
 const routeStore = useRouteStore();
-
 const { headerReveal, headerDismiss } = useUtilAnimations();
 
 const pageHeader = ref(null);
@@ -27,10 +26,11 @@ const isSubmitting = ref(false);
 const submitStatus = ref(''); // 'success', 'error', or ''
 
 onMounted(() => {
-    headerReveal({
+    const runHeaderReveal = headerReveal({
         headerEl: pageHeader.value,
         extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link'],
     });
+    runHeaderReveal();
 });
 
 watch(

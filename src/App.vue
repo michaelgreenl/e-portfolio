@@ -8,23 +8,15 @@ import BgSVG from '@/components/SVGs/BgSVG.vue';
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
-// Getting theme immediately to prevent flashing on inital loads
-let theme = localStorage.getItem('THEME');
-
-if (theme === null) {
-    localStorage.setItem('THEME', 'dark');
-    theme = 'dark';
-}
-
-themeStore.theme = theme;
-document.documentElement.setAttribute('data-theme', theme);
+themeStore.init();
 </script>
 
 <template>
     <BgSVG class="bg-svg" />
-
     <Navbar />
+
     <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
+
     <Footer />
 </template>
 
@@ -33,6 +25,10 @@ document.documentElement.setAttribute('data-theme', theme);
 
 * {
     box-sizing: border-box;
+}
+
+.theme-animating,
+.theme-animating * {
     transition:
         background-color 0.3s ease,
         color 0.3s ease,

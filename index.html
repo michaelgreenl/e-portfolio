@@ -11,6 +11,20 @@
 
         <title>M. Green | E-portfolio</title>
 
+        <script>
+            (function () {
+                const KEY = 'THEME';
+                let theme = localStorage.getItem(KEY);
+
+                if (theme !== 'dark' && theme !== 'light') {
+                    theme = 'dark';
+                    localStorage.setItem(KEY, theme);
+                }
+
+                document.documentElement.setAttribute('data-theme', theme);
+            })();
+        </script>
+
         <link rel="stylesheet" href="/fonts.css" />
         <link
             rel="preload"
@@ -19,13 +33,13 @@
             type="font/woff2"
             crossorigin="anonymous"
         />
-        <link
-            rel="preload"
-            href="/fonts/clashdisplay/ClashDisplay-Medium.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/clashdisplay/ClashDisplay-Medium.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
         <link
             rel="preload"
             href="/fonts/clashdisplay/ClashDisplay-Semibold.woff2"
@@ -40,48 +54,48 @@
             type="font/woff2"
             crossorigin="anonymous"
         />
-        <link
-            rel="preload"
-            href="/fonts/spartan/LeagueSpartan-Regular.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="/fonts/spartan/LeagueSpartan-Medium.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="/fonts/spartan/LeagueSpartan-SemiBold.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="/fonts/projects/BitCount-Regular.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="/fonts/projects/audiowide-normal-400.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="/fonts/projects/Futura-Regular.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/spartan/LeagueSpartan-Regular.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/spartan/LeagueSpartan-Medium.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/spartan/LeagueSpartan-SemiBold.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/projects/BitCount-Regular.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/projects/audiowide-normal-400.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
+        <!-- <link -->
+        <!--     rel="preload" -->
+        <!--     href="/fonts/projects/Futura-Regular.woff2" -->
+        <!--     as="font" -->
+        <!--     type="font/woff2" -->
+        <!--     crossorigin="anonymous" -->
+        <!-- /> -->
     </head>
     <body>
         <div id="app"></div>

@@ -8,43 +8,45 @@ export const homeAnimations = {
         gsap.set('.hero-line, .nav-links-line', { opacity: 0, scaleX: 0 });
         gsap.set('.contact-link', { opacity: 0 });
 
-        tl.to('.nav-link', {
-            duration: TIMING.duration.normal,
-            ease: TIMING.easing.organic,
-            opacity: 1,
-            x: 0,
-            stagger: TIMING.stagger.normal,
-        })
-            .to(
-                '.hero-content',
-                {
-                    duration: TIMING.duration.normal,
-                    ease: TIMING.easing.organic,
-                    opacity: 1,
-                    x: 0,
-                },
-                0.2,
-            )
-            .to(
-                '.hero-line, .nav-links-line',
-                {
-                    duration: TIMING.duration.slow,
-                    ease: TIMING.easing.bounce,
-                    opacity: 1,
-                    scaleX: 1,
-                },
-                0.2,
-            )
-            .to(
-                '.contact-link',
-                {
-                    duration: TIMING.duration.normal,
-                    ease: TIMING.easing.linear,
-                    opacity: 1,
-                    stagger: TIMING.stagger.normal,
-                },
-                0.2,
-            );
+        return function runEnterPage() {
+            tl.to('.nav-link', {
+                duration: TIMING.duration.normal,
+                ease: TIMING.easing.organic,
+                opacity: 1,
+                x: 0,
+                stagger: TIMING.stagger.normal,
+            })
+                .to(
+                    '.hero-content',
+                    {
+                        duration: TIMING.duration.normal,
+                        ease: TIMING.easing.organic,
+                        opacity: 1,
+                        x: 0,
+                    },
+                    0.2,
+                )
+                .to(
+                    '.hero-line, .nav-links-line',
+                    {
+                        duration: TIMING.duration.slow,
+                        ease: TIMING.easing.bounce,
+                        opacity: 1,
+                        scaleX: 1,
+                    },
+                    0.2,
+                )
+                .to(
+                    '.contact-link',
+                    {
+                        duration: TIMING.duration.normal,
+                        ease: TIMING.easing.linear,
+                        opacity: 1,
+                        stagger: TIMING.stagger.normal,
+                    },
+                    0.2,
+                );
+        };
     },
 
     exitPage: ({ tl }) => {

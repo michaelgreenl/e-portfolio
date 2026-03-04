@@ -22,9 +22,19 @@ export function useGsap(scope) {
                 ...userOptions,
             };
 
+            let returnedClosure;
             ctx.value.add(() => {
-                animationLogic(defaults);
+                returnedClosure = animationLogic(defaults);
             });
+
+            if (typeof returnedClosure === 'function') {
+                return (...args) => {
+                    ctx.value.add(() => {
+                        returnedClosure(...args);
+                    });
+                    return defaults.tl;
+                };
+            }
 
             return defaults.tl;
         };

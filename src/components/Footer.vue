@@ -1,21 +1,24 @@
 <script setup>
-import { onMounted, watch } from 'vue';
+import { watch } from 'vue';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 
 const { fadeIn, fadeOut } = useUtilAnimations();
 const routeStore = useRouteStore();
 
-onMounted(() => {
-    fadeIn({ selector: '.footer-text', opts: { delay: 0.3 } });
-});
-
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
             fadeOut({ selector: '.footer-text' });
-        } else {
+        }
+    },
+);
+
+watch(
+    () => routeStore.routeReady,
+    (newVal) => {
+        if (newVal) {
             fadeIn({ selector: '.footer-text', opts: { delay: 0.3 } });
         }
     },
@@ -47,5 +50,6 @@ footer {
 p {
     font-family: $primary-font-stack !important;
     color: $color-text-muted;
+    opacity: 0;
 }
 </style>

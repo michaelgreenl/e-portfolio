@@ -17,26 +17,44 @@ export function useUtilAnimations() {
         });
     };
 
-    const fadeIn = registerAnim(({ selector, opts, onComplete }) => {
+    const fadeIn = registerAnim(({ selector, opts, onComplete, returnClosure = false }) => {
         gsap.set(selector, { opacity: 0 });
-        gsap.to(selector, {
-            duration: TIMING.duration.fast,
-            ease: TIMING.easing.linear,
-            opacity: 1,
-            ...opts,
-            onComplete,
-        });
+
+        const runFadeIn = () => {
+            gsap.to(selector, {
+                duration: TIMING.duration.fast,
+                ease: TIMING.easing.linear,
+                opacity: 1,
+                ...opts,
+                onComplete,
+            });
+        };
+
+        if (returnClosure) {
+            return runFadeIn;
+        } else {
+            runFadeIn();
+        }
     });
 
-    const fadeOut = registerAnim(({ selector, opts, onComplete }) => {
+    const fadeOut = registerAnim(({ selector, opts, onComplete, returnClosure = false }) => {
         gsap.set(selector, { opacity: 1 });
-        gsap.to(selector, {
-            duration: TIMING.duration.fast,
-            ease: TIMING.easing.linear,
-            opacity: 0,
-            ...opts,
-            onComplete,
-        });
+
+        const runFadeOut = () => {
+            gsap.to(selector, {
+                duration: TIMING.duration.fast,
+                ease: TIMING.easing.linear,
+                opacity: 0,
+                ...opts,
+                onComplete,
+            });
+        };
+
+        if (returnClosure) {
+            return runFadeOut;
+        } else {
+            runFadeOut();
+        }
     });
 
     const headerReveal = registerAnim(({ tl, headerEl, extraTargets = [] }) => {
@@ -46,20 +64,22 @@ export function useUtilAnimations() {
         gsap.set([...children, ...extraTargets], { opacity: 0 });
         gsap.set(hr, { scaleX: 0 });
 
-        tl.to([...children, ...extraTargets], {
-            duration: TIMING.duration.normal,
-            ease: TIMING.easing.linear,
-            opacity: 1,
-            stagger: TIMING.stagger.tight,
-        }).to(
-            hr,
-            {
-                duration: TIMING.duration.moderate,
-                ease: TIMING.easing.bounce,
-                scaleX: 1,
-            },
-            0.3,
-        );
+        return function runHeaderReveal() {
+            tl.to([...children, ...extraTargets], {
+                duration: TIMING.duration.normal,
+                ease: TIMING.easing.linear,
+                opacity: 1,
+                stagger: TIMING.stagger.tight,
+            }).to(
+                hr,
+                {
+                    duration: TIMING.duration.moderate,
+                    ease: TIMING.easing.bounce,
+                    scaleX: 1,
+                },
+                0.3,
+            );
+        };
     });
 
     const headerDismiss = registerAnim(({ tl, headerEl, extraTargets = [] }) => {

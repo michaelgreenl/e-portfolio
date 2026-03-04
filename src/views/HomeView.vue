@@ -20,6 +20,11 @@ const anims = {
     exitPage: registerAnim(homeAnimations.exitPage),
 };
 
+onMounted(() => {
+    const runEnterPage = anims.enterPage();
+    runEnterPage();
+});
+
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
@@ -28,10 +33,6 @@ watch(
         }
     },
 );
-
-onMounted(() => {
-    anims.enterPage();
-});
 </script>
 
 <template>

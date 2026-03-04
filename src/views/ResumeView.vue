@@ -16,7 +16,12 @@ const themeStore = useThemeStore();
 const { fadeIn, fadeOut } = useUtilAnimations();
 
 onMounted(() => {
-    fadeIn({ selector: '.resume-container', opts: { duration: TIMING.duration.slow } });
+    const runFadeIn = fadeIn({
+        selector: '.resume-container',
+        opts: { duration: TIMING.duration.slow },
+        returnClosure: true,
+    });
+    runFadeIn();
 });
 
 watch(
