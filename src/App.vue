@@ -4,6 +4,7 @@ import { useThemeStore } from '@/stores/themeStore.js';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import BgSVG from '@/components/SVGs/BgSVG.vue';
+import RouteLoading from '@/components/RouteLoading.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -15,7 +16,12 @@ themeStore.init();
     <BgSVG class="bg-svg" />
     <Navbar />
 
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
+    <div v-if="routeStore.loadError" class="page load-error">
+        <p>{{ routeStore.loadError }}</p>
+        <button @click="routeStore.retryInitialLoad">Retry</button>
+    </div>
+    <RouteLoading v-else-if="routeStore.isLoading || !routeStore.currentRoute?.component" class="page" />
+    <component v-else :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
 
     <Footer />
 </template>
@@ -113,5 +119,36 @@ button {
 
 a {
     text-decoration: none;
+}
+
+.load-error {
+    min-height: clamp(280px, 76vh, 560px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    p {
+        font-family: $secondary-font-stack;
+        color: $color-text-secondary;
+        text-align: center;
+    }
+
+    button {
+        font-family: $primary-font-stack;
+        padding: 0.5em 1.5em;
+        font-size: 1em;
+        border: 1px solid $color-text-muted;
+        border-radius: 8px;
+        background: transparent;
+        color: $color-text-primary;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
 }
 </style>

@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref, markRaw, computed, watch, defineAsyncComponent } from 'vue';
+import { ref, reactive, markRaw, computed, watch } from 'vue';
 import { LEAVE_DURATION } from '@/animations/constants/timing';
 
-import RouteLoading from '@/components/RouteLoading.vue';
 import HomeIcon from '@/components/SVGs/HomeIcon.vue';
 import HomeIconFill from '@/components/SVGs/HomeIconFill.vue';
 import ProjectsIcon from '@/components/SVGs/ProjectsIcon.vue';
@@ -18,13 +17,10 @@ const routeLoaders = {
     contact: () => import('@/views/ContactView.vue'),
 };
 
-const asyncView = (base) =>
-    markRaw(
-        defineAsyncComponent({
-            loader: routeLoaders[`${base}`],
-            loadingComponent: RouteLoading,
-        }),
-    );
+const asyncView = async (base) => {
+    const mod = await routeLoaders[base]();
+    return markRaw(mod.default);
+};
 
 const routeAssets = {
     home: { fonts: ['400 1em "Inter"', '600 1em "ClashDisplay"'] },
@@ -63,32 +59,38 @@ const NEXT_ROUTE_ORDER = {
 };
 
 export const useRouteStore = defineStore('router', () => {
-    const routes = {
+    const routes = reactive({
         home: {
-            component: asyncView('home'),
+            component: null,
             name: 'Home',
             meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
-            component: asyncView('projects'),
+            component: null,
             name: 'Projects',
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         resume: {
-            component: asyncView('resume'),
+            component: null,
             name: 'Resume',
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
-            component: asyncView('contact'),
+            component: null,
             name: 'Contact',
             meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
         },
-    };
+    });
 
     const activePath = ref(getInitialPath());
     const isLeaving = ref(false);
     const toPath = ref();
+    const isLoading = ref(false);
+    const readyRoutes = ref(new Set());
+    const routeReady = ref(false);
+    const loadError = ref(null);
+    const pendingAssets = new Map();
+    let navId = 0;
 
     function parsePath(fullPath) {
         const [pathString, queryString] = fullPath.split('?');
@@ -128,17 +130,117 @@ export const useRouteStore = defineStore('router', () => {
 
     const leaveDuration = LEAVE_DURATION;
 
+    function loadRouteAssets(routeName) {
+        if (readyRoutes.value.has(routeName)) return Promise.resolve();
+        if (pendingAssets.has(routeName)) return pendingAssets.get(routeName);
+
+        const outerPromise = (async () => {
+            try {
+                const results = await Promise.all([
+                    asyncView(routeName),
+                    ...(routeAssets[routeName]?.fonts ?? []).map((descriptor) => document.fonts.load(descriptor)),
+                    ...(routeAssets[routeName]?.images ?? []).map((filename) => {
+                        const url = new URL(`../assets/images/${filename}`, import.meta.url).href;
+                        return new Promise((resolve) => {
+                            const img = new Image();
+                            img.onload = resolve;
+                            img.onerror = resolve;
+                            img.src = url;
+                        });
+                    }),
+                ]);
+
+                const component = results[0];
+                routes[routeName].component = component;
+                readyRoutes.value.add(routeName);
+            } catch (err) {
+                console.error(`Failed to load route assets for "${routeName}":`, err);
+                throw err;
+            } finally {
+                pendingAssets.delete(routeName);
+            }
+        })();
+
+        pendingAssets.set(routeName, outerPromise);
+        return outerPromise;
+    }
+
+    async function preloadNextRoutes(currentRouteName) {
+        const order = NEXT_ROUTE_ORDER[currentRouteName];
+        if (!order) return;
+
+        const remaining = order.filter((r) => !readyRoutes.value.has(r));
+
+        function waitForIdle() {
+            return new Promise((resolve) => {
+                if (typeof requestIdleCallback === 'function') {
+                    requestIdleCallback(resolve);
+                } else {
+                    setTimeout(resolve, 1);
+                }
+            });
+        }
+
+        for (const routeName of remaining) {
+            await waitForIdle();
+            await loadRouteAssets(routeName).catch(() => {});
+        }
+    }
+
     async function changeRoute(to) {
+        const currentNavId = ++navId;
+        const isStale = () => currentNavId !== navId;
+
         isLeaving.value = true;
         toPath.value = to;
+        routeReady.value = false;
 
-        await new Promise((resolve) => setTimeout(resolve, leaveDuration));
+        const { base } = parsePath(to);
+
+        const loadPromise = loadRouteAssets(base);
+        let assetsResolved = false;
+        loadPromise
+            .then(() => {
+                assetsResolved = true;
+            })
+            .catch(() => {});
+
+        await new Promise((res) => setTimeout(res, leaveDuration));
+
+        if (isStale()) return;
+
+        let spinnerTimer;
+        if (!assetsResolved) {
+            spinnerTimer = setTimeout(() => {
+                if (!isStale()) {
+                    isLoading.value = true;
+                }
+            }, 100);
+        }
+
+        try {
+            await loadPromise;
+        } catch (err) {
+            if (!isStale()) {
+                loadError.value = 'Failed to load. Please refresh or try again.';
+                clearTimeout(spinnerTimer);
+                isLoading.value = false;
+            }
+            return;
+        }
+
+        if (isStale()) return;
+
+        clearTimeout(spinnerTimer);
+        isLoading.value = false;
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-
         activePath.value = to;
         isLeaving.value = false;
+        routeReady.value = true;
         window.location.hash = to;
+
+        preloadNextRoutes(base);
     }
 
     function toRoute(to) {
@@ -176,5 +278,44 @@ export const useRouteStore = defineStore('router', () => {
         window.location.hash = activePath.value;
     }
 
-    return { routes, activePath, currentRoute, toRoute, isLeaving, toPath };
+    async function performInitialLoad() {
+        const { base } = parsePath(activePath.value);
+        const initialTimer = setTimeout(() => {
+            isLoading.value = true;
+        }, 100);
+
+        try {
+            await loadRouteAssets(base);
+            clearTimeout(initialTimer);
+            isLoading.value = false;
+            if (readyRoutes.value.has(base)) {
+                routeReady.value = true;
+            }
+            preloadNextRoutes(base);
+        } catch (err) {
+            clearTimeout(initialTimer);
+            isLoading.value = false;
+            loadError.value = 'Failed to load. Please refresh or try again.';
+        }
+    }
+
+    function retryInitialLoad() {
+        loadError.value = null;
+        performInitialLoad();
+    }
+
+    performInitialLoad();
+
+    return {
+        routes,
+        activePath,
+        currentRoute,
+        toRoute,
+        isLeaving,
+        toPath,
+        isLoading,
+        routeReady,
+        loadError,
+        retryInitialLoad,
+    };
 });
