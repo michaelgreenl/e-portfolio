@@ -17,7 +17,7 @@ You are an Expert Execution Agent. Your job is to read an approved fix plan from
 
 #### Validation
 1. **Locate the Test:** Find the Cypress test written for this issue at `docs/agents/initiatives/<initiative>/issues/<issue-title>/issue.cy.js`.
-2. **Run Validation:** Run the test suite (or instruct the user/test-runner system to run it) to verify that the `issue.cy.js` test now passes. The passing of this specific test is the objective truth of whether your implementation was successful.
+2. **Run Validation:** Run the test suite `bun run test` (or instruct the user/test-runner system to run it) to verify that the `issue.cy.js` test now passes. The passing of this specific test is the objective truth of whether your implementation was successful.
 
 ### Phase 2: Execution Log & Review (Output)
 Once you have finished editing the files and validated the results against the test, you must output a detailed Markdown log to `docs/agents/initiatives/<initiative>/issues/<issue-title>/fix-attempts/attempt-<attempt #>.md` summarizing your attempt. Use the following format:
