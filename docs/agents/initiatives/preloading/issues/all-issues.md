@@ -1,0 +1,13 @@
+# All Issues
+- [ ] the images are flashing in when entering on the project page
+    - given what I've seen in the network tab, the images are being loaded once before the projects page enters, but they're being loaded again right before the enter animation runs. The project images don't animate in with the page's enter animation, but instead jump in (not animate in) once the images that started loading right before the enter animation finally load.
+        - It seems that the images the project page ends up using are the images starting to load right before the project page's enter animation.
+        - The images are also being loaded every time the projects page is navigated to (instead of just once).
+        - The project page's enter doesn't seem to wait for the images to load before entering, at least not for the images that the DOM will be using.
+        - The basic sequence when navigating to / loading the projects page is 
+            - successfully load into base route (/home) 
+            - background loading loads the images 
+            - navigate to /projects
+            - images start to load again (seen via network tab)
+            - enter animation runs
+            - images flash in once they're loaded
