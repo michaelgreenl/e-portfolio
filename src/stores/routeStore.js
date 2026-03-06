@@ -90,6 +90,7 @@ export const useRouteStore = defineStore('router', () => {
     const routeReady = ref(false);
     const loadError = ref(null);
     const pendingAssets = new Map();
+    const preloadedImages = new Map();
     let navId = 0;
 
     function parsePath(fullPath) {
@@ -140,9 +141,11 @@ export const useRouteStore = defineStore('router', () => {
                     asyncView(routeName),
                     ...(routeAssets[routeName]?.fonts ?? []).map((descriptor) => document.fonts.load(descriptor)),
                     ...(routeAssets[routeName]?.images ?? []).map((filename) => {
+                        if (preloadedImages.has(filename)) return Promise.resolve();
                         const url = new URL(`../assets/images/${filename}`, import.meta.url).href;
                         return new Promise((resolve) => {
                             const img = new Image();
+                            preloadedImages.set(filename, img);
                             img.onload = resolve;
                             img.onerror = resolve;
                             img.src = url;
