@@ -32,8 +32,8 @@
             "sass",
             "gsap"
         ],
-        "shortDate": "Jan. '25 - Present",
-        "longDate": "January 2025 - Present",
+        "shortDate": "Jan. '26 - Present",
+        "longDate": "January 2026 - Present",
         "description": {
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
             "long": [
