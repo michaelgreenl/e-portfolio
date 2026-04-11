@@ -55,7 +55,7 @@ onMounted(() => {
             </p>
 
             <div class="cta">
-                <Button :onClick="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
+                <Button @click="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
                 <a href="/files/Michael-L-Green-Resume.pdf" download="Michael-L-Green-Resume.pdf">
                     <Button
                         text="Resume/CV"
@@ -72,7 +72,7 @@ onMounted(() => {
             <div v-for="(route, key) in routeStore.routes" :key="key" class="nav-link">
                 <Button
                     v-if="key !== 'home'"
-                    :onClick="() => routeStore.toRoute(key)"
+                    @click="() => routeStore.toRoute(key)"
                     :text="route.meta.title"
                     :iconLeft="route.meta.icon"
                     :iconLeftFill="route.meta.iconFill"

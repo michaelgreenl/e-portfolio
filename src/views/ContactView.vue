@@ -241,7 +241,7 @@ const clearStatus = () => {
                 class="contact-link"
                 preset="primary"
                 :text="isSubmitting ? 'Sending...' : 'Send'"
-                :onClick="handleSubmit"
+                @click="handleSubmit"
                 :styles="{
                     opacity: isSubmitting ? 0.7 : 1,
                     pointerEvents: isSubmitting ? 'none' : 'auto',

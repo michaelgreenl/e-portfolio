@@ -38,7 +38,7 @@ defineExpose({ el, overlay });
                     <p>{{ activeProject.longDate }}</p>
                 </div>
 
-                <Button :onClick="() => emit('close-project')" preset="secondary" :iconRight="CloseIcon" />
+                <Button @click="() => emit('close-project')" preset="secondary" :iconRight="CloseIcon" />
             </div>
 
             <div class="selected-body">

@@ -3,9 +3,6 @@ const props = defineProps({
     preset: {
         type: String, // primary, primary-accent, secondary
     },
-    onClick: {
-        type: Function,
-    },
     text: {
         type: String,
     },
@@ -19,20 +16,10 @@ const props = defineProps({
         type: Object,
     },
 });
-
-const emit = defineEmits(['click']);
-
-function handleClick(evt) {
-    emit('click', evt);
-
-    if (typeof onClick === 'function') {
-        props.onClick(evt);
-    }
-}
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }" @click="handleClick">
+    <button :class="preset" :style="{ ...styles }">
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}
