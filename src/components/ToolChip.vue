@@ -39,14 +39,14 @@ const tools = {
     langgraph: {
         text: 'LangGraph',
         icon: markRaw(LangGraphIcon),
-        lightColor: '#7FC8FF',
+        lightColor: '#003b57',
         darkColor: '#7FC8FF',
         maxWidth: '9em',
     },
     bun: {
         text: 'Bun',
         icon: markRaw(BunIcon),
-        lightColor: '#f3d09b',
+        lightColor: '#444444',
         darkColor: '#fbf0df',
         maxWidth: '6em',
     },
@@ -89,7 +89,7 @@ const tools = {
     zod: {
         text: 'Zod',
         icon: markRaw(ZodIcon),
-        lightColor: '#45a9ff',
+        lightColor: '#003b57',
         darkColor: '#45a9ff',
         maxWidth: '6.5em',
     },
