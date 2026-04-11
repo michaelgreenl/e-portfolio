@@ -2,13 +2,13 @@ import { defineStore } from 'pinia';
 import { ref, markRaw, computed, watch, defineAsyncComponent } from 'vue';
 import { LEAVE_DURATION } from '@/animations/constants/timing';
 
-import HomeIcon from '@/components/SVGs/HomeIcon.vue';
-import HomeIconFill from '@/components/SVGs/HomeIconFill.vue';
-import ProjectsIcon from '@/components/SVGs/ProjectsIcon.vue';
-import ResumeIcon from '@/components/SVGs/ResumeIcon.vue';
-import ResumeIconFill from '@/components/SVGs/ResumeIconFill.vue';
-import ContactIcon from '@/components/SVGs/ContactIcon.vue';
-import ContactIconFill from '@/components/SVGs/ContactIconFill.vue';
+import HomeIcon from '@/components/SVGs/Views/HomeIcon.vue';
+import HomeIconFill from '@/components/SVGs/Views/HomeIconFill.vue';
+import ProjectsIcon from '@/components/SVGs/Views/ProjectsIcon.vue';
+import ResumeIcon from '@/components/SVGs/Views/ResumeIcon.vue';
+import ResumeIconFill from '@/components/SVGs/Views/ResumeIconFill.vue';
+import ContactIcon from '@/components/SVGs/Views/ContactIcon.vue';
+import ContactIconFill from '@/components/SVGs/Views/ContactIconFill.vue';
 
 export const useRouteStore = defineStore('router', () => {
     const routes = {
