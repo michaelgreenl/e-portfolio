@@ -15,7 +15,7 @@ const props = defineProps({
 const emit = defineEmits(['open-project']);
 
 const getURL = (img) => {
-    return new URL(`../assets/images/${img}`, import.meta.url).href;
+    return new URL(`../../assets/images/${img}`, import.meta.url).href;
 };
 </script>
 
@@ -28,7 +28,7 @@ const getURL = (img) => {
         @keydown.enter="emit('open-project', project)"
         @keydown.space.prevent="emit('open-project', project)"
     >
-        <div class="card-img-container">
+        <div v-if="project.video" class="card-img-container">
             <Button @click.stop="() => emit('open-project', project, true)" :iconRight="PlayIcon" />
             <img
                 :src="getURL(project.img)"
@@ -328,7 +328,7 @@ p {
 }
 
 .card-description {
-    max-width: 66ch;
+    max-width: 59ch;
     font-size: 1.35em;
 
     @include bp-xsm-phone {
