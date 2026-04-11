@@ -142,7 +142,7 @@ function closeProject() {
                 :project="project"
                 :project-logos="projectLogos"
                 :external-icons="externalIcons"
-                @open-project="openProject(project)"
+                @open-project="openProject"
             />
             <!-- @click="openProject(project)" -->
             <!-- @keydown.enter="openProject(project)" -->
