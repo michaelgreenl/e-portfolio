@@ -85,6 +85,10 @@ defineExpose({ el, overlay });
 </template>
 
 <style lang="scss" scoped>
+p {
+    margin: 0;
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -252,6 +256,14 @@ defineExpose({ el, overlay });
         margin: 0 !important;
         font-size: 2em;
 
+        @include theme-dark {
+            color: $color-gray3;
+        }
+
+        @include theme-light {
+            color: $color-primary-darker;
+        }
+
         @include bp-custom-min(450) {
             font-size: 2.2em;
         }
@@ -295,5 +307,69 @@ defineExpose({ el, overlay });
     font-size: 1.5em;
     color: $color-text-secondary;
     border-top: solid 1px $color-text-muted;
+}
+
+.external-links {
+    &-selected {
+        display: flex;
+        gap: $size-4;
+        margin-left: auto;
+        font-size: 1.1em;
+
+        a:nth-child(2) {
+            &:deep(button) svg {
+                stroke-width: 0 !important;
+
+                @include theme-dark {
+                    fill: lighten-color($color-text-muted, 15%) !important;
+                }
+
+                @include theme-light {
+                    fill: darken-color($color-text-muted, 15%) !important;
+                }
+            }
+        }
+    }
+
+    a {
+        &:deep(button) {
+            @include bp-md-tablet {
+                gap: $size-2;
+            }
+
+            span {
+                display: none;
+
+                @include bp-md-tablet {
+                    display: block !important;
+                }
+            }
+
+            svg {
+                height: $size-6;
+                fill: rgb(0 0 0 / 0%) !important;
+                stroke-width: 2;
+                transition: fill 0.3s ease-in-out;
+
+                @include theme-dark {
+                    stroke: lighten-color($color-text-muted, 15%);
+                }
+
+                @include theme-light {
+                    stroke: darken-color($color-text-muted, 15%);
+                }
+            }
+        }
+
+        &:hover :deep(button) svg {
+            @include theme-dark {
+                fill: lighten-color($color-text-muted, 15%) !important;
+            }
+
+            @include theme-light {
+                fill: darken-color($color-text-muted, 15%) !important;
+            }
+        }
+    }
 }
 </style>

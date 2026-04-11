@@ -89,6 +89,10 @@ const getURL = (img) => {
 </template>
 
 <style lang="scss" scoped>
+p {
+    margin: 0;
+}
+
 .project-card {
     display: flex;
     flex-direction: column;
@@ -264,6 +268,14 @@ const getURL = (img) => {
         margin: 0 !important;
         font-size: 2.1em;
 
+        @include theme-dark {
+            color: $color-gray3;
+        }
+
+        @include theme-light {
+            color: $color-primary-darker;
+        }
+
         @include bp-xsm-phone {
             font-size: 2.5em !important;
         }
@@ -368,6 +380,69 @@ const getURL = (img) => {
 
     @include bp-lg-laptop {
         font-size: 1.1em;
+    }
+}
+
+.external-links {
+    &-card {
+        display: flex;
+        gap: $size-4;
+        font-size: 1.1em;
+
+        a:nth-child(3) {
+            &:deep(button) svg {
+                stroke-width: 0 !important;
+
+                @include theme-dark {
+                    fill: lighten-color($color-text-muted, 15%) !important;
+                }
+
+                @include theme-light {
+                    fill: darken-color($color-text-muted, 15%) !important;
+                }
+            }
+        }
+    }
+
+    a {
+        &:deep(button) {
+            @include bp-md-tablet {
+                gap: $size-2;
+            }
+
+            span {
+                display: none;
+
+                @include bp-md-tablet {
+                    display: block !important;
+                }
+            }
+
+            svg {
+                height: $size-6;
+                fill: rgb(0 0 0 / 0%) !important;
+                stroke-width: 2;
+                transition: fill 0.3s ease-in-out;
+
+                @include theme-dark {
+                    stroke: lighten-color($color-text-muted, 15%);
+                }
+
+                @include theme-light {
+                    stroke: darken-color($color-text-muted, 15%);
+                }
+            }
+        }
+
+        &:hover :deep(button) svg {
+            @include theme-dark {
+                fill: lighten-color($color-text-muted, 15%) !important;
+            }
+
+            @include theme-light {
+                fill: darken-color($color-text-muted, 15%) !important;
+            }
+        }
     }
 }
 </style>
