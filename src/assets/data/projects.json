@@ -1,5 +1,31 @@
 [
     {
+        "title": "Gmail Filter",
+        "slug": "email-filter",
+        "stackText": ["TypeScript", "LangGraph", "Bun", "Docker", "SQLite"],
+        "stack": ["typescript", "langgraph", "bun", "docker", "sqlite"],
+        "shortDate": "April 2026",
+        "longDate": "April 2026",
+        "description": {
+            "short": "An autonomous AI email triage agent built with LangGraph and OpenAI that classifies and acts on unread Gmail, with a correction-based in-context learning loop and dual control interfaces (HTTP + Telegram bot).",
+            "long": [
+                "Built a confidence-gated safety layer that redirects low-confidence trash decisions to a quarantine label instead of deletion, preventing irreversible data loss from uncertain model outputs.",
+                "Built a feedback loop that persists user corrections to SQLite and injects them into the system prompt as examples on each run, allowing the agent to adapt to preferences without fine-tuning.",
+                "Exposed two independent control surfaces — an HTTP server and a Telegram bot — both routing through the same core pipeline function, so adding new interfaces never requires duplicating agent logic."
+            ]
+        },
+        "fontFamily": "ClashDisplay",
+        "externalLinks": {
+            "github": {
+                "href": "https://github.com/michaelgreenl/email-filter",
+                "text": "Repository"
+            },
+            "porfolioLink": {
+                "href": "https://michaelgreenl.net/#projects?slug=email-filter&autoplay=false"
+            }
+        }
+    },
+    {
         "title": "Tally",
         "slug": "tally",
         "stackText": [
@@ -46,7 +72,10 @@
         "img": "tally_blurred.webp",
         "video": "1166819858",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/tally-tracker", "text": "Repository" },
+            "github": {
+                "href": "https://github.com/michaelgreenl/tally-tracker",
+                "text": "Repository"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/#projects?slug=tally&autoplay=true",
                 "text": "Demo Video"
@@ -75,7 +104,10 @@
         "img": "reaction_blurred.webp",
         "video": "1149531486",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Repository" },
+            "github": {
+                "href": "https://github.com/michaelgreenl/reaction-client",
+                "text": "Repository"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/#projects?slug=reaction&autoplay=true",
                 "text": "Demo Video"
@@ -105,7 +137,10 @@
         "img": "game-lobby_blurred.webp",
         "video": "1119895851",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Repository" },
+            "github": {
+                "href": "https://github.com/michaelgreenl/game-lobby",
+                "text": "Repository"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=true",
                 "text": "Demo Video"
@@ -136,7 +171,7 @@
         "video": "1149531735",
         "externalLinks": {
             "github": {
-                "href": "https://github.com/michaelgreenl/AlgoVisualizer",
+                "href": "https://github.com/michaelgreenl/algovisualizer",
                 "text": "Repository"
             },
             "demoVideo": {

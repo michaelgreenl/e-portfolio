@@ -4,7 +4,7 @@
             "title": "Central Michigan University",
             "location": "Mount Pleasant MI",
             "dates": "Graduation: August 2023",
-            "major": "Bachelor's of Science in Computer Science",
+            "major": "Bachelor of Science in Computer Science",
             "minor": "Minor in Mathematics"
         },
         "springboard": {
@@ -24,10 +24,10 @@
             "location": "Troy MI",
             "dates": "January 2022 - August 2022",
             "info": [
-                "Served as the primary frontend developer for multiple client projects, rigorously translating UI/UX mockups into fully functional, pixel-perfect Vue.js interfaces.",
-                "Independently executed the frontend logic for smaller-scale applications, delivering interactive and bug-free components ready for integration.",
-                "Collaborated with backend teams to consume RESTful APIs, ensuring accurate data rendering and seamless user interactions.",
-                "Implemented complex UI animations and micro-interactions for convention applications, directly translating client requests into working code."
+                "Built interactive expo activations for Fortune 500 clients including Salesforce, Waymo, and Essilor Luxottica (Oakley and Vogue)",
+                "Built the Oakley expo activation that Essilor Luxottica named their favorite of 4 experiences at the event — delivered as the first client assignment of the internship.",
+                "Independently took 4 live experiential activations from UI mockup to deployed production within 2–6 weeks each.",
+                "Built a full-featured analytics dashboard UI for an internal expo reporting tool — including data display and CSV export — that remained in active company use following the internship."
             ]
         }
     },
@@ -39,7 +39,6 @@
         "frameworks": {
             "category": "Frameworks & Libraries",
             "list": [
-                "Node",
                 "Vue",
                 "Nuxt",
                 "Ionic",
@@ -48,17 +47,30 @@
                 "Express",
                 "Socket.IO",
                 "GSAP",
+                "LangChain/LangGraph",
                 "Cypress",
                 "Vitest"
             ]
         },
         "tools": {
             "category": "Tools & Databases",
-            "list": ["Git", "Bash", "REST APIs", "JWT", "PostgreSQL", "MySQL", "Prisma", "Sequelize", "Zod"]
+            "list": [
+                "Git",
+                "Bash",
+                "REST APIs",
+                "JWT",
+                "OAuth",
+                "PostgreSQL",
+                "MySQL",
+                "SQLite",
+                "Prisma",
+                "Sequelize",
+                "Zod"
+            ]
         },
         "infrastructure": {
             "category": "Infrastructure",
-            "list": ["Docker", "Render", "Github Pages", "Github Actions", "Vercel"]
+            "list": ["Node", "Bun", "Docker", "Render", "Vercel", "GitHub Pages", "GitHub Actions"]
         }
     }
 }
