@@ -119,7 +119,7 @@ watch(
                             </span>
 
                             <span>
-                                <a class="external-link" :href="project.externalLinks.demoVideo.href"> Demo Video</a>
+                                <a class="external-link" :href="project.externalLinks.demoVideo?.href"> Demo Video</a>
                                 |
                             </span>
 
