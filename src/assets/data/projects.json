@@ -1,20 +1,20 @@
 [
     {
-        "title": "Gmail Filter",
+        "title": "Gmail Agent",
         "slug": "email-filter",
         "stackText": ["TypeScript", "LangGraph", "Bun", "Docker", "SQLite"],
         "stack": ["typescript", "langgraph", "bun", "docker", "sqlite"],
         "shortDate": "April 2026",
         "longDate": "April 2026",
         "description": {
-            "short": "An autonomous AI email triage agent built with LangGraph and OpenAI that classifies and acts on unread Gmail, with a correction-based in-context learning loop and dual control interfaces (HTTP + Telegram bot).",
+            "short": "Autonomous AI email triage agent using LangGraph and OpenAI to classify and handle unread Gmail, with correction-driven learning and HTTP + Telegram controls",
             "long": [
                 "Built a confidence-gated safety layer that redirects low-confidence trash decisions to a quarantine label instead of deletion, preventing irreversible data loss from uncertain model outputs.",
                 "Built a feedback loop that persists user corrections to SQLite and injects them into the system prompt as examples on each run, allowing the agent to adapt to preferences without fine-tuning.",
                 "Exposed two independent control surfaces — an HTTP server and a Telegram bot — both routing through the same core pipeline function, so adding new interfaces never requires duplicating agent logic."
             ]
         },
-        "fontFamily": "ClashDisplay",
+        "fontFamily": "Futura",
         "externalLinks": {
             "github": {
                 "href": "https://github.com/michaelgreenl/email-filter",
