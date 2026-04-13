@@ -42,7 +42,7 @@ defineExpose({ el, overlay });
             </div>
 
             <div class="selected-body">
-                <div class="selected-img-container" v-if="activeProject.video">
+                <div v-if="activeProject.video" class="selected-img-container">
                     <iframe
                         :src="`https://player.vimeo.com/video/${activeProject.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
                         frameborder="0"
