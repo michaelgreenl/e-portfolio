@@ -58,7 +58,7 @@ export function useUtilAnimations() {
                 ease: TIMING.easing.bounce,
                 scaleX: 1,
             },
-            0.3,
+            0.1,
         );
     });
 
