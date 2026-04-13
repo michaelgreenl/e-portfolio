@@ -15,11 +15,8 @@ import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
 import GmailFilterLogo from '@/components/SVGs/ProjectLogos/GmailFilterLogo.vue';
 
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
-// import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
-// import PlayIcon from '@/components/SVGs/PlayIcon.vue';
-// import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
 const routeStore = useRouteStore();
 const { headerReveal, headerDismiss } = useUtilAnimations();
@@ -115,23 +112,13 @@ function closeProject() {
             :external-icons="externalIcons"
             @close-project="closeProject()"
         />
-        <!-- <div -->
-        <!--     v-if="activeProject" -->
-        <!--     ref="selectedProject" -->
-        <!--     class="selected-container" -->
-        <!--     tabindex="0" -->
-        <!--     role="dialog" -->
-        <!--     aria-modal="true" -->
-        <!--     :aria-label="activeProject.title" -->
-        <!--     @keydown.esc="closeProject()" -->
-        <!-- ></div> -->
 
         <div ref="pageHeader" class="page-header">
             <h1>Projects</h1>
             <hr />
             <p>
-                Here are a few projects I've built recently, spanning cross-platform mobile development, real-time
-                full-stack systems, and complex frontend visualizations.
+                Recent projects spanning cross-platform mobile development, real-time full-stack systems, agentic
+                applications, and advanced frontend visualizations.
             </p>
         </div>
 
@@ -144,20 +131,6 @@ function closeProject() {
                 :external-icons="externalIcons"
                 @open-project="openProject"
             />
-            <!-- @click="openProject(project)" -->
-            <!-- @keydown.enter="openProject(project)" -->
-            <!-- @keydown.space.prevent="openProject(project)" -->
-
-            <!-- <div -->
-            <!--     v-for="project in projectsData" -->
-            <!--     :key="project.title" -->
-            <!--     class="project-card" -->
-            <!--     role="button" -->
-            <!--     tabindex="0" -->
-            <!--     @click="openProject(project)" -->
-            <!--     @keydown.enter="openProject(project)" -->
-            <!--     @keydown.space.prevent="openProject(project)" -->
-            <!-- ></div> -->
         </div>
     </div>
 </template>
@@ -251,13 +224,12 @@ function closeProject() {
     }
 
     p {
-        max-width: 42ch;
+        max-width: 48ch;
         font-size: 1.7em;
         color: $color-text-secondary;
         text-align: center;
 
         @include bp-sm-phone {
-            max-width: 48ch;
             font-size: 1.8em;
         }
     }
@@ -271,7 +243,7 @@ function closeProject() {
     padding: $size-5;
 
     @include bp-xsm-phone {
-        max-width: 53em;
+        max-width: 58em;
     }
 
     @include bp-sm-phone {
@@ -279,7 +251,7 @@ function closeProject() {
     }
 
     @include bp-lg-laptop {
-        max-width: 126em;
+        max-width: 96em;
     }
 }
 </style>

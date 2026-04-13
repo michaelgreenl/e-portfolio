@@ -28,28 +28,23 @@ const getURL = (img) => {
         @keydown.enter="emit('open-project', project)"
         @keydown.space.prevent="emit('open-project', project)"
     >
-        <div v-if="project.video" class="card-img-container">
-            <Button @click.stop="() => emit('open-project', project, true)" :iconRight="PlayIcon" />
-            <img
-                :src="getURL(project.img)"
-                :alt="'Screenshot of ' + project.title"
-                loading="eager"
-                class="project-img"
-            />
-        </div>
-
         <div class="card-body">
             <div class="card-header">
-                <component :is="projectLogos[project.slug]" class="project-logo" />
-                <h2 :style="{ fontFamily: project.fontFamily }">
-                    {{ project.title }}
-                </h2>
+                <div class="card-title">
+                    <component :is="projectLogos[project.slug]" class="project-logo" />
+
+                    <h2 :style="{ fontFamily: project.fontFamily }">
+                        {{ project.title }}
+                    </h2>
+                </div>
+
                 <div class="card-date">
                     <CalendarIcon />
                     <p class="short-date">{{ project.shortDate }}</p>
                     <p class="long-date">{{ project.longDate }}</p>
                 </div>
             </div>
+
             <p class="card-description">{{ project.description.short }}</p>
 
             <div class="card-tool-chips">
@@ -60,6 +55,7 @@ const getURL = (img) => {
                 <div class="external-links external-links-card">
                     <a
                         v-for="(link, key) in project.externalLinks"
+                        :class="`${Object.keys(project.externalLinks).length < 3 ? undefined : 'responsive-link-text'}`"
                         :key="link"
                         :href="key === 'demoVideo' ? null : link.href"
                         target="_blank"
@@ -98,14 +94,8 @@ p {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: $size-8;
+    padding: $size-6 $size-8;
     cursor: pointer;
-
-    &:last-child {
-        .card-body .card-header {
-            gap: $size-1;
-        }
-    }
 
     @include theme-dark {
         &:first-child {
@@ -166,7 +156,6 @@ p {
     @include bp-sm-phone {
         flex-direction: row;
         gap: $size-6;
-        padding: $size-4 $size-8;
     }
 }
 
@@ -247,45 +236,52 @@ p {
 
 .card-header {
     display: flex;
-    gap: $size-3;
+    gap: $size-2;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap-reverse;
 
-    .project-logo {
+    .card-title {
         display: flex;
         align-items: center;
-        height: 2.8em;
+        gap: 0.6em;
+        font-size: 1.4em;
+        margin-right: $size-4;
 
-        @include theme-dark {
-            fill: $color-gray3;
+        .project-logo {
+            display: flex;
+            align-items: center;
+            height: 2.6em;
+
+            @include theme-dark {
+                fill: $color-gray3;
+            }
+
+            @include theme-light {
+                fill: $color-primary-darker;
+            }
         }
 
-        @include theme-light {
-            fill: $color-primary-darker;
+        h2 {
+            margin: 0 !important;
+            font-size: 2.2em;
+
+            @include theme-dark {
+                color: $color-gray3;
+            }
+
+            @include theme-light {
+                color: $color-primary-darker;
+            }
+
+            @include bp-xsm-phone {
+                font-size: 2.4em !important;
+            }
         }
     }
 
-    h2 {
-        margin: 0 !important;
-        font-size: 2.1em;
-
-        @include theme-dark {
-            color: $color-gray3;
-        }
-
-        @include theme-light {
-            color: $color-primary-darker;
-        }
-
-        @include bp-xsm-phone {
-            font-size: 2.5em !important;
-        }
-
-        @include bp-md-tablet {
-            font-size: 2.9em !important;
-        }
-    }
-
-    div {
+    .card-header,
+    .card-date {
         display: flex;
         gap: $size-2;
         align-items: center;
@@ -294,14 +290,6 @@ p {
 
         @include bp-sm-phone {
             margin-bottom: 1em;
-        }
-
-        @include bp-md-tablet {
-            margin-bottom: 1.5em;
-        }
-
-        @include bp-lg-laptop {
-            margin-bottom: 2em;
         }
 
         svg {
@@ -328,19 +316,19 @@ p {
 }
 
 .card-description {
-    max-width: 59ch;
-    font-size: 1.35em;
+    max-width: 86ch;
+    font-size: 1.4em;
 
     @include bp-xsm-phone {
-        font-size: 1.6em;
+        font-size: 1.5em !important;
     }
 
     @include bp-sm-phone {
-        font-size: 1.45em !important;
+        font-size: 1.6em !important;
     }
 
     @include bp-md-tablet {
-        font-size: 1.6em !important;
+        font-size: 1.7em !important;
     }
 }
 
@@ -355,8 +343,12 @@ p {
     overflow: hidden;
     font-size: 1.1em;
 
-    @include bp-md-tablet {
+    @include bp-xsm-phone {
         font-size: 1.2em;
+    }
+
+    @include bp-sm-phone {
+        font-size: 1.3em;
     }
 
     .chip {
@@ -371,6 +363,10 @@ p {
     justify-content: space-between;
     margin-top: $size-4;
     font-size: 1.3em;
+
+    @include bp-sm-phone {
+        font-size: 1.4em;
+    }
 }
 
 .see-more {
@@ -405,17 +401,19 @@ p {
     }
 
     a {
+        &.responsive-link-text {
+            &:deep(button) span {
+                display: none;
+
+                @include bp-custom-min(480) {
+                    display: block !important;
+                }
+            }
+        }
+
         &:deep(button) {
             @include bp-md-tablet {
                 gap: $size-2;
-            }
-
-            span {
-                display: none;
-
-                @include bp-md-tablet {
-                    display: block !important;
-                }
             }
 
             svg {
