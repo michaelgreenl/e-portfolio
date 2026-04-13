@@ -1,104 +1,31 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 682.667 682.667" role="img">
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 -31.5 256 256"
+        preserveAspectRatio="xMidYMid"
+    >
         <g>
-            <defs>
-                <clipPath id="a" clipPathUnits="userSpaceOnUse">
-                    <path
-                        d="M0 512h512V0H0Z"
-                        fill="#000000"
-                        opacity="1"
-                        data-original="#000000"
-                        data-darkreader-inline-fill=""
-                        style="--darkreader-inline-fill: var(--darkreader-text-000000, #a2a19f)"
-                    ></path>
-                </clipPath>
-            </defs>
-            <g clip-path="url(#a)" transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
-                <path
-                    d="M0 0h-20c-22.091 0-40 17.909-40 40v192c0 22.091 17.909 40 40 40h392c22.091 0 40-17.909 40-40V40c0-22.091-17.909-40-40-40h-20"
-                    style="
-                        stroke-width: 40;
-                        stroke-linecap: butt;
-                        stroke-linejoin: miter;
-                        stroke-miterlimit: 10;
-                        stroke-dasharray: none;
-                        stroke-opacity: 1;
-                        --darkreader-inline-stroke: var(--darkreader-text-000000, #a2a19f);
-                    "
-                    transform="translate(80 220.036)"
-                    fill="none"
-                    stroke="#000000"
-                    stroke-width="40"
-                    stroke-linecap="butt"
-                    stroke-linejoin="miter"
-                    stroke-miterlimit="10"
-                    stroke-dasharray="none"
-                    stroke-opacity=""
-                    data-original="#000000"
-                    data-darkreader-inline-stroke=""
-                    class=""
-                ></path>
-                <path
-                    d="m0 0 177.447-120.965c26.872-17.914 61.88-17.914 88.752 0L443.646 0"
-                    style="
-                        stroke-width: 40;
-                        stroke-linecap: butt;
-                        stroke-linejoin: miter;
-                        stroke-miterlimit: 10;
-                        stroke-dasharray: none;
-                        stroke-opacity: 1;
-                        --darkreader-inline-stroke: var(--darkreader-text-000000, #a2a19f);
-                    "
-                    transform="translate(34.177 482.584)"
-                    fill="none"
-                    stroke="#000000"
-                    stroke-width="40"
-                    stroke-linecap="butt"
-                    stroke-linejoin="miter"
-                    stroke-miterlimit="10"
-                    stroke-dasharray="none"
-                    stroke-opacity=""
-                    data-original="#000000"
-                    data-darkreader-inline-stroke=""
-                    class=""
-                ></path>
-                <path
-                    d="M0 0v-80l-80-45.736V0l-80 100H80Z"
-                    style="
-                        stroke-width: 40;
-                        stroke-linecap: square;
-                        stroke-linejoin: miter;
-                        stroke-miterlimit: 10;
-                        stroke-dasharray: none;
-                        stroke-opacity: 1;
-                        --darkreader-inline-stroke: var(--darkreader-text-000000, #a2a19f);
-                    "
-                    transform="translate(296 160.036)"
-                    fill="none"
-                    stroke="#000000"
-                    stroke-width="40"
-                    stroke-linecap="square"
-                    stroke-linejoin="miter"
-                    stroke-miterlimit="10"
-                    stroke-dasharray="none"
-                    stroke-opacity=""
-                    data-original="#000000"
-                    data-darkreader-inline-stroke=""
-                    class=""
-                ></path>
-            </g>
+            <path
+                d="M58.1818182,192.049515 L58.1818182,93.1404244 L27.5066233,65.0770089 L0,49.5040608 L0,174.59497 C0,184.253152 7.82545455,192.049515 17.4545455,192.049515 L58.1818182,192.049515 Z"
+                fill="#4285F4"
+            ></path>
+            <path
+                d="M197.818182,192.049515 L238.545455,192.049515 C248.203636,192.049515 256,184.224061 256,174.59497 L256,49.5040608 L224.844415,67.3422767 L197.818182,93.1404244 L197.818182,192.049515 Z"
+                fill="#34A853"
+            ></path>
+            <polygon
+                fill="#EA4335"
+                points="58.1818182 93.1404244 54.0077618 54.4932827 58.1818182 17.5040608 128 69.8676972 197.818182 17.5040608 202.487488 52.4960089 197.818182 93.1404244 128 145.504061"
+            ></polygon>
+            <path
+                d="M197.818182,17.5040608 L197.818182,93.1404244 L256,49.5040608 L256,26.2313335 C256,4.64587897 231.36,-7.65957557 214.109091,5.28587897 L197.818182,17.5040608 Z"
+                fill="#FBBC04"
+            ></path>
+            <path
+                d="M0,49.5040608 L26.7588051,69.5731646 L58.1818182,93.1404244 L58.1818182,17.5040608 L41.8909091,5.28587897 C24.6109091,-7.65957557 0,4.64587897 0,26.2313335 L0,49.5040608 Z"
+                fill="#C5221F"
+            ></path>
         </g>
     </svg>
 </template>
-
-<style lang="scss" scoped>
-path {
-    @include theme-dark {
-        stroke: $color-text-primary;
-    }
-
-    @include theme-light {
-        stroke: $color-primary-darker;
-    }
-}
-</style>
