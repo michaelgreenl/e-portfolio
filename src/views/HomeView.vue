@@ -50,8 +50,8 @@ onMounted(() => {
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                I build secure, scalable applications that combine elegant, intuitive UIs with robust, maintainable
-                backend architecture.
+                I build secure, scalable applications with elegant, intuitive user interfaces, robust backend
+                architecture, and intelligent agentic systems.
             </p>
 
             <div class="cta">
@@ -91,9 +91,13 @@ onMounted(() => {
     width: 100%;
     padding: 0 $size-4;
     margin: 0 auto;
-    font-size: clamp(10px, 4vw, 16px);
+    font-size: 0.9em;
     color: $color-text-primary;
     @include flexCenterAll;
+
+    @include bp-xsm-phone {
+        font-size: 1em;
+    }
 
     @include bp-custom-min(750) {
         padding: 0 $size-11;
@@ -111,21 +115,21 @@ onMounted(() => {
 
     @include bp-xl-desktop {
         max-width: 1600px;
-        font-size: 1.2em;
     }
 }
+
+$hero-tablet-bp: 640;
 
 h1 {
     padding-bottom: $size-1;
     margin: 0;
-    font-size: 5.1em;
+    font-size: clamp(4.5em, 21vw, 5.2em);
     line-height: 0.8ch;
 
-    @include bp-custom-min(612) {
+    @include bp-custom-min($hero-tablet-bp) {
         max-width: 100vw;
         padding-bottom: $size-1;
         margin: 0 auto;
-        font-size: clamp(5.1em, 12vw, 5.5em);
         line-height: 1ch;
     }
 
@@ -136,7 +140,7 @@ h1 {
     span {
         margin-left: 1.4em;
 
-        @include bp-custom-min(612) {
+        @include bp-custom-min($hero-tablet-bp) {
             margin-left: 0 !important;
         }
 
@@ -164,17 +168,24 @@ h2 {
 h3 {
     margin: 0 2px $size-2;
 
-    @include bp-custom-min(612) {
+    @include bp-custom-min($hero-tablet-bp) {
         margin: 0 2px !important;
         font-size: 1.25em !important;
     }
 }
 
 p {
-    max-width: 50ch;
+    max-width: 30ch;
     margin: 0 auto;
-    font-size: 1.1em;
     text-align: center;
+
+    @include bp-custom-min(400) {
+        max-width: 37ch;
+    }
+
+    @include bp-custom-min($hero-tablet-bp) {
+        max-width: 56ch;
+    }
 
     @include bp-md-tablet {
         margin: 0 !important;
@@ -188,7 +199,7 @@ p {
     gap: $size-2;
     max-width: 370px;
 
-    @include bp-custom-min(612) {
+    @include bp-custom-min($hero-tablet-bp) {
         max-width: 100vw;
     }
 }

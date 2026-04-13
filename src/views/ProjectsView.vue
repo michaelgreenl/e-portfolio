@@ -214,24 +214,19 @@ function closeProject() {
 
     @include bp-lg-laptop {
         margin: $size-12 0 $size-20;
-        font-size: 1.2em;
     }
 
     h1 {
-        @include bp-xsm-phone {
-            font-size: 6.5em;
+        @include bp-lg-laptop {
+            font-size: 6.2em;
         }
     }
 
     p {
         max-width: 48ch;
-        font-size: 1.7em;
         color: $color-text-secondary;
         text-align: center;
-
-        @include bp-sm-phone {
-            font-size: 1.8em;
-        }
+        font-size: 1.6em;
     }
 }
 

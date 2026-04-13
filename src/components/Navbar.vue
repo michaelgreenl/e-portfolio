@@ -163,7 +163,7 @@ watch(
     left: $size-2;
     display: flex;
     justify-content: space-between;
-    max-width: 335px;
+    max-width: 347px;
     height: $size-10;
     padding: $size-2;
     margin: 0 auto;
@@ -173,6 +173,10 @@ watch(
 
     @include bp-xsm-phone {
         font-size: 1.2em;
+    }
+
+    @include bp-sm-phone {
+        max-width: 374px;
     }
 
     @include bp-md-tablet {

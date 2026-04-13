@@ -4,8 +4,8 @@
         "slug": "email-filter",
         "stackText": ["TypeScript", "LangGraph", "Bun", "Docker", "SQLite"],
         "stack": ["typescript", "langgraph", "bun", "docker", "sqlite"],
-        "shortDate": "April 2026",
-        "longDate": "April 2026",
+        "shortDate": "April 2026 - Present",
+        "longDate": "April 2026 - Present",
         "description": {
             "short": "Autonomous AI email triage agent using LangGraph and OpenAI to classify and handle unread Gmail, with correction-driven learning and HTTP + Telegram controls",
             "long": [
@@ -58,7 +58,7 @@
             "sass",
             "gsap"
         ],
-        "shortDate": "Jan. '26 - Present",
+        "shortDate": "January 2026 - Present",
         "longDate": "January 2026 - Present",
         "description": {
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
@@ -123,7 +123,7 @@
         "slug": "game-lobby",
         "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Sass"],
         "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "sass"],
-        "shortDate": "June '25 - July '25",
+        "shortDate": "June 2025 - July 2025",
         "longDate": "June 2025 - July 2025",
         "description": {
             "short": "A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by JWTs and supported by Prisma for persistent match history.",
@@ -156,7 +156,7 @@
         "slug": "algo-visualizer",
         "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "shortDate": "May '22 ~ July '25",
+        "shortDate": "May 2022 ~ July 2025",
         "longDate": "May 2022 ~ July 2025",
         "description": {
             "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",

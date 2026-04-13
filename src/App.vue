@@ -57,7 +57,11 @@ body,
     flex-direction: column;
     font-size: 16px;
 
-    @include bp-xsm-phone {
+    @include bp-sm-phone {
+        font-size: 17px;
+    }
+
+    @include bp-xl-desktop {
         font-size: 18px;
     }
 }

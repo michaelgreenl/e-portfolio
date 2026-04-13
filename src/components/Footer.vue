@@ -36,7 +36,7 @@ footer {
     align-items: center;
     justify-content: flex-end;
     width: 100%;
-    padding: 0 $size-8 5em;
+    padding: 0 $size-8 4em;
     margin-top: auto;
 
     @include bp-md-tablet {

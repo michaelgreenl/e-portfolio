@@ -236,7 +236,7 @@ p {
 
 .card-header {
     display: flex;
-    gap: $size-2;
+    gap: $size-3;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap-reverse;
@@ -273,10 +273,6 @@ p {
             @include theme-light {
                 color: $color-primary-darker;
             }
-
-            @include bp-xsm-phone {
-                font-size: 2.4em !important;
-            }
         }
     }
 
@@ -297,10 +293,12 @@ p {
             stroke: $color-text-secondary;
         }
 
+        $date-bp: 400;
+
         .short-date {
             display: flex;
 
-            @include bp-md-tablet {
+            @include bp-custom-min($date-bp) {
                 display: none;
             }
         }
@@ -308,7 +306,7 @@ p {
         .long-date {
             display: none;
 
-            @include bp-md-tablet {
+            @include bp-custom-min($date-bp) {
                 display: flex;
             }
         }
@@ -317,17 +315,9 @@ p {
 
 .card-description {
     max-width: 86ch;
-    font-size: 1.4em;
-
-    @include bp-xsm-phone {
-        font-size: 1.5em !important;
-    }
+    font-size: 1.5em;
 
     @include bp-sm-phone {
-        font-size: 1.6em !important;
-    }
-
-    @include bp-md-tablet {
         font-size: 1.7em !important;
     }
 }
@@ -341,11 +331,7 @@ p {
     height: $size-8;
     margin-top: $size-2;
     overflow: hidden;
-    font-size: 1.1em;
-
-    @include bp-xsm-phone {
-        font-size: 1.2em;
-    }
+    font-size: 1.05em;
 
     @include bp-sm-phone {
         font-size: 1.3em;
@@ -405,7 +391,7 @@ p {
             &:deep(button) span {
                 display: none;
 
-                @include bp-custom-min(480) {
+                @include bp-custom-min(600) {
                     display: block !important;
                 }
             }

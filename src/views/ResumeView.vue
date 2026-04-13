@@ -51,7 +51,7 @@ watch(
                 <div v-for="education in resumeData.education" :key="education.title" class="section-segment">
                     <div class="segment-header">
                         <h3 class="segment-title">
-                            {{ education.title }}<span v-if="education.location">, {{ education.location }}</span>
+                            {{ education.title }} <span v-if="education.location"> {{ education.location }}</span>
                         </h3>
 
                         <div class="segment-dates">
@@ -104,30 +104,11 @@ watch(
                 <hr />
 
                 <div v-for="project in projectsData" :key="project.title" class="section-segment">
-                    <div class="segment-header">
+                    <div class="segment-header segment-header-projects">
                         <h3 class="segment-title segment-title-projects">
                             <a :href="project.externalLinks.porfolioLink.href" class="project-link">
                                 {{ project.title }}
                             </a>
-                            <span> - </span>
-
-                            <span v-if="project.externalLinks.liveSite">
-                                <a class="external-link" :href="project.externalLinks.liveSite.href" target="_blank">
-                                    Live Site</a
-                                >
-                                |
-                            </span>
-
-                            <span>
-                                <a class="external-link" :href="project.externalLinks.demoVideo?.href"> Demo Video</a>
-                                |
-                            </span>
-
-                            <span>
-                                <a class="external-link" :href="project.externalLinks.github.href" target="_blank">
-                                    Repository</a
-                                >
-                            </span>
                         </h3>
 
                         <div class="segment-dates">
@@ -180,7 +161,7 @@ watch(
     max-width: 32em;
     padding: $size-4;
     margin: 0 auto;
-    font-size: 0.7em;
+    font-size: 0.9em;
     color: $color-text-primary;
 
     @include bp-custom-min(730) {
@@ -192,7 +173,12 @@ watch(
     }
 
     @include bp-xsm-phone {
-        font-size: clamp(0.75em, 3.3vw, 1.05em);
+        font-size: 0.9em;
+        font-size: clamp(0.9em, 3.3vw, 1em);
+    }
+
+    @include bp-sm-phone {
+        font-size: 1em;
     }
 }
 
@@ -262,11 +248,18 @@ hr {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap-reverse;
     width: 100%;
     padding-right: $size-2;
 
+    h1 {
+        margin: 0;
+        margin-right: $size-2;
+    }
+
     a {
         font-size: 0.9em;
+        margin-left: auto;
 
         @include bp-xsm-phone {
             font-size: 1em;
@@ -282,7 +275,6 @@ hr {
 
     &-skills {
         padding-top: 0.1em !important;
-        font-size: 0.94em;
 
         p span {
             font-weight: 400;
@@ -303,34 +295,26 @@ hr {
 .segment-header {
     display: flex;
     flex-wrap: wrap-reverse;
-    gap: 3px;
+    gap: $size-2;
     justify-content: space-between;
 }
 
 .segment-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $size-1;
     font-size: 1.3em;
     font-weight: 600;
+    margin-right: $size-5;
 
     &-projects {
         .project-link {
+            font-size: 1.2em;
             color: $color-text-primary;
 
             @include interactive {
                 text-decoration: underline;
             }
-        }
-
-        .external-link {
-            color: $color-text-secondary;
-            text-decoration: underline;
-
-            @include interactive {
-                color: $color-primary-darker;
-            }
-        }
-
-        span {
-            font-size: 0.8em;
         }
     }
 }
