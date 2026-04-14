@@ -117,8 +117,8 @@ function closeProject() {
             <h1>Projects</h1>
             <hr />
             <p>
-                Recent projects spanning cross-platform mobile development, real-time full-stack systems, agentic
-                applications, and advanced frontend visualizations.
+                Recent projects spanning cross-platform mobile development, real-time full-stack systems, advanced
+                frontend visualizations, and intelligent agentic applications.
             </p>
         </div>
 
@@ -210,11 +210,7 @@ function closeProject() {
 
     flex-direction: column;
     padding: 0 $size-4;
-    margin: $size-16 0 $size-20;
-
-    @include bp-lg-laptop {
-        margin: $size-12 0 $size-20;
-    }
+    margin: $size-12 0 $size-20;
 
     h1 {
         @include bp-lg-laptop {
@@ -223,7 +219,7 @@ function closeProject() {
     }
 
     p {
-        max-width: 48ch;
+        max-width: 51ch;
         color: $color-text-secondary;
         text-align: center;
         font-size: 1.6em;
@@ -245,8 +241,35 @@ function closeProject() {
         max-width: 110em;
     }
 
-    @include bp-lg-laptop {
-        max-width: 96em;
+    @include bp-md-tablet {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: $size-6;
+        align-items: stretch;
+        width: 100%;
+        max-width: 92em;
+        margin-inline: auto;
+
+        :deep(.project-card) {
+            @include theme-dark {
+                border: solid 1px $color-bg-secondary;
+            }
+
+            @include theme-light {
+                border: solid 1px $color-text-muted;
+            }
+
+            border-radius: 12px;
+        }
+
+        :deep(.project-card:nth-child(3)) {
+            grid-column: 1 / span 2;
+            grid-row: 2;
+        }
+    }
+
+    @include bp-xl-desktop {
+        max-width: 116em;
     }
 }
 </style>

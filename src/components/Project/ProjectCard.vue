@@ -1,12 +1,13 @@
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
-import PlayIcon from '@/components/SVGs/PlayIcon.vue';
 
-const props = defineProps({
+defineProps({
     project: { required: true, type: Object },
     projectLogos: { required: true, type: Object },
     externalIcons: { required: true, type: Object },
@@ -14,13 +15,42 @@ const props = defineProps({
 
 const emit = defineEmits(['open-project']);
 
-const getURL = (img) => {
-    return new URL(`../../assets/images/${img}`, import.meta.url).href;
+const bp = useBreakpoints();
+const externalLinkRespText = (projectSlug, externalLinks) => {
+    const className = 'responsive-link-text';
+
+    if (bp.isXlLaptop.value) {
+        return 'undefined';
+    }
+
+    if (bp.isLgLaptop.value) {
+        if (projectSlug === 'reaction') return 'undefined';
+        return `${Object.keys(externalLinks).length <= 3 ? undefined : className}`;
+    }
+
+    if (bp.isLaptop.value) {
+        if (projectSlug === 'reaction') return 'undefined';
+        return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
+    }
+
+    let customMin;
+    customMin = bp.customMin(540);
+    if (customMin.value) {
+        return 'undefined';
+    }
+
+    customMin = bp.customMin(416);
+    if (customMin.value) {
+        return `${Object.keys(externalLinks).length <= 3 ? undefined : className}`;
+    }
+
+    return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
 };
 </script>
 
 <template>
     <div
+        ref="rootEl"
         class="project-card"
         role="button"
         tabindex="0"
@@ -55,7 +85,7 @@ const getURL = (img) => {
                 <div class="external-links external-links-card">
                     <a
                         v-for="(link, key) in project.externalLinks"
-                        :class="`${Object.keys(project.externalLinks).length < 3 ? undefined : 'responsive-link-text'}`"
+                        :class="externalLinkRespText(project.slug, project.externalLinks)"
                         :key="link"
                         :href="key === 'demoVideo' ? null : link.href"
                         target="_blank"
@@ -205,28 +235,6 @@ p {
     }
 }
 
-.project-img {
-    position: relative;
-    z-index: 0;
-    border-radius: 10px;
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 1.6/1;
-
-    mask-image:
-        linear-gradient(to bottom, transparent, black 10%, black 90%, transparent),
-        linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    mask-composite: intersect;
-    -webkit-mask-image:
-        linear-gradient(to bottom, transparent, black 0%, black 98%, transparent),
-        linear-gradient(to right, transparent, black 1%, black 98%, transparent);
-    -webkit-mask-composite: source-in;
-
-    @include bp-sm-phone {
-        width: auto;
-    }
-}
-
 .card-body {
     display: flex;
     flex-direction: column;
@@ -245,8 +253,20 @@ p {
         display: flex;
         align-items: center;
         gap: 0.6em;
-        font-size: 1.4em;
-        margin-right: $size-4;
+        font-size: 1.2em;
+        margin-right: 3em;
+
+        @include bp-xsm-phone {
+            font-size: 1.4em;
+        }
+
+        @include bp-md-tablet {
+            margin-right: 8em;
+        }
+
+        @include bp-xl-desktop {
+            margin-right: 4em;
+        }
 
         .project-logo {
             display: flex;
@@ -286,6 +306,10 @@ p {
 
         @include bp-sm-phone {
             margin-bottom: 1em;
+
+            @include bp-md-tablet {
+                margin-bottom: 0;
+            }
         }
 
         svg {
@@ -314,6 +338,7 @@ p {
 }
 
 .card-description {
+    flex: 1;
     max-width: 86ch;
     font-size: 1.5em;
 
@@ -327,7 +352,6 @@ p {
     flex-wrap: wrap;
     gap: $size-6;
     align-items: center;
-    max-width: 65em;
     height: $size-8;
     margin-top: $size-2;
     overflow: hidden;
@@ -350,6 +374,10 @@ p {
     margin-top: $size-4;
     font-size: 1.3em;
 
+    @include bp-md-tablet {
+        flex-wrap: nowrap;
+    }
+
     @include bp-sm-phone {
         font-size: 1.4em;
     }
@@ -359,6 +387,11 @@ p {
     gap: 0.6em;
     border-width: 1px;
     border-radius: 7px;
+
+    @include bp-md-tablet {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
 
     @include bp-lg-laptop {
         font-size: 1.1em;
@@ -390,14 +423,12 @@ p {
         &.responsive-link-text {
             &:deep(button) span {
                 display: none;
-
-                @include bp-custom-min(600) {
-                    display: block !important;
-                }
             }
         }
 
         &:deep(button) {
+            white-space: nowrap;
+
             @include bp-md-tablet {
                 gap: $size-2;
             }
