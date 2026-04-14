@@ -1,7 +1,6 @@
 <script setup>
 import { markRaw } from 'vue';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useMediaQuery } from '@vueuse/core';
 import VueIcon from '@/components/SVGs/Tools/VueIcon.vue';
 import GitIcon from '@/components/SVGs/Tools/GitIcon.vue';
 import NuxtIcon from '@/components/SVGs/Tools/NuxtIcon.vue';
@@ -33,7 +32,6 @@ defineProps({
 
 const themeStore = useThemeStore();
 
-const isMobile = useMediaQuery('(min-width: 682px)');
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '6.5em' },
     langgraph: {
@@ -145,7 +143,6 @@ const tools = {
         :style="{
             backgroundColor:
                 themeStore.theme === 'light' ? `${tools[tool].lightColor}30` : `${tools[tool].darkColor}30`,
-            maxWidth: isMobile ? tools[tool].maxWidth : '100vw',
         }"
     >
         <div class="icon-container">
