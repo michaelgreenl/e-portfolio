@@ -4,8 +4,8 @@
         "slug": "email-filter",
         "stackText": ["TypeScript", "LangGraph", "Bun", "Docker", "SQLite"],
         "stack": ["typescript", "langgraph", "bun", "docker", "sqlite"],
-        "shortDate": "April 2026 - Present",
-        "longDate": "April 2026 - Present",
+        "shortDate": "April 2026",
+        "longDate": "April 2026",
         "description": {
             "short": "Autonomous AI email triage agent using LangGraph and OpenAI to classify and handle unread Gmail, with correction-driven learning and HTTP + Telegram controls",
             "long": [
@@ -58,8 +58,8 @@
             "sass",
             "gsap"
         ],
-        "shortDate": "January 2026 - Present",
-        "longDate": "January 2026 - Present",
+        "shortDate": "January 2026 - March 2026",
+        "longDate": "January 2026 - March 2026",
         "description": {
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
             "long": [
