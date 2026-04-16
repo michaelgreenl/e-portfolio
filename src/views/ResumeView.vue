@@ -309,7 +309,7 @@ hr {
 
     &-projects {
         .project-link {
-            font-size: 1.2em;
+            font-size: 1.1em;
             color: $color-text-primary;
 
             @include interactive {

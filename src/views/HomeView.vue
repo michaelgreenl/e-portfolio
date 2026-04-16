@@ -114,7 +114,7 @@ onMounted(() => {
     }
 
     @include bp-xl-desktop {
-        max-width: 1600px;
+        max-width: 1400px;
     }
 }
 
@@ -269,6 +269,10 @@ p {
     :deep(button) {
         padding: 0 $size-1;
         font-size: 1.2em;
+
+        @include bp-lg-laptop {
+            font-size: 1.3em;
+        }
 
         &::after {
             height: 2px;
