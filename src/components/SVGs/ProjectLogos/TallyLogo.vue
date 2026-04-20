@@ -13,6 +13,12 @@
 
 <style lang="scss" scoped>
 path {
-    fill: $color-text-primary;
+    @include theme-dark {
+        fill: $color-text-primary;
+    }
+
+    @include theme-light {
+        fill: $color-primary-darker;
+    }
 }
 </style>

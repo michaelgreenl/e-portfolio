@@ -15,7 +15,11 @@ import PostgresIcon from '@/components/SVGs/Tools/PostgresIcon.vue';
 import PrismaIcon from '@/components/SVGs/Tools/PrismaIcon.vue';
 import SequelizeIcon from '@/components/SVGs/Tools/SequelizeIcon.vue';
 import MySQLIcon from '@/components/SVGs/Tools/MySQLIcon.vue';
-import TypescriptIcon from '@/components/SVGs/Tools/TypescriptIcon.vue';
+import TypeScriptIcon from '@/components/SVGs/Tools/TypeScriptIcon.vue';
+import LangGraphIcon from '@/components/SVGs/Tools/LangGraphIcon.vue';
+import BunIcon from '@/components/SVGs/Tools/BunIcon.vue';
+import SQLiteIcon from '@/components/SVGs/Tools/SQLiteIcon.vue';
+import DockerIcon from '@/components/SVGs/Tools/DockerIcon.vue';
 import IonicIcon from '@/components/SVGs/Tools/IonicIcon.vue';
 import CypressIcon from '@/components/SVGs/Tools/CypressIcon.vue';
 import VitestIcon from '@/components/SVGs/Tools/VitestIcon.vue';
@@ -32,12 +36,40 @@ const themeStore = useThemeStore();
 const isMobile = useMediaQuery('(min-width: 682px)');
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '6.5em' },
+    langgraph: {
+        text: 'LangGraph',
+        icon: markRaw(LangGraphIcon),
+        lightColor: '#7FC8FF',
+        darkColor: '#7FC8FF',
+        maxWidth: '9em',
+    },
+    bun: {
+        text: 'Bun',
+        icon: markRaw(BunIcon),
+        lightColor: '#f3d09b',
+        darkColor: '#fbf0df',
+        maxWidth: '6em',
+    },
+    docker: {
+        text: 'Docker',
+        icon: markRaw(DockerIcon),
+        lightColor: '#2496ED',
+        darkColor: '#2496ED',
+        maxWidth: '8em',
+    },
+    sqlite: {
+        text: 'SQLite',
+        icon: markRaw(SQLiteIcon),
+        lightColor: '#003b57',
+        darkColor: '#97d9f6',
+        maxWidth: '8em',
+    },
     typescript: {
-        text: 'Typescript',
-        icon: markRaw(TypescriptIcon),
+        text: 'TypeScript',
+        icon: markRaw(TypeScriptIcon),
         lightColor: '#017acb',
         darkColor: '#017acb',
-        maxWidth: '8em',
+        maxWidth: '8.5em',
     },
     ionic: { text: 'Ionic', icon: markRaw(IonicIcon), lightColor: '#3880ff', darkColor: '#3880ff', maxWidth: '6.5em' },
     cypress: {
