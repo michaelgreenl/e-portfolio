@@ -34,7 +34,7 @@
     "skills": {
         "languages": {
             "category": "Languages",
-            "list": ["Typescript", "JavaScript (ES6+)", "SQL", "Python", "Java", "C/C++", "HTML/CSS", "Sass"]
+            "list": ["TypeScript", "JavaScript (ES6+)", "SQL", "Python", "Java", "C/C++", "HTML/CSS", "Sass"]
         },
         "frameworks": {
             "category": "Frameworks & Libraries",

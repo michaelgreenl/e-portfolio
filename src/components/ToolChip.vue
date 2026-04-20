@@ -15,7 +15,7 @@ import PostgresIcon from '@/components/SVGs/Tools/PostgresIcon.vue';
 import PrismaIcon from '@/components/SVGs/Tools/PrismaIcon.vue';
 import SequelizeIcon from '@/components/SVGs/Tools/SequelizeIcon.vue';
 import MySQLIcon from '@/components/SVGs/Tools/MySQLIcon.vue';
-import TypescriptIcon from '@/components/SVGs/Tools/TypescriptIcon.vue';
+import TypeScriptIcon from '@/components/SVGs/Tools/TypeScriptIcon.vue';
 import IonicIcon from '@/components/SVGs/Tools/IonicIcon.vue';
 import CypressIcon from '@/components/SVGs/Tools/CypressIcon.vue';
 import VitestIcon from '@/components/SVGs/Tools/VitestIcon.vue';
@@ -33,8 +33,8 @@ const isMobile = useMediaQuery('(min-width: 682px)');
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '6.5em' },
     typescript: {
-        text: 'Typescript',
-        icon: markRaw(TypescriptIcon),
+        text: 'TypeScript',
+        icon: markRaw(TypeScriptIcon),
         lightColor: '#017acb',
         darkColor: '#017acb',
         maxWidth: '8em',
