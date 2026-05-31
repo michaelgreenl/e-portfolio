@@ -136,7 +136,7 @@ button {
             position: absolute;
             right: 100%;
             bottom: -6px;
-            left: 1.9em;
+            left: 1.7em;
             height: 1px;
             content: '';
             transition: all 0.3s ease;

@@ -17,6 +17,7 @@ import GmailFilterLogo from '@/components/SVGs/ProjectLogos/GmailFilterLogo.vue'
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
+import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 
 const routeStore = useRouteStore();
 const { headerReveal, headerDismiss } = useUtilAnimations();
@@ -36,13 +37,13 @@ const projectLogos = {
     'game-lobby': GameLobbyLogo,
     'algo-visualizer': AlgoVisualizerLogo,
     tally: TallyLogo,
-    'email-filter': GmailFilterLogo,
 };
 
 const externalIcons = {
     github: GithubIcon,
     demoVideo: VideoIcon,
     liveSite: BoxArrowIcon,
+    npm: NPMIcon,
 };
 
 const activeProject = ref();

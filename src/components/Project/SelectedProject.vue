@@ -61,7 +61,12 @@ defineExpose({ el, overlay });
 
                         <div class="external-links external-links-selected">
                             <template v-for="(link, key) in activeProject.externalLinks" :key="link">
-                                <a v-if="key !== 'demoVideo'" :href="link.href" target="_blank">
+                                <a
+                                    v-if="key !== 'demoVideo'"
+                                    :class="`${key === 'liveSite' ? 'no-fill' : undefined}`"
+                                    :href="link.href"
+                                    target="_blank"
+                                >
                                     <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                                 </a>
                             </template>
@@ -316,7 +321,7 @@ p {
         margin-left: auto;
         font-size: 1.1em;
 
-        a:nth-child(2) {
+        .no-fill {
             &:deep(button) svg {
                 stroke-width: 0 !important;
 

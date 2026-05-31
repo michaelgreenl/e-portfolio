@@ -23,6 +23,7 @@ import IonicIcon from '@/components/SVGs/Tools/IonicIcon.vue';
 import CypressIcon from '@/components/SVGs/Tools/CypressIcon.vue';
 import VitestIcon from '@/components/SVGs/Tools/VitestIcon.vue';
 import ZodIcon from '@/components/SVGs/Tools/ZodIcon.vue';
+import OpenCodeIcon from '@/components/SVGs/Tools/OpenCodeIcon.vue';
 
 defineProps({
     tool: {
@@ -34,6 +35,13 @@ const themeStore = useThemeStore();
 
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '6.5em' },
+    opencode: {
+        text: 'OpenCode',
+        icon: markRaw(OpenCodeIcon),
+        lightColor: '#4B4646',
+        darkColor: '#F1ECEC',
+        maxWidth: '8em',
+    },
     langgraph: {
         text: 'LangGraph',
         icon: markRaw(LangGraphIcon),

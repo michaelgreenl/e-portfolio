@@ -1,27 +1,31 @@
 [
     {
-        "title": "Gmail Agent",
+        "title": "MAWM",
         "slug": "email-filter",
-        "stackText": ["TypeScript", "LangGraph", "Bun", "Docker", "SQLite"],
-        "stack": ["typescript", "langgraph", "bun", "docker", "sqlite"],
-        "shortDate": "April 2026",
-        "longDate": "April 2026",
+        "stackText": ["TypeScript", "LangGraph", "Node", "OpenCode"],
+        "stack": ["typescript", "langgraph", "node", "opencode"],
+        "shortDate": "April 2026 - Present",
+        "longDate": "April 2026 - Active Development",
         "description": {
-            "short": "Autonomous AI email triage agent using LangGraph and OpenAI to classify and handle unread Gmail, with correction-driven learning and HTTP + Telegram controls",
+            "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing LangGraph workflows with the purpose of agent execution and orchestration.",
             "long": [
-                "Built a confidence-gated safety layer that redirects low-confidence trash decisions to a quarantine label instead of deletion, preventing irreversible data loss from uncertain model outputs.",
-                "Built a feedback loop that persists user corrections to SQLite and injects them into the system prompt as examples on each run, allowing the agent to adapt to preferences without fine-tuning.",
-                "Exposed two independent control surfaces — an HTTP server and a Telegram bot — both routing through the same core pipeline function, so adding new interfaces never requires duplicating agent logic."
+                "Shipped @mawm/cli, a TypeScript npm CLI for packaging and installing LangGraph workflows, with dual global/project-local installation, JSON manifest management, and full install/update/remove lifecycle.",
+                "Built a type-safe CLI framework from scratch in TypeScript — getopt-style parser with short-flag clustering and variadic args, with compile-time handler type inference via conditional types and const generics.",
+                "Engineered a tool managing LangGraph dev server lifecycle — detached spawn, PID persistence, health checks, stale-server reaping, and SIGTERM→SIGKILL teardown — for executing and resuming workflows over HTTP."
             ]
         },
-        "fontFamily": "Futura",
+        "fontFamily": "ClashDisplay",
         "externalLinks": {
             "github": {
-                "href": "https://github.com/michaelgreenl/email-filter",
+                "href": "https://github.com/michaelgreenl/mawm",
                 "text": "Repository"
             },
+            "npm": {
+                "href": "https://www.npmjs.com/package/@mawm/cli",
+                "text": "Package"
+            },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/#projects?slug=email-filter&autoplay=false"
+                "href": "https://michaelgreenl.net/#projects?slug=mawm&autoplay=false"
             }
         }
     },
