@@ -1,11 +1,11 @@
 [
     {
         "title": "MAWM",
-        "slug": "email-filter",
+        "slug": "mawm",
         "stackText": ["TypeScript", "LangGraph", "Node", "OpenCode"],
         "stack": ["typescript", "langgraph", "node", "opencode"],
-        "shortDate": "April 2026 - Present",
-        "longDate": "April 2026 - Active Development",
+        "shortDate": "May 2026 - Present",
+        "longDate": "May 2026 - Active Development",
         "description": {
             "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing LangGraph workflows with the purpose of agent execution and orchestration.",
             "long": [
@@ -43,9 +43,7 @@
             "Vitest",
             "Cypress",
             "Express",
-            "Postgres",
-            "Sass",
-            "GSAP"
+            "Postgres"
         ],
         "stack": [
             "vue",
@@ -58,9 +56,7 @@
             "vitest",
             "cypress",
             "express",
-            "postgres",
-            "sass",
-            "gsap"
+            "postgres"
         ],
         "shortDate": "January 2026 - March 2026",
         "longDate": "January 2026 - March 2026",
