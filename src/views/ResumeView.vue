@@ -99,6 +99,7 @@ watch(
                     </ul>
                 </div>
             </div>
+
             <div class="section">
                 <h2 class="section-header">Projects</h2>
                 <hr />
@@ -169,7 +170,7 @@ watch(
     }
 
     @include bp-xl-desktop {
-        max-width: 61em;
+        max-width: 56em;
     }
 
     @include bp-xsm-phone {
