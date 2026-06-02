@@ -1,21 +1,31 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useGsap } from '@/composables/useGsap.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
+import { projectAnimations } from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
+import ArrowIcon from '@/components/SVGs/ArrowIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 
-defineProps({
+const props = defineProps({
     project: { required: true, type: Object },
     projectLogos: { required: true, type: Object },
     externalIcons: { required: true, type: Object },
 });
 
-const emit = defineEmits(['open-project']);
+const emit = defineEmits(['open-project', 'close-selected']);
+
+const { registerAnim } = useGsap();
+const anims = {
+    expandProjectCard: registerAnim(projectAnimations.expandProjectCard),
+    shrinkProjectCard: registerAnim(projectAnimations.shrinkProjectCard),
+};
 
 const bp = useBreakpoints();
+
 const externalLinkRespText = (projectSlug, externalLinks) => {
     const className = 'responsive-link-text';
 
@@ -46,15 +56,48 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 
     return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
 };
+
+const cardEl = ref(null);
+const projectSelected = ref(false);
+const autoplayVideo = ref(false);
+
+function openProject(autoplay = false) {
+    if (bp.isLaptop.value) {
+        emit('open-project', props.project, autoplay);
+        projectSelected.value = true;
+    } else {
+        projectSelected.value = true;
+        autoplayVideo.value = autoplay;
+        anims.expandProjectCard({ targets: cardEl.value });
+    }
+}
+
+function closeProject() {
+    projectSelected.value = false;
+    autoplayVideo.value = false;
+    anims.shrinkProjectCard({ targets: cardEl.value });
+}
+
+// ensures window resizing doesn't result in unwanted UI layouts
+watch(bp.isLaptop, (newVal, oldVal) => {
+    if (projectSelected.value && !newVal) {
+        projectSelected.value = false;
+        emit('close-selected');
+    } else if (projectSelected.value && newVal) {
+        closeProject();
+        projectSelected.value = false;
+    }
+});
 </script>
 
 <template>
     <div
-        ref="rootEl"
+        ref="cardEl"
         class="project-card"
+        :class="`${projectSelected && !bp.isLaptop.value ? 'selected-mobile' : undefined}`"
         role="button"
         tabindex="0"
-        @click="emit('open-project', project)"
+        @click="openProject()"
         @keydown.enter="emit('open-project', project)"
         @keydown.space.prevent="emit('open-project', project)"
     >
@@ -81,10 +124,30 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
                 <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
             </div>
 
+            <template v-if="projectSelected && !bp.isLaptop.value">
+                <iframe
+                    v-if="project.video"
+                    class="demo-video"
+                    :src="`https://player.vimeo.com/video/${project.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
+                    frameborder="0"
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    :title="`${project.slug}-demo-vid`"
+                ></iframe>
+
+                <ul class="selected-description">
+                    <li v-for="description in project.description?.long" :key="description">
+                        {{ description }}
+                    </li>
+                </ul>
+            </template>
+
             <div class="card-footer">
                 <div class="external-links external-links-card">
                     <a
-                        v-for="(link, key) in project.externalLinks"
+                        v-for="[key, link] in Object.entries(project.externalLinks).filter(
+                            ([key]) => key !== 'porfolioLink',
+                        )"
                         :class="externalLinkRespText(project.slug, project.externalLinks)"
                         :key="link"
                         :href="key === 'demoVideo' ? null : link.href"
@@ -92,7 +155,7 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
                     >
                         <Button
                             v-if="key === 'demoVideo'"
-                            @click.stop="() => emit('open-project', project, true)"
+                            @click.stop="openProject(true)"
                             :text="link.text"
                             :iconLeft="externalIcons[key]"
                             preset="secondary"
@@ -103,8 +166,18 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
                 </div>
 
                 <Button
+                    v-if="!bp.isLaptop.value"
+                    class="see-more mobile"
+                    :class="`${projectSelected ? 'project-selected' : undefined}`"
+                    @click.stop="projectSelected ? closeProject() : openProject()"
+                    :text="`See ${projectSelected ? 'Less' : 'More'}`"
+                    :iconRight="ArrowIcon"
+                    preset="primary"
+                />
+                <Button
+                    v-else
                     class="see-more"
-                    @click.stop="() => emit('open-project', project, true)"
+                    @click.stop="openProject()"
                     text="See More"
                     :iconRight="BoxArrowIcon"
                     preset="primary"
@@ -187,51 +260,11 @@ p {
         flex-direction: row;
         gap: $size-6;
     }
-}
 
-.card-img-container {
-    position: relative;
-    @include flexCenterAll;
-    padding: $size-7;
-    aspect-ratio: 1.46/1;
-    width: 105%;
-
-    @include bp-sm-phone {
-        padding: $size-4;
-        width: auto;
-        height: 19em;
-        aspect-ratio: 1.54/1;
-    }
-
-    :deep(button) {
-        position: absolute;
-        z-index: 1;
-        background: transparent;
-        border: none;
-        transition: transform 0.2s ease;
-
-        @include interactive {
-            transform: scale(1.1);
-        }
-
-        &:active {
-            transform: scale(0.9);
-        }
-
-        svg {
-            height: $size-12;
-            fill: $color-gray3;
-
-            @include bp-xsm-phone {
-                height: $size-15;
-                margin-top: $size-8;
-            }
-
-            @include bp-sm-phone {
-                height: $size-12;
-                margin-top: 0;
-            }
-        }
+    &.selected-mobile .card-body .card-footer {
+        margin-top: $size-2;
+        padding-top: $size-4;
+        border-top: solid 1px $color-text-muted;
     }
 }
 
@@ -349,21 +382,78 @@ p {
 
 .card-tool-chips {
     display: flex;
-    flex-wrap: wrap;
     gap: $size-6;
     align-items: center;
-    height: $size-8;
     margin-top: $size-2;
-    overflow: hidden;
-    font-size: 1.05em;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    padding-bottom: $size-3;
+    font-size: 1.1em;
+
+    :deep(.chip-container) {
+        max-width: none !important;
+    }
 
     @include bp-sm-phone {
         font-size: 1.3em;
     }
 
+    @include bp-md-tablet {
+        flex-wrap: wrap;
+        height: $size-8;
+        overflow: hidden;
+    }
+
     .chip {
         flex: 1;
         font-size: 1.2em;
+    }
+
+    &::-webkit-scrollbar {
+        height: $size-2;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #adb5bd0f;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #adb5bd1f;
+        border-radius: 5px;
+    }
+}
+
+.demo-video {
+    width: 100%;
+    max-width: 50em;
+    aspect-ratio: 2/1.1;
+    margin: $size-4 auto 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
+
+    @include bp-xsm-phone {
+        width: 95%;
+    }
+
+    @include bp-sm-phone {
+        width: 90%;
+    }
+}
+
+.selected-description {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+    padding: $size-2 0 $size-2 $size-4;
+    margin: 0;
+    font-family: $secondary-font-stack;
+    font-size: 1.5em;
+    color: $color-text-secondary;
+
+    @include bp-sm-phone {
+        font-size: 1.6em;
+        padding: $size-3 0 0 $size-5;
     }
 }
 
@@ -371,11 +461,14 @@ p {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: $size-4;
     font-size: 1.3em;
+    margin-top: $size-1;
 
     @include bp-md-tablet {
         flex-wrap: nowrap;
+        margin-top: $size-2;
+        padding-top: $size-4;
+        border-top: solid 1px $color-text-muted;
     }
 
     @include bp-sm-phone {
@@ -383,7 +476,7 @@ p {
     }
 }
 
-.see-more {
+:deep(.see-more) {
     gap: 0.6em;
     border-width: 1px;
     border-radius: 7px;
@@ -395,6 +488,18 @@ p {
 
     @include bp-lg-laptop {
         font-size: 1.1em;
+    }
+
+    .icon {
+        transition: transform 0.3s ease;
+    }
+
+    &.mobile .icon {
+        transform: rotate(180deg);
+    }
+
+    &.project-selected .icon {
+        transform: rotate(0deg);
     }
 }
 

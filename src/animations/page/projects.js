@@ -20,4 +20,20 @@ export const projectAnimations = {
             onComplete,
         });
     },
+
+    expandProjectCard: ({ tl, targets }) => {
+        tl.to(targets, {
+            duration: TIMING.duration.normal,
+            ease: TIMING.easing.smooth,
+            height: 'auto',
+        });
+    },
+
+    shrinkProjectCard: ({ tl, targets }) => {
+        tl.to(targets, {
+            duration: TIMING.duration.normal,
+            ease: TIMING.easing.smooth,
+            height: 'auto',
+        });
+    },
 };

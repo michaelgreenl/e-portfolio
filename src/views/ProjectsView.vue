@@ -131,6 +131,7 @@ function closeProject() {
                 :project-logos="projectLogos"
                 :external-icons="externalIcons"
                 @open-project="openProject"
+                @close-selected="closeProject"
             />
         </div>
     </div>
