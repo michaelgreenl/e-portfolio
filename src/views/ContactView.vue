@@ -241,7 +241,7 @@ const clearStatus = () => {
                 class="contact-link"
                 preset="primary"
                 :text="isSubmitting ? 'Sending...' : 'Send'"
-                :onClick="handleSubmit"
+                @click="handleSubmit"
                 :styles="{
                     opacity: isSubmitting ? 0.7 : 1,
                     pointerEvents: isSubmitting ? 'none' : 'auto',
@@ -282,10 +282,6 @@ const clearStatus = () => {
     margin-bottom: $size-8;
     text-align: center;
 
-    @include bp-lg-laptop {
-        font-size: 1.25em;
-    }
-
     h1,
     p {
         margin: 0;
@@ -319,9 +315,13 @@ const clearStatus = () => {
     }
 
     p {
-        max-width: 42ch;
+        max-width: 27ch;
         line-height: 1.6;
         color: $color-text-secondary;
+
+        @include bp-xsm-phone {
+            max-width: 42ch;
+        }
     }
 }
 

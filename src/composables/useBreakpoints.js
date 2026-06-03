@@ -1,28 +1,25 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { useMediaQuery } from '@vueuse/core';
 
 export function useBreakpoints() {
-    const isSmPhone = ref(false);
-    const isMobile = ref(false);
-    const isLgDesktop = ref(false);
-    const isXlDesktop = ref(false);
+    const isMobile = useMediaQuery('(max-width: 682px)');
 
-    const update = () => {
-        const width = window.innerWidth;
+    const isSmPhone = useMediaQuery('(min-width: 332px)');
+    const isTablet = useMediaQuery('(min-width: 682px)');
+    const isLaptop = useMediaQuery('(min-width: 848px)');
+    const isLgLaptop = useMediaQuery('(min-width: 992px)');
+    const isXlLaptop = useMediaQuery('(min-width: 1200px)');
+    const isXlDesktop = useMediaQuery('(min-width: 1600px)');
 
-        isSmPhone.value = width < 400;
-        isMobile.value = width < 682;
-        isLgDesktop.value = width > 1200;
-        isXlDesktop.value = width > 1600;
+    const customMin = (bp) => useMediaQuery(`(min-width: ${bp}px)`);
+
+    return {
+        isMobile,
+        isSmPhone,
+        isTablet,
+        isLaptop,
+        isLgLaptop,
+        isXlLaptop,
+        isXlDesktop,
+        customMin,
     };
-
-    onMounted(() => {
-        window.addEventListener('resize', update);
-        update();
-    });
-
-    onUnmounted(() => {
-        window.removeEventListener('resize', update);
-    });
-
-    return { isSmPhone, isMobile, isLgDesktop, isXlDesktop };
 }

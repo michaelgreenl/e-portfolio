@@ -55,10 +55,14 @@ body,
     position: relative;
     display: flex;
     flex-direction: column;
-    font-size: 0.85em;
+    font-size: 16px;
 
-    @include bp-xsm-phone {
-        font-size: 0.9em;
+    @include bp-sm-phone {
+        font-size: 17px;
+    }
+
+    @include bp-xl-desktop {
+        font-size: 18px;
     }
 }
 

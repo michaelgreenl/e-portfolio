@@ -1,6 +1,36 @@
 [
     {
-        "title": "Tally",
+        "title": "MAWM",
+        "slug": "mawm",
+        "stackText": ["TypeScript", "LangGraph", "Node", "OpenCode", "Vitest"],
+        "stack": ["typescript", "langgraph", "node", "opencode", "vitest"],
+        "shortDate": "May 2026 - Present",
+        "longDate": "May 2026 - Active Development",
+        "description": {
+            "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing LangGraph workflows with the purpose of agent orchestration.",
+            "long": [
+                "Shipped @mawm/cli, a TypeScript npm CLI for packaging and installing LangGraph workflows, with dual global/project-local installation, JSON manifest management, and full install/update/remove lifecycle.",
+                "Built a type-safe CLI framework from scratch in TypeScript — getopt-style parser with short-flag clustering and variadic args, with compile-time handler type inference via conditional types and const generics.",
+                "Engineered a tool managing LangGraph dev server lifecycle — detached spawn, PID persistence, health checks, stale-server reaping, and SIGTERM→SIGKILL teardown — for executing and resuming workflows over HTTP."
+            ]
+        },
+        "fontFamily": "ClashDisplay",
+        "externalLinks": {
+            "github": {
+                "href": "https://github.com/michaelgreenl/mawm",
+                "text": "Repository"
+            },
+            "npm": {
+                "href": "https://www.npmjs.com/package/@mawm/cli",
+                "text": "Package"
+            },
+            "porfolioLink": {
+                "href": "https://michaelgreenl.net/#projects?slug=mawm&autoplay=false"
+            }
+        }
+    },
+    {
+        "title": "Tally Tracker",
         "slug": "tally",
         "stackText": [
             "Vue",
@@ -13,9 +43,7 @@
             "Vitest",
             "Cypress",
             "Express",
-            "Postgres",
-            "Sass",
-            "GSAP"
+            "Postgres"
         ],
         "stack": [
             "vue",
@@ -28,12 +56,10 @@
             "vitest",
             "cypress",
             "express",
-            "postgres",
-            "sass",
-            "gsap"
+            "postgres"
         ],
-        "shortDate": "Jan. '26 - Present",
-        "longDate": "January 2026 - Present",
+        "shortDate": "January 2026 - March 2026",
+        "longDate": "January 2026 - March 2026",
         "description": {
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
             "long": [
@@ -46,7 +72,10 @@
         "img": "tally_blurred.webp",
         "video": "1166819858",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/tally-tracker", "text": "Repository" },
+            "github": {
+                "href": "https://github.com/michaelgreenl/tally-tracker",
+                "text": "Repository"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/#projects?slug=tally&autoplay=true",
                 "text": "Demo Video"
@@ -75,7 +104,10 @@
         "img": "reaction_blurred.webp",
         "video": "1149531486",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/reaction-client", "text": "Repository" },
+            "github": {
+                "href": "https://github.com/michaelgreenl/reaction-client",
+                "text": "Repository"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/#projects?slug=reaction&autoplay=true",
                 "text": "Demo Video"
@@ -91,7 +123,7 @@
         "slug": "game-lobby",
         "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Sass"],
         "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "sass"],
-        "shortDate": "June '25 - July '25",
+        "shortDate": "June 2025 - July 2025",
         "longDate": "June 2025 - July 2025",
         "description": {
             "short": "A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by JWTs and supported by Prisma for persistent match history.",
@@ -105,7 +137,10 @@
         "img": "game-lobby_blurred.webp",
         "video": "1119895851",
         "externalLinks": {
-            "github": { "href": "https://github.com/michaelgreenl/game-lobby", "text": "Repository" },
+            "github": {
+                "href": "https://github.com/michaelgreenl/game-lobby",
+                "text": "Repository"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=true",
                 "text": "Demo Video"
@@ -121,7 +156,7 @@
         "slug": "algo-visualizer",
         "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "shortDate": "May '22 ~ July '25",
+        "shortDate": "May 2022 ~ July 2025",
         "longDate": "May 2022 ~ July 2025",
         "description": {
             "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
@@ -136,7 +171,7 @@
         "video": "1149531735",
         "externalLinks": {
             "github": {
-                "href": "https://github.com/michaelgreenl/AlgoVisualizer",
+                "href": "https://github.com/michaelgreenl/algovisualizer",
                 "text": "Repository"
             },
             "demoVideo": {

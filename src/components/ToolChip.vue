@@ -1,7 +1,6 @@
 <script setup>
 import { markRaw } from 'vue';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useMediaQuery } from '@vueuse/core';
 import VueIcon from '@/components/SVGs/Tools/VueIcon.vue';
 import GitIcon from '@/components/SVGs/Tools/GitIcon.vue';
 import NuxtIcon from '@/components/SVGs/Tools/NuxtIcon.vue';
@@ -16,10 +15,15 @@ import PrismaIcon from '@/components/SVGs/Tools/PrismaIcon.vue';
 import SequelizeIcon from '@/components/SVGs/Tools/SequelizeIcon.vue';
 import MySQLIcon from '@/components/SVGs/Tools/MySQLIcon.vue';
 import TypeScriptIcon from '@/components/SVGs/Tools/TypeScriptIcon.vue';
+import LangGraphIcon from '@/components/SVGs/Tools/LangGraphIcon.vue';
+import BunIcon from '@/components/SVGs/Tools/BunIcon.vue';
+import SQLiteIcon from '@/components/SVGs/Tools/SQLiteIcon.vue';
+import DockerIcon from '@/components/SVGs/Tools/DockerIcon.vue';
 import IonicIcon from '@/components/SVGs/Tools/IonicIcon.vue';
 import CypressIcon from '@/components/SVGs/Tools/CypressIcon.vue';
 import VitestIcon from '@/components/SVGs/Tools/VitestIcon.vue';
 import ZodIcon from '@/components/SVGs/Tools/ZodIcon.vue';
+import OpenCodeIcon from '@/components/SVGs/Tools/OpenCodeIcon.vue';
 
 defineProps({
     tool: {
@@ -29,72 +33,106 @@ defineProps({
 
 const themeStore = useThemeStore();
 
-const isMobile = useMediaQuery('(min-width: 682px)');
 const tools = {
-    vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '6.5em' },
+    vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '7em' },
+    opencode: {
+        text: 'OpenCode',
+        icon: markRaw(OpenCodeIcon),
+        lightColor: '#4B4646',
+        darkColor: '#F1ECEC',
+        maxWidth: '9em',
+    },
+    langgraph: {
+        text: 'LangGraph',
+        icon: markRaw(LangGraphIcon),
+        lightColor: '#003b57',
+        darkColor: '#7FC8FF',
+        maxWidth: '9em',
+    },
+    bun: {
+        text: 'Bun',
+        icon: markRaw(BunIcon),
+        lightColor: '#444444',
+        darkColor: '#fbf0df',
+        maxWidth: '6em',
+    },
+    docker: {
+        text: 'Docker',
+        icon: markRaw(DockerIcon),
+        lightColor: '#2496ED',
+        darkColor: '#2496ED',
+        maxWidth: '8em',
+    },
+    sqlite: {
+        text: 'SQLite',
+        icon: markRaw(SQLiteIcon),
+        lightColor: '#003b57',
+        darkColor: '#97d9f6',
+        maxWidth: '7em',
+    },
     typescript: {
         text: 'TypeScript',
         icon: markRaw(TypeScriptIcon),
         lightColor: '#017acb',
         darkColor: '#017acb',
-        maxWidth: '8em',
+        maxWidth: '9.5em',
     },
-    ionic: { text: 'Ionic', icon: markRaw(IonicIcon), lightColor: '#3880ff', darkColor: '#3880ff', maxWidth: '6.5em' },
+    ionic: { text: 'Ionic', icon: markRaw(IonicIcon), lightColor: '#3880ff', darkColor: '#3880ff', maxWidth: '7em' },
     cypress: {
         text: 'Cypress',
         icon: markRaw(CypressIcon),
         lightColor: '#3880ff',
         darkColor: '#3880ff',
-        maxWidth: '6.5em',
+        maxWidth: '8em',
     },
     vitest: {
         text: 'Vitest',
         icon: markRaw(VitestIcon),
         lightColor: '#69d3a7',
         darkColor: '#69d3a7',
-        maxWidth: '6.5em',
+        maxWidth: '7.5em',
     },
     zod: {
         text: 'Zod',
         icon: markRaw(ZodIcon),
-        lightColor: '#45a9ff',
+        lightColor: '#003b57',
         darkColor: '#45a9ff',
         maxWidth: '6.5em',
     },
 
-    git: { text: 'Git', icon: markRaw(GitIcon), lightColor: '#DE4C36', darkColor: '#DE4C36', maxWidth: '6.5em' },
-    nuxt: { text: 'Nuxt', icon: markRaw(NuxtIcon), lightColor: '#00AC65', darkColor: '#00DC82', maxWidth: '6.5em' },
-    gsap: { text: 'GSAP', icon: markRaw(GsapIcon), lightColor: '#00AC65', darkColor: '#00DC82', maxWidth: '6.5em' },
-    pinia: { text: 'Pinia', icon: markRaw(PiniaIcon), lightColor: '#52c861', darkColor: '#FFE56C', maxWidth: '6.5em' },
-    sass: { text: 'Sass', icon: markRaw(SassIcon), lightColor: '#CD6799', darkColor: '#CD6799', maxWidth: '6.5em' },
-    node: { text: 'Node', icon: markRaw(NodeIcon), lightColor: '#78B537', darkColor: '#8CC84B', maxWidth: '6.5em' },
+    git: { text: 'Git', icon: markRaw(GitIcon), lightColor: '#DE4C36', darkColor: '#DE4C36', maxWidth: '7em' },
+    nuxt: { text: 'Nuxt', icon: markRaw(NuxtIcon), lightColor: '#00AC65', darkColor: '#00DC82', maxWidth: '7em' },
+    gsap: { text: 'GSAP', icon: markRaw(GsapIcon), lightColor: '#00AC65', darkColor: '#00DC82', maxWidth: '7em' },
+    pinia: { text: 'Pinia', icon: markRaw(PiniaIcon), lightColor: '#52c861', darkColor: '#FFE56C', maxWidth: '7.5em' },
+    sass: { text: 'Sass', icon: markRaw(SassIcon), lightColor: '#CD6799', darkColor: '#CD6799', maxWidth: '7em' },
+    node: { text: 'Node', icon: markRaw(NodeIcon), lightColor: '#78B537', darkColor: '#8CC84B', maxWidth: '7em' },
     socket: {
         text: 'Socket.IO',
         icon: markRaw(SocketIcon),
         lightColor: '#111111',
         darkColor: '#ffffff',
-        maxWidth: '7.5em',
+        maxWidth: '8.5em',
     },
     express: {
         text: 'Express',
         icon: markRaw(ExpressIcon),
         lightColor: '#111111',
         darkColor: '#ffffff',
-        maxWidth: '7em',
+        maxWidth: '8em',
     },
     postgres: {
         text: 'Postgres',
         icon: markRaw(PostgresIcon),
         lightColor: '#336791',
         darkColor: '#4789BE',
-        maxWidth: '7.5em',
+        maxWidth: '8.5em',
     },
     prisma: {
         text: 'Prisma',
         icon: markRaw(PrismaIcon),
         lightColor: '#586C8D',
         darkColor: '#7588A9',
-        maxWidth: '6.5em',
+        maxWidth: '7.5em',
     },
     sequelize: {
         text: 'Sequelize',
@@ -113,7 +151,7 @@ const tools = {
         :style="{
             backgroundColor:
                 themeStore.theme === 'light' ? `${tools[tool].lightColor}30` : `${tools[tool].darkColor}30`,
-            maxWidth: isMobile ? tools[tool].maxWidth : '100vw',
+            maxWidth: `${tools[tool].maxWidth}`,
         }"
     >
         <div class="icon-container">
@@ -129,9 +167,8 @@ const tools = {
 <style lang="scss" scoped>
 .chip-container {
     @include flexCenterAll;
-
     gap: $size-2;
-    height: 100%;
+    height: 1em;
     padding: 0.85em 1em;
     border-radius: 7px;
 }
