@@ -110,8 +110,10 @@ watch(bp.isLaptop, (newVal) => {
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div class="card-tool-chips">
-                <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
+            <div class="tool-chips-container">
+                <div class="card-tool-chips">
+                    <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
+                </div>
             </div>
 
             <template v-if="projectSelected && !bp.isLaptop.value">
@@ -382,18 +384,64 @@ p {
     }
 }
 
+$inset-width: 12px;
+
+.tool-chips-container {
+    position: relative;
+    margin-top: $size-2;
+    border-radius: 8px;
+
+    &::before,
+    &::after {
+        @include bp-md-tablet {
+            display: none;
+        }
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        z-index: 100;
+        width: $inset-width;
+        top: 0;
+        bottom: 3px;
+        left: -1px; // account for coverage when card's scale increases on hover
+        background: linear-gradient(-90deg, #272c3000, #272c3099);
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        z-index: 100;
+        width: $inset-width;
+        top: 0;
+        bottom: 3px;
+        right: -1px; // account for coverage when card's scale increases on hover
+        background: linear-gradient(90deg, #272c3000, #272c3099);
+    }
+}
+
 .card-tool-chips {
+    position: relative;
     display: flex;
     gap: $size-6;
     align-items: center;
-    margin-top: $size-2;
+    // margin-top: $size-2;
     overflow-x: scroll;
     overflow-y: hidden;
-    padding-bottom: $size-3;
+    padding-bottom: $size-1;
     font-size: 1.1em;
 
     :deep(.chip-container) {
         max-width: none !important;
+
+        &:first-child {
+            margin-left: calc($inset-width - 4px);
+        }
+
+        &:last-child {
+            margin-right: calc($inset-width - 4px);
+        }
     }
 
     @include bp-sm-phone {
@@ -411,19 +459,20 @@ p {
         font-size: 1.2em;
     }
 
-    &::-webkit-scrollbar {
-        height: $size-2;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: #adb5bd0f;
-        border-radius: 5px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #adb5bd1f;
-        border-radius: 5px;
-    }
+    // &::-webkit-scrollbar {
+    //     margin-top: $size-1;
+    //     height: $size-1;
+    // }
+    //
+    // &::-webkit-scrollbar-track {
+    //     background: #adb5bd0f;
+    //     border-radius: 5px;
+    // }
+    //
+    // &::-webkit-scrollbar-thumb {
+    //     background: #adb5bd1f;
+    //     border-radius: 5px;
+    // }
 }
 
 .demo-video {
