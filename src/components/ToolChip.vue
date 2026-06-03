@@ -171,10 +171,6 @@ const tools = {
     height: 1em;
     padding: 0.85em 1em;
     border-radius: 7px;
-
-    // @include bp-md-tablet {
-    //     max-width: none !important;
-    // }
 }
 
 .icon {
