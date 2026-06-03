@@ -252,18 +252,6 @@ function closeProject() {
         max-width: 92em;
         margin-inline: auto;
 
-        :deep(.project-card) {
-            @include theme-dark {
-                border: solid 1px $color-bg-secondary;
-            }
-
-            @include theme-light {
-                border: solid 1px $color-text-muted;
-            }
-
-            border-radius: 12px;
-        }
-
         :deep(.project-card:nth-child(3)) {
             grid-column: 1 / span 2;
             grid-row: 2;

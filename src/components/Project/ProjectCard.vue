@@ -261,6 +261,18 @@ p {
         gap: $size-6;
     }
 
+    @include bp-md-tablet {
+        @include theme-dark {
+            border: solid 1px $color-bg-secondary !important;
+        }
+
+        @include theme-light {
+            border: solid 1px #cdd0d3 !important;
+        }
+
+        border-radius: 12px;
+    }
+
     &.selected-mobile .card-body .card-footer {
         margin-top: $size-2;
         padding-top: $size-4;
