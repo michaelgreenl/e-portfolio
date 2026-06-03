@@ -89,7 +89,7 @@ onMounted(() => {
     flex-grow: 1;
     gap: $size-17;
     width: 100%;
-    padding: 0 $size-4;
+    padding: $size-8 $size-4 0;
     margin: 0 auto;
     font-size: 0.9em;
     color: $color-text-primary;
