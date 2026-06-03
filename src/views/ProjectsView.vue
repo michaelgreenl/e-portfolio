@@ -12,7 +12,6 @@ import ReactionLogo from '@/components/SVGs/ProjectLogos/ReactionLogo.vue';
 import AlgoVisualizerLogo from '@/components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
 import GameLobbyLogo from '@/components/SVGs/ProjectLogos/GameLobbyLogo.vue';
 import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
-import GmailFilterLogo from '@/components/SVGs/ProjectLogos/GmailFilterLogo.vue';
 
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';

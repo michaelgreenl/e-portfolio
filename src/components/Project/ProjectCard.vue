@@ -1,8 +1,6 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useGsap } from '@/composables/useGsap.js';
+import { ref, watch } from 'vue';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
-import { projectAnimations } from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 
@@ -17,12 +15,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['open-project', 'close-selected']);
-
-const { registerAnim } = useGsap();
-const anims = {
-    expandProjectCard: registerAnim(projectAnimations.expandProjectCard),
-    shrinkProjectCard: registerAnim(projectAnimations.shrinkProjectCard),
-};
 
 const bp = useBreakpoints();
 
@@ -68,18 +60,16 @@ function openProject(autoplay = false) {
     } else {
         projectSelected.value = true;
         autoplayVideo.value = autoplay;
-        anims.expandProjectCard({ targets: cardEl.value });
     }
 }
 
 function closeProject() {
     projectSelected.value = false;
     autoplayVideo.value = false;
-    anims.shrinkProjectCard({ targets: cardEl.value });
 }
 
 // ensures window resizing doesn't result in unwanted UI layouts
-watch(bp.isLaptop, (newVal, oldVal) => {
+watch(bp.isLaptop, (newVal) => {
     if (projectSelected.value && !newVal) {
         projectSelected.value = false;
         emit('close-selected');

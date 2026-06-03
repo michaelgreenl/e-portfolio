@@ -1,7 +1,6 @@
 <script setup>
 import { markRaw } from 'vue';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useBreakpoints } from '@/composables/useBreakpoints';
 import VueIcon from '@/components/SVGs/Tools/VueIcon.vue';
 import GitIcon from '@/components/SVGs/Tools/GitIcon.vue';
 import NuxtIcon from '@/components/SVGs/Tools/NuxtIcon.vue';
