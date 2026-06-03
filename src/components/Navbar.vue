@@ -303,11 +303,11 @@ watch(
 
         &:hover {
             @include theme-dark {
-                background-color: $color-bg-secondary;
+                background-color: #343a4060;
             }
 
             @include theme-light {
-                background-color: lighten-color($color-gray4, 10%);
+                background-color: #ced4da60;
             }
         }
 
