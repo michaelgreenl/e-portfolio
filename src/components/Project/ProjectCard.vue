@@ -424,7 +424,7 @@ $inset-width: 12px;
         background: linear-gradient(-90deg, #272c3000, #272c3099);
 
         @include theme-light {
-            background: linear-gradient(-90deg, #dee2e600, #dee2e6d9);
+            background: linear-gradient(-90deg, #dee2e600, #dee2e699);
         }
     }
 
@@ -439,27 +439,37 @@ $inset-width: 12px;
         background: linear-gradient(90deg, #272c3000, #272c3099);
 
         @include theme-light {
-            background: linear-gradient(90deg, #dee2e600, #dee2e6d9);
+            background: linear-gradient(90deg, #dee2e600, #dee2e699);
         }
     }
 
-    &.top-third {
-        &::before {
-            background: linear-gradient(-90deg, #2e363b00, #2e363b99);
+    @include theme-dark {
+        &.top-third {
+            &::before {
+                background: linear-gradient(-90deg, #2e363b00, #2e363b99);
+
+                @include theme-light {
+                    background: linear-gradient(90deg, #d7dde300, #d7dde385);
+                }
+            }
+
+            &::after {
+                background: linear-gradient(90deg, #2e363b00, #2e363b99);
+
+                @include theme-light {
+                    background: linear-gradient(90deg, #d7dde300, #d7dde385);
+                }
+            }
         }
 
-        &::after {
-            background: linear-gradient(90deg, #2e363b00, #2e363b99);
-        }
-    }
+        &.middle-third {
+            &::before {
+                background: linear-gradient(-90deg, #2d323600, #2d323699);
+            }
 
-    &.middle-third {
-        &::before {
-            background: linear-gradient(-90deg, #2d323600, #2d323699);
-        }
-
-        &::after {
-            background: linear-gradient(90deg, #2d323600, #2d323699);
+            &::after {
+                background: linear-gradient(90deg, #2d323600, #2d323699);
+            }
         }
     }
 }
