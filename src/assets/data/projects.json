@@ -88,8 +88,8 @@
     {
         "title": "Reaction",
         "slug": "reaction",
-        "stackText": ["Vue", "Pinia", "Sass", "GSAP", "Node", "Sequelize", "Express", "Postgres"],
-        "stack": ["vue", "pinia", "sass", "gsap", "node", "sequelize", "express", "postgres"],
+        "stackText": ["Vue", "Pinia", "Sass", "GSAP", "Node", "Sequelize", "Express"],
+        "stack": ["vue", "pinia", "sass", "gsap", "node", "sequelize", "express"],
         "shortDate": "Sep. '25 - Dec. '25",
         "longDate": "September 2025 - December 2025",
         "description": {

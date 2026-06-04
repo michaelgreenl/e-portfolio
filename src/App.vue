@@ -112,6 +112,7 @@ h4 {
 p {
     font-family: $secondary-font-stack;
     color: $color-text-secondary;
+    text-wrap: pretty;
 }
 
 a,
