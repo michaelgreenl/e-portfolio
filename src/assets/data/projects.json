@@ -9,9 +9,9 @@
         "description": {
             "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing LangGraph workflows with the purpose of agent orchestration.",
             "long": [
-                "Shipped @mawm/cli, a TypeScript npm CLI for packaging and installing LangGraph workflows, with dual global/project-local installation, JSON manifest management, and full install/update/remove lifecycle.",
-                "Built a type-safe CLI framework from scratch in TypeScript — getopt-style parser with short-flag clustering and variadic args, with compile-time handler type inference via conditional types and const generics.",
-                "Engineered a tool managing LangGraph dev server lifecycle — detached spawn, PID persistence, health checks, stale-server reaping, and SIGTERM→SIGKILL teardown — for executing and resuming workflows over HTTP."
+                "Shipped @mawm/cli, a TypeScript npm CLI that packages LangGraph workflows into reusable modules with manifest-based install, update, remove, and execution flows.",
+                "Designed a workflow distribution model with global and project-local installs, giving developers a repeatable way to share, version, and run LangGraph automations across projects.",
+                "Automated LangGraph workflow execution from the CLI, including server startup, health checks, resumable runs, and cleanup so users can run workflows without managing infra manually."
             ]
         },
         "fontFamily": "ClashDisplay",
