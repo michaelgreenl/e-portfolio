@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
+import { useElementBounding, useWindowSize } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
@@ -50,8 +51,22 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 };
 
 const cardEl = ref(null);
+const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
+
+const { top: toolChipTop } = useElementBounding(toolChipsContainer);
+const { height: viewportHeight } = useWindowSize();
+
+const toolChipsYValue = computed(() => {
+    if (!Boolean(toolChipsContainer.value)) return undefined;
+
+    if (toolChipTop.value <= viewportHeight.value * 0.45) {
+        return 'top-third';
+    } else if (toolChipTop.value <= viewportHeight.value * 0.65) {
+        return 'middle-third';
+    }
+});
 
 function openProject(autoplay = false) {
     if (bp.isLaptop.value) {
@@ -110,7 +125,7 @@ watch(bp.isLaptop, (newVal) => {
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div class="tool-chips-container">
+            <div ref="toolChipsContainer" class="tool-chips-container" :class="`${toolChipsYValue}`">
                 <div class="card-tool-chips">
                     <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
                 </div>
@@ -194,10 +209,10 @@ p {
 
     @include theme-dark {
         &:first-child {
-            border-top: solid 1px $color-bg-secondary;
+            border-top: solid 1px $color-text-muted;
         }
 
-        border-bottom: solid 1px $color-bg-secondary;
+        border-bottom: solid 1px $color-text-muted;
     }
 
     @include theme-light {
@@ -399,25 +414,53 @@ $inset-width: 12px;
     }
 
     &::before {
-        content: '';
         position: absolute;
-        z-index: 100;
-        width: $inset-width;
         top: 0;
         bottom: 3px;
         left: -1px; // account for coverage when card's scale increases on hover
+        z-index: 100;
+        width: $inset-width;
+        content: '';
         background: linear-gradient(-90deg, #272c3000, #272c3099);
+
+        @include theme-light {
+            background: linear-gradient(-90deg, #dee2e600, #dee2e6d9);
+        }
     }
 
     &::after {
-        content: '';
         position: absolute;
+        top: 0;
+        right: -1px; // account for coverage when card's scale increases on hover
+        bottom: 3px;
         z-index: 100;
         width: $inset-width;
-        top: 0;
-        bottom: 3px;
-        right: -1px; // account for coverage when card's scale increases on hover
+        content: '';
         background: linear-gradient(90deg, #272c3000, #272c3099);
+
+        @include theme-light {
+            background: linear-gradient(90deg, #dee2e600, #dee2e6d9);
+        }
+    }
+
+    &.top-third {
+        &::before {
+            background: linear-gradient(-90deg, #2e363b00, #2e363b99);
+        }
+
+        &::after {
+            background: linear-gradient(90deg, #2e363b00, #2e363b99);
+        }
+    }
+
+    &.middle-third {
+        &::before {
+            background: linear-gradient(-90deg, #2d323600, #2d323699);
+        }
+
+        &::after {
+            background: linear-gradient(90deg, #2d323600, #2d323699);
+        }
     }
 }
 
@@ -426,10 +469,9 @@ $inset-width: 12px;
     display: flex;
     gap: $size-6;
     align-items: center;
-    // margin-top: $size-2;
     overflow-x: scroll;
     overflow-y: hidden;
-    padding-bottom: $size-1;
+    padding-bottom: $size-2;
     font-size: 1.1em;
 
     :deep(.chip-container) {
