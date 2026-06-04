@@ -494,6 +494,10 @@ $inset-width: 12px;
         &:last-child {
             margin-right: calc($inset-width - 4px);
         }
+
+        @include bp-md-tablet {
+            margin: 0 !important;
+        }
     }
 
     @include bp-sm-phone {
