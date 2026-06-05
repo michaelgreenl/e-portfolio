@@ -93,6 +93,8 @@ watch(bp.isLaptop, (newVal) => {
         projectSelected.value = false;
     }
 });
+
+defineExpose({ openProject, projectSelected });
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { projectAnimations } from '@/animations/page/projects.js';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
+import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import projectsData from '@/assets/data/projects.json';
 import SelectedProject from '@/components/Project/SelectedProject.vue';
 import ProjectCard from '@/components/Project/ProjectCard.vue';
@@ -21,6 +22,7 @@ import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 const routeStore = useRouteStore();
 const { headerReveal, headerDismiss } = useUtilAnimations();
 
+const { isLaptop } = useBreakpoints();
 const { registerAnim } = useGsap();
 
 const anims = {
@@ -30,6 +32,7 @@ const anims = {
 
 const pageHeader = ref(null);
 const selectedProject = ref(null);
+const projectCardRefs = ref({});
 
 const projectLogos = {
     reaction: ReactionLogo,
@@ -74,16 +77,25 @@ onMounted(() => {
 });
 
 async function openProject(project, autoplay = false) {
+    const queriedProjectRef = projectCardRefs.value[project.slug];
+
+    queriedProjectRef.projectSelected = true;
     autoplayVideo.value = autoplay;
-    activeProject.value = project;
 
-    scrollPosition.value = window.scrollY;
-    document.body.classList.add('no-scroll');
-    document.body.style.top = `-${scrollPosition.value}px`;
+    if (isLaptop.value) {
+        activeProject.value = project;
 
-    await nextTick();
-    selectedProject.value.el.focus();
-    anims.showSelectedProject({ targets: [selectedProject.value.el, selectedProject.value.overlay] });
+        scrollPosition.value = window.scrollY;
+        document.body.classList.add('no-scroll');
+        document.body.style.top = `-${scrollPosition.value}px`;
+
+        await nextTick();
+        selectedProject.value.el.focus();
+        anims.showSelectedProject({ targets: [selectedProject.value.el, selectedProject.value.overlay] });
+    } else {
+        queriedProjectRef.openProject(autoplay);
+        window.scrollTo(0, queriedProjectRef.$el.offsetTop);
+    }
 }
 
 function closeProject() {
@@ -91,13 +103,15 @@ function closeProject() {
     document.body.style.top = '';
     window.scrollTo(0, scrollPosition.value);
 
-    anims.hideSelectedProject({
-        targets: [selectedProject.value.el, selectedProject.value.overlay],
-        onComplete: () => {
-            selectedProject.value.el.blur();
-            activeProject.value = null;
-        },
-    });
+    if (selectedProject.value) {
+        anims.hideSelectedProject({
+            targets: [selectedProject.value.el, selectedProject.value.overlay],
+            onComplete: () => {
+                selectedProject.value.el.blur();
+                activeProject.value = null;
+            },
+        });
+    }
 }
 </script>
 
@@ -124,8 +138,9 @@ function closeProject() {
 
         <div class="cards">
             <ProjectCard
-                v-for="project in projectsData"
+                v-for="(project, index) in projectsData"
                 :key="project.title"
+                :ref="(el) => (projectCardRefs[project.slug] = el)"
                 :project="project"
                 :project-logos="projectLogos"
                 :external-icons="externalIcons"
