@@ -651,7 +651,7 @@ $inset-width: 12px;
                 height: $size-6;
                 fill: rgb(0 0 0 / 0%) !important;
                 stroke-width: 2;
-                transition: fill 0.3s ease-in-out;
+                transition: fill 0.1s ease-in-out;
 
                 @include theme-dark {
                     stroke: lighten-color($color-text-muted, 15%);
