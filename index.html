@@ -11,6 +11,20 @@
 
         <title>M. Green | E-portfolio</title>
 
+        <script>
+            (function () {
+                const KEY = 'THEME';
+                let theme = localStorage.getItem(KEY);
+
+                if (theme !== 'dark' && theme !== 'light') {
+                    theme = 'dark';
+                    localStorage.setItem(KEY, theme);
+                }
+
+                document.documentElement.setAttribute('data-theme', theme);
+            })();
+        </script>
+
         <link rel="stylesheet" href="/fonts.css" />
         <link
             rel="preload"
