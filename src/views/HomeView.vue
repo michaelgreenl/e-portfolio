@@ -48,10 +48,10 @@ onMounted(() => {
             <h3>Hi 👋, my name is</h3>
             <h1>Michael <span> Green </span></h1>
             <hr class="hero-line" />
-            <h2>Software Engineer</h2>
+            <h2>Full-Stack Developer</h2>
             <p>
-                I build secure, scalable applications with elegant, intuitive user interfaces, robust backend
-                architecture, and intelligent agentic systems.
+                I build secure, scalable applications with elegant, intuitive user interfaces and robust, maintainable
+                backend architecture.
             </p>
 
             <div class="cta">
