@@ -27,12 +27,13 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
     }
 
     if (bp.isLgLaptop.value) {
-        if (projectSlug === 'reaction') return 'undefined';
+        // if project is the large project-card in the grid
+        if (projectSlug === 'game-lobby') return 'undefined';
         return `${Object.keys(externalLinks).length <= 3 ? undefined : className}`;
     }
 
     if (bp.isLaptop.value) {
-        if (projectSlug === 'reaction') return 'undefined';
+        if (projectSlug === 'game-lobby') return 'undefined';
         return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
     }
 
