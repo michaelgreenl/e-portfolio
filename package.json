@@ -19,7 +19,8 @@
         "@vueuse/core": "^13.8.0",
         "gsap": "^3.14.1",
         "pinia": "^3.0.3",
-        "vue": "^3.5.17"
+        "vue": "^3.5.17",
+        "vue-router": "^4"
     },
     "devDependencies": {
         "@babel/core": "^7.17.10",
