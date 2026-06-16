@@ -44,6 +44,20 @@
                 }
 
                 document.documentElement.setAttribute('data-theme', theme);
+
+                let redirect;
+                try {
+                    redirect = sessionStorage.getItem('spa-redirect');
+                    if (redirect) {
+                        sessionStorage.removeItem('spa-redirect');
+                    }
+                } catch {
+                    redirect = undefined;
+                }
+
+                if (redirect) {
+                    history.replaceState(null, '', redirect);
+                }
             })();
         </script>
 
@@ -164,57 +178,57 @@
                     <h2 id="static-projects-heading">Project Summaries</h2>
 
                     <article>
-                        <h3><a href="/projects/tally">Tally Tracker</a></h3>
+                        <h3><a href="/projects">Tally Tracker</a></h3>
                         <p>
                             A cross-platform offline-first application utilizing a custom synchronization queue for
                             network resilience, featuring real-time shared counters and native deep linking integration.
                         </p>
                         <p>
                             <a href="https://github.com/michaelgreenl/tally-tracker">Repository</a>
-                            <a href="https://michaelgreenl.net/projects/tally?autoplay=true">Demo Video</a>
+                            <a href="https://player.vimeo.com/video/1166819858">Demo Video</a>
                         </p>
                     </article>
 
                     <article>
-                        <h3><a href="/projects/reaction">Reaction</a></h3>
+                        <h3><a href="/projects">Reaction</a></h3>
                         <p>
                             A full-stack application engineered with a decoupled architecture, utilizing the Repository
                             Pattern to securely manage authentication, game metrics, and user persistence.
                         </p>
                         <p>
                             <a href="https://github.com/michaelgreenl/reaction-client">Repository</a>
-                            <a href="https://michaelgreenl.net/projects/reaction?autoplay=true">Demo Video</a>
+                            <a href="https://player.vimeo.com/video/1149531486">Demo Video</a>
                             <a href="https://trainreaction.gg">Live Site</a>
                         </p>
                     </article>
 
                     <article>
-                        <h3><a href="/projects/game-lobby">GameLobby</a></h3>
+                        <h3><a href="/projects">GameLobby</a></h3>
                         <p>
                             A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by
                             JWTs and supported by Prisma for persistent match history.
                         </p>
                         <p>
                             <a href="https://github.com/michaelgreenl/game-lobby">Repository</a>
-                            <a href="https://michaelgreenl.net/projects/game-lobby?autoplay=true">Demo Video</a>
+                            <a href="https://player.vimeo.com/video/1119895851">Demo Video</a>
                             <a href="https://gamelobby.io">Live Site</a>
                         </p>
                     </article>
 
                     <article>
-                        <h3><a href="/projects/algo-visualizer">AlgoVisualizer</a></h3>
+                        <h3><a href="/projects">AlgoVisualizer</a></h3>
                         <p>
                             An interactive educational platform that visualizes complex algorithms and data structures
                             with high-performance, synchronized, step-by-step animations.
                         </p>
                         <p>
                             <a href="https://github.com/michaelgreenl/algovisualizer">Repository</a>
-                            <a href="https://michaelgreenl.net/projects/algo-visualizer?autoplay=true">Demo Video</a>
+                            <a href="https://player.vimeo.com/video/1149531735">Demo Video</a>
                         </p>
                     </article>
 
                     <article>
-                        <h3><a href="/projects/mawm">MAWM</a></h3>
+                        <h3><a href="/projects">MAWM</a></h3>
                         <p>
                             Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing
                             LangGraph workflows with the purpose of agent orchestration.

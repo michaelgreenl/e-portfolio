@@ -71,11 +71,11 @@ const toolChipsYValue = computed(() => {
     return undefined;
 });
 
-const projectHref = computed(() => `/projects/${props.project.slug}`);
-const demoHref = computed(() => `${projectHref.value}?autoplay=true`);
+const projectsHref = '/projects';
+const demoHref = computed(() => props.project.externalLinks.demoVideo?.href || projectsHref);
 
-function openProject(autoplay = false, updateRoute = true) {
-    if (updateRoute) {
+function openProject(autoplay = false, notifyParent = true) {
+    if (notifyParent) {
         emit('open-project', props.project, autoplay);
     }
 
@@ -87,11 +87,11 @@ function openProject(autoplay = false, updateRoute = true) {
     }
 }
 
-function closeProject(updateRoute = true) {
+function closeProject(notifyParent = true) {
     projectSelected.value = false;
     autoplayVideo.value = false;
 
-    if (updateRoute) {
+    if (notifyParent) {
         emit('close-selected');
     }
 }
@@ -197,7 +197,7 @@ defineExpose({ openProject, closeProject, projectSelected });
                 <a
                     v-if="!bp.isLaptop.value"
                     class="see-more-link"
-                    :href="projectHref"
+                    :href="projectsHref"
                     @click.stop.prevent="projectSelected ? closeProject() : openProject()"
                 >
                     <Button
@@ -209,7 +209,7 @@ defineExpose({ openProject, closeProject, projectSelected });
                         preset="primary"
                     />
                 </a>
-                <a v-else class="see-more-link" :href="projectHref" @click.stop.prevent="openProject()">
+                <a v-else class="see-more-link" :href="projectsHref" @click.stop.prevent="openProject()">
                     <Button as="span" class="see-more" text="See More" :iconRight="BoxArrowIcon" preset="primary" />
                 </a>
             </div>

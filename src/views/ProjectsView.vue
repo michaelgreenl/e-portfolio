@@ -1,6 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, watch, nextTick } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { projectAnimations } from '@/animations/page/projects.js';
@@ -21,8 +20,6 @@ import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 
 const routeStore = useRouteStore();
-const route = useRoute();
-const router = useRouter();
 const { headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
@@ -55,15 +52,12 @@ const activeProject = ref();
 const scrollPosition = ref();
 const autoplayVideo = ref(false);
 
-const routedProject = computed(() => projectsData.find((project) => project.slug === route.params.slug));
-const shouldAutoplay = computed(() => route.query.autoplay === 'true');
-
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
             if (activeProject.value) {
-                closeProject({ updateRoute: false });
+                closeProject();
             }
 
             headerDismiss({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
@@ -73,43 +67,9 @@ watch(
 
 onMounted(() => {
     headerReveal({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
-
-    syncProjectFromRoute();
 });
 
-watch(
-    () => route.fullPath,
-    () => {
-        syncProjectFromRoute();
-    },
-);
-
-async function syncProjectFromRoute() {
-    await nextTick();
-
-    if (route.name === 'project' && !routedProject.value) {
-        router.replace({ name: 'projects' });
-        return;
-    }
-
-    if (routedProject.value) {
-        openProject(routedProject.value, shouldAutoplay.value, false);
-        return;
-    }
-
-    closeProject({ updateRoute: false });
-}
-
-async function openProject(project, autoplay = false, updateRoute = true) {
-    if (updateRoute) {
-        await router.push({
-            name: 'project',
-            params: { slug: project.slug },
-            query: autoplay ? { autoplay: 'true' } : {},
-        });
-        return;
-    }
-
+async function openProject(project, autoplay = false) {
     const queriedProjectRef = projectCardRefs.value[project.slug];
     if (!queriedProjectRef) return;
 
@@ -136,7 +96,7 @@ async function openProject(project, autoplay = false, updateRoute = true) {
     }
 }
 
-async function closeProject({ updateRoute = true } = {}) {
+function closeProject() {
     Object.values(projectCardRefs.value).forEach((projectCard) => {
         projectCard?.closeProject(false);
     });
@@ -158,10 +118,6 @@ async function closeProject({ updateRoute = true } = {}) {
         });
     } else {
         activeProject.value = null;
-    }
-
-    if (updateRoute && route.name === 'project') {
-        await router.push({ name: 'projects' });
     }
 }
 </script>

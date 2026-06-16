@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Redirecting | Michael Green</title>
+        <script>
+            (function () {
+                const redirect = window.location.pathname + window.location.search + window.location.hash;
+
+                try {
+                    sessionStorage.setItem('spa-redirect', redirect);
+                } catch {
+                    // Continue to the app root if storage is unavailable.
+                }
+
+                window.location.replace('/');
+            })();
+        </script>
+    </head>
+    <body>
+        <p><a href="/">Continue to Michael Green's portfolio</a></p>
+    </body>
+</html>

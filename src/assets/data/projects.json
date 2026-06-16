@@ -47,11 +47,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects/tally?autoplay=true",
+                "href": "https://player.vimeo.com/video/1166819858",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects/tally"
+                "href": "https://michaelgreenl.net/projects"
             }
         }
     },
@@ -79,12 +79,12 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects/reaction?autoplay=true",
+                "href": "https://player.vimeo.com/video/1149531486",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects/reaction"
+                "href": "https://michaelgreenl.net/projects"
             }
         }
     },
@@ -112,12 +112,12 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects/game-lobby?autoplay=true",
+                "href": "https://player.vimeo.com/video/1119895851",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects/game-lobby"
+                "href": "https://michaelgreenl.net/projects"
             }
         }
     },
@@ -145,11 +145,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects/algo-visualizer?autoplay=true",
+                "href": "https://player.vimeo.com/video/1149531735",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects/algo-visualizer"
+                "href": "https://michaelgreenl.net/projects"
             }
         }
     },
@@ -179,7 +179,7 @@
                 "text": "Package"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects/mawm"
+                "href": "https://michaelgreenl.net/projects"
             }
         }
     }

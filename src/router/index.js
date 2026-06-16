@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import projectsData from '@/assets/data/projects.json';
 
 const SITE_ORIGIN = 'https://michaelgreenl.net';
 const SITE_NAME = 'Michael Green | Full-Stack Developer';
@@ -21,17 +20,6 @@ const routes = [
     {
         path: '/projects',
         name: 'projects',
-        component: () => import('@/views/ProjectsView.vue'),
-        meta: {
-            navKey: 'projects',
-            title: 'Projects',
-            description:
-                'Selected full-stack, cross-platform, real-time, visualization, and agentic application projects by Michael Green.',
-        },
-    },
-    {
-        path: '/projects/:slug',
-        name: 'project',
         component: () => import('@/views/ProjectsView.vue'),
         meta: {
             navKey: 'projects',
@@ -74,10 +62,6 @@ const router = createRouter({
     },
 });
 
-function findProject(route) {
-    return route.name === 'project' ? projectsData.find((project) => project.slug === route.params.slug) : null;
-}
-
 function setMetaTag(attribute, key, content) {
     let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
 
@@ -91,9 +75,8 @@ function setMetaTag(attribute, key, content) {
 }
 
 function updateDocumentMeta(route) {
-    const project = findProject(route);
-    const title = project ? `${project.title} | M. Green Projects` : `M. Green | ${route.meta.title}`;
-    const description = project?.description?.short || route.meta.description || DEFAULT_DESCRIPTION;
+    const title = `M. Green | ${route.meta.title}`;
+    const description = route.meta.description || DEFAULT_DESCRIPTION;
     const canonicalUrl = `${SITE_ORIGIN}${route.path}`;
 
     document.title = title;
