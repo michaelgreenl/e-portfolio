@@ -1,4 +1,5 @@
 <script setup>
+import { RouterView } from 'vue-router';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import Navbar from '@/components/Navbar.vue';
@@ -24,7 +25,9 @@ document.documentElement.setAttribute('data-theme', theme);
     <BgSVG class="bg-svg" />
 
     <Navbar />
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
+    <RouterView v-slot="{ Component }">
+        <component :is="Component" :key="routeStore.activePath" class="page" />
+    </RouterView>
     <Footer />
 </template>
 

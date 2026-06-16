@@ -1,49 +1,18 @@
 import { defineStore } from 'pinia';
-import { ref, markRaw, computed, watch, defineAsyncComponent } from 'vue';
+import { computed, ref } from 'vue';
 import { LEAVE_DURATION } from '@/animations/constants/timing';
-
-import HomeIcon from '@/components/SVGs/Views/HomeIcon.vue';
-import HomeIconFill from '@/components/SVGs/Views/HomeIconFill.vue';
-import ProjectsIcon from '@/components/SVGs/Views/ProjectsIcon.vue';
-import ResumeIcon from '@/components/SVGs/Views/ResumeIcon.vue';
-import ResumeIconFill from '@/components/SVGs/Views/ResumeIconFill.vue';
-import ContactIcon from '@/components/SVGs/Views/ContactIcon.vue';
-import ContactIconFill from '@/components/SVGs/Views/ContactIconFill.vue';
+import { navigationRoutes, router } from '@/router/index.js';
 
 export const useRouteStore = defineStore('router', () => {
-    const routes = {
-        home: {
-            component: defineAsyncComponent(() => import('@/views/HomeView.vue')),
-            name: 'Home',
-            meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
-        },
-        projects: {
-            component: defineAsyncComponent(() => import('@/views/ProjectsView.vue')),
-            name: 'Projects',
-            meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
-        },
-        resume: {
-            component: defineAsyncComponent(() => import('@/views/ResumeView.vue')),
-            name: 'Resume',
-            meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
-        },
-        contact: {
-            component: defineAsyncComponent(() => import('@/views/ContactView.vue')),
-            name: 'Contact',
-            meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
-        },
-    };
-
-    const activePath = ref(getInitialPath());
+    const routes = navigationRoutes;
     const isLeaving = ref(false);
     const toPath = ref();
     const leaveDuration = LEAVE_DURATION;
 
     function parsePath(fullPath) {
         const [pathString, queryString] = fullPath.split('?');
-        const parts = pathString.split('/');
+        const parts = pathString.split('/').filter(Boolean);
         const base = parts[0] || 'home';
-        const params = { id: parts[1] || null };
 
         const query = {};
         if (queryString) {
@@ -52,76 +21,67 @@ export const useRouteStore = defineStore('router', () => {
             });
         }
 
-        return { base, params, query };
+        return { base, query };
     }
 
-    function getInitialPath() {
-        const hash = window.location.hash.slice(1);
-        if (!hash) return 'home';
+    function getRouteBase(route) {
+        const name = route.name?.toString();
 
-        const { base } = parsePath(hash);
-        return routes[base] ? hash : 'home';
+        return routes[name] ? name : 'home';
     }
+
+    function toActivePath(route) {
+        const base = getRouteBase(route);
+
+        if (base === 'home') return 'home';
+
+        return route.fullPath.replace(/^\//, '');
+    }
+
+    function resolveRoute(to) {
+        if (typeof to !== 'string') return to;
+
+        const { base, query } = parsePath(to);
+        if (!routes[base]) return { name: 'home' };
+
+        return { name: base, query };
+    }
+
+    const activePath = computed(() => toActivePath(router.currentRoute.value));
 
     const currentRoute = computed(() => {
-        const { base, params, query } = parsePath(activePath.value);
+        const route = router.currentRoute.value;
+        const base = getRouteBase(route);
 
         return {
             base,
-            params,
-            query,
-            component: routes[base]?.component,
-            meta: routes[base]?.meta,
+            params: route.params,
+            query: route.query,
+            component: route.matched[0]?.components?.default,
+            meta: route.meta,
         };
     });
 
-    async function changeRoute(to) {
+    function toRoute(to) {
+        return router.push(resolveRoute(to));
+    }
+
+    router.beforeEach(async (to, from) => {
+        if (!from.name || to.fullPath === from.fullPath) return true;
+
         isLeaving.value = true;
-        toPath.value = to;
+        toPath.value = getRouteBase(to);
 
         await new Promise((resolve) => setTimeout(resolve, leaveDuration));
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
-        activePath.value = to;
-        isLeaving.value = false;
-        window.location.hash = to;
-    }
-
-    function toRoute(to) {
-        const { base } = parsePath(to);
-        if (!routes[base]) {
-            to = 'home';
-        }
-
-        changeRoute(to);
-    }
-
-    window.addEventListener('hashchange', async () => {
-        const newPath = getInitialPath();
-        if (newPath !== activePath.value) {
-            changeRoute(newPath);
-        }
+        return true;
     });
 
-    watch(
-        activePath,
-        (newPath) => {
-            const { base } = parsePath(newPath);
-
-            let title = 'M. Green';
-            if (routes[base]?.meta?.title) {
-                title += ' | ' + routes[base].meta.title;
-            }
-
-            document.title = title;
-        },
-        { immediate: true },
-    );
-
-    if (!window.location.hash) {
-        window.location.hash = activePath.value;
-    }
+    router.afterEach(() => {
+        isLeaving.value = false;
+    });
 
     return { routes, activePath, currentRoute, toRoute, isLeaving, leaveDuration, toPath };
 });

@@ -11,6 +11,22 @@
 
         <title>M. Green | E-portfolio</title>
 
+        <script>
+            (function (location) {
+                if (location.search[1] !== '/') return;
+
+                var decodedRoute = location.search
+                    .slice(1)
+                    .split('&')
+                    .map(function (segment) {
+                        return segment.replace(/~and~/g, '&');
+                    })
+                    .join('?');
+
+                window.history.replaceState(null, null, location.pathname.slice(0, -1) + decodedRoute + location.hash);
+            })(window.location);
+        </script>
+
         <link rel="stylesheet" href="/fonts.css" />
         <link
             rel="preload"
