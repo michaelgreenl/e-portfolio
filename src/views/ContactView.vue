@@ -169,9 +169,11 @@ const clearStatus = () => {
 <template>
     <div ref="pageElement" class="contact-container">
         <div ref="pageHeader" class="contact-header">
-            <h1>Get In Touch!</h1>
-            <hr />
-            <p>It'd be great to hear from you. Send me a message and I'll respond as soon as I can!</p>
+            <h1 class="contact-title">Get In Touch!</h1>
+            <hr class="contact-rule" />
+            <p class="contact-copy">
+                It'd be great to hear from you. Send me a message and I'll respond as soon as I can!
+            </p>
         </div>
 
         <form ref="formElement" @submit.prevent="handleSubmit" class="contact-form">
@@ -189,7 +191,7 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('email')"
                     @focus="handleFieldFocus('email')"
                 />
-                <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+                <span class="error-message" aria-live="polite">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
@@ -206,10 +208,10 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('subject')"
                     @focus="handleFieldFocus('subject')"
                 />
-                <span v-if="errors.subject" class="error-message">{{ errors.subject }}</span>
+                <span class="error-message" aria-live="polite">{{ errors.subject }}</span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group form-group-message">
                 <label for="message" class="form-label">Message</label>
                 <textarea
                     id="message"
@@ -223,32 +225,33 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('message')"
                     @focus="handleFieldFocus('message')"
                 ></textarea>
-                <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
-            </div>
-        </form>
-        <div class="form-actions">
-            <div class="contact-links">
-                <a href="https://github.com/michaelgreenl" target="_blank">
-                    <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
-                </a>
-                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                    <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
-                </a>
+                <span class="error-message" aria-live="polite">{{ errors.message }}</span>
             </div>
 
-            <Button
-                type="submit"
-                class="contact-link"
-                preset="primary"
-                :text="isSubmitting ? 'Sending...' : 'Send'"
-                @click="handleSubmit"
-                :styles="{
-                    opacity: isSubmitting ? 0.7 : 1,
-                    pointerEvents: isSubmitting ? 'none' : 'auto',
-                }"
-                :iconRight="MailIcon"
-            />
-        </div>
+            <div class="form-actions">
+                <div class="contact-links">
+                    <a href="https://github.com/michaelgreenl" target="_blank" rel="noopener noreferrer">
+                        <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+                    </a>
+                    <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank" rel="noopener noreferrer">
+                        <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+                    </a>
+                </div>
+
+                <Button
+                    type="submit"
+                    class="contact-link"
+                    preset="primary"
+                    :text="isSubmitting ? 'Sending...' : 'Send'"
+                    :disabled="isSubmitting"
+                    :styles="{
+                        opacity: isSubmitting ? 0.7 : 1,
+                        pointerEvents: isSubmitting ? 'none' : 'auto',
+                    }"
+                    :iconRight="MailIcon"
+                />
+            </div>
+        </form>
 
         <div v-if="submitStatus === 'success'" class="status-message success" @click="clearStatus">
             <p>✓ Message sent successfully! I'll get back to you soon.</p>
@@ -263,90 +266,121 @@ const clearStatus = () => {
 <style lang="scss" scoped>
 .contact-container {
     position: relative;
-    flex-direction: column;
+    display: grid;
     flex-grow: 1;
+    grid-template-rows: auto minmax(0, auto);
+    gap: $size-3;
+    align-content: center;
+    justify-items: center;
     width: 100%;
-    padding: $size-8 $size-4;
+    min-height: 0;
+    max-height: 100%;
+    padding: $size-2 $size-4 $size-1;
     margin: 0 auto;
+    overflow: hidden;
     font-size: 0.9em;
-    @include flexCenterAll;
 
     @include bp-xsm-phone {
-        font-size: clamp(0.9em, 3.5vw, 1em);
+        font-size: 0.95em;
+    }
+
+    @include bp-sm-phone {
+        gap: $size-4;
+        padding: $size-4;
+        font-size: 1em;
     }
 }
 
 .contact-header {
-    max-width: 27em;
-    margin: $size-6 0 $size-10;
-    margin-bottom: $size-8;
+    width: min(100%, 34em);
+    margin: 0;
     text-align: center;
 
-    h1,
-    p {
-        margin: 0;
+    @include bp-md-tablet {
+        width: min(100%, 42em);
+    }
+}
+
+.contact-title,
+.contact-copy {
+    margin: 0;
+}
+
+.contact-title {
+    font-size: 2.1em;
+    line-height: 1;
+
+    @include bp-sm-phone {
+        font-size: 2.65em;
+    }
+}
+
+.contact-rule {
+    width: 100%;
+    height: 1px;
+    margin: $size-1 auto;
+    border: 0;
+
+    @include theme-dark {
+        background-color: $color-gray6;
     }
 
-    h1 {
-        font-size: 2.6em;
-
-        @include bp-xsm-phone {
-            font-size: 3em;
-        }
-
-        @include bp-sm-phone {
-            font-size: 3.2em;
-        }
+    @include theme-light {
+        background-color: $color-primary-darker;
     }
+}
 
-    hr {
-        width: 100%;
-        height: 1px;
-        margin: $size-1 auto $size-2;
-        border: 0;
+.contact-copy {
+    max-width: 42ch;
+    margin: 0 auto;
+    font-size: 0.92em;
+    line-height: 1.35;
+    color: $color-text-secondary;
 
-        @include theme-dark {
-            background-color: $color-gray6;
-        }
-
-        @include theme-light {
-            background-color: $color-primary-darker;
-        }
-    }
-
-    p {
-        max-width: 27ch;
-        line-height: 1.6;
-        color: $color-text-secondary;
-
-        @include bp-xsm-phone {
-            max-width: 42ch;
-        }
+    @include bp-sm-phone {
+        font-size: 1em;
+        line-height: 1.45;
     }
 }
 
 .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: $size-6;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: $size-1;
     width: 100%;
-    max-width: 33em;
+    max-width: 36em;
+    min-height: 0;
+
+    @include bp-md-tablet {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: $size-3 $size-4;
+        max-width: 46em;
+    }
 
     @include bp-lg-laptop {
-        max-width: 40em;
+        max-width: 50em;
     }
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: $size-2;
+    gap: $size-1;
+    min-width: 0;
+}
+
+.form-group-message,
+.form-actions {
+    @include bp-md-tablet {
+        grid-column: 1 / -1;
+    }
 }
 
 .form-label {
     font-family: $primary-font-stack;
-    font-size: 1em;
+    font-size: 0.88em;
     font-weight: 500;
+    line-height: 1.15;
 
     @include theme-dark {
         color: $color-text-primary;
@@ -359,10 +393,12 @@ const clearStatus = () => {
 
 .form-input,
 .form-textarea {
-    padding: $size-3 $size-4;
+    width: 100%;
+    padding: 0.45em $size-3;
     font-family: $secondary-font-stack;
-    font-size: 1em;
-    resize: vertical;
+    font-size: 0.95em;
+    line-height: 1.2;
+    resize: none;
     background-color: transparent;
     border: 2px solid transparent;
     border-radius: 8px;
@@ -382,7 +418,6 @@ const clearStatus = () => {
             outline: none;
             box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
             backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
         }
     }
 
@@ -401,7 +436,6 @@ const clearStatus = () => {
             outline: none;
             box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
             backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
         }
     }
 
@@ -419,20 +453,37 @@ const clearStatus = () => {
 }
 
 .form-textarea {
-    min-height: 120px;
+    height: 4.5rem;
+    min-height: 0;
     font-family: $secondary-font-stack;
-    line-height: 1.5;
+    line-height: 1.35;
+
+    @include bp-sm-phone {
+        height: 5.25rem;
+    }
+
+    @include bp-md-tablet {
+        height: 6.5rem;
+    }
 }
 
 .error-message {
-    margin-top: $size-1;
+    min-height: 1.1em;
+    margin-top: 0;
     font-family: $secondary-font-stack;
-    font-size: 0.9em;
+    font-size: 0.74em;
+    line-height: 1.1;
     color: $color-error;
 }
 
 .status-message {
+    position: absolute;
+    right: $size-3;
+    bottom: $size-2;
+    left: $size-3;
+    max-width: 36em;
     padding: $size-4;
+    margin: 0 auto;
     font-family: $secondary-font-stack;
     font-weight: 500;
     text-align: center;
@@ -457,26 +508,31 @@ const clearStatus = () => {
     }
 
     p {
+        margin: 0;
         font-size: 0.95em;
     }
 }
 
 .form-actions {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 33em;
-    padding: $size-5 $size-3;
-    font-size: 0.95em;
+    padding-top: $size-1;
+    font-size: 0.86em;
 
-    @include bp-lg-laptop {
-        max-width: 40em;
+    @include bp-sm-phone {
+        font-size: 0.95em;
     }
 
     .contact-links {
         display: flex;
         gap: $size-1;
-        font-size: 1.5em;
+        font-size: 1.35em;
+
+        @include bp-sm-phone {
+            font-size: 1.5em;
+        }
 
         a :deep(button) .icon:hover {
             fill: $color-primary;
@@ -485,6 +541,55 @@ const clearStatus = () => {
 
     :deep(button) {
         gap: $size-2;
+    }
+}
+
+@media (max-height: 600px) {
+    .contact-container {
+        gap: $size-1;
+        padding-block: $size-1 0;
+        font-size: 0.84em;
+    }
+
+    .contact-title {
+        font-size: 1.95em;
+    }
+
+    .contact-rule {
+        margin: 0 auto $size-1;
+    }
+
+    .contact-copy {
+        font-size: 0.86em;
+        line-height: 1.25;
+    }
+
+    .contact-form {
+        gap: $size-1;
+    }
+
+    .form-label {
+        font-size: 0.84em;
+    }
+
+    .form-input,
+    .form-textarea {
+        padding: 0.35em $size-3;
+        font-size: 0.9em;
+    }
+
+    .form-textarea {
+        height: 3.75rem;
+    }
+
+    .error-message {
+        min-height: 1em;
+        font-size: 0.72em;
+    }
+
+    .form-actions {
+        padding-top: 0;
+        font-size: 0.8em;
     }
 }
 </style>
