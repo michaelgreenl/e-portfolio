@@ -1,5 +1,9 @@
 <script setup>
-const props = defineProps({
+defineProps({
+    as: {
+        type: String,
+        default: 'button',
+    },
     preset: {
         type: String, // primary, primary-accent, secondary
     },
@@ -19,17 +23,17 @@ const props = defineProps({
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }">
+    <component :is="as" class="app-button" :class="preset" :style="{ ...styles }">
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}
         </span>
         <component :is="iconRight" class="icon" />
-    </button>
+    </component>
 </template>
 
 <style lang="scss" scoped>
-button {
+.app-button {
     @include flexCenterAll;
 
     font-family: $primary-font-stack;

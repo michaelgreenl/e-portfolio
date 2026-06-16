@@ -60,18 +60,26 @@ const { top: toolChipTop } = useElementBounding(toolChipsContainer);
 const { height: viewportHeight } = useWindowSize();
 
 const toolChipsYValue = computed(() => {
-    if (!Boolean(toolChipsContainer.value)) return undefined;
+    if (!toolChipsContainer.value) return undefined;
 
     if (toolChipTop.value <= viewportHeight.value * 0.45) {
         return 'top-third';
     } else if (toolChipTop.value <= viewportHeight.value * 0.65) {
         return 'middle-third';
     }
+
+    return undefined;
 });
 
-function openProject(autoplay = false) {
-    if (bp.isLaptop.value) {
+const projectHref = computed(() => `/projects/${props.project.slug}`);
+const demoHref = computed(() => `${projectHref.value}?autoplay=true`);
+
+function openProject(autoplay = false, updateRoute = true) {
+    if (updateRoute) {
         emit('open-project', props.project, autoplay);
+    }
+
+    if (bp.isLaptop.value) {
         projectSelected.value = true;
     } else {
         projectSelected.value = true;
@@ -79,9 +87,13 @@ function openProject(autoplay = false) {
     }
 }
 
-function closeProject() {
+function closeProject(updateRoute = true) {
     projectSelected.value = false;
     autoplayVideo.value = false;
+
+    if (updateRoute) {
+        emit('close-selected');
+    }
 }
 
 // ensures window resizing doesn't result in unwanted UI layouts
@@ -95,7 +107,7 @@ watch(bp.isLaptop, (newVal) => {
     }
 });
 
-defineExpose({ openProject, projectSelected });
+defineExpose({ openProject, closeProject, projectSelected });
 </script>
 
 <template>
@@ -106,8 +118,8 @@ defineExpose({ openProject, projectSelected });
         role="button"
         tabindex="0"
         @click="openProject()"
-        @keydown.enter="emit('open-project', project)"
-        @keydown.space.prevent="emit('open-project', project)"
+        @keydown.enter="openProject()"
+        @keydown.space.prevent="openProject()"
     >
         <div class="card-body">
             <div class="card-header">
@@ -154,44 +166,52 @@ defineExpose({ openProject, projectSelected });
 
             <div class="card-footer">
                 <div class="external-links external-links-card">
-                    <a
+                    <template
                         v-for="[key, link] in Object.entries(project.externalLinks).filter(
                             ([key]) => key !== 'porfolioLink',
                         )"
-                        :class="externalLinkRespText(project.slug, project.externalLinks)"
-                        :key="link"
-                        :href="key === 'demoVideo' ? null : link.href"
-                        target="_blank"
+                        :key="key"
                     >
-                        <Button
+                        <a
                             v-if="key === 'demoVideo'"
-                            @click.stop="openProject(true)"
-                            :text="link.text"
-                            :iconLeft="externalIcons[key]"
-                            preset="secondary"
-                        />
+                            :class="externalLinkRespText(project.slug, project.externalLinks)"
+                            :href="demoHref"
+                            @click.stop.prevent="openProject(true)"
+                        >
+                            <Button as="span" :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                        </a>
 
-                        <Button v-else :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
-                    </a>
+                        <a
+                            v-else
+                            :class="externalLinkRespText(project.slug, project.externalLinks)"
+                            :href="link.href"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            @click.stop
+                        >
+                            <Button as="span" :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                        </a>
+                    </template>
                 </div>
 
-                <Button
+                <a
                     v-if="!bp.isLaptop.value"
-                    class="see-more mobile"
-                    :class="`${projectSelected ? 'project-selected' : undefined}`"
-                    @click.stop="projectSelected ? closeProject() : openProject()"
-                    :text="`See ${projectSelected ? 'Less' : 'More'}`"
-                    :iconRight="ArrowIcon"
-                    preset="primary"
-                />
-                <Button
-                    v-else
-                    class="see-more"
-                    @click.stop="openProject()"
-                    text="See More"
-                    :iconRight="BoxArrowIcon"
-                    preset="primary"
-                />
+                    class="see-more-link"
+                    :href="projectHref"
+                    @click.stop.prevent="projectSelected ? closeProject() : openProject()"
+                >
+                    <Button
+                        as="span"
+                        class="see-more mobile"
+                        :class="`${projectSelected ? 'project-selected' : undefined}`"
+                        :text="`See ${projectSelected ? 'Less' : 'More'}`"
+                        :iconRight="ArrowIcon"
+                        preset="primary"
+                    />
+                </a>
+                <a v-else class="see-more-link" :href="projectHref" @click.stop.prevent="openProject()">
+                    <Button as="span" class="see-more" text="See More" :iconRight="BoxArrowIcon" preset="primary" />
+                </a>
             </div>
         </div>
     </div>
@@ -620,7 +640,7 @@ $inset-width: 12px;
         font-size: 1.1em;
 
         a:nth-child(3) {
-            &:deep(button) svg {
+            &:deep(.app-button) svg {
                 stroke-width: 0 !important;
 
                 @include theme-dark {
@@ -636,12 +656,12 @@ $inset-width: 12px;
 
     a {
         &.responsive-link-text {
-            &:deep(button) span {
+            &:deep(.app-button) span {
                 display: none;
             }
         }
 
-        &:deep(button) {
+        &:deep(.app-button) {
             white-space: nowrap;
 
             @include bp-md-tablet {
@@ -664,7 +684,7 @@ $inset-width: 12px;
             }
         }
 
-        &:hover :deep(button) svg {
+        &:hover :deep(.app-button) svg {
             @include theme-dark {
                 fill: lighten-color($color-text-muted, 15%) !important;
             }

@@ -47,11 +47,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/#projects?slug=tally&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/tally?autoplay=true",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/#projects?slug=tally&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/tally"
             }
         }
     },
@@ -79,12 +79,12 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/#projects?slug=reaction&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/reaction?autoplay=true",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/#projects?slug=reaction&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/reaction"
             }
         }
     },
@@ -112,12 +112,12 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/game-lobby?autoplay=true",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/#projects?slug=game-lobby&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/game-lobby"
             }
         }
     },
@@ -145,11 +145,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/#projects?slug=algo-visualizer&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/algo-visualizer?autoplay=true",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net#projects?slug=algo-visualizer&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/algo-visualizer"
             }
         }
     },
@@ -179,7 +179,7 @@
                 "text": "Package"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/#projects?slug=mawm&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/mawm"
             }
         }
     }

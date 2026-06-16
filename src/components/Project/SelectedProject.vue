@@ -5,7 +5,7 @@ import ToolChip from '@/components/ToolChip.vue';
 
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
-const props = defineProps({
+defineProps({
     activeProject: { required: true, type: Object },
     autoplayVideo: { required: true, type: Boolean },
     projectLogos: { required: true, type: Object },
@@ -81,8 +81,9 @@ defineExpose({ el, overlay });
                         :class="{ 'no-fill': key === 'liveSite' }"
                         :href="link.href"
                         target="_blank"
+                        rel="noopener noreferrer"
                     >
-                        <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                        <Button as="span" :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
                     </a>
                 </div>
 
@@ -278,7 +279,7 @@ iframe {
     font-size: 1.5em;
 
     .no-fill {
-        &:deep(button) svg {
+        &:deep(.app-button) svg {
             stroke-width: 0 !important;
 
             @include theme-dark {
@@ -292,7 +293,7 @@ iframe {
     }
 
     a {
-        &:deep(button) {
+        &:deep(.app-button) {
             @include bp-md-tablet {
                 gap: $size-2;
             }
@@ -321,7 +322,7 @@ iframe {
             }
         }
 
-        &:hover :deep(button) svg {
+        &:hover :deep(.app-button) svg {
             @include theme-dark {
                 fill: lighten-color($color-text-muted, 15%) !important;
             }

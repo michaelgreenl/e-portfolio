@@ -36,6 +36,7 @@ watch(
 
             <a href="/files/Michael-L-Green-Resume.pdf" download="Michael-L-Green-Resume.pdf">
                 <Button
+                    as="span"
                     text="Download PDF"
                     :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
                     preset="primary"
