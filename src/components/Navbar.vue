@@ -89,6 +89,7 @@ watch(
                 true-value="dark"
                 false-value="light"
                 aria-label="Toggle theme"
+                :checked="themeStore.theme === 'dark'"
                 @click="themeStore.toggleTheme()"
             />
 
