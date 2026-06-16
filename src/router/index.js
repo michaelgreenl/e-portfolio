@@ -50,6 +50,29 @@ export const router = createRouter({
     ],
 });
 
+function resolveLegacyHashRoute(hash) {
+    const legacyPath = hash.replace(/^#\/?/, '');
+    const [pathString, queryString] = legacyPath.split('?');
+    const base = pathString.split('/').filter(Boolean)[0] || 'home';
+
+    if (!navigationRoutes[base]) return null;
+
+    const query = {};
+    if (queryString) {
+        new URLSearchParams(queryString).forEach((val, key) => {
+            query[key] = val;
+        });
+    }
+
+    return { name: base, query, replace: true };
+}
+
+router.beforeEach((to) => {
+    if (to.path !== '/' || !to.hash) return true;
+
+    return resolveLegacyHashRoute(to.hash) || true;
+});
+
 router.afterEach((to) => {
     let title = 'M. Green';
 

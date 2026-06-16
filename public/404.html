@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>M. Green | E-portfolio</title>
+        <script>
+            (function (location) {
+                var pathSegmentsToKeep = 0;
+                var pathnameSegments = location.pathname.split('/');
+                var routeSegments = pathnameSegments.slice(1 + pathSegmentsToKeep);
+                var basePath = pathnameSegments.slice(0, 1 + pathSegmentsToKeep).join('/') + '/';
+                var routePath = routeSegments.join('/').replace(/&/g, '~and~');
+                var query = location.search ? '&' + location.search.slice(1).replace(/&/g, '~and~') : '';
+
+                location.replace(
+                    location.protocol +
+                        '//' +
+                        location.hostname +
+                        (location.port ? ':' + location.port : '') +
+                        basePath +
+                        '?' +
+                        '/' +
+                        routePath +
+                        query +
+                        location.hash
+                );
+            })(window.location);
+        </script>
+    </head>
+    <body></body>
+</html>
