@@ -3,13 +3,41 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="Michael Green is a full-stack developer building secure, scalable applications with polished Vue interfaces and maintainable Node backends."
+        />
+        <meta name="author" content="Michael Green" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://michaelgreenl.net/" />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://michaelgreenl.net/" />
+        <meta property="og:site_name" content="Michael Green Portfolio" />
+        <meta property="og:title" content="Michael Green | Full-Stack Developer" />
+        <meta
+            property="og:description"
+            content="Explore Michael Green's full-stack portfolio, including secure Vue, TypeScript, Node, Socket.IO, Prisma, LangGraph, and real-time application projects."
+        />
+        <meta property="og:image" content="https://michaelgreenl.net/web-app-manifest-512x512.png" />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+        <meta property="og:image:alt" content="Michael Green portfolio logo" />
+
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Michael Green | Full-Stack Developer" />
+        <meta
+            name="twitter:description"
+            content="Full-stack portfolio for Michael Green, featuring Vue, TypeScript, Node, secure back-end architecture, and real-time application work."
+        />
+        <meta name="twitter:image" content="https://michaelgreenl.net/web-app-manifest-512x512.png" />
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
-        <title>M. Green | E-portfolio</title>
+        <title>Michael Green | Full-Stack Developer</title>
 
         <script>
             (function (location) {
@@ -101,6 +129,142 @@
     </head>
     <body>
         <div id="app"></div>
+        <noscript>
+            <main>
+                <section aria-labelledby="portfolio-title">
+                    <p>Hi, my name is</p>
+                    <h1 id="portfolio-title">Michael Green</h1>
+                    <h2>Full-Stack Developer</h2>
+                    <p>
+                        I build secure, scalable applications with elegant, intuitive user interfaces and robust,
+                        maintainable backend architecture.
+                    </p>
+                </section>
+
+                <section aria-labelledby="portfolio-projects">
+                    <h2 id="portfolio-projects">Projects</h2>
+                    <article>
+                        <h3>Tally Tracker</h3>
+                        <p>
+                            A cross-platform offline-first application utilizing a custom synchronization queue for
+                            network resilience, featuring real-time shared counters and native deep linking integration.
+                        </p>
+                        <p>
+                            Stack: Vue, TypeScript, Ionic, Node, Socket.IO, Prisma, Zod, Vitest, Cypress, Express,
+                            Postgres.
+                        </p>
+                        <p>
+                            Links:
+                            <a href="https://github.com/michaelgreenl/tally-tracker">Repository</a>,
+                            <a href="https://michaelgreenl.net/#projects?slug=tally&amp;autoplay=false"
+                                >Portfolio project</a
+                            >
+                        </p>
+                    </article>
+                    <article>
+                        <h3>Reaction</h3>
+                        <p>
+                            A full-stack application engineered with a decoupled architecture, utilizing the Repository
+                            Pattern to securely manage authentication, game metrics, and user persistence.
+                        </p>
+                        <p>Stack: Vue, Pinia, Sass, GSAP, Node, Sequelize, Express.</p>
+                        <p>
+                            Links:
+                            <a href="https://github.com/michaelgreenl/reaction-client">Repository</a>,
+                            <a href="https://trainreaction.gg">Live site</a>,
+                            <a href="https://michaelgreenl.net/#projects?slug=reaction&amp;autoplay=false"
+                                >Portfolio project</a
+                            >
+                        </p>
+                    </article>
+                    <article>
+                        <h3>GameLobby</h3>
+                        <p>
+                            A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by
+                            JWTs and supported by Prisma for persistent match history.
+                        </p>
+                        <p>Stack: Vue, Socket.IO, Pinia, Prisma, Postgres, Node, Sass.</p>
+                        <p>
+                            Links:
+                            <a href="https://github.com/michaelgreenl/game-lobby">Repository</a>,
+                            <a href="https://gamelobby.io">Live site</a>,
+                            <a href="https://michaelgreenl.net/#projects?slug=game-lobby&amp;autoplay=false"
+                                >Portfolio project</a
+                            >
+                        </p>
+                    </article>
+                    <article>
+                        <h3>AlgoVisualizer</h3>
+                        <p>
+                            An interactive educational platform that visualizes complex algorithms and data structures
+                            with high-performance, synchronized, step-by-step animations.
+                        </p>
+                        <p>Stack: Vue, Nuxt, GSAP, Pinia, Sass, Node.</p>
+                        <p>
+                            Links:
+                            <a href="https://github.com/michaelgreenl/algovisualizer">Repository</a>,
+                            <a href="https://michaelgreenl.net/#projects?slug=algo-visualizer&amp;autoplay=false">
+                                Portfolio project
+                            </a>
+                        </p>
+                    </article>
+                    <article>
+                        <h3>MAWM</h3>
+                        <p>
+                            Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing
+                            LangGraph workflows with the purpose of agent orchestration.
+                        </p>
+                        <p>Stack: TypeScript, LangGraph, Node, OpenCode, Vitest.</p>
+                        <p>
+                            Links:
+                            <a href="https://github.com/michaelgreenl/mawm">Repository</a>,
+                            <a href="https://www.npmjs.com/package/@mawm/cli">NPM package</a>,
+                            <a href="https://michaelgreenl.net/#projects?slug=mawm&amp;autoplay=false"
+                                >Portfolio project</a
+                            >
+                        </p>
+                    </article>
+                </section>
+
+                <section aria-labelledby="portfolio-experience">
+                    <h2 id="portfolio-experience">Experience</h2>
+                    <article>
+                        <h3>Software Development Intern, 24g</h3>
+                        <p>Troy MI, January 2022 - August 2022</p>
+                        <p>
+                            Built interactive expo activations for Fortune 500 clients including Salesforce, Waymo, and
+                            Essilor Luxottica, independently taking live experiential activations from UI mockup to
+                            deployed production.
+                        </p>
+                    </article>
+                </section>
+
+                <section aria-labelledby="portfolio-skills">
+                    <h2 id="portfolio-skills">Skills</h2>
+                    <p>Languages: TypeScript, JavaScript (ES6+), SQL, Python, Java, C/C++, HTML/CSS, Sass.</p>
+                    <p>
+                        Frameworks and libraries: Vue, Nuxt, Ionic, Capacitor, React, Express, Socket.IO, GSAP,
+                        LangChain/LangGraph, Cypress, Vitest.
+                    </p>
+                    <p>
+                        Tools and databases: Git, Bash, REST APIs, JWT, OAuth, PostgreSQL, MySQL, SQLite, Prisma,
+                        Sequelize, Zod.
+                    </p>
+                    <p>Infrastructure: Node, Bun, Docker, Render, Vercel, GitHub Pages, GitHub Actions.</p>
+                </section>
+
+                <nav aria-label="Portfolio links">
+                    <h2>Links</h2>
+                    <a href="https://github.com/michaelgreenl">GitHub</a>
+                    <a href="https://www.linkedin.com/in/michaelgreen5/">LinkedIn</a>
+                    <a href="mailto:greenmichael5000@gmail.com">Email</a>
+                    <a href="/files/Michael-L-Green-Resume.pdf">Resume PDF</a>
+                    <a href="https://michaelgreenl.net/#projects">Projects</a>
+                    <a href="https://michaelgreenl.net/#resume">Resume</a>
+                    <a href="https://michaelgreenl.net/#contact">Contact</a>
+                </nav>
+            </main>
+        </noscript>
         <script type="module" src="/src/main.js"></script>
     </body>
 </html>
