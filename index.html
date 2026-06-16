@@ -118,6 +118,20 @@
             type="font/woff2"
             crossorigin="anonymous"
         />
+
+        <script>
+            (function () {
+                const KEY = 'THEME';
+                let theme = localStorage.getItem(KEY);
+
+                if (theme !== 'dark' && theme !== 'light') {
+                    theme = 'dark';
+                    localStorage.setItem(KEY, theme);
+                }
+
+                document.documentElement.setAttribute('data-theme', theme);
+            })();
+        </script>
     </head>
     <body>
         <div id="app">
