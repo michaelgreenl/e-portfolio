@@ -169,9 +169,8 @@ const clearStatus = () => {
 <template>
     <div ref="pageElement" class="contact-container">
         <div ref="pageHeader" class="contact-header">
-            <h1>Get In Touch!</h1>
+            <h1>Get in Touch!</h1>
             <hr />
-            <p>It'd be great to hear from you. Send me a message and I'll respond as soon as I can!</p>
         </div>
 
         <form ref="formElement" @submit.prevent="handleSubmit" class="contact-form">
@@ -266,20 +265,20 @@ const clearStatus = () => {
     flex-direction: column;
     flex-grow: 1;
     width: 100%;
-    padding: $size-8 $size-4;
+    padding: $size-2 $size-4;
     margin: 0 auto;
     font-size: 0.9em;
     @include flexCenterAll;
 
-    @include bp-xsm-phone {
+    @include bp-xl-desktop {
         font-size: clamp(0.9em, 3.5vw, 1em);
     }
 }
 
 .contact-header {
     max-width: 27em;
-    margin: $size-6 0 $size-10;
-    margin-bottom: $size-8;
+    width: 90%;
+    margin: $size-6 0 $size-6;
     text-align: center;
 
     h1,
@@ -288,6 +287,7 @@ const clearStatus = () => {
     }
 
     h1 {
+        white-space: nowrap;
         font-size: 2.6em;
 
         @include bp-xsm-phone {
@@ -302,7 +302,7 @@ const clearStatus = () => {
     hr {
         width: 100%;
         height: 1px;
-        margin: $size-1 auto $size-2;
+        margin: $size-3 auto $size-2;
         border: 0;
 
         @include theme-dark {
@@ -327,17 +327,19 @@ const clearStatus = () => {
 
 .contact-form {
     display: flex;
-    flex-direction: column;
-    gap: $size-6;
+    gap: $size-4;
     width: 100%;
     max-width: 33em;
+    flex-wrap: wrap;
 
     @include bp-lg-laptop {
+        gap: $size-6;
         max-width: 40em;
     }
 }
 
 .form-group {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: $size-2;
@@ -362,7 +364,6 @@ const clearStatus = () => {
     padding: $size-3 $size-4;
     font-family: $secondary-font-stack;
     font-size: 1em;
-    resize: vertical;
     background-color: transparent;
     border: 2px solid transparent;
     border-radius: 8px;
@@ -419,9 +420,14 @@ const clearStatus = () => {
 }
 
 .form-textarea {
-    min-height: 120px;
+    height: 5em;
     font-family: $secondary-font-stack;
+    resize: vertical;
     line-height: 1.5;
+
+    @include bp-sm-phone {
+        min-height: 120px;
+    }
 }
 
 .error-message {
@@ -464,6 +470,7 @@ const clearStatus = () => {
 .form-actions {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     max-width: 33em;
     padding: $size-5 $size-3;
