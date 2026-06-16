@@ -118,9 +118,10 @@
             type="font/woff2"
             crossorigin="anonymous"
         />
-
         <script>
             (function () {
+                document.documentElement.classList.add('js');
+
                 const KEY = 'THEME';
                 let theme = localStorage.getItem(KEY);
 
@@ -132,6 +133,11 @@
                 document.documentElement.setAttribute('data-theme', theme);
             })();
         </script>
+        <style>
+            .js .static-profile {
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <div id="app">
