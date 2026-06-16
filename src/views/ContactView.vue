@@ -233,6 +233,9 @@ const clearStatus = () => {
                 <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
                     <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
                 </a>
+                <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
+                    <Button class="contact-link" :iconLeft="MailIcon" preset="secondary" />
+                </a>
             </div>
 
             <Button
