@@ -1,10 +1,8 @@
 import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 
-const THEME_STORAGE_KEY = 'THEME';
-
 function getInitialTheme() {
-    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    const storedTheme = localStorage.getItem('THEME');
     if (storedTheme === 'dark' || storedTheme === 'light') return storedTheme;
 
     const documentTheme = document.documentElement.getAttribute('data-theme');
@@ -19,7 +17,7 @@ export const useThemeStore = defineStore('theme', () => {
     const toggleTheme = () => {
         theme.value = theme.value === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', theme.value);
-        localStorage.setItem(THEME_STORAGE_KEY, theme.value);
+        localStorage.setItem('THEME', theme.value);
     };
 
     return {
