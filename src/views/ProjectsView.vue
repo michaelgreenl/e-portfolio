@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { computed, ref, onMounted, watch, nextTick } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { projectAnimations } from '@/animations/page/projects.js';
@@ -20,6 +21,8 @@ import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 
 const routeStore = useRouteStore();
+const route = useRoute();
+const router = useRouter();
 const { headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
@@ -52,12 +55,15 @@ const activeProject = ref();
 const scrollPosition = ref();
 const autoplayVideo = ref(false);
 
+const routedProject = computed(() => projectsData.find((project) => project.slug === route.params.slug));
+const shouldAutoplay = computed(() => route.query.autoplay === 'true');
+
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
             if (activeProject.value) {
-                closeProject();
+                closeProject({ updateRoute: false });
             }
 
             headerDismiss({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
@@ -68,40 +74,79 @@ watch(
 onMounted(() => {
     headerReveal({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
 
-    const query = routeStore.currentRoute.query;
-    const projectToOpen = projectsData.find((p) => p.slug === query.slug);
-
-    if (query && projectToOpen) {
-        openProject(projectToOpen, query.autoplay === 'true');
-    }
+    syncProjectFromRoute();
 });
 
-async function openProject(project, autoplay = false) {
-    const queriedProjectRef = projectCardRefs.value[project.slug];
+watch(
+    () => route.fullPath,
+    () => {
+        syncProjectFromRoute();
+    },
+);
 
-    queriedProjectRef.projectSelected = true;
+async function syncProjectFromRoute() {
+    await nextTick();
+
+    if (route.name === 'project' && !routedProject.value) {
+        router.replace({ name: 'projects' });
+        return;
+    }
+
+    if (routedProject.value) {
+        openProject(routedProject.value, shouldAutoplay.value, false);
+        return;
+    }
+
+    closeProject({ updateRoute: false });
+}
+
+async function openProject(project, autoplay = false, updateRoute = true) {
+    if (updateRoute) {
+        await router.push({
+            name: 'project',
+            params: { slug: project.slug },
+            query: autoplay ? { autoplay: 'true' } : {},
+        });
+        return;
+    }
+
+    const queriedProjectRef = projectCardRefs.value[project.slug];
+    if (!queriedProjectRef) return;
+
+    queriedProjectRef.openProject(autoplay, false);
     autoplayVideo.value = autoplay;
 
     if (isLaptop.value) {
         activeProject.value = project;
 
-        scrollPosition.value = window.scrollY;
-        document.body.classList.add('no-scroll');
-        document.body.style.top = `-${scrollPosition.value}px`;
+        if (!document.body.classList.contains('no-scroll')) {
+            scrollPosition.value = window.scrollY;
+            document.body.classList.add('no-scroll');
+            document.body.style.top = `-${scrollPosition.value}px`;
+        }
 
         await nextTick();
         selectedProject.value.el.focus();
         anims.showSelectedProject({ targets: [selectedProject.value.el, selectedProject.value.overlay] });
     } else {
-        queriedProjectRef.openProject(autoplay);
+        activeProject.value = null;
+        document.body.classList.remove('no-scroll');
+        document.body.style.top = '';
         window.scrollTo(0, queriedProjectRef.$el.offsetTop);
     }
 }
 
-function closeProject() {
+async function closeProject({ updateRoute = true } = {}) {
+    Object.values(projectCardRefs.value).forEach((projectCard) => {
+        projectCard?.closeProject(false);
+    });
+
     document.body.classList.remove('no-scroll');
     document.body.style.top = '';
-    window.scrollTo(0, scrollPosition.value);
+
+    if (scrollPosition.value !== undefined) {
+        window.scrollTo(0, scrollPosition.value);
+    }
 
     if (selectedProject.value) {
         anims.hideSelectedProject({
@@ -111,6 +156,12 @@ function closeProject() {
                 activeProject.value = null;
             },
         });
+    } else {
+        activeProject.value = null;
+    }
+
+    if (updateRoute && route.name === 'project') {
+        await router.push({ name: 'projects' });
     }
 }
 </script>
@@ -138,7 +189,7 @@ function closeProject() {
 
         <div class="cards">
             <ProjectCard
-                v-for="(project, index) in projectsData"
+                v-for="project in projectsData"
                 :key="project.title"
                 :ref="(el) => (projectCardRefs[project.slug] = el)"
                 :project="project"

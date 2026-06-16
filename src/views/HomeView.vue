@@ -9,6 +9,7 @@ import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
 import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
+import MailIcon from '@/components/SVGs/MailIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -37,11 +38,14 @@ onMounted(() => {
 <template>
     <div class="home-container">
         <div class="contact-links">
-            <a href="https://github.com/michaelgreenl" target="_blank">
-                <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+            <a href="https://github.com/michaelgreenl" target="_blank" rel="noopener noreferrer">
+                <Button as="span" class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
             </a>
-            <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+            <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank" rel="noopener noreferrer">
+                <Button as="span" class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+            </a>
+            <a href="mailto:greenmichael5000@gmail.com">
+                <Button as="span" class="contact-link" :iconLeft="MailIcon" preset="secondary" />
             </a>
         </div>
         <div class="hero-content">
@@ -55,9 +59,12 @@ onMounted(() => {
             </p>
 
             <div class="cta">
-                <Button @click="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
+                <a :href="routeStore.routes.contact.path" @click.prevent="routeStore.toRoute('contact')">
+                    <Button as="span" text="Contact" preset="primary primary-accent" />
+                </a>
                 <a href="/files/Michael-L-Green-Resume.pdf" download="Michael-L-Green-Resume.pdf">
                     <Button
+                        as="span"
                         text="Resume/CV"
                         :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
                         preset="primary"
@@ -70,14 +77,9 @@ onMounted(() => {
             <hr class="nav-links-line" />
 
             <div v-for="(route, key) in routeStore.routes" :key="key" class="nav-link">
-                <Button
-                    v-if="key !== 'home'"
-                    @click="() => routeStore.toRoute(key)"
-                    :text="route.meta.title"
-                    :iconLeft="route.meta.icon"
-                    :iconLeftFill="route.meta.iconFill"
-                    preset="secondary"
-                />
+                <a v-if="key !== 'home'" :href="route.path" @click.prevent="routeStore.toRoute(key)">
+                    <Button as="span" :text="route.meta.title" :iconLeft="route.meta.icon" preset="secondary" />
+                </a>
             </div>
         </div>
     </div>
@@ -213,7 +215,7 @@ p {
     justify-content: flex-end;
     font-size: 1.5em;
 
-    a :deep(button) .icon:hover {
+    a :deep(.app-button) .icon:hover {
         fill: $color-primary;
     }
 }
@@ -248,7 +250,7 @@ p {
         justify-content: flex-start !important;
     }
 
-    :deep(button) {
+    :deep(.app-button) {
         font-weight: 400;
     }
 }
@@ -266,7 +268,7 @@ p {
         display: flex;
     }
 
-    :deep(button) {
+    :deep(.app-button) {
         padding: 0 $size-1;
         font-size: 1.2em;
 

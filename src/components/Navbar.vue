@@ -66,18 +66,19 @@ watch(
         <Logo class="logo" />
 
         <nav v-if="routeStore.currentRoute.base !== 'home'" class="nav-desktop">
-            <button
+            <a
                 v-for="(route, key) in routeStore.routes"
                 :key="key"
-                class="nav-item"
+                class="nav-item nav-link"
                 :class="{ active: routeStore.currentRoute.base === key }"
-                :disabled="routeStore.currentRoute.base === key"
-                @click="routeStore.toRoute(key)"
+                :href="route.path"
+                :aria-current="routeStore.currentRoute.base === key ? 'page' : undefined"
+                @click.prevent="routeStore.toRoute(key)"
             >
                 <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
                 <component :is="route.meta.icon" v-else class="icon" />
                 {{ route.name }}
-            </button>
+            </a>
         </nav>
 
         <label class="theme-toggle">
@@ -102,17 +103,19 @@ watch(
     <hr class="nav-line" />
 
     <nav class="nav-mobile">
-        <button
+        <a
             v-for="(route, key) in routeStore.routes"
             :key="key"
-            @click="routeStore.toRoute(key)"
+            class="nav-link"
             :class="{ active: routeStore.currentRoute.base === key }"
-            :disabled="routeStore.currentRoute.base === key"
+            :href="route.path"
+            :aria-current="routeStore.currentRoute.base === key ? 'page' : undefined"
+            @click.prevent="routeStore.toRoute(key)"
         >
             <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
 
             <span>{{ route.name }}</span>
-        </button>
+        </a>
     </nav>
 </template>
 
@@ -146,7 +149,7 @@ watch(
     transform: scaleX(0);
 }
 
-.nav-desktop button {
+.nav-desktop .nav-item {
     opacity: 0;
     transform: translateX(-50px) scaleX(0.5);
 }
@@ -183,7 +186,7 @@ watch(
         display: none;
     }
 
-    button {
+    .nav-link {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -260,7 +263,7 @@ watch(
         display: flex;
     }
 
-    button {
+    .nav-link {
         position: relative;
         font-size: 0.85em;
         font-family: $primary-font-stack;

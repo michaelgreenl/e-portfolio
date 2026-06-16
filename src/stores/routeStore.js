@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref, markRaw, computed, watch, defineAsyncComponent } from 'vue';
+import { markRaw, computed, shallowRef } from 'vue';
 import { LEAVE_DURATION } from '@/animations/constants/timing';
+import router from '@/router';
 
 import HomeIcon from '@/components/SVGs/Views/HomeIcon.vue';
 import HomeIconFill from '@/components/SVGs/Views/HomeIconFill.vue';
@@ -13,115 +14,69 @@ import ContactIconFill from '@/components/SVGs/Views/ContactIconFill.vue';
 export const useRouteStore = defineStore('router', () => {
     const routes = {
         home: {
-            component: defineAsyncComponent(() => import('@/views/HomeView.vue')),
             name: 'Home',
+            path: '/',
             meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
         },
         projects: {
-            component: defineAsyncComponent(() => import('@/views/ProjectsView.vue')),
             name: 'Projects',
+            path: '/projects',
             meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
         },
         resume: {
-            component: defineAsyncComponent(() => import('@/views/ResumeView.vue')),
             name: 'Resume',
+            path: '/resume',
             meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
         },
         contact: {
-            component: defineAsyncComponent(() => import('@/views/ContactView.vue')),
             name: 'Contact',
+            path: '/contact',
             meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
         },
     };
 
-    const activePath = ref(getInitialPath());
-    const isLeaving = ref(false);
-    const toPath = ref();
+    const isLeaving = shallowRef(false);
+    const toPath = shallowRef();
     const leaveDuration = LEAVE_DURATION;
 
-    function parsePath(fullPath) {
-        const [pathString, queryString] = fullPath.split('?');
-        const parts = pathString.split('/');
-        const base = parts[0] || 'home';
-        const params = { id: parts[1] || null };
-
-        const query = {};
-        if (queryString) {
-            new URLSearchParams(queryString).forEach((val, key) => {
-                query[key] = val;
-            });
-        }
-
-        return { base, params, query };
-    }
-
-    function getInitialPath() {
-        const hash = window.location.hash.slice(1);
-        if (!hash) return 'home';
-
-        const { base } = parsePath(hash);
-        return routes[base] ? hash : 'home';
-    }
-
+    const activePath = computed(() => router.currentRoute.value.meta.navKey || 'home');
     const currentRoute = computed(() => {
-        const { base, params, query } = parsePath(activePath.value);
+        const route = router.currentRoute.value;
+        const base = route.meta.navKey || 'home';
 
         return {
             base,
-            params,
-            query,
-            component: routes[base]?.component,
+            params: route.params,
+            query: route.query,
             meta: routes[base]?.meta,
         };
     });
 
+    function getHref(to) {
+        return routes[to]?.path || to || '/';
+    }
+
+    function getRouteKey(href) {
+        return Object.entries(routes).find(([, route]) => route.path === href)?.[0] || 'home';
+    }
+
     async function changeRoute(to) {
+        const href = getHref(to);
+
+        if (href === router.currentRoute.value.path) return;
+
         isLeaving.value = true;
-        toPath.value = to;
+        toPath.value = getRouteKey(href);
 
         await new Promise((resolve) => setTimeout(resolve, leaveDuration));
 
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-
-        activePath.value = to;
+        await router.push(href);
         isLeaving.value = false;
-        window.location.hash = to;
     }
 
     function toRoute(to) {
-        const { base } = parsePath(to);
-        if (!routes[base]) {
-            to = 'home';
-        }
-
-        changeRoute(to);
+        changeRoute(getHref(to));
     }
 
-    window.addEventListener('hashchange', async () => {
-        const newPath = getInitialPath();
-        if (newPath !== activePath.value) {
-            changeRoute(newPath);
-        }
-    });
-
-    watch(
-        activePath,
-        (newPath) => {
-            const { base } = parsePath(newPath);
-
-            let title = 'M. Green';
-            if (routes[base]?.meta?.title) {
-                title += ' | ' + routes[base].meta.title;
-            }
-
-            document.title = title;
-        },
-        { immediate: true },
-    );
-
-    if (!window.location.hash) {
-        window.location.hash = activePath.value;
-    }
-
-    return { routes, activePath, currentRoute, toRoute, isLeaving, leaveDuration, toPath };
+    return { routes, activePath, currentRoute, toRoute, getHref, isLeaving, leaveDuration, toPath };
 });

@@ -1,17 +1,16 @@
 <script setup>
-import { useRouteStore } from '@/stores/routeStore.js';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import BgSVG from '@/components/SVGs/BgSVG.vue';
-
-const routeStore = useRouteStore();
 </script>
 
 <template>
     <BgSVG class="bg-svg" />
 
     <Navbar />
-    <component :is="routeStore.currentRoute.component" :key="routeStore.activePath" class="page" />
+    <RouterView v-slot="{ Component, route }">
+        <component :is="Component" :key="route.meta.navKey || route.fullPath" class="page" />
+    </RouterView>
     <Footer />
 </template>
 
@@ -103,7 +102,8 @@ p {
 }
 
 a,
-button {
+button,
+.app-button {
     cursor: pointer;
 }
 

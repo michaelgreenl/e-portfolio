@@ -228,11 +228,14 @@ const clearStatus = () => {
         </form>
         <div class="form-actions">
             <div class="contact-links">
-                <a href="https://github.com/michaelgreenl" target="_blank">
-                    <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+                <a href="https://github.com/michaelgreenl" target="_blank" rel="noopener noreferrer">
+                    <Button as="span" class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
                 </a>
-                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                    <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank" rel="noopener noreferrer">
+                    <Button as="span" class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+                </a>
+                <a href="mailto:greenmichael5000@gmail.com">
+                    <Button as="span" class="contact-link" :iconLeft="MailIcon" preset="secondary" />
                 </a>
             </div>
 
@@ -478,12 +481,12 @@ const clearStatus = () => {
         gap: $size-1;
         font-size: 1.5em;
 
-        a :deep(button) .icon:hover {
+        a :deep(.app-button) .icon:hover {
             fill: $color-primary;
         }
     }
 
-    :deep(button) {
+    :deep(.app-button) {
         gap: $size-2;
     }
 }
