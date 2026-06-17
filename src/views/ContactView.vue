@@ -39,7 +39,9 @@ watch(
         if (newVal) {
             headerDismiss({
                 headerEl: pageHeader.value,
-                extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link, .status-message'],
+                extraTargets: [
+                    '.form-label, .form-input, .form-textarea, .contact-link, .status-message, .error-message',
+                ],
             });
         }
     },
@@ -188,7 +190,7 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('email')"
                     @focus="handleFieldFocus('email')"
                 />
-                <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+                <span v-if="errors.email" class="status-message error-message">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
@@ -205,7 +207,7 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('subject')"
                     @focus="handleFieldFocus('subject')"
                 />
-                <span v-if="errors.subject" class="error-message">{{ errors.subject }}</span>
+                <span v-if="errors.subject" class="status-message error-message">{{ errors.subject }}</span>
             </div>
 
             <div class="form-group">
@@ -222,9 +224,11 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('message')"
                     @focus="handleFieldFocus('message')"
                 ></textarea>
-                <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
+
+                <span v-if="errors.message" class="status-message error-message">{{ errors.message }}</span>
             </div>
         </form>
+
         <div class="form-actions">
             <div class="contact-links">
                 <a href="https://github.com/michaelgreenl" target="_blank">
@@ -292,7 +296,7 @@ const clearStatus = () => {
         }
 
         @include bp-sm-phone {
-            font-size: 3.2em;
+            font-size: 3.4em;
         }
     }
 
@@ -320,7 +324,7 @@ const clearStatus = () => {
     max-width: 33em;
 
     @include bp-lg-laptop {
-        gap: $size-6;
+        gap: $size-5;
         max-width: 40em;
     }
 }
@@ -360,7 +364,7 @@ const clearStatus = () => {
 }
 
 .form-textarea {
-    height: 5em;
+    height: 6.5em;
     line-height: 1.5;
     resize: vertical;
 
@@ -377,7 +381,7 @@ const clearStatus = () => {
     border: 2px solid transparent;
 
     &:focus {
-        border-color: $color-primary;
+        border-color: $color-primary !important;
         outline: none;
         box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
         backdrop-filter: blur(4px);
@@ -425,17 +429,15 @@ const clearStatus = () => {
 }
 
 .error-message {
-    margin-top: $size-1;
-    font-size: 0.9em;
     color: $color-error;
 }
 
 .status-message {
-    padding: $size-4;
+    padding: 0 $size-4;
     font-weight: 500;
-    text-align: center;
+    white-space: nowrap;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    font-size: 0.8em;
 
     &:hover {
         opacity: 0.8;
@@ -455,6 +457,14 @@ const clearStatus = () => {
 
     p {
         font-size: 0.95em;
+    }
+
+    @include bp-xsm-phone {
+        font-size: 0.85em;
+    }
+
+    @include bp-sm-phone {
+        font-size: 0.9em;
     }
 }
 
