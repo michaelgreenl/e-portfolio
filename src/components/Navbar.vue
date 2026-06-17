@@ -30,6 +30,7 @@ const fromHome = shallowRef(false);
 const mobileNav = useTemplateRef('mobileNav');
 const activeItemBg = useTemplateRef('activeItemBg');
 const activeBgTween = shallowRef(null);
+const pendingLabelRects = shallowRef(null);
 const mobileNavButtonRefs = new Map();
 
 let resizeObserver;
@@ -66,6 +67,54 @@ const setActiveBgMetrics = (metrics) => {
     gsap.set(activeItemBg.value, {
         x: metrics.x,
         width: metrics.width,
+    });
+};
+
+const captureMobileNavLabelRects = () => {
+    const rects = new Map();
+
+    mobileNavButtonRefs.forEach((buttonEl, key) => {
+        const label = buttonEl.querySelector('.nav-label');
+
+        if (!label) return;
+
+        const rect = label.getBoundingClientRect();
+        rects.set(key, {
+            left: rect.left,
+            top: rect.top,
+        });
+    });
+
+    return rects;
+};
+
+const animateMobileNavLabels = (previousRects) => {
+    if (!previousRects || prefersReducedMotion()) return;
+
+    mobileNavButtonRefs.forEach((buttonEl, key) => {
+        const label = buttonEl.querySelector('.nav-label');
+        const previousRect = previousRects.get(key);
+
+        if (!label || !previousRect) return;
+
+        const currentRect = label.getBoundingClientRect();
+        const x = previousRect.left - currentRect.left;
+        const y = previousRect.top - currentRect.top;
+
+        if (Math.abs(x) < 0.5 && Math.abs(y) < 0.5) return;
+
+        gsap.killTweensOf(label);
+        gsap.fromTo(
+            label,
+            { x, y },
+            {
+                duration: TIMING.duration.normal,
+                ease: TIMING.easing.smooth,
+                x: 0,
+                y: 0,
+                clearProps: 'transform',
+            },
+        );
     });
 };
 
@@ -158,6 +207,10 @@ onMounted(() => {
 watch(
     () => routeStore.isLeaving,
     async (newVal) => {
+        if (newVal) {
+            pendingLabelRects.value = captureMobileNavLabelRects();
+        }
+
         if (routeStore.activePath !== 'home' && fromHome.value) {
             await nextTick();
             anims.enterNavItem();
@@ -174,15 +227,19 @@ watch(
     () => routeStore.currentRoute.base,
     async (newRouteBase, oldRouteBase) => {
         const fromMetrics = measureMobileNavItem(oldRouteBase);
+        const previousLabelRects = pendingLabelRects.value;
 
         await nextTick();
 
+        animateMobileNavLabels(previousLabelRects);
         animateActiveBgToRoute(fromMetrics, measureMobileNavItem(newRouteBase));
+        pendingLabelRects.value = null;
     },
 );
 
 onUnmounted(() => {
     activeBgTween.value?.kill();
+    gsap.killTweensOf('.nav-label');
     resizeObserver?.disconnect();
 });
 
@@ -246,16 +303,17 @@ const navMobileRouteTo = (key) => {
             :class="{ active: routeStore.currentRoute.base === key }"
             :disabled="routeStore.currentRoute.base === key"
         >
-            <component
-                :is="route.meta.iconFill"
-                class="icon mobile-nav-icon"
-                :class="{
-                    active: routeStore.currentRoute.base === key,
-                }"
-            />
-            <!-- v-if="routeStore.currentRoute.base === key" -->
+            <span class="mobile-nav-icon-slot" aria-hidden="true">
+                <component
+                    :is="route.meta.iconFill"
+                    class="icon mobile-nav-icon"
+                    :class="{
+                        active: routeStore.currentRoute.base === key,
+                    }"
+                />
+            </span>
 
-            <span>{{ route.name }}</span>
+            <span class="nav-label">{{ route.name }}</span>
         </button>
     </nav>
 </template>
@@ -372,27 +430,51 @@ const navMobileRouteTo = (key) => {
         border-radius: $size-4;
 
         @include bp-xsm-phone {
-            gap: $size-2;
+            gap: 0;
             font-size: 0.7em;
+        }
+
+        .mobile-nav-icon-slot {
+            display: none;
         }
 
         .icon {
             display: none;
 
             @include bp-xsm-phone {
+                display: block;
+                flex: 0 0 $size-6;
                 width: $size-6;
                 height: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
+            }
+        }
 
-                &.active {
-                    display: inline-block;
+        @include bp-xsm-phone {
+            .mobile-nav-icon-slot {
+                display: inline-flex;
+                flex: 0 0 auto;
+                align-items: center;
+                justify-content: center;
+                width: $size-6;
+                max-width: 0;
+                margin-right: 0;
+                overflow: hidden;
+            }
+
+            &.active {
+                .mobile-nav-icon-slot {
+                    max-width: $size-6;
+                    margin-right: $size-2;
                 }
             }
         }
 
-        span {
+        .nav-label {
+            display: inline-block;
             font-size: clamp(0.4em, 4vw, 1em);
+            will-change: transform;
 
             @include bp-xsm-phone {
                 font-size: clamp(0.9em, 3.7vw, 1em);
