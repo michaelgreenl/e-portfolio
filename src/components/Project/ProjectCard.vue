@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch, nextTick } from 'vue';
 import { useElementBounding, useWindowSize } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import Button from '@/components/Button.vue';
@@ -68,13 +68,15 @@ const toolChipsYValue = computed(() => {
     }
 });
 
-function openProject(autoplay = false) {
+async function openProject(autoplay = false) {
     if (bp.isLaptop.value) {
         emit('open-project', props.project, autoplay);
         projectSelected.value = true;
     } else {
         projectSelected.value = true;
         autoplayVideo.value = autoplay;
+        await nextTick();
+        window.scrollTo({ top: cardEl.value.offsetTop, behavior: 'smooth' });
     }
 }
 
@@ -104,7 +106,7 @@ defineExpose({ openProject, projectSelected });
         :class="`${projectSelected && !bp.isLaptop.value ? 'selected-mobile' : undefined}`"
         role="button"
         tabindex="0"
-        @click="openProject()"
+        @click="projectSelected && !bp.isLaptop.value ? undefined : openProject()"
         @keydown.enter="emit('open-project', project)"
         @keydown.space.prevent="emit('open-project', project)"
     >
@@ -300,12 +302,6 @@ p {
         }
 
         border-radius: 12px;
-    }
-
-    &.selected-mobile .card-body .card-footer {
-        padding-top: $size-4;
-        margin-top: $size-2;
-        border-top: solid 1px $color-text-muted;
     }
 }
 

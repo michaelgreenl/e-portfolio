@@ -94,7 +94,8 @@ async function openProject(project, autoplay = false) {
         anims.showSelectedProject({ targets: [selectedProject.value.el, selectedProject.value.overlay] });
     } else {
         queriedProjectRef.openProject(autoplay);
-        window.scrollTo(0, queriedProjectRef.$el.offsetTop);
+        await nextTick();
+        window.scrollTo({ top: queriedProjectRef.$el.offsetTop, behavior: 'smooth' });
     }
 }
 
