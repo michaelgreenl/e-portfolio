@@ -36,7 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="home-container">
+    <div class="home-container page-shell">
         <div class="contact-links">
             <a href="https://github.com/michaelgreenl" target="_blank">
                 <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
@@ -89,15 +89,8 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .home-container {
-    flex-direction: column;
-    flex-grow: 1;
     gap: $size-17;
-    width: 100%;
     padding: $size-8 $size-4 0;
-    margin: 0 auto;
-    font-size: 0.9em;
-    color: $color-text-primary;
-    @include flexCenterAll;
 
     @include bp-xsm-phone {
         font-size: 1em;
@@ -114,7 +107,6 @@ onMounted(() => {
 
     @include bp-lg-laptop {
         max-width: 1200px;
-        margin: 0 auto;
     }
 
     @include bp-xl-desktop {
@@ -212,9 +204,9 @@ p {
     position: absolute;
     top: $size-3;
     right: $size-2;
-    width: 100vw;
     display: flex;
     justify-content: flex-end;
+    width: 100vw;
     font-size: 1.5em;
 
     a :deep(button) .icon:hover {
@@ -230,20 +222,10 @@ p {
 
 .hero-line {
     width: 95%;
-    height: 1px;
     margin: 0 auto $size-2;
-    border: 0;
 
     @include bp-md-tablet {
         display: none;
-    }
-
-    @include theme-dark {
-        background-color: $color-gray6;
-    }
-
-    @include theme-light {
-        background-color: $color-gray5;
     }
 }
 
@@ -292,15 +274,5 @@ p {
 
 .nav-links-line {
     flex-grow: 1;
-    height: 1px;
-    border: 0;
-
-    @include theme-dark {
-        background-color: $color-gray6;
-    }
-
-    @include theme-light {
-        background-color: $color-gray5;
-    }
 }
 </style>

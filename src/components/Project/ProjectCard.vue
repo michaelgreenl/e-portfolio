@@ -201,28 +201,48 @@ p {
     margin: 0;
 }
 
-.project-card {
+.project-card,
+.card-body,
+.selected-description {
     display: flex;
     flex-direction: column;
+}
+
+.card-header,
+.card-title,
+.card-date,
+.card-footer,
+.card-tool-chips {
+    display: flex;
+    align-items: center;
+}
+
+.card-footer {
+    justify-content: space-between;
+    margin-top: $size-1;
+    font-size: 1.3em;
+
+    @include bp-md-tablet {
+        flex-wrap: nowrap;
+        padding-top: $size-4;
+        margin-top: $size-2;
+        border-top: solid 1px $color-text-muted;
+    }
+
+    @include bp-sm-phone {
+        font-size: 1.4em;
+    }
+}
+
+.project-card {
     align-items: center;
     justify-content: space-between;
     padding: $size-6 $size-8;
     cursor: pointer;
+    border-bottom: solid 1px $color-text-muted;
 
-    @include theme-dark {
-        &:first-child {
-            border-top: solid 1px $color-text-muted;
-        }
-
-        border-bottom: solid 1px $color-text-muted;
-    }
-
-    @include theme-light {
-        &:first-child {
-            border-top: solid 1px $color-text-muted;
-        }
-
-        border-bottom: solid 1px $color-text-muted;
+    &:first-child {
+        border-top: solid 1px $color-text-muted;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -233,17 +253,22 @@ p {
             transform: scale(1.01) !important;
             backdrop-filter: blur(2px);
 
+            .card-footer {
+                :deep(.see-more) {
+                    color: $color-bg-primary !important;
+
+                    .icon {
+                        fill: $color-bg-primary !important;
+                    }
+                }
+            }
+
             @include theme-dark {
                 background: linear-gradient(90deg, #21252922, #21252900);
 
                 .card-footer {
                     :deep(.see-more) {
-                        color: $color-bg-primary !important;
                         background: $color-text-primary;
-
-                        .icon {
-                            fill: $color-bg-primary;
-                        }
                     }
                 }
             }
@@ -253,12 +278,7 @@ p {
 
                 .card-footer {
                     :deep(.see-more) {
-                        color: $color-bg-primary !important;
                         background: $color-primary-darker;
-
-                        .icon {
-                            fill: $color-bg-primary !important;
-                        }
                     }
                 }
             }
@@ -283,32 +303,26 @@ p {
     }
 
     &.selected-mobile .card-body .card-footer {
-        margin-top: $size-2;
         padding-top: $size-4;
+        margin-top: $size-2;
         border-top: solid 1px $color-text-muted;
     }
 }
 
 .card-body {
-    display: flex;
-    flex-direction: column;
     gap: $size-2;
     width: 100%;
 }
 
 .card-header {
-    display: flex;
-    gap: $size-3;
-    align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap-reverse;
+    gap: $size-3;
+    justify-content: space-between;
 
     .card-title {
-        display: flex;
-        align-items: center;
         gap: 0.6em;
-        font-size: 1.2em;
         margin-right: 3em;
+        font-size: 1.2em;
 
         @include bp-xsm-phone {
             font-size: 1.4em;
@@ -350,11 +364,8 @@ p {
         }
     }
 
-    .card-header,
     .card-date {
-        display: flex;
         gap: $size-2;
-        align-items: center;
         margin-left: auto;
         font-size: 1.4em;
 
@@ -478,12 +489,10 @@ $inset-width: 12px;
 
 .card-tool-chips {
     position: relative;
-    display: flex;
     gap: $size-6;
-    align-items: center;
+    padding-bottom: $size-2;
     overflow-x: scroll;
     overflow-y: hidden;
-    padding-bottom: $size-2;
     font-size: 1.1em;
 
     :deep(.chip-container) {
@@ -516,21 +525,6 @@ $inset-width: 12px;
         flex: 1;
         font-size: 1.2em;
     }
-
-    // &::-webkit-scrollbar {
-    //     margin-top: $size-1;
-    //     height: $size-1;
-    // }
-    //
-    // &::-webkit-scrollbar-track {
-    //     background: #adb5bd0f;
-    //     border-radius: 5px;
-    // }
-    //
-    // &::-webkit-scrollbar-thumb {
-    //     background: #adb5bd1f;
-    //     border-radius: 5px;
-    // }
 }
 
 .demo-video {
@@ -551,8 +545,6 @@ $inset-width: 12px;
 }
 
 .selected-description {
-    display: flex;
-    flex-direction: column;
     gap: $size-2;
     padding: $size-2 0 $size-2 $size-4;
     margin: 0;
@@ -561,27 +553,8 @@ $inset-width: 12px;
     color: $color-text-secondary;
 
     @include bp-sm-phone {
-        font-size: 1.6em;
         padding: $size-3 0 0 $size-5;
-    }
-}
-
-.card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.3em;
-    margin-top: $size-1;
-
-    @include bp-md-tablet {
-        flex-wrap: nowrap;
-        margin-top: $size-2;
-        padding-top: $size-4;
-        border-top: solid 1px $color-text-muted;
-    }
-
-    @include bp-sm-phone {
-        font-size: 1.4em;
+        font-size: 1.6em;
     }
 }
 
@@ -613,26 +586,6 @@ $inset-width: 12px;
 }
 
 .external-links {
-    &-card {
-        display: flex;
-        gap: $size-4;
-        font-size: 1.1em;
-
-        a:nth-child(3) {
-            &:deep(button) svg {
-                stroke-width: 0 !important;
-
-                @include theme-dark {
-                    fill: lighten-color($color-text-muted, 15%) !important;
-                }
-
-                @include theme-light {
-                    fill: #466675 !important;
-                }
-            }
-        }
-    }
-
     a {
         &.responsive-link-text {
             &:deep(button) span {
@@ -662,8 +615,18 @@ $inset-width: 12px;
                 }
             }
         }
+    }
 
-        &:hover :deep(button) svg {
+    &-card {
+        display: flex;
+        gap: $size-4;
+        font-size: 1.1em;
+    }
+
+    &-card a:nth-child(3) {
+        &:deep(button) svg {
+            stroke-width: 0 !important;
+
             @include theme-dark {
                 fill: lighten-color($color-text-muted, 15%) !important;
             }
@@ -671,6 +634,16 @@ $inset-width: 12px;
             @include theme-light {
                 fill: #466675 !important;
             }
+        }
+    }
+
+    a:hover :deep(button) svg {
+        @include theme-dark {
+            fill: lighten-color($color-text-muted, 15%) !important;
+        }
+
+        @include theme-light {
+            fill: #466675 !important;
         }
     }
 }

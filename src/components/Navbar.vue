@@ -143,24 +143,41 @@ watch(
 }
 
 .nav-line {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    min-height: 1px;
+    margin: 0;
+    border: 0;
     transform: scaleX(0);
+
+    @include theme-dark {
+        background-color: #575e6455;
+    }
+
+    @include theme-light {
+        background-color: #3d505c33;
+    }
 }
 
-.nav-desktop button {
-    opacity: 0;
-    transform: translateX(-50px) scaleX(0.5);
+%nav-button-base {
+    display: flex;
+    align-items: center;
+    font-family: $primary-font-stack;
+    background-color: transparent;
+    border: 0;
 }
 
-.nav-mobile {
-    transform: translateY(150px) scaleX(0);
+%nav-soft-shadow {
+    box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
 }
 
 .nav-mobile {
     position: fixed;
-    z-index: 9;
     right: $size-2;
     bottom: $size-2;
     left: $size-2;
+    z-index: 9;
     display: flex;
     justify-content: space-between;
     max-width: 347px;
@@ -170,6 +187,7 @@ watch(
     background-color: $color-bg-secondary;
     border-radius: $size-4;
     box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
+    transform: translateY(150px) scaleX(0);
 
     @include bp-xsm-phone {
         font-size: 1.2em;
@@ -184,20 +202,17 @@ watch(
     }
 
     button {
-        display: flex;
-        align-items: center;
+        @extend %nav-button-base;
+
         justify-content: center;
         padding: $size-2 $size-3;
-        font-family: $primary-font-stack;
         font-weight: 600;
         color: $color-accent;
-        background-color: transparent;
-        border: 0;
         border-radius: $size-4;
 
         @include bp-xsm-phone {
-            font-size: 0.7em;
             gap: $size-2;
+            font-size: 0.7em;
         }
 
         .icon {
@@ -205,8 +220,8 @@ watch(
 
             @include bp-xsm-phone {
                 display: inline-block;
-                height: $size-6;
                 width: $size-6;
+                height: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
             }
@@ -246,8 +261,9 @@ watch(
 
         &.active,
         &:active {
+            @extend %nav-soft-shadow;
+
             background-color: lighten-color($color-bg-secondary, 10%);
-            box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
         }
     }
 }
@@ -261,34 +277,33 @@ watch(
     }
 
     button {
+        @extend %nav-button-base;
+
         position: relative;
-        font-size: 0.85em;
-        font-family: $primary-font-stack;
-        display: flex;
         gap: $size-3;
-        align-items: center;
         padding: $size-3 $size-5;
-        background-color: transparent;
-        border: 0;
+        font-size: 0.85em;
+        opacity: 0;
         border-radius: $size-3;
+        transform: translateX(-50px) scaleX(0.5);
 
         @include theme-dark {
-            color: $color-text-primary;
             font-weight: 400;
+            color: $color-text-primary;
         }
 
         @include theme-light {
-            color: $color-primary-darker;
             font-weight: 500;
+            color: $color-primary-darker;
         }
 
         &::after {
-            content: '';
             position: absolute;
             bottom: 0;
             left: $size-2;
             width: 0;
             height: 1px;
+            content: '';
             border-radius: $size-4;
             transition: width 0.15s ease-in-out;
 
@@ -323,20 +338,6 @@ watch(
             &:hover {
                 background-color: transparent;
             }
-
-            .icon {
-                height: $size-6;
-
-                @include theme-dark {
-                    fill: $color-text-secondary;
-                    stroke: $color-text-secondary;
-                }
-
-                @include theme-light {
-                    fill: $color-primary-darker;
-                    stroke: $color-primary-darker;
-                }
-            }
         }
 
         .icon {
@@ -365,6 +366,8 @@ header {
     padding: 0 $size-2;
 
     .theme-toggle {
+        @extend %nav-soft-shadow;
+
         display: inline-flex;
         width: $size-11;
         height: $size-8;
@@ -372,7 +375,6 @@ header {
         margin: $size-4;
         cursor: pointer;
         border-radius: 100px;
-        box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
 
         @include theme-dark {
             background-color: $color-bg-secondary;
@@ -402,12 +404,13 @@ header {
             transition: all 0.3s ease;
 
             &::before {
+                @extend %nav-soft-shadow;
+
                 position: absolute;
-                content: '';
                 width: $size-6;
                 height: $size-6;
+                content: '';
                 border-radius: 100%;
-                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
 
                 @include theme-dark {
@@ -439,23 +442,6 @@ header {
                 transform: translateX(115%);
             }
         }
-    }
-}
-
-.nav-line {
-    position: relative;
-    z-index: 3;
-    border: 0;
-    width: 100%;
-    margin: 0;
-    min-height: 1px;
-
-    @include theme-dark {
-        background-color: #575e6455;
-    }
-
-    @include theme-light {
-        background-color: #3d505c33;
     }
 }
 </style>
