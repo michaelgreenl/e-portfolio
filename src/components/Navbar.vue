@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick, shallowRef } from 'vue';
 import { gsap } from 'gsap';
 import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
+import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import { navbarAnimations } from '@/animations/component/navbar.js';
 import MoonIcon from '@/components/SVGs/MoonIcon.vue';
 import SunIcon from '@/components/SVGs/SunIcon.vue';
@@ -13,6 +14,7 @@ const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
 const { registerAnim } = useGsap();
+const { fadeIn, fadeOut } = useUtilAnimations();
 
 // Register all animations with component-scoped context
 const anims = {
@@ -59,6 +61,14 @@ watch(
         }
     },
 );
+
+const navMobileRouteTo = (key) => {
+    fadeOut({ selector: '.mobile-nav-icon' });
+    routeStore.toRoute(key);
+    setTimeout(() => {
+        fadeIn({ selector: '.mobile-nav-icon' });
+    }, 400);
+};
 </script>
 
 <template>
@@ -102,14 +112,23 @@ watch(
     <hr class="nav-line" />
 
     <nav class="nav-mobile">
+        <div class="active-item-bg" :class="routeStore.currentRoute.base"></div>
+
         <button
             v-for="(route, key) in routeStore.routes"
             :key="key"
-            @click="routeStore.toRoute(key)"
+            @click="navMobileRouteTo(key)"
             :class="{ active: routeStore.currentRoute.base === key }"
             :disabled="routeStore.currentRoute.base === key"
         >
-            <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
+            <component
+                :is="route.meta.iconFill"
+                class="icon mobile-nav-icon"
+                :class="{
+                    active: routeStore.currentRoute.base === key,
+                }"
+            />
+            <!-- v-if="routeStore.currentRoute.base === key" -->
 
             <span>{{ route.name }}</span>
         </button>
@@ -201,9 +220,41 @@ watch(
         display: none;
     }
 
+    .active-item-bg {
+        @extend %nav-soft-shadow;
+
+        position: absolute;
+        z-index: 1;
+        border-radius: 14px;
+        background-color: lighten-color($color-bg-secondary, 10%);
+        top: $size-2;
+        bottom: $size-2;
+        width: 30%;
+        left: 3.8em;
+
+        &.home {
+            width: 26%;
+            left: 0.4em;
+        }
+
+        &.projects {
+            left: 3.85em;
+        }
+
+        &.resume {
+            left: 8.1em;
+        }
+
+        &.contact {
+            left: 12.2em;
+        }
+    }
+
     button {
         @extend %nav-button-base;
 
+        position: relative;
+        z-index: 2;
         justify-content: center;
         padding: $size-2 $size-3;
         font-weight: 600;
@@ -219,11 +270,14 @@ watch(
             display: none;
 
             @include bp-xsm-phone {
-                display: inline-block;
                 width: $size-6;
                 height: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
+
+                &.active {
+                    display: inline-block;
+                }
             }
         }
 
@@ -261,9 +315,9 @@ watch(
 
         &.active,
         &:active {
-            @extend %nav-soft-shadow;
+            // @extend %nav-soft-shadow;
 
-            background-color: lighten-color($color-bg-secondary, 10%);
+            // background-color: lighten-color($color-bg-secondary, 10%);
         }
     }
 }
