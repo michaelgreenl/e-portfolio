@@ -8,6 +8,7 @@ import ResumeIcon from '@/components/SVGs/Views/ResumeIcon.vue';
 import ResumeIconFill from '@/components/SVGs/Views/ResumeIconFill.vue';
 import ContactIcon from '@/components/SVGs/Views/ContactIcon.vue';
 import ContactIconFill from '@/components/SVGs/Views/ContactIconFill.vue';
+import ResumeView from '@/views/ResumeView.vue';
 
 export const navigationRoutes = {
     home: {
@@ -25,7 +26,7 @@ export const navigationRoutes = {
     resume: {
         path: '/resume',
         name: 'Resume',
-        component: () => import('@/views/ResumeView.vue'),
+        component: markRaw(ResumeView),
         meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
     },
     contact: {
