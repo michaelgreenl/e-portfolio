@@ -1,7 +1,9 @@
 <script setup>
 import { computed, ref, useTemplateRef, watch, nextTick } from 'vue';
 import { useElementBounding, useWindowSize } from '@vueuse/core';
+import { gsap } from 'gsap';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
+import { TIMING } from '@/animations/constants/timing.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 
@@ -59,14 +61,103 @@ const { top: toolChipTop } = useElementBounding(toolChipsContainer);
 const { height: viewportHeight } = useWindowSize();
 
 const toolChipsYValue = computed(() => {
-    if (!Boolean(toolChipsContainer.value)) return undefined;
+    if (!toolChipsContainer.value) return undefined;
 
     if (toolChipTop.value <= viewportHeight.value * 0.45) {
         return 'top-third';
     } else if (toolChipTop.value <= viewportHeight.value * 0.65) {
         return 'middle-third';
     }
+
+    return undefined;
 });
+
+const getSelectedDetailTargets = (el) => [...el.querySelectorAll('.demo-video, .selected-description li')];
+
+const shouldSkipSelectedDetailsAnimation = () =>
+    bp.isLaptop.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function onSelectedDetailsEnter(el, done) {
+    if (shouldSkipSelectedDetailsAnimation()) {
+        done();
+        return;
+    }
+
+    const detailTargets = getSelectedDetailTargets(el);
+
+    gsap.killTweensOf([el, ...detailTargets]);
+    gsap.set(el, { height: 0, overflow: 'hidden' });
+    gsap.set(detailTargets, { autoAlpha: 0, y: 8 });
+
+    const tl = gsap
+        .timeline({
+            onComplete: () => {
+                gsap.set(el, { clearProps: 'height,overflow' });
+                done();
+            },
+        })
+        .to(el, {
+            duration: TIMING.duration.moderate,
+            ease: TIMING.easing.smooth,
+            height: 'auto',
+        });
+
+    if (detailTargets.length) {
+        tl.to(
+            detailTargets,
+            {
+                duration: TIMING.duration.fast,
+                ease: TIMING.easing.smooth,
+                autoAlpha: 1,
+                y: 0,
+                stagger: TIMING.stagger.tight,
+            },
+            '-=0.2',
+        );
+    }
+}
+
+function onSelectedDetailsLeave(el, done) {
+    const finishLeave = () => {
+        autoplayVideo.value = false;
+        done();
+    };
+
+    if (shouldSkipSelectedDetailsAnimation()) {
+        finishLeave();
+        return;
+    }
+
+    const detailTargets = getSelectedDetailTargets(el);
+
+    gsap.killTweensOf([el, ...detailTargets]);
+    gsap.set(el, { height: el.offsetHeight, overflow: 'hidden' });
+
+    const tl = gsap.timeline({ onComplete: finishLeave });
+
+    if (detailTargets.length) {
+        tl.to(detailTargets, {
+            duration: TIMING.duration.fast,
+            ease: TIMING.easing.linear,
+            autoAlpha: 0,
+            y: -6,
+            stagger: {
+                each: TIMING.stagger.instant,
+                from: 'end',
+            },
+        });
+    }
+
+    tl.to(
+        el,
+        {
+            duration: TIMING.duration.normal,
+            ease: TIMING.easing.bounceIn,
+            height: 0,
+        },
+        detailTargets.length ? '<' : 0,
+    );
+}
 
 async function openProject(autoplay = false) {
     if (bp.isLaptop.value) {
@@ -82,7 +173,6 @@ async function openProject(autoplay = false) {
 
 function closeProject() {
     projectSelected.value = false;
-    autoplayVideo.value = false;
 }
 
 // ensures window resizing doesn't result in unwanted UI layouts
@@ -135,23 +225,25 @@ defineExpose({ openProject, projectSelected });
                 </div>
             </div>
 
-            <template v-if="projectSelected && !bp.isLaptop.value">
-                <iframe
-                    v-if="project.video"
-                    class="demo-video"
-                    :src="`https://player.vimeo.com/video/${project.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
-                    frameborder="0"
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    :title="`${project.slug}-demo-vid`"
-                ></iframe>
+            <Transition :css="false" @enter="onSelectedDetailsEnter" @leave="onSelectedDetailsLeave">
+                <div v-if="projectSelected && !bp.isLaptop.value" class="selected-details">
+                    <iframe
+                        v-if="project.video"
+                        class="demo-video"
+                        :src="`https://player.vimeo.com/video/${project.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
+                        frameborder="0"
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        :title="`${project.slug}-demo-vid`"
+                    ></iframe>
 
-                <ul class="selected-description">
-                    <li v-for="description in project.description?.long" :key="description">
-                        {{ description }}
-                    </li>
-                </ul>
-            </template>
+                    <ul class="selected-description">
+                        <li v-for="description in project.description?.long" :key="description">
+                            {{ description }}
+                        </li>
+                    </ul>
+                </div>
+            </Transition>
 
             <div class="card-footer">
                 <div class="external-links external-links-card">
@@ -406,6 +498,12 @@ p {
     @include bp-sm-phone {
         font-size: 1.7em !important;
     }
+}
+
+.selected-details {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 $inset-width: 12px;
