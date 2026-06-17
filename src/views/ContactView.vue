@@ -39,7 +39,7 @@ watch(
         if (newVal) {
             headerDismiss({
                 headerEl: pageHeader.value,
-                extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link'],
+                extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link, .status-message'],
             });
         }
     },
