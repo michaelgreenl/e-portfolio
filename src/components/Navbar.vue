@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted, watch, nextTick, shallowRef } from 'vue';
+import { nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue';
 import { gsap } from 'gsap';
 import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import { navbarAnimations } from '@/animations/component/navbar.js';
+import { TIMING } from '@/animations/constants/timing.js';
 import MoonIcon from '@/components/SVGs/MoonIcon.vue';
 import SunIcon from '@/components/SVGs/SunIcon.vue';
 import Logo from '@/components/Logo.vue';
@@ -25,9 +26,116 @@ const anims = {
     enterPage: registerAnim(navbarAnimations.enterPage),
 };
 
-const fromHome = ref(false);
+const fromHome = shallowRef(false);
+const mobileNav = useTemplateRef('mobileNav');
+const activeItemBg = useTemplateRef('activeItemBg');
+const activeBgTween = shallowRef(null);
+const mobileNavButtonRefs = new Map();
+
+let resizeObserver;
+
+const setMobileNavButtonRef = (key, el) => {
+    if (el) {
+        mobileNavButtonRefs.set(key, el);
+        return;
+    }
+
+    mobileNavButtonRefs.delete(key);
+};
+
+const measureMobileNavItem = (key) => {
+    const buttonEl = mobileNavButtonRefs.get(key);
+
+    if (!buttonEl || !buttonEl.offsetWidth) return null;
+
+    const x = buttonEl.offsetLeft;
+    const width = buttonEl.offsetWidth;
+
+    return {
+        x,
+        width,
+        right: x + width,
+    };
+};
+
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const setActiveBgMetrics = (metrics) => {
+    if (!activeItemBg.value || !metrics) return;
+
+    gsap.set(activeItemBg.value, {
+        x: metrics.x,
+        width: metrics.width,
+    });
+};
+
+const syncActiveBgToCurrentRoute = () => {
+    activeBgTween.value?.kill();
+    activeBgTween.value = null;
+
+    setActiveBgMetrics(measureMobileNavItem(routeStore.currentRoute.base));
+};
+
+const getExpandedMetrics = (fromMetrics, toMetrics) => {
+    if (toMetrics.x > fromMetrics.x) {
+        return {
+            x: fromMetrics.x,
+            width: toMetrics.right - fromMetrics.x,
+        };
+    }
+
+    return {
+        x: toMetrics.x,
+        width: fromMetrics.right - toMetrics.x,
+    };
+};
+
+const animateActiveBgToRoute = (fromMetrics, toMetrics) => {
+    if (!activeItemBg.value || !toMetrics) return;
+
+    if (!fromMetrics || prefersReducedMotion()) {
+        setActiveBgMetrics(toMetrics);
+        return;
+    }
+
+    activeBgTween.value?.kill();
+    setActiveBgMetrics(fromMetrics);
+
+    const expandedMetrics = getExpandedMetrics(fromMetrics, toMetrics);
+
+    activeBgTween.value = gsap
+        .timeline({
+            defaults: {
+                ease: TIMING.easing.smooth,
+            },
+            onComplete: () => {
+                activeBgTween.value = null;
+            },
+        })
+        .to(activeItemBg.value, {
+            duration: TIMING.duration.fast,
+            x: expandedMetrics.x,
+            width: expandedMetrics.width,
+        })
+        .to(
+            activeItemBg.value,
+            {
+                duration: TIMING.duration.normal,
+                x: toMetrics.x,
+                width: toMetrics.width,
+            },
+            '-=0.03',
+        );
+};
 
 onMounted(() => {
+    syncActiveBgToCurrentRoute();
+
+    if (mobileNav.value) {
+        resizeObserver = new ResizeObserver(syncActiveBgToCurrentRoute);
+        resizeObserver.observe(mobileNav.value);
+    }
+
     if (routeStore.activePath !== 'home') {
         const tl = gsap.timeline();
         anims.enterPage({
@@ -61,6 +169,22 @@ watch(
         }
     },
 );
+
+watch(
+    () => routeStore.currentRoute.base,
+    async (newRouteBase, oldRouteBase) => {
+        const fromMetrics = measureMobileNavItem(oldRouteBase);
+
+        await nextTick();
+
+        animateActiveBgToRoute(fromMetrics, measureMobileNavItem(newRouteBase));
+    },
+);
+
+onUnmounted(() => {
+    activeBgTween.value?.kill();
+    resizeObserver?.disconnect();
+});
 
 const navMobileRouteTo = (key) => {
     fadeOut({ selector: '.mobile-nav-icon' });
@@ -111,12 +235,13 @@ const navMobileRouteTo = (key) => {
     </header>
     <hr class="nav-line" />
 
-    <nav class="nav-mobile">
-        <div class="active-item-bg" :class="routeStore.currentRoute.base"></div>
+    <nav ref="mobileNav" class="nav-mobile">
+        <div ref="activeItemBg" class="active-item-bg" aria-hidden="true"></div>
 
         <button
             v-for="(route, key) in routeStore.routes"
             :key="key"
+            :ref="(el) => setMobileNavButtonRef(key, el)"
             @click="navMobileRouteTo(key)"
             :class="{ active: routeStore.currentRoute.base === key }"
             :disabled="routeStore.currentRoute.base === key"
@@ -224,30 +349,15 @@ const navMobileRouteTo = (key) => {
         @extend %nav-soft-shadow;
 
         position: absolute;
-        z-index: 1;
-        border-radius: 14px;
-        background-color: lighten-color($color-bg-secondary, 10%);
         top: $size-2;
         bottom: $size-2;
-        width: 30%;
-        left: 3.8em;
-
-        &.home {
-            width: 26%;
-            left: 0.4em;
-        }
-
-        &.projects {
-            left: 3.85em;
-        }
-
-        &.resume {
-            left: 8.1em;
-        }
-
-        &.contact {
-            left: 12.2em;
-        }
+        left: 0;
+        z-index: 1;
+        width: 0;
+        pointer-events: none;
+        background-color: lighten-color($color-bg-secondary, 10%);
+        border-radius: 14px;
+        will-change: transform, width;
     }
 
     button {
@@ -311,13 +421,6 @@ const navMobileRouteTo = (key) => {
                     }
                 }
             }
-        }
-
-        &.active,
-        &:active {
-            // @extend %nav-soft-shadow;
-
-            // background-color: lighten-color($color-bg-secondary, 10%);
         }
     }
 }
