@@ -625,7 +625,7 @@ $inset-width: 12px;
     width: 100%;
     max-width: 50em;
     aspect-ratio: 2/1.1;
-    margin: $size-4 auto 0;
+    margin: $size-4 auto;
     border-radius: 12px;
     box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
 
