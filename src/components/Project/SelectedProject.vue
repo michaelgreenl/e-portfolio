@@ -101,6 +101,18 @@ p {
     margin: 0;
 }
 
+.selected-container,
+.close-btn {
+    @include flexCenterAll;
+}
+
+.project-title,
+.tool-chips,
+.date {
+    display: flex;
+    align-items: center;
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -113,13 +125,12 @@ p {
 }
 
 .selected-container {
-    font-size: 1.1em;
     position: fixed;
     top: 0;
     z-index: 2;
-    @include flexCenterAll;
     width: 100vw;
     height: 100vh;
+    font-size: 1.1em;
     backdrop-filter: blur(5px);
 
     @include theme-dark {
@@ -129,18 +140,17 @@ p {
 
 .close-btn {
     position: absolute !important;
-    z-index: 100;
     top: $size-3;
     right: $size-4;
-    font-size: 1.2em;
-    @include flexCenterAll;
-    height: $size-10;
+    z-index: 100;
     width: $size-10;
+    height: $size-10;
     padding: 0.9em;
-    border: 0;
-    outline: 0;
-    border-radius: 100%;
+    font-size: 1.2em;
     background: transparent;
+    border: 0;
+    border-radius: 100%;
+    outline: 0;
 
     @include bp-xl-desktop {
         top: $size-4;
@@ -178,12 +188,12 @@ p {
     display: flex;
     flex-direction: column;
     gap: $size-2;
-    max-height: 95dvh;
-    overflow-y: auto;
     width: 95vw;
     max-width: 94em;
+    max-height: 95dvh;
     padding: 2.4em $size-11;
     margin: $size-8 0;
+    overflow-y: auto;
     border: 1px solid rgb(255 255 255 / 12%);
     border-radius: 20px;
     box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
@@ -208,8 +218,6 @@ p {
 }
 
 .project-title {
-    display: flex;
-    align-items: center;
     gap: $size-2;
     font-size: 1.2em;
 
@@ -251,10 +259,10 @@ p {
 .project-body {
     display: flex;
     gap: $size-9;
-    border-top: solid 1px $color-text-muted;
-    border-bottom: solid 1px $color-text-muted;
     padding: $size-8 0;
     margin: $size-4 0;
+    border-top: solid 1px $color-text-muted;
+    border-bottom: solid 1px $color-text-muted;
 
     @include bp-lg-laptop {
         gap: $size-10;
@@ -276,20 +284,6 @@ iframe {
     display: flex;
     gap: $size-6;
     font-size: 1.5em;
-
-    .no-fill {
-        &:deep(button) svg {
-            stroke-width: 0 !important;
-
-            @include theme-dark {
-                fill: lighten-color($color-text-muted, 15%) !important;
-            }
-
-            @include theme-light {
-                fill: darken-color($color-text-muted, 15%) !important;
-            }
-        }
-    }
 
     a {
         &:deep(button) {
@@ -320,8 +314,12 @@ iframe {
                 }
             }
         }
+    }
 
-        &:hover :deep(button) svg {
+    .no-fill {
+        &:deep(button) svg {
+            stroke-width: 0 !important;
+
             @include theme-dark {
                 fill: lighten-color($color-text-muted, 15%) !important;
             }
@@ -329,6 +327,16 @@ iframe {
             @include theme-light {
                 fill: darken-color($color-text-muted, 15%) !important;
             }
+        }
+    }
+
+    a:hover :deep(button) svg {
+        @include theme-dark {
+            fill: lighten-color($color-text-muted, 15%) !important;
+        }
+
+        @include theme-light {
+            fill: darken-color($color-text-muted, 15%) !important;
         }
     }
 }
@@ -342,13 +350,11 @@ iframe {
 }
 
 .tool-chips {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
     gap: $size-4;
-    font-size: 1.2em;
     justify-content: center;
     padding-right: $size-3;
+    font-size: 1.2em;
 
     .chip {
         flex: 1;
@@ -361,34 +367,32 @@ iframe {
 }
 
 .date {
-    display: flex;
     gap: $size-2;
-    align-items: center;
-    white-space: nowrap;
     font-size: 1.3em;
+    white-space: nowrap;
 }
 
 .description {
     font-family: $secondary-font-stack;
-    color: $color-text-secondary;
     font-size: 1.5em;
+    color: $color-text-secondary;
 
     &-short {
         margin: $size-1 0 0;
     }
 
     &-long {
-        flex: 1.2;
         display: flex;
+        flex: 1.2;
         flex-direction: column;
-        justify-content: center;
         gap: $size-2;
+        justify-content: center;
         margin: 0;
         line-height: 2ch;
 
         &.contains-video {
-            font-size: clamp(1.3em, 1.7vw, 1.4em);
             padding: 0;
+            font-size: clamp(1.3em, 1.7vw, 1.4em);
         }
     }
 }

@@ -83,6 +83,33 @@ body,
     z-index: 3;
 }
 
+.page-shell {
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    margin: 0 auto;
+    font-size: 0.9em;
+    color: $color-text-primary;
+    @include flexCenterAll;
+}
+
+.hero-line,
+.nav-links-line,
+.projects-container hr,
+.resume-container hr,
+.contact-header hr {
+    height: 1px;
+    border: 0;
+
+    @include theme-dark {
+        background-color: $color-gray6;
+    }
+
+    @include theme-light {
+        background-color: $color-gray5;
+    }
+}
+
 h1 {
     font-family: $primary-font-stack;
     font-weight: 600;

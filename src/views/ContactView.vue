@@ -39,7 +39,9 @@ watch(
         if (newVal) {
             headerDismiss({
                 headerEl: pageHeader.value,
-                extraTargets: ['.form-label, .form-input, .form-textarea, .contact-link, .status-message'],
+                extraTargets: [
+                    '.form-label, .form-input, .form-textarea, .contact-link, .status-message, .error-message',
+                ],
             });
         }
     },
@@ -167,7 +169,7 @@ const clearStatus = () => {
 </script>
 
 <template>
-    <div ref="pageElement" class="contact-container">
+    <div ref="pageElement" class="contact-container page-shell">
         <div ref="pageHeader" class="contact-header">
             <h1>Get in Touch!</h1>
             <hr />
@@ -188,7 +190,7 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('email')"
                     @focus="handleFieldFocus('email')"
                 />
-                <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+                <span v-if="errors.email" class="status-message error-message">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
@@ -205,7 +207,7 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('subject')"
                     @focus="handleFieldFocus('subject')"
                 />
-                <span v-if="errors.subject" class="error-message">{{ errors.subject }}</span>
+                <span v-if="errors.subject" class="status-message error-message">{{ errors.subject }}</span>
             </div>
 
             <div class="form-group">
@@ -222,9 +224,11 @@ const clearStatus = () => {
                     @blur="handleFieldBlur('message')"
                     @focus="handleFieldFocus('message')"
                 ></textarea>
-                <span v-if="errors.message" class="error-message">{{ errors.message }}</span>
+
+                <span v-if="errors.message" class="status-message error-message">{{ errors.message }}</span>
             </div>
         </form>
+
         <div class="form-actions">
             <div class="contact-links">
                 <a href="https://github.com/michaelgreenl" target="_blank">
@@ -265,13 +269,7 @@ const clearStatus = () => {
 <style lang="scss" scoped>
 .contact-container {
     position: relative;
-    flex-direction: column;
-    flex-grow: 1;
-    width: 100%;
     padding: $size-2 $size-4;
-    margin: 0 auto;
-    font-size: 0.9em;
-    @include flexCenterAll;
 
     @include bp-xl-desktop {
         font-size: clamp(0.9em, 3.5vw, 1em);
@@ -279,8 +277,8 @@ const clearStatus = () => {
 }
 
 .contact-header {
-    max-width: 27em;
     width: 90%;
+    max-width: 27em;
     margin: $size-6 0 $size-6;
     text-align: center;
 
@@ -290,31 +288,21 @@ const clearStatus = () => {
     }
 
     h1 {
-        white-space: nowrap;
         font-size: 2.6em;
+        white-space: nowrap;
 
         @include bp-xsm-phone {
             font-size: 3em;
         }
 
         @include bp-sm-phone {
-            font-size: 3.2em;
+            font-size: 3.4em;
         }
     }
 
     hr {
         width: 100%;
-        height: 1px;
         margin: $size-3 auto $size-2;
-        border: 0;
-
-        @include theme-dark {
-            background-color: $color-gray6;
-        }
-
-        @include theme-light {
-            background-color: $color-gray5;
-        }
     }
 
     p {
@@ -330,20 +318,20 @@ const clearStatus = () => {
 
 .contact-form {
     display: flex;
+    flex-wrap: wrap;
     gap: $size-4;
     width: 100%;
     max-width: 33em;
-    flex-wrap: wrap;
 
     @include bp-lg-laptop {
-        gap: $size-6;
+        gap: $size-5;
         max-width: 40em;
     }
 }
 
 .form-group {
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
     gap: $size-2;
 }
@@ -363,13 +351,41 @@ const clearStatus = () => {
 }
 
 .form-input,
+.form-textarea,
+.error-message,
+.status-message {
+    font-family: $secondary-font-stack;
+}
+
+.form-input,
+.form-textarea,
+.status-message {
+    border-radius: 8px;
+}
+
+.form-textarea {
+    height: 6.5em;
+    line-height: 1.5;
+    resize: vertical;
+
+    @include bp-sm-phone {
+        min-height: 120px;
+    }
+}
+
+.form-input,
 .form-textarea {
     padding: $size-3 $size-4;
-    font-family: $secondary-font-stack;
     font-size: 1em;
     background-color: transparent;
     border: 2px solid transparent;
-    border-radius: 8px;
+
+    &:focus {
+        border-color: $color-primary !important;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+        backdrop-filter: blur(4px);
+    }
 
     @include theme-dark {
         color: $color-text-primary;
@@ -382,11 +398,6 @@ const clearStatus = () => {
 
         &:focus {
             background: linear-gradient(90deg, #21252922, #21252900);
-            border-color: $color-primary;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
-            backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
         }
     }
 
@@ -401,11 +412,6 @@ const clearStatus = () => {
 
         &:focus {
             background: linear-gradient(90deg, #dee2e622, #dee2e600);
-            border-color: $color-primary;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
-            backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
         }
     }
 
@@ -422,32 +428,16 @@ const clearStatus = () => {
     }
 }
 
-.form-textarea {
-    height: 5em;
-    font-family: $secondary-font-stack;
-    resize: vertical;
-    line-height: 1.5;
-
-    @include bp-sm-phone {
-        min-height: 120px;
-    }
-}
-
 .error-message {
-    margin-top: $size-1;
-    font-family: $secondary-font-stack;
-    font-size: 0.9em;
     color: $color-error;
 }
 
 .status-message {
-    padding: $size-4;
-    font-family: $secondary-font-stack;
+    padding: 0 $size-4;
     font-weight: 500;
-    text-align: center;
+    white-space: nowrap;
     cursor: pointer;
-    border-radius: 8px;
-    transition: opacity 0.3s ease;
+    font-size: 0.8em;
 
     &:hover {
         opacity: 0.8;
@@ -468,12 +458,20 @@ const clearStatus = () => {
     p {
         font-size: 0.95em;
     }
+
+    @include bp-xsm-phone {
+        font-size: 0.85em;
+    }
+
+    @include bp-sm-phone {
+        font-size: 0.9em;
+    }
 }
 
 .form-actions {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     max-width: 33em;
     padding: $size-5 $size-3;

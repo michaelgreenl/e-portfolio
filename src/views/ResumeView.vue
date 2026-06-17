@@ -200,7 +200,8 @@ h2 {
     font-size: 1.8em;
 }
 
-h3 {
+h3,
+p span {
     font-family: $ternary-font-stack;
 }
 
@@ -214,7 +215,6 @@ p {
     margin: $size-1 0;
 
     span {
-        font-family: $ternary-font-stack;
         font-size: 1.15em;
         font-weight: 600;
     }
@@ -232,24 +232,14 @@ li {
 
 hr {
     width: 100%;
-    height: 1px;
     margin: $size-2 auto;
-    border: 0;
-
-    @include theme-dark {
-        background-color: $color-gray6;
-    }
-
-    @include theme-light {
-        background-color: $color-gray5;
-    }
 }
 
 .page-header {
     display: flex;
+    flex-wrap: wrap-reverse;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap-reverse;
     width: 100%;
     padding-right: $size-2;
 
@@ -259,8 +249,8 @@ hr {
     }
 
     a {
-        font-size: 0.9em;
         margin-left: auto;
+        font-size: 0.9em;
 
         @include bp-xsm-phone {
             font-size: 1em;
@@ -268,10 +258,14 @@ hr {
     }
 }
 
-.section-segment {
+.section-segment,
+.segment-details {
     display: flex;
     flex-direction: column;
     gap: 2px;
+}
+
+.section-segment {
     padding: $size-2;
 
     &-skills {
@@ -287,12 +281,6 @@ hr {
     }
 }
 
-.segment-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
 .segment-header {
     display: flex;
     flex-wrap: wrap-reverse;
@@ -304,9 +292,9 @@ hr {
     display: flex;
     flex-wrap: wrap;
     gap: $size-1;
+    margin-right: $size-5;
     font-size: 1.3em;
     font-weight: 600;
-    margin-right: $size-5;
 
     &-projects {
         .project-link {

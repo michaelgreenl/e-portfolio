@@ -116,7 +116,7 @@ function closeProject() {
 </script>
 
 <template>
-    <div class="projects-container">
+    <div class="projects-container page-shell">
         <SelectedProject
             v-if="activeProject"
             ref="selectedProject"
@@ -154,17 +154,8 @@ function closeProject() {
 <style lang="scss" scoped>
 .projects-container {
     position: relative;
-    flex-direction: column;
-    flex-grow: 1;
-    width: 100%;
     padding: $size-12 0 $size-4;
     font-size: 0.6em;
-    color: $color-text-primary;
-    @include flexCenterAll;
-
-    @include bp-sm-phone {
-        margin: 0 auto;
-    }
 
     @include bp-md-tablet {
         max-width: 110em;
@@ -186,8 +177,8 @@ function closeProject() {
 
     h2 {
         display: flex;
-        align-items: center;
         gap: 6px;
+        align-items: center;
 
         @include theme-dark {
             color: $color-gray3;
@@ -207,17 +198,7 @@ function closeProject() {
 
     hr {
         width: 100%;
-        height: 1px;
         margin: $size-2 auto $size-6;
-        border: 0;
-
-        @include theme-dark {
-            background-color: $color-gray6;
-        }
-
-        @include theme-light {
-            background-color: $color-gray5;
-        }
     }
 }
 
@@ -236,9 +217,9 @@ function closeProject() {
 
     p {
         max-width: 51ch;
+        font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
-        font-size: 1.6em;
     }
 }
 
@@ -267,8 +248,8 @@ function closeProject() {
         margin-inline: auto;
 
         :deep(.project-card:nth-child(3)) {
-            grid-column: 1 / span 2;
             grid-row: 2;
+            grid-column: 1 / span 2;
         }
     }
 

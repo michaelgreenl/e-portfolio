@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue';
 import { gsap } from 'gsap';
 import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
+import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import { navbarAnimations } from '@/animations/component/navbar.js';
+import { TIMING } from '@/animations/constants/timing.js';
 import MoonIcon from '@/components/SVGs/MoonIcon.vue';
 import SunIcon from '@/components/SVGs/SunIcon.vue';
 import Logo from '@/components/Logo.vue';
@@ -13,6 +15,7 @@ const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
 const { registerAnim } = useGsap();
+const { fadeIn, fadeOut } = useUtilAnimations();
 
 // Register all animations with component-scoped context
 const anims = {
@@ -23,9 +26,165 @@ const anims = {
     enterPage: registerAnim(navbarAnimations.enterPage),
 };
 
-const fromHome = ref(false);
+const fromHome = shallowRef(false);
+const mobileNav = useTemplateRef('mobileNav');
+const activeItemBg = useTemplateRef('activeItemBg');
+const activeBgTween = shallowRef(null);
+const pendingLabelRects = shallowRef(null);
+const mobileNavButtonRefs = new Map();
+
+let resizeObserver;
+
+const setMobileNavButtonRef = (key, el) => {
+    if (el) {
+        mobileNavButtonRefs.set(key, el);
+        return;
+    }
+
+    mobileNavButtonRefs.delete(key);
+};
+
+const measureMobileNavItem = (key) => {
+    const buttonEl = mobileNavButtonRefs.get(key);
+
+    if (!buttonEl || !buttonEl.offsetWidth) return null;
+
+    const x = buttonEl.offsetLeft;
+    const width = buttonEl.offsetWidth;
+
+    return {
+        x,
+        width,
+        right: x + width,
+    };
+};
+
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const setActiveBgMetrics = (metrics) => {
+    if (!activeItemBg.value || !metrics) return;
+
+    gsap.set(activeItemBg.value, {
+        x: metrics.x,
+        width: metrics.width,
+    });
+};
+
+const captureMobileNavLabelRects = () => {
+    const rects = new Map();
+
+    mobileNavButtonRefs.forEach((buttonEl, key) => {
+        const label = buttonEl.querySelector('.nav-label');
+
+        if (!label) return;
+
+        const rect = label.getBoundingClientRect();
+        rects.set(key, {
+            left: rect.left,
+            top: rect.top,
+        });
+    });
+
+    return rects;
+};
+
+const animateMobileNavLabels = (previousRects) => {
+    if (!previousRects || prefersReducedMotion()) return;
+
+    mobileNavButtonRefs.forEach((buttonEl, key) => {
+        const label = buttonEl.querySelector('.nav-label');
+        const previousRect = previousRects.get(key);
+
+        if (!label || !previousRect) return;
+
+        const currentRect = label.getBoundingClientRect();
+        const x = previousRect.left - currentRect.left;
+        const y = previousRect.top - currentRect.top;
+
+        if (Math.abs(x) < 0.5 && Math.abs(y) < 0.5) return;
+
+        gsap.killTweensOf(label);
+        gsap.fromTo(
+            label,
+            { x, y },
+            {
+                duration: TIMING.duration.normal,
+                ease: TIMING.easing.smooth,
+                x: 0,
+                y: 0,
+                clearProps: 'transform',
+            },
+        );
+    });
+};
+
+const syncActiveBgToCurrentRoute = () => {
+    activeBgTween.value?.kill();
+    activeBgTween.value = null;
+
+    setActiveBgMetrics(measureMobileNavItem(routeStore.currentRoute.base));
+};
+
+const getExpandedMetrics = (fromMetrics, toMetrics) => {
+    if (toMetrics.x > fromMetrics.x) {
+        return {
+            x: fromMetrics.x,
+            width: toMetrics.right - fromMetrics.x,
+        };
+    }
+
+    return {
+        x: toMetrics.x,
+        width: fromMetrics.right - toMetrics.x,
+    };
+};
+
+const animateActiveBgToRoute = (fromMetrics, toMetrics) => {
+    if (!activeItemBg.value || !toMetrics) return;
+
+    if (!fromMetrics || prefersReducedMotion()) {
+        setActiveBgMetrics(toMetrics);
+        return;
+    }
+
+    activeBgTween.value?.kill();
+    setActiveBgMetrics(fromMetrics);
+
+    const expandedMetrics = getExpandedMetrics(fromMetrics, toMetrics);
+
+    activeBgTween.value = gsap
+        .timeline({
+            defaults: {
+                ease: TIMING.easing.smooth,
+            },
+            onComplete: () => {
+                activeBgTween.value = null;
+            },
+        })
+        .to(activeItemBg.value, {
+            duration: TIMING.duration.fast,
+            x: expandedMetrics.x,
+            width: expandedMetrics.width,
+        })
+        .to(
+            activeItemBg.value,
+            {
+                duration: TIMING.duration.normal,
+                x: toMetrics.x,
+                width: toMetrics.width,
+            },
+            '-=0.03',
+        );
+};
 
 onMounted(() => {
+    syncActiveBgToCurrentRoute();
+
+    if (mobileNav.value) {
+        resizeObserver = new ResizeObserver(syncActiveBgToCurrentRoute);
+        resizeObserver.observe(mobileNav.value);
+    }
+
     if (routeStore.activePath !== 'home') {
         const tl = gsap.timeline();
         anims.enterPage({
@@ -48,6 +207,10 @@ onMounted(() => {
 watch(
     () => routeStore.isLeaving,
     async (newVal) => {
+        if (newVal) {
+            pendingLabelRects.value = captureMobileNavLabelRects();
+        }
+
         if (routeStore.activePath !== 'home' && fromHome.value) {
             await nextTick();
             anims.enterNavItem();
@@ -59,6 +222,34 @@ watch(
         }
     },
 );
+
+watch(
+    () => routeStore.currentRoute.base,
+    async (newRouteBase, oldRouteBase) => {
+        const fromMetrics = measureMobileNavItem(oldRouteBase);
+        const previousLabelRects = pendingLabelRects.value;
+
+        await nextTick();
+
+        animateMobileNavLabels(previousLabelRects);
+        animateActiveBgToRoute(fromMetrics, measureMobileNavItem(newRouteBase));
+        pendingLabelRects.value = null;
+    },
+);
+
+onUnmounted(() => {
+    activeBgTween.value?.kill();
+    gsap.killTweensOf('.nav-label');
+    resizeObserver?.disconnect();
+});
+
+const navMobileRouteTo = (key) => {
+    fadeOut({ selector: '.mobile-nav-icon' });
+    routeStore.toRoute(key);
+    setTimeout(() => {
+        fadeIn({ selector: '.mobile-nav-icon' });
+    }, 400);
+};
 </script>
 
 <template>
@@ -101,17 +292,28 @@ watch(
     </header>
     <hr class="nav-line" />
 
-    <nav class="nav-mobile">
+    <nav ref="mobileNav" class="nav-mobile">
+        <div ref="activeItemBg" class="active-item-bg" aria-hidden="true"></div>
+
         <button
             v-for="(route, key) in routeStore.routes"
             :key="key"
-            @click="routeStore.toRoute(key)"
+            :ref="(el) => setMobileNavButtonRef(key, el)"
+            @click="navMobileRouteTo(key)"
             :class="{ active: routeStore.currentRoute.base === key }"
             :disabled="routeStore.currentRoute.base === key"
         >
-            <component :is="route.meta.iconFill" v-if="routeStore.currentRoute.base === key" class="icon" />
+            <span class="mobile-nav-icon-slot" aria-hidden="true">
+                <component
+                    :is="route.meta.iconFill"
+                    class="icon mobile-nav-icon"
+                    :class="{
+                        active: routeStore.currentRoute.base === key,
+                    }"
+                />
+            </span>
 
-            <span>{{ route.name }}</span>
+            <span class="nav-label">{{ route.name }}</span>
         </button>
     </nav>
 </template>
@@ -143,24 +345,41 @@ watch(
 }
 
 .nav-line {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    min-height: 1px;
+    margin: 0;
+    border: 0;
     transform: scaleX(0);
+
+    @include theme-dark {
+        background-color: #575e6455;
+    }
+
+    @include theme-light {
+        background-color: #3d505c33;
+    }
 }
 
-.nav-desktop button {
-    opacity: 0;
-    transform: translateX(-50px) scaleX(0.5);
+%nav-button-base {
+    display: flex;
+    align-items: center;
+    font-family: $primary-font-stack;
+    background-color: transparent;
+    border: 0;
 }
 
-.nav-mobile {
-    transform: translateY(150px) scaleX(0);
+%nav-soft-shadow {
+    box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
 }
 
 .nav-mobile {
     position: fixed;
-    z-index: 9;
     right: $size-2;
     bottom: $size-2;
     left: $size-2;
+    z-index: 9;
     display: flex;
     justify-content: space-between;
     max-width: 347px;
@@ -170,6 +389,7 @@ watch(
     background-color: $color-bg-secondary;
     border-radius: $size-4;
     box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
+    transform: translateY(150px) scaleX(0);
 
     @include bp-xsm-phone {
         font-size: 1.2em;
@@ -183,37 +403,78 @@ watch(
         display: none;
     }
 
+    .active-item-bg {
+        @extend %nav-soft-shadow;
+
+        position: absolute;
+        top: $size-2;
+        bottom: $size-2;
+        left: 0;
+        z-index: 1;
+        width: 0;
+        pointer-events: none;
+        background-color: lighten-color($color-bg-secondary, 10%);
+        border-radius: 14px;
+        will-change: transform, width;
+    }
+
     button {
-        display: flex;
-        align-items: center;
+        @extend %nav-button-base;
+
+        position: relative;
+        z-index: 2;
         justify-content: center;
         padding: $size-2 $size-3;
-        font-family: $primary-font-stack;
         font-weight: 600;
         color: $color-accent;
-        background-color: transparent;
-        border: 0;
         border-radius: $size-4;
 
         @include bp-xsm-phone {
+            gap: 0;
             font-size: 0.7em;
-            gap: $size-2;
+        }
+
+        .mobile-nav-icon-slot {
+            display: none;
         }
 
         .icon {
             display: none;
 
             @include bp-xsm-phone {
-                display: inline-block;
-                height: $size-6;
+                display: block;
+                flex: 0 0 $size-6;
                 width: $size-6;
+                height: $size-6;
                 fill: $color-accent;
                 stroke: $color-accent;
             }
         }
 
-        span {
+        @include bp-xsm-phone {
+            .mobile-nav-icon-slot {
+                display: inline-flex;
+                flex: 0 0 auto;
+                align-items: center;
+                justify-content: center;
+                width: $size-6;
+                max-width: 0;
+                margin-right: 0;
+                overflow: hidden;
+            }
+
+            &.active {
+                .mobile-nav-icon-slot {
+                    max-width: $size-6;
+                    margin-right: $size-2;
+                }
+            }
+        }
+
+        .nav-label {
+            display: inline-block;
             font-size: clamp(0.4em, 4vw, 1em);
+            will-change: transform;
 
             @include bp-xsm-phone {
                 font-size: clamp(0.9em, 3.7vw, 1em);
@@ -243,12 +504,6 @@ watch(
                 }
             }
         }
-
-        &.active,
-        &:active {
-            background-color: lighten-color($color-bg-secondary, 10%);
-            box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
-        }
     }
 }
 
@@ -261,34 +516,33 @@ watch(
     }
 
     button {
+        @extend %nav-button-base;
+
         position: relative;
-        font-size: 0.85em;
-        font-family: $primary-font-stack;
-        display: flex;
         gap: $size-3;
-        align-items: center;
         padding: $size-3 $size-5;
-        background-color: transparent;
-        border: 0;
+        font-size: 0.85em;
+        opacity: 0;
         border-radius: $size-3;
+        transform: translateX(-50px) scaleX(0.5);
 
         @include theme-dark {
-            color: $color-text-primary;
             font-weight: 400;
+            color: $color-text-primary;
         }
 
         @include theme-light {
-            color: $color-primary-darker;
             font-weight: 500;
+            color: $color-primary-darker;
         }
 
         &::after {
-            content: '';
             position: absolute;
             bottom: 0;
             left: $size-2;
             width: 0;
             height: 1px;
+            content: '';
             border-radius: $size-4;
             transition: width 0.15s ease-in-out;
 
@@ -323,20 +577,6 @@ watch(
             &:hover {
                 background-color: transparent;
             }
-
-            .icon {
-                height: $size-6;
-
-                @include theme-dark {
-                    fill: $color-text-secondary;
-                    stroke: $color-text-secondary;
-                }
-
-                @include theme-light {
-                    fill: $color-primary-darker;
-                    stroke: $color-primary-darker;
-                }
-            }
         }
 
         .icon {
@@ -365,6 +605,8 @@ header {
     padding: 0 $size-2;
 
     .theme-toggle {
+        @extend %nav-soft-shadow;
+
         display: inline-flex;
         width: $size-11;
         height: $size-8;
@@ -372,7 +614,6 @@ header {
         margin: $size-4;
         cursor: pointer;
         border-radius: 100px;
-        box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
 
         @include theme-dark {
             background-color: $color-bg-secondary;
@@ -402,12 +643,13 @@ header {
             transition: all 0.3s ease;
 
             &::before {
+                @extend %nav-soft-shadow;
+
                 position: absolute;
-                content: '';
                 width: $size-6;
                 height: $size-6;
+                content: '';
                 border-radius: 100%;
-                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
                 transition: transform 0.3s;
 
                 @include theme-dark {
@@ -439,23 +681,6 @@ header {
                 transform: translateX(115%);
             }
         }
-    }
-}
-
-.nav-line {
-    position: relative;
-    z-index: 3;
-    border: 0;
-    width: 100%;
-    margin: 0;
-    min-height: 1px;
-
-    @include theme-dark {
-        background-color: #575e6455;
-    }
-
-    @include theme-light {
-        background-color: #3d505c33;
     }
 }
 </style>
