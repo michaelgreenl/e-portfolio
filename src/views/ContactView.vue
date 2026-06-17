@@ -323,6 +323,10 @@ const clearStatus = () => {
     width: 100%;
     max-width: 33em;
 
+    @include bp-md-tablet {
+        max-width: 36em;
+    }
+
     @include bp-lg-laptop {
         gap: $size-5;
         max-width: 40em;
@@ -334,6 +338,7 @@ const clearStatus = () => {
     flex: 1;
     flex-direction: column;
     gap: $size-2;
+    min-width: 18em;
 }
 
 .form-label {
@@ -476,6 +481,10 @@ const clearStatus = () => {
     max-width: 33em;
     padding: $size-5 $size-3;
     font-size: 0.95em;
+
+    @include bp-md-tablet {
+        max-width: 36em;
+    }
 
     @include bp-lg-laptop {
         max-width: 40em;
