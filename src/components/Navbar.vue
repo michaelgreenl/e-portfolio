@@ -244,7 +244,7 @@ onUnmounted(() => {
 });
 
 const navMobileRouteTo = (key) => {
-    fadeOut({ selector: '.mobile-nav-icon' });
+    fadeOut({ selector: '.mobile-nav-icon', opts: { delay: 0.2 } });
     routeStore.toRoute(key);
     setTimeout(() => {
         fadeIn({ selector: '.mobile-nav-icon' });
