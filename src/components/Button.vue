@@ -116,7 +116,7 @@ button {
         }
 
         @include theme-light {
-            color: $color-primary-darker;
+            color: #466675;
         }
 
         .icon {
@@ -128,7 +128,7 @@ button {
             }
 
             @include theme-light {
-                fill: $color-primary-darker;
+                fill: #466675;
             }
         }
 
@@ -146,7 +146,7 @@ button {
             }
 
             @include theme-light {
-                background-color: $color-primary-darker;
+                background-color: #466675;
             }
         }
 

@@ -627,7 +627,7 @@ $inset-width: 12px;
                 }
 
                 @include theme-light {
-                    fill: darken-color($color-text-muted, 15%) !important;
+                    fill: #466675 !important;
                 }
             }
         }
@@ -658,7 +658,7 @@ $inset-width: 12px;
                 }
 
                 @include theme-light {
-                    stroke: darken-color($color-text-muted, 15%);
+                    stroke: #466675;
                 }
             }
         }
@@ -669,7 +669,7 @@ $inset-width: 12px;
             }
 
             @include theme-light {
-                fill: darken-color($color-text-muted, 15%) !important;
+                fill: #466675 !important;
             }
         }
     }

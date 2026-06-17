@@ -218,7 +218,13 @@ p {
     font-size: 1.5em;
 
     a :deep(button) .icon:hover {
-        fill: $color-primary;
+        @include theme-dark {
+            fill: $color-primary;
+        }
+
+        @include theme-light {
+            fill: #5f8494;
+        }
     }
 }
 
