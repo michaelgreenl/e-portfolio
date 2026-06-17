@@ -294,7 +294,7 @@ p {
     }
 
     @include theme-light {
-        background-color: $color-primary-darker;
+        background-color: $color-gray5;
     }
 }
 </style>
