@@ -147,8 +147,8 @@ watch(
                 <div class="section-content">
                     <div class="section-segment section-segment-skills">
                         <p v-for="skills in resumeData.skills" :key="skills.category">
-                            <span>{{ skills.category }}:</span>&nbsp;
-                            <span v-for="(skill, i) in skills.list" :key="skill"
+                            <span class="skill-category">{{ skills.category }}:</span>&nbsp;
+                            <span v-for="(skill, i) in skills.list" :key="skill" class="skill-name"
                                 >{{ skill }}{{ i < skills.list.length - 1 ? ', ' : '' }}</span
                             >
                         </p>
@@ -161,6 +161,11 @@ watch(
 
 <style lang="scss" scoped>
 .resume-container {
+    --resume-light-ink: #2f3940;
+    --resume-light-heading: #2f4858;
+    --resume-light-accent: #315f72;
+    --resume-light-muted: #52646e;
+
     position: relative;
     display: flex;
     flex-direction: column;
@@ -172,6 +177,10 @@ watch(
     margin: 0 auto;
     font-size: 0.9em;
     color: $color-text-primary;
+
+    @include theme-light {
+        color: var(--resume-light-ink);
+    }
 
     @include bp-custom-min(730) {
         max-width: 48em;
@@ -205,6 +214,10 @@ h1 {
     font-size: clamp(2.4em, 13vw, 3.4em);
     line-height: 0.95;
     letter-spacing: 0;
+
+    @include theme-light {
+        color: var(--resume-light-heading);
+    }
 }
 
 h2,
@@ -218,6 +231,10 @@ h2 {
     font-family: $primary-font-stack;
     font-size: clamp(1.6em, 8vw, 2em);
     line-height: 1.15;
+
+    @include theme-light {
+        color: var(--resume-light-accent);
+    }
 }
 
 h3,
@@ -229,10 +246,18 @@ h3 span {
     font-size: 0.9em;
     font-weight: 400;
     color: $color-text-secondary;
+
+    @include theme-light {
+        color: var(--resume-light-muted);
+    }
 }
 
 p {
     margin: $size-1 0;
+
+    @include theme-light {
+        color: var(--resume-light-muted);
+    }
 
     span {
         font-size: 1.15em;
@@ -249,6 +274,10 @@ li {
     font-family: $secondary-font-stack;
     line-height: 1.45;
     color: $color-text-secondary;
+
+    @include theme-light {
+        color: #45545c;
+    }
 }
 
 .page-header {
@@ -275,14 +304,18 @@ li {
 }
 
 .page-eyebrow {
+    padding-left: 2px;
     font-family: $primary-font-stack;
     font-size: 0.78em;
     font-weight: 600;
     line-height: 1;
     color: $color-text-secondary;
-    letter-spacing: 1px;
     text-transform: uppercase;
-    padding-left: 2px;
+    letter-spacing: 1px;
+
+    @include theme-light {
+        color: var(--resume-light-muted);
+    }
 }
 
 .download-link {
@@ -294,9 +327,9 @@ li {
     }
 
     :deep(button.primary) {
-        border-radius: 10px;
         gap: 0.4em !important;
         min-height: 2.75em;
+        border-radius: 10px;
 
         span {
             display: none;
@@ -332,7 +365,6 @@ li {
     border: solid 1px transparent;
     border-radius: 12px;
     backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
     transition:
         background-color 0.15s ease-in-out,
         border-color 0.15s ease-in-out,
@@ -359,6 +391,10 @@ li {
     padding-left: $size-1;
     font-weight: 600;
     letter-spacing: 1px;
+
+    @include theme-light {
+        color: var(--resume-light-accent);
+    }
 }
 
 .section-segment,
@@ -388,12 +424,13 @@ li {
     &-skills {
         gap: $size-1;
 
-        p span {
+        .skill-category,
+        .skill-name {
             font-weight: 400;
+        }
 
-            &:first-child {
-                font-weight: 600;
-            }
+        .skill-category {
+            font-weight: 600;
         }
     }
 }
@@ -408,11 +445,11 @@ li {
 .segment-title {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     margin-right: $size-5;
     font-size: 1.3em;
     font-weight: 600;
     line-height: 1.25;
-    align-items: center;
 
     @include bp-custom-min(489) {
         gap: $size-1;
@@ -421,7 +458,7 @@ li {
     &-projects {
         .project-link {
             font-size: 1.1em;
-            color: $color-text-primary;
+            color: inherit;
 
             &:focus-visible {
                 outline: 2px solid $color-primary;
@@ -443,11 +480,19 @@ li {
     font-size: 0.9em;
     color: $color-text-secondary;
 
+    @include theme-light {
+        color: var(--resume-light-muted);
+    }
+
     :deep(svg) {
         height: 1em;
         margin-bottom: 4px;
         stroke: $color-text-primary;
         will-change: opacity;
+
+        @include theme-light {
+            stroke: var(--resume-light-accent);
+        }
     }
 }
 
