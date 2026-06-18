@@ -139,7 +139,7 @@ function closeProject() {
 
         <div class="cards">
             <ProjectCard
-                v-for="(project, index) in projectsData"
+                v-for="project in projectsData"
                 :key="project.title"
                 :ref="(el) => (projectCardRefs[project.slug] = el)"
                 :project="project"

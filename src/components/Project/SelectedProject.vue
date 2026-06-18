@@ -5,7 +5,7 @@ import ToolChip from '@/components/ToolChip.vue';
 
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
-const props = defineProps({
+defineProps({
     activeProject: { required: true, type: Object },
     autoplayVideo: { required: true, type: Boolean },
     projectLogos: { required: true, type: Object },
@@ -302,42 +302,22 @@ iframe {
             svg {
                 height: $size-6;
                 fill: rgb(0 0 0 / 0%) !important;
+                stroke: currentcolor;
                 stroke-width: 2;
                 transition: fill 0.3s ease-in-out;
-
-                @include theme-dark {
-                    stroke: lighten-color($color-text-muted, 15%);
-                }
-
-                @include theme-light {
-                    stroke: darken-color($color-text-muted, 15%);
-                }
             }
         }
     }
 
     .no-fill {
         &:deep(button) svg {
+            fill: currentcolor !important;
             stroke-width: 0 !important;
-
-            @include theme-dark {
-                fill: lighten-color($color-text-muted, 15%) !important;
-            }
-
-            @include theme-light {
-                fill: darken-color($color-text-muted, 15%) !important;
-            }
         }
     }
 
     a:hover :deep(button) svg {
-        @include theme-dark {
-            fill: lighten-color($color-text-muted, 15%) !important;
-        }
-
-        @include theme-light {
-            fill: darken-color($color-text-muted, 15%) !important;
-        }
+        fill: currentcolor !important;
     }
 }
 

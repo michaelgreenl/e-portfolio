@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+defineProps({
     preset: {
         type: String, // primary, primary-accent, secondary
     },
@@ -116,7 +116,7 @@ button {
         }
 
         @include theme-light {
-            color: #466675;
+            color: $color-primary-darker;
         }
 
         .icon {
@@ -128,7 +128,7 @@ button {
             }
 
             @include theme-light {
-                fill: #466675;
+                fill: $color-primary-darker;
             }
         }
 
@@ -146,7 +146,7 @@ button {
             }
 
             @include theme-light {
-                background-color: #466675;
+                background-color: $color-primary-darker;
             }
         }
 

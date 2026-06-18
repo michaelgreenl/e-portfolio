@@ -393,7 +393,7 @@ li {
     letter-spacing: 1px;
 
     @include theme-light {
-        color: var(--resume-light-accent);
+        color: $color-primary;
     }
 }
 

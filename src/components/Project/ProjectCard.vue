@@ -705,7 +705,7 @@ $inset-width: 12px;
                 }
 
                 @include theme-light {
-                    stroke: #466675;
+                    stroke: $color-primary-darker;
                 }
             }
         }
@@ -726,7 +726,7 @@ $inset-width: 12px;
             }
 
             @include theme-light {
-                fill: #466675 !important;
+                fill: $color-primary-darker !important;
             }
         }
     }
@@ -737,7 +737,7 @@ $inset-width: 12px;
         }
 
         @include theme-light {
-            fill: #466675 !important;
+            fill: $color-primary-darker !important;
         }
     }
 }
