@@ -423,7 +423,14 @@ li {
 
     &-skills {
         gap: $size-1;
-        width: 100%;
+
+        p {
+            text-wrap: auto;
+
+            @include bp-sm-phone {
+                text-wrap: pretty;
+            }
+        }
 
         .skill-category,
         .skill-name {
