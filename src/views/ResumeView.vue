@@ -423,6 +423,7 @@ li {
 
     &-skills {
         gap: $size-1;
+        width: 100%;
 
         .skill-category,
         .skill-name {
