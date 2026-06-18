@@ -137,6 +137,7 @@ h4 {
     font-family: $primary-font-stack;
     font-weight: 400;
     color: $color-primary-darker;
+    text-wrap: pretty;
 }
 
 p {
