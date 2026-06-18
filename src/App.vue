@@ -47,6 +47,9 @@ document.documentElement.setAttribute('data-theme', theme);
 html,
 body,
 #app {
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     height: 100%;
     padding: 0;
     margin: 0;
