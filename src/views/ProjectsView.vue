@@ -132,8 +132,8 @@ function closeProject() {
             <h1>Projects</h1>
             <hr />
             <p>
-                Recent projects spanning cross-platform mobile development, real-time full-stack systems, advanced
-                frontend visualizations, and intelligent agentic applications.
+                Recent projects spanning cross-platform mobile development, real-time full-stack systems, and advanced
+                frontend visualizations.
             </p>
         </div>
 
@@ -217,7 +217,7 @@ function closeProject() {
     }
 
     p {
-        max-width: 51ch;
+        max-width: 53.5ch;
         font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
