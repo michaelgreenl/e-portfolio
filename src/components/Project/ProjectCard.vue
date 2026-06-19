@@ -167,6 +167,18 @@ async function openProject(autoplay = false) {
         projectSelected.value = true;
         autoplayVideo.value = autoplay;
         await nextTick();
+
+        // Handling race condition with scrollTo getting viewportHeight and project-card grow animation completing
+        if (props.project.slug === 'algo-visualizer' || props.project.slug === 'mawm') {
+            setTimeout(() => {
+                if (props.project.slug === 'algo-visualizer') {
+                    window.scrollTo({ top: cardEl.value.offsetTop, behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }
+            }, 100);
+        }
+
         window.scrollTo({ top: cardEl.value.offsetTop, behavior: 'smooth' });
     }
 }
