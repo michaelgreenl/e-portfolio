@@ -424,6 +424,8 @@ li {
     &-skills {
         gap: $size-1;
 
+        // `text-wrap: pretty;` doesn't work on mobile browsers,
+        // it seems to replace it with `text-wrap: balanced;` and looks off putting
         p {
             text-wrap: auto;
 
