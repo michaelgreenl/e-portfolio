@@ -302,22 +302,42 @@ iframe {
             svg {
                 height: $size-6;
                 fill: rgb(0 0 0 / 0%) !important;
-                stroke: currentcolor;
                 stroke-width: 2;
                 transition: fill 0.3s ease-in-out;
+
+                @include theme-dark {
+                    stroke: color-mix(in srgb, var(--color-text-muted) 85%, white 15%);
+                }
+
+                @include theme-light {
+                    stroke: $color-primary-darker;
+                }
             }
         }
     }
 
     .no-fill {
         &:deep(button) svg {
-            fill: currentcolor !important;
             stroke-width: 0 !important;
+
+            @include theme-dark {
+                fill: color-mix(in srgb, var(--color-text-muted) 85%, white 15%) !important;
+            }
+
+            @include theme-light {
+                fill: $color-primary-darker !important;
+            }
         }
     }
 
     a:hover :deep(button) svg {
-        fill: currentcolor !important;
+        @include theme-dark {
+            fill: color-mix(in srgb, var(--color-text-muted) 85%, white 15%) !important;
+        }
+
+        @include theme-light {
+            fill: $color-primary-darker !important;
+        }
     }
 }
 
