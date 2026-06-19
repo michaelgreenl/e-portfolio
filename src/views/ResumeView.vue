@@ -424,9 +424,11 @@ li {
     &-skills {
         gap: $size-1;
 
-        // `text-wrap: pretty;` doesn't work on mobile browsers,
-        // it seems to replace it with `text-wrap: balanced;` and looks off putting
         p {
+            line-height: 2ch;
+
+            // `text-wrap: pretty;` doesn't work on mobile browsers,
+            // it seems to replace it with `text-wrap: balanced;` and looks off putting
             text-wrap: auto;
 
             @include bp-sm-phone {
