@@ -63,11 +63,11 @@
         "shortDate": "Sep. '25 - Dec. '25",
         "longDate": "September 2025 - December 2025",
         "description": {
-            "short": "A full-stack application engineered with a decoupled architecture, utilizing the Repository Pattern to securely manage authentication, game metrics, and user persistence.",
+            "short": "Reaction is a reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
             "long": [
                 "Architected a reactive Vue 3 frontend utilizing Pinia for modular state management and GSAP for high-fidelity timeline animations, significantly enhancing user experience through intuitive visual feedback.",
                 "Developed backend services adhering to the Repository Pattern, creating a clean separation of concerns and improving maintainability.",
-                "Engineered a defense-in-depth security strategy, utilizing HTTP-only cookies for XSS-proof JWT storage and implementing rate-limiting middleware to mitigate brute-force attacks."
+                "Implemented a defense-in-depth security strategy by storing JWTs in HTTP-only cookies to mitigate XSS attacks and applying rate limiting to prevent brute-force attempts."
             ]
         },
         "fontFamily": "AudioWide",
@@ -91,12 +91,12 @@
     {
         "title": "GameLobby",
         "slug": "game-lobby",
-        "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Sass"],
-        "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "sass"],
+        "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Express", "Sass"],
+        "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "express", "sass"],
         "shortDate": "June 2025 - July 2025",
         "longDate": "June 2025 - July 2025",
         "description": {
-            "short": "A real-time multiplayer application featuring a live lobby system via Socket.IO, secured by JWTs and supported by Prisma for persistent match history.",
+            "short": "A real-time multiplayer game platform with Socket.IO-powered live lobbies, JWT-secured sessions, and server-authoritative in-memory match state for responsive gameplay.",
             "long": [
                 "Architected a server-authoritative Node.js backend to centralize game logic, preventing client-side state manipulation and ensuring fair play for multiplayer sessions.",
                 "Orchestrated real-time data synchronization between a Vue.js client and server using Socket.IO, implementing fault-tolerant reconnection strategies via JWTs to preserve user sessions.",
@@ -131,7 +131,7 @@
         "description": {
             "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
             "long": [
-                "Constructed a modular algorithm visualization platform using Nuxt 3 and Vue 3, utilizing dynamic component loading to seamlessly scale from 1 to 50+ algorithm visualizations without bundle size bloat.",
+                "Constructed a modular algorithm visualization platform using Nuxt 3 and Vue 3, leveraging dynamic component loading to add new algorithm visualizations without increasing the initial bundle size.",
                 "Created an interactive explanation system using gsap.TextPlugin to type out context-aware, step-by-step textual descriptions synchronized perfectly with the visual elements of the algorithm.",
                 "Optimized animation performance by using Vue's markRaw to exclude heavy GSAP timeline objects from reactivity tracking, preventing unnecessary re-renders and memory leaks."
             ]
@@ -161,11 +161,11 @@
         "shortDate": "May 2026 - Present",
         "longDate": "May 2026 - Active Development",
         "description": {
-            "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging and installing LangGraph workflows with the purpose of agent orchestration.",
+            "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging, installing, and distributing LangGraph workflows for multi-agent orchestration.",
             "long": [
                 "Shipped @mawm/cli, a TypeScript npm CLI that packages LangGraph workflows into reusable modules with manifest-based install, update, remove, and execution flows.",
                 "Designed a workflow distribution model with global and project-local installs, giving developers a repeatable way to share, version, and run LangGraph automations across projects.",
-                "Automated LangGraph workflow execution from the CLI, including server startup, health checks, resumable runs, and cleanup so users can run workflows without managing infra manually."
+                "Bundled an execute-graph OpenCode tool that runs globally installed LangGraph workflows with server startup, health checks, resumable run state, and cleanup, so projects can use workflows without manual LangGraph server management."
             ]
         },
         "fontFamily": "ClashDisplay",
