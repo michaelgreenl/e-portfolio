@@ -34,7 +34,7 @@
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
             "long": [
                 "Architected an offline-first architecture with optimistic UI, durable command queue, background sync, and server-side idempotency to safely replay mutations after network failures/app restarts.",
-                "Designed access/refresh token auth with rotation and dual delivery (HttpOnly cookies for web, Bearer tokens for native) including automatic refresh/retry and concurrent refresh de-duplication in the API client.",
+                "Designed access/refresh token auth with rotation and dual delivery (HTTP-only cookies for web, Bearer tokens for native) including automatic refresh/retry and concurrent refresh de-duplication in the API client.",
                 "Engineered a real-time collaboration layer for shared counters with server-authoritative participant resolution and client-side state reconciliation to keep multiple devices consistent during concurrent updates."
             ]
         },
