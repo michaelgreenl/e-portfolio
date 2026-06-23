@@ -24,17 +24,19 @@ const bp = useBreakpoints();
 const externalLinkRespText = (projectSlug, externalLinks) => {
     const className = 'responsive-link-text';
 
+    const TWO_COLUMN_CARD = 'game-lobby';
+
     if (bp.isXlLaptop.value) {
         return 'undefined';
     }
 
     if (bp.isLgLaptop.value) {
-        if (projectSlug === 'game-lobby') return 'undefined';
+        if (projectSlug === TWO_COLUMN_CARD) return 'undefined';
         return `${Object.keys(externalLinks).length <= 3 ? undefined : className}`;
     }
 
     if (bp.isLaptop.value) {
-        if (projectSlug === 'game-lobby') return 'undefined';
+        if (projectSlug === TWO_COLUMN_CARD) return 'undefined';
         return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
     }
 
@@ -185,6 +187,7 @@ async function openProject(autoplay = false) {
 
 function closeProject() {
     projectSelected.value = false;
+    autoplayVideo.value = false;
 }
 
 // ensures window resizing doesn't result in unwanted UI layouts
