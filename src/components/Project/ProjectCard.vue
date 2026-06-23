@@ -1,9 +1,9 @@
 <script setup>
 import { computed, ref, useTemplateRef, watch, nextTick } from 'vue';
 import { useElementBounding, useWindowSize } from '@vueuse/core';
-import { gsap } from 'gsap';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
-import { TIMING } from '@/animations/constants/timing.js';
+import { useGsap } from '@/composables/useGsap.js';
+import { projectAnimations } from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 
@@ -55,9 +55,15 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 };
 
 const cardEl = ref(null);
+const { registerAnim } = useGsap(cardEl);
 const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
+
+const anims = {
+    showSelectedProjectDetails: registerAnim(projectAnimations.showSelectedProjectDetails),
+    hideSelectedProjectDetails: registerAnim(projectAnimations.hideSelectedProjectDetails),
+};
 
 const { top: toolChipTop } = useElementBounding(toolChipsContainer);
 const { height: viewportHeight } = useWindowSize();
@@ -74,8 +80,6 @@ const toolChipsYValue = computed(() => {
     return undefined;
 });
 
-const getSelectedDetailTargets = (el) => [...el.querySelectorAll('.demo-video, .selected-description li')];
-
 const shouldSkipSelectedDetailsAnimation = () =>
     bp.isLaptop.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -85,38 +89,7 @@ function onSelectedDetailsEnter(el, done) {
         return;
     }
 
-    const detailTargets = getSelectedDetailTargets(el);
-
-    gsap.killTweensOf([el, ...detailTargets]);
-    gsap.set(el, { height: 0, overflow: 'hidden' });
-    gsap.set(detailTargets, { autoAlpha: 0, y: 8 });
-
-    const tl = gsap
-        .timeline({
-            onComplete: () => {
-                gsap.set(el, { clearProps: 'height,overflow' });
-                done();
-            },
-        })
-        .to(el, {
-            duration: TIMING.duration.moderate,
-            ease: TIMING.easing.smooth,
-            height: 'auto',
-        });
-
-    if (detailTargets.length) {
-        tl.to(
-            detailTargets,
-            {
-                duration: TIMING.duration.fast,
-                ease: TIMING.easing.smooth,
-                autoAlpha: 1,
-                y: 0,
-                stagger: TIMING.stagger.tight,
-            },
-            '-=0.2',
-        );
-    }
+    anims.showSelectedProjectDetails({ target: el, onComplete: done });
 }
 
 function onSelectedDetailsLeave(el, done) {
@@ -130,35 +103,7 @@ function onSelectedDetailsLeave(el, done) {
         return;
     }
 
-    const detailTargets = getSelectedDetailTargets(el);
-
-    gsap.killTweensOf([el, ...detailTargets]);
-    gsap.set(el, { height: el.offsetHeight, overflow: 'hidden' });
-
-    const tl = gsap.timeline({ onComplete: finishLeave });
-
-    if (detailTargets.length) {
-        tl.to(detailTargets, {
-            duration: TIMING.duration.fast,
-            ease: TIMING.easing.linear,
-            autoAlpha: 0,
-            y: -6,
-            stagger: {
-                each: TIMING.stagger.instant,
-                from: 'end',
-            },
-        });
-    }
-
-    tl.to(
-        el,
-        {
-            duration: TIMING.duration.normal,
-            ease: TIMING.easing.bounceIn,
-            height: 0,
-        },
-        detailTargets.length ? '<' : 0,
-    );
+    anims.hideSelectedProjectDetails({ target: el, onComplete: finishLeave });
 }
 
 async function openProject(autoplay = false) {
