@@ -54,8 +54,7 @@ onMounted(() => {
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                I build secure, scalable applications with elegant, intuitive user interfaces and robust, maintainable
-                backend architecture.
+                Simplicity is not the absence of complexity; it is its resolution, the clarity distilled from its chaos.
             </p>
 
             <div class="cta">
@@ -96,10 +95,6 @@ onMounted(() => {
         font-size: 1em;
     }
 
-    @include bp-custom-min(750) {
-        padding: 0 $size-11;
-    }
-
     @include bp-md-tablet {
         align-items: flex-start;
         padding: 0 $size-12;
@@ -114,7 +109,7 @@ onMounted(() => {
     }
 }
 
-$hero-tablet-bp: 640;
+$hero-tablet-bp: 525;
 
 h1 {
     padding-bottom: $size-1;
@@ -127,6 +122,9 @@ h1 {
         padding-bottom: $size-1;
         margin: 0 auto;
         line-height: 1ch;
+        font-size: 4.2em;
+
+        font-size: clamp(4.2em, 13.2vw, 5.2em);
     }
 
     @include bp-md-tablet {
@@ -171,16 +169,16 @@ h3 {
 }
 
 p {
-    max-width: 30ch;
+    max-width: 32ch;
     margin: 0 auto;
     text-align: center;
 
     @include bp-custom-min(400) {
-        max-width: 37ch;
+        font-size: 1.1em;
     }
 
     @include bp-custom-min($hero-tablet-bp) {
-        max-width: 56ch;
+        max-width: 46ch;
     }
 
     @include bp-md-tablet {
@@ -203,7 +201,6 @@ p {
 .contact-links {
     position: absolute;
     top: $size-3;
-    right: $size-2;
     display: flex;
     justify-content: flex-end;
     width: 100vw;
@@ -217,6 +214,10 @@ p {
         @include theme-light {
             fill: #5f8494;
         }
+    }
+
+    @include bp-custom-min(440) {
+        right: $size-2;
     }
 }
 
@@ -252,7 +253,7 @@ p {
     align-items: center;
     align-self: flex-end;
     justify-content: flex-end;
-    width: 80%;
+    width: 90%;
 
     @include bp-md-tablet {
         display: flex;
@@ -260,11 +261,7 @@ p {
 
     :deep(button) {
         padding: 0 $size-1;
-        font-size: 1.2em;
-
-        @include bp-lg-laptop {
-            font-size: 1.3em;
-        }
+        font-size: 1.3em;
 
         &::after {
             height: 2px;

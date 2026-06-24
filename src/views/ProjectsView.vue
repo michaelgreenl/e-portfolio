@@ -217,10 +217,15 @@ function closeProject() {
     }
 
     p {
-        max-width: 53.5ch;
+        max-width: 50ch;
         font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
+
+        @include bp-lg-laptop {
+            max-width: 53ch;
+            font-size: 1.8em;
+        }
     }
 }
 
