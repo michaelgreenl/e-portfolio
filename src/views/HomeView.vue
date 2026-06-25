@@ -134,6 +134,10 @@ h1 {
         padding: 0 !important;
     }
 
+    .hero-title-1 {
+        color: $color-primary-darker;
+    }
+
     .hero-title-2 {
         margin-left: 1.4em;
 
