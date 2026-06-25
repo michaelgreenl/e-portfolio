@@ -52,7 +52,7 @@ onMounted(() => {
             <h3>Hi 👋, my name is</h3>
             <h1>
                 <span class="hero-title hero-title-1">Michael</span>
-                <span class="hero-title hero-title-2"> Green </span>
+                <span class="hero-title hero-title-2">Green</span>
             </h1>
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
@@ -121,12 +121,12 @@ h1 {
     line-height: 0.8ch;
 
     @include bp-custom-min($hero-tablet-bp) {
+        display: flex;
+        gap: 12px;
         max-width: 100vw;
         padding-bottom: $size-1;
         margin: 0 auto;
         line-height: 1ch;
-        font-size: 4.2em;
-
         font-size: clamp(4.2em, 13.2vw, 5.2em);
     }
 
@@ -140,9 +140,11 @@ h1 {
 
     .hero-title-2 {
         margin-left: 1.4em;
+        display: inherit;
 
         @include bp-custom-min($hero-tablet-bp) {
             margin-left: 0 !important;
+            display: inline-block;
         }
 
         @include theme-dark {
@@ -185,7 +187,7 @@ p {
     }
 
     @include bp-custom-min($hero-tablet-bp) {
-        max-width: 46ch;
+        max-width: 47ch;
     }
 
     @include bp-md-tablet {
