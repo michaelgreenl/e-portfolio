@@ -10,7 +10,8 @@
     pointer-events: none;
 
     @include theme-dark {
-        --bg: #{$color-bg-primary};
+        // $color-bg-primary
+        --bg: #212529;
         --grid: rgb(255 255 255 / 3.5%);
         --spotA: rgb(255 255 255 / 7%);
         --spotB: rgb(137 207 240 / 6%);
@@ -18,7 +19,8 @@
     }
 
     @include theme-light {
-        --bg: #{$color-bg-primary};
+        // $color-bg-primary
+        --bg: #dee2e6;
         --grid: rgb(0 0 0 / 4%);
         --spotA: rgb(0 0 0 / 3%);
         --spotB: rgb(173 216 230 / 10%);
