@@ -4,8 +4,8 @@ import projectsData from '@/assets/data/projects.json';
 import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
-import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
-import { TIMING } from '@/animations/constants/timing.js';
+import { useGsap } from '@/composables/useGsap.js';
+import { resumeAnimations } from '@/animations/page/resume.js';
 import Button from '@/components/Button.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
@@ -13,20 +13,26 @@ import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
-const { fadeIn, fadeOut } = useUtilAnimations();
 
-onMounted(() => {
-    fadeIn({ selector: '.resume-container', opts: { duration: TIMING.duration.slow } });
-});
+const { registerAnim } = useGsap();
+
+const anims = {
+    enterPage: registerAnim(resumeAnimations.enterPage),
+    exitPage: registerAnim(resumeAnimations.exitPage),
+};
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
-            fadeOut({ selector: '.resume-container' });
+            anims.exitPage();
         }
     },
 );
+
+onMounted(() => {
+    anims.enterPage();
+});
 </script>
 
 <template>
@@ -340,7 +346,7 @@ li {
         }
 
         svg {
-            height: 1.2em;
+            height: 1.35em;
         }
     }
 }
