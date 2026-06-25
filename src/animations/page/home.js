@@ -3,7 +3,9 @@ import { TIMING } from '@/animations/constants/timing.js';
 
 export const homeAnimations = {
     enterPage: ({ tl }) => {
-        gsap.set('.hero-content', { opacity: 0, x: -150 });
+        gsap.set('.hero-content > h3, .hero-title, .hero-content > h2, .hero-content > p, .cta > button, .cta > a', {
+            opacity: 0,
+        });
         gsap.set('.nav-link', { opacity: 0, x: 50 });
         gsap.set('.hero-line, .nav-links-line', { opacity: 0, scaleX: 0 });
         gsap.set('.contact-link', { opacity: 0 });
@@ -16,14 +18,14 @@ export const homeAnimations = {
             stagger: TIMING.stagger.normal,
         })
             .to(
-                '.hero-content',
+                '.hero-content > h3, .hero-title-1, .hero-title-2, .hero-content > h2, .hero-content > p, .cta > button, .cta > a',
                 {
-                    duration: TIMING.duration.normal,
-                    ease: TIMING.easing.organic,
+                    duration: TIMING.duration.moderate,
+                    ease: TIMING.easing.linear,
                     opacity: 1,
-                    x: 0,
+                    stagger: TIMING.stagger.tight,
                 },
-                0.2,
+                0.1,
             )
             .to(
                 '.hero-line, .nav-links-line',
@@ -55,12 +57,12 @@ export const homeAnimations = {
             scaleX: 0,
         })
             .to(
-                '.hero-content',
+                '.cta > a, .cta > button, .hero-content > p, .hero-content > h2, .hero-title-2, .hero-title-1, .hero-content > h3',
                 {
                     duration: TIMING.duration.normal,
                     ease: TIMING.easing.smooth,
+                    stagger: TIMING.stagger.tight,
                     opacity: 0,
-                    x: -150,
                 },
                 0,
             )

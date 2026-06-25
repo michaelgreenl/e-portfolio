@@ -50,7 +50,10 @@ onMounted(() => {
         </div>
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
-            <h1>Michael <span> Green </span></h1>
+            <h1>
+                <span class="hero-title hero-title-1">Michael</span>
+                <span class="hero-title hero-title-2"> Green </span>
+            </h1>
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
@@ -131,7 +134,7 @@ h1 {
         padding: 0 !important;
     }
 
-    span {
+    span:nth-child(2) {
         margin-left: 1.4em;
 
         @include bp-custom-min($hero-tablet-bp) {
