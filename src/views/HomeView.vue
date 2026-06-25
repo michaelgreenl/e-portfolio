@@ -134,7 +134,7 @@ h1 {
         padding: 0 !important;
     }
 
-    span:nth-child(2) {
+    .hero-title-2 {
         margin-left: 1.4em;
 
         @include bp-custom-min($hero-tablet-bp) {
