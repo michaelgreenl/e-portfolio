@@ -182,7 +182,7 @@ p {
     margin: 0 auto;
     text-align: center;
 
-    @include bp-custom-min(400) {
+    @include bp-xsm-phone {
         font-size: 1.1em;
     }
 
