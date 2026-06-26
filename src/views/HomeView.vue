@@ -181,6 +181,7 @@ p {
     max-width: 32ch;
     margin: 0 auto;
     text-align: center;
+    text-wrap: auto !important;
 
     @include bp-xsm-phone {
         font-size: 1.1em;
