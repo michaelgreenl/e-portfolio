@@ -495,8 +495,14 @@ const clearStatus = () => {
         gap: $size-1;
         font-size: 1.5em;
 
-        a :deep(button) .icon:hover {
-            fill: $color-primary;
+        a :deep(button) {
+            &::after {
+                display: none;
+            }
+
+            .icon:hover {
+                fill: $color-primary;
+            }
         }
     }
 
