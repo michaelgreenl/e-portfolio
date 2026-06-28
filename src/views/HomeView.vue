@@ -9,7 +9,7 @@ import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
 import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
-import MailIcon from '@/components/SVGs/MailIcon.vue';
+import MailSquareIcon from '@/components/SVGs/MailSquareIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -45,7 +45,7 @@ onMounted(() => {
                 <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
             </a>
             <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-                <Button class="contact-link" :iconLeft="MailIcon" preset="secondary" />
+                <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
             </a>
         </div>
         <div class="hero-content">

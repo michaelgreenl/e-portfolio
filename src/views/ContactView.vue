@@ -5,6 +5,7 @@ import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import emailjs from '@emailjs/browser';
 import Button from '@/components/Button.vue';
 import MailIcon from '@/components/SVGs/MailIcon.vue';
+import MailSquareIcon from '@/components/SVGs/MailSquareIcon.vue';
 import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
 import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
 
@@ -238,7 +239,7 @@ const clearStatus = () => {
                     <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
                 </a>
                 <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-                    <Button class="contact-link" :iconLeft="MailIcon" preset="secondary" />
+                    <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
                 </a>
             </div>
 
