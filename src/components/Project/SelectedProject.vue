@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
+import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
 
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
@@ -55,14 +56,7 @@ defineExpose({ el, overlay });
             </div>
 
             <div class="project-body">
-                <iframe
-                    v-if="activeProject.video"
-                    :src="`https://player.vimeo.com/video/${activeProject.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
-                    frameborder="0"
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    :title="activeProject.slug"
-                ></iframe>
+                <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
 
                 <ul class="description description-long" :class="{ 'contains-video': activeProject.video }">
                     <li v-for="description in activeProject.description?.long" :key="description">
@@ -269,9 +263,10 @@ p {
     }
 }
 
-iframe {
+.demo-video {
+    align-self: center;
     width: 45%;
-    aspect-ratio: 2/1.1;
+    border-radius: 12px;
 }
 
 .project-footer {

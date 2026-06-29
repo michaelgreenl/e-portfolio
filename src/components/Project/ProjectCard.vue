@@ -6,6 +6,7 @@ import { useGsap } from '@/composables/useGsap.js';
 import { projectAnimations } from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
+import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
 
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 import ArrowIcon from '@/components/SVGs/ArrowIcon.vue';
@@ -187,15 +188,7 @@ defineExpose({ openProject, projectSelected });
 
             <Transition :css="false" @enter="onSelectedDetailsEnter" @leave="onSelectedDetailsLeave">
                 <div v-if="projectSelected && !bp.isLaptop.value" class="selected-details">
-                    <iframe
-                        v-if="project.video"
-                        class="demo-video"
-                        :src="`https://player.vimeo.com/video/${project.video}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=${autoplayVideo ? '1' : '0'}&amp;muted=1`"
-                        frameborder="0"
-                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        :title="`${project.slug}-demo-vid`"
-                    ></iframe>
+                    <ProjectDemoVideo v-if="project.video" :project="project" :autoplay="autoplayVideo" />
 
                     <ul class="selected-description">
                         <li v-for="description in project.description?.long" :key="description">
@@ -577,7 +570,7 @@ $inset-width: 12px;
 .demo-video {
     width: 100%;
     max-width: 50em;
-    aspect-ratio: 2/1.1;
+    aspect-ratio: 16 / 9;
     margin: $size-4 auto;
     border-radius: 12px;
 
