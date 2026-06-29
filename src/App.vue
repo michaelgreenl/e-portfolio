@@ -34,7 +34,9 @@ document.documentElement.setAttribute('data-theme', theme);
 <style lang="scss">
 @use './assets/styles/_variables.scss';
 
-* {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     transition:
         background-color 0.3s ease,

@@ -475,8 +475,14 @@ $inset-width: 12px;
 
     &::before,
     &::after {
+        background-color: #272c3099;
+
         @include bp-md-tablet {
             display: none;
+        }
+
+        @include theme-light {
+            background-color: #dee2e699;
         }
     }
 
@@ -488,11 +494,7 @@ $inset-width: 12px;
         z-index: 100;
         width: $inset-width;
         content: '';
-        background: linear-gradient(-90deg, #272c3000, #272c3099);
-
-        @include theme-light {
-            background: linear-gradient(-90deg, #dee2e600, #dee2e699);
-        }
+        mask-image: linear-gradient(-90deg, transparent, #000);
     }
 
     &::after {
@@ -503,39 +505,30 @@ $inset-width: 12px;
         z-index: 100;
         width: $inset-width;
         content: '';
-        background: linear-gradient(90deg, #272c3000, #272c3099);
-
-        @include theme-light {
-            background: linear-gradient(90deg, #dee2e600, #dee2e699);
-        }
+        mask-image: linear-gradient(90deg, transparent, #000);
     }
 
     @include theme-dark {
         &.top-third {
-            &::before {
-                background: linear-gradient(-90deg, #2e363b00, #2e363b99);
-
-                @include theme-light {
-                    background: linear-gradient(90deg, #d7dde300, #d7dde385);
-                }
-            }
-
+            &::before,
             &::after {
-                background: linear-gradient(90deg, #2e363b00, #2e363b99);
-
-                @include theme-light {
-                    background: linear-gradient(90deg, #d7dde300, #d7dde385);
-                }
+                background-color: #2e363b99;
             }
         }
 
         &.middle-third {
-            &::before {
-                background: linear-gradient(-90deg, #2d323600, #2d323699);
-            }
-
+            &::before,
             &::after {
-                background: linear-gradient(90deg, #2d323600, #2d323699);
+                background-color: #2d323699;
+            }
+        }
+    }
+
+    @include theme-light {
+        &.top-third {
+            &::before,
+            &::after {
+                background-color: #d7dde385;
             }
         }
     }
