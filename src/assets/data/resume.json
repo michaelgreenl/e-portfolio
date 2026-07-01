@@ -11,8 +11,8 @@
             "title": "Springboard Cybersecurity",
             "dates": "Completion: June 2025",
             "info": [
-                "Gained hands-on experience in vulnerability assessment and threat modeling through 50+ technical labs, providing critical context for building secure back-end services and defending against common attack vectors.",
-                "Completed an intensive, project-based curriculum focused on defensive security principles, application security, secure coding practices, and cloud security fundamentals."
+                "Completed a 50-lab cybersecurity analyst curriculum covering host hardening, network security, IAM, cryptography, SecOps, application-security testing, cloud risk, and vulnerability assessment.",
+                "Delivered a guided penetration-test capstone spanning reconnaissance, target scanning, vulnerability identification, threat assessment, and security reporting."
             ]
         }
     },
