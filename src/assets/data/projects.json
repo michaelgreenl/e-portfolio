@@ -63,11 +63,11 @@
         "shortDate": "Sep. '25 - Dec. '25",
         "longDate": "September 2025 - December 2025",
         "description": {
-            "short": "Reaction is a reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
+            "short": "A reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
             "long": [
-                "Architected a reactive Vue 3 frontend utilizing Pinia for modular state management and GSAP for high-fidelity timeline animations, significantly enhancing user experience through intuitive visual feedback.",
-                "Developed backend services adhering to the Repository Pattern, creating a clean separation of concerns and improving maintainability.",
-                "Implemented a defense-in-depth security strategy by storing JWTs in HTTP-only cookies to mitigate XSS attacks and applying rate limiting to prevent brute-force attempts."
+                "Built a Vue 3/Pinia reaction-time game UI with configurable target size/speed, recent scores, profile history, and GSAP-driven transitions across game/profile states.",
+                "Structured the Express/PostgreSQL API around Sequelize models and repository modules for users, games, stats, and settings.",
+                "Implemented cookie-based JWT login with HTTP-only cookies, rate limiting, and saved per-game settings snapshots for filtered performance history."
             ]
         },
         "fontFamily": "AudioWide",
@@ -96,11 +96,11 @@
         "shortDate": "June 2025 - July 2025",
         "longDate": "June 2025 - July 2025",
         "description": {
-            "short": "A real-time multiplayer game platform with Socket.IO-powered live lobbies, JWT-secured sessions, and server-authoritative in-memory match state for responsive gameplay.",
+            "short": "A real-time tic-tac-toe lobby with JWT-authenticated Socket.IO sessions, server-side move validation, rematches, forfeits, and disconnect recovery.",
             "long": [
-                "Architected a server-authoritative Node.js backend to centralize game logic, preventing client-side state manipulation and ensuring fair play for multiplayer sessions.",
-                "Orchestrated real-time data synchronization between a Vue.js client and server using Socket.IO, implementing fault-tolerant reconnection strategies via JWTs to preserve user sessions.",
-                "Engineered a real-time lobby system to manage concurrent user connections, enabling dynamic matchmaking and live player status updates."
+                "Built server-authoritative Node.js/Socket.IO game handlers for tic-tac-toe move validation, turn enforcement, win/draw resolution, forfeits, and rematches.",
+                "Implemented JWT-authenticated Socket.IO connections with user-to-socket session tracking for multi-tab support and reconnect/soft-disconnect handling.",
+                "Persisted user and game records with Prisma/PostgreSQL and added Socket.IO integration tests for auth, lobby lifecycle, win/draw outcomes, rematches, and disconnect behavior."
             ]
         },
         "fontFamily": "BitCount",
@@ -129,11 +129,11 @@
         "shortDate": "May 2022 ~ July 2025",
         "longDate": "May 2022 ~ July 2025",
         "description": {
-            "short": "An interactive educational platform that visualizes complex algorithms and data structures with high-performance, synchronized, step-by-step animations.",
+            "short": "An algorithm visualization prototype featuring an insertion-sort visualizer using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
             "long": [
-                "Constructed a modular algorithm visualization platform using Nuxt 3 and Vue 3, leveraging dynamic component loading to add new algorithm visualizations without increasing the initial bundle size.",
-                "Created an interactive explanation system using gsap.TextPlugin to type out context-aware, step-by-step textual descriptions synchronized perfectly with the visual elements of the algorithm.",
-                "Optimized animation performance by using Vue's markRaw to exclude heavy GSAP timeline objects from reactivity tracking, preventing unnecessary re-renders and memory leaks."
+                "Built a Nuxt 3/Vue 3 visualization shell with category navigation, searchable module lists, and dynamic component loading around an implemented insertion-sort visualizer.",
+                "Created GSAP timeline controls for play/pause, step navigation, restart, speed changes, and TextPlugin-powered explanations synchronized with visual algorithm steps.",
+                "Optimized animation state by using Pinia and Vue's markRaw to keep heavy GSAP timeline objects out of reactivity."
             ]
         },
         "fontFamily": "Futura",
@@ -161,11 +161,11 @@
         "shortDate": "May 2026 - Present",
         "longDate": "May 2026 - Active Development",
         "description": {
-            "short": "Multi-Agent Workflow Management (MAWM) is a TypeScript CLI for packaging, installing, and distributing LangGraph workflows for multi-agent orchestration.",
+            "short": "A TypeScript CLI for packaging, installing, and running LangGraph workflow templates with manifest-based distribution and bundled OpenCode execution assets.",
             "long": [
-                "Shipped @mawm/cli, a TypeScript npm CLI that packages LangGraph workflows into reusable modules with manifest-based install, update, remove, and execution flows.",
-                "Designed a workflow distribution model with global and project-local installs, giving developers a repeatable way to share, version, and run LangGraph automations across projects.",
-                "Bundled an execute-graph OpenCode tool that runs globally installed LangGraph workflows with server startup, health checks, resumable run state, and cleanup, so projects can use workflows without manual LangGraph server management."
+                "Built @mawm/cli, a TypeScript ESM CLI with typed command definitions, workflow metadata validation, manifest management, and install/update/remove/list flows.",
+                "Designed a workflow template distribution model with global installs, project-local planning assets, and scaffolded LangGraph workflow packages.",
+                "Bundled OpenCode execution assets that start local LangGraph workflow servers, manage run state, support thread resume, and summarize workflow results."
             ]
         },
         "fontFamily": "ClashDisplay",
