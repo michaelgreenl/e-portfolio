@@ -16,7 +16,7 @@ import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
 
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
-import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
+import WebsiteIcon from '@/components/SVGs/WebsiteIcon.vue';
 import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 
 const routeStore = useRouteStore();
@@ -44,7 +44,7 @@ const projectLogos = {
 const externalIcons = {
     github: GithubIcon,
     demoVideo: VideoIcon,
-    liveSite: BoxArrowIcon,
+    liveSite: WebsiteIcon,
     npm: NPMIcon,
 };
 
