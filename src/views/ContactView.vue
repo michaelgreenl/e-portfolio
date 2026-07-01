@@ -245,7 +245,7 @@ const clearStatus = () => {
 
             <Button
                 type="submit"
-                class="contact-link send-button"
+                class="contact-link"
                 preset="primary"
                 :text="isSubmitting ? 'Sending...' : 'Send'"
                 @click="handleSubmit"
@@ -440,10 +440,10 @@ const clearStatus = () => {
 
 .status-message {
     padding: 0 $size-4;
-    font-size: 0.8em;
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
+    font-size: 0.8em;
 
     &:hover {
         opacity: 0.8;
@@ -494,7 +494,7 @@ const clearStatus = () => {
     .contact-links {
         display: flex;
         gap: $size-1;
-        font-size: 1.8em;
+        font-size: 1.5em;
 
         a :deep(button) {
             &::after {
@@ -509,14 +509,6 @@ const clearStatus = () => {
 
     :deep(button) {
         gap: $size-2;
-    }
-
-    :deep(.send-button) {
-        font-size: 1.15em;
-
-        @include bp-md-tablet {
-            font-size: 1em;
-        }
     }
 }
 </style>
