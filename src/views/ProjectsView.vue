@@ -18,9 +18,10 @@ import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
 import WebsiteIcon from '@/components/SVGs/WebsiteIcon.vue';
 import NPMIcon from '@/components/SVGs/NPMIcon.vue';
+import { TIMING } from '@/animations/constants/timing';
 
 const routeStore = useRouteStore();
-const { headerReveal, headerDismiss } = useUtilAnimations();
+const { fadeIn, headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
 const { registerAnim } = useGsap();
@@ -66,7 +67,11 @@ watch(
 );
 
 onMounted(() => {
-    headerReveal({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
+    headerReveal({ headerEl: pageHeader.value });
+    fadeIn({
+        selector: '.project-card',
+        opts: { delay: 0.2, duration: TIMING.duration.moderate, stagger: TIMING.stagger.loose },
+    });
 
     const query = routeStore.currentRoute.query;
     const projectToOpen = projectsData.find((p) => p.slug === query.slug);
