@@ -68,7 +68,6 @@ const anims = {
 
 const { top: toolChipTop } = useElementBounding(toolChipsContainer);
 const { height: viewportHeight } = useWindowSize();
-const MOBILE_SELECTED_CARD_SCROLL_OFFSET = 12;
 
 const toolChipsYValue = computed(() => {
     if (!toolChipsContainer.value) return undefined;
@@ -112,7 +111,7 @@ function scrollToSelectedCard() {
     const cardTop = cardEl.value.offsetTop;
 
     if (!bp.isTablet.value) {
-        window.scrollTo({ top: Math.max(cardTop - MOBILE_SELECTED_CARD_SCROLL_OFFSET, 0), behavior: 'smooth' });
+        window.scrollTo({ top: Math.max(cardTop + 48, 0), behavior: 'smooth' });
         return;
     }
 
@@ -678,20 +677,6 @@ $inset-width: 12px;
         font-size: 1.1em;
     }
 
-    &-card a:nth-child(3) {
-        &:deep(button) svg {
-            stroke-width: 0 !important;
-
-            @include theme-dark {
-                fill: lighten-color($color-text-muted, 15%) !important;
-            }
-
-            @include theme-light {
-                fill: $color-primary-darker !important;
-            }
-        }
-    }
-
     a:hover :deep(button) svg {
         @include theme-dark {
             fill: lighten-color($color-text-muted, 15%) !important;
@@ -700,6 +685,10 @@ $inset-width: 12px;
         @include theme-light {
             fill: $color-primary-darker !important;
         }
+    }
+
+    a:nth-child(3):hover :deep(button) svg {
+        fill: transparent !important;
     }
 }
 </style>
