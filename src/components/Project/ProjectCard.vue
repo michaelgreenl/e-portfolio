@@ -68,6 +68,7 @@ const anims = {
 
 const { top: toolChipTop } = useElementBounding(toolChipsContainer);
 const { height: viewportHeight } = useWindowSize();
+const MOBILE_SELECTED_CARD_SCROLL_OFFSET = 12;
 
 const toolChipsYValue = computed(() => {
     if (!toolChipsContainer.value) return undefined;
@@ -107,6 +108,17 @@ function onSelectedDetailsLeave(el, done) {
     anims.hideSelectedProjectDetails({ target: el, onComplete: finishLeave });
 }
 
+function scrollToSelectedCard() {
+    const cardTop = cardEl.value.offsetTop;
+
+    if (!bp.isTablet.value) {
+        window.scrollTo({ top: Math.max(cardTop - MOBILE_SELECTED_CARD_SCROLL_OFFSET, 0), behavior: 'smooth' });
+        return;
+    }
+
+    window.scrollTo({ top: cardTop, behavior: 'smooth' });
+}
+
 async function openProject(autoplay = false) {
     if (bp.isLaptop.value) {
         emit('open-project', props.project, autoplay);
@@ -120,14 +132,18 @@ async function openProject(autoplay = false) {
         if (props.project.slug === 'algo-visualizer' || props.project.slug === 'mawm') {
             setTimeout(() => {
                 if (props.project.slug === 'algo-visualizer') {
-                    window.scrollTo({ top: cardEl.value.offsetTop, behavior: 'smooth' });
+                    scrollToSelectedCard();
                 } else {
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    if (bp.isTablet.value) {
+                        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    } else {
+                        scrollToSelectedCard();
+                    }
                 }
             }, 100);
         }
 
-        window.scrollTo({ top: cardEl.value.offsetTop, behavior: 'smooth' });
+        scrollToSelectedCard();
     }
 }
 
@@ -147,7 +163,7 @@ watch(bp.isLaptop, (newVal) => {
     }
 });
 
-defineExpose({ openProject, projectSelected });
+defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 </script>
 
 <template>

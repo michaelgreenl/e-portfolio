@@ -95,7 +95,7 @@ async function openProject(project, autoplay = false) {
     } else {
         queriedProjectRef.openProject(autoplay);
         await nextTick();
-        window.scrollTo({ top: queriedProjectRef.$el.offsetTop, behavior: 'smooth' });
+        queriedProjectRef.scrollToSelectedCard();
     }
 }
 
