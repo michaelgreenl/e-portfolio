@@ -271,10 +271,6 @@ const clearStatus = () => {
 .contact-container {
     position: relative;
     padding: $size-2 $size-4;
-
-    @include bp-xl-desktop {
-        font-size: clamp(0.9em, 3.5vw, 1em);
-    }
 }
 
 .contact-header {
