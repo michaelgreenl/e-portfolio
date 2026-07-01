@@ -445,7 +445,7 @@ p {
 
 .card-description {
     flex: 1;
-    max-width: 86ch;
+    max-width: 78ch;
     font-size: 1.5em;
 
     @include bp-sm-phone {

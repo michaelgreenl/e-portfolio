@@ -10,13 +10,17 @@
 <style lang="scss" scoped>
 div {
     display: flex;
-    padding-left: 1em;
+    padding-left: $size-2;
     font-family: $primary-font-stack;
+
+    @include bp-sm-phone {
+        padding-left: $size-4;
+    }
 }
 
 h1 {
     position: relative;
-    font-size: 2em;
+    font-size: $size-8;
     font-weight: 600;
     letter-spacing: -0.1ch;
 }

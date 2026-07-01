@@ -91,7 +91,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .home-container {
-    gap: $size-17;
+    gap: 12vh;
     padding: $size-8 $size-4 0;
 
     @include bp-xsm-phone {
@@ -211,12 +211,16 @@ p {
 .contact-links {
     position: absolute;
     top: $size-3;
+    right: $size-2;
     display: flex;
+    gap: $size-2;
     justify-content: flex-end;
     width: 100vw;
-    font-size: 1.5em;
+    font-size: 1.7em;
 
     a :deep(button) {
+        gap: 0;
+
         &::after {
             display: none;
         }
@@ -232,8 +236,17 @@ p {
         }
     }
 
-    @include bp-custom-min(440) {
-        right: $size-2;
+    @include bp-custom-min($hero-tablet-bp) {
+        gap: 0.6em;
+        font-size: 1.8em;
+    }
+
+    @include bp-sm-phone {
+        right: 0.85em;
+    }
+
+    @include bp-lg-laptop {
+        font-size: 1.7em;
     }
 }
 

@@ -183,7 +183,7 @@ p {
     flex-direction: column;
     gap: $size-2;
     width: 95vw;
-    max-width: 94em;
+    max-width: 84em;
     max-height: 95dvh;
     padding: 2.4em $size-11;
     margin: $size-8 0;

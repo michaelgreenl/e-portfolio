@@ -36,8 +36,12 @@ footer {
     align-items: center;
     justify-content: flex-end;
     width: 100%;
-    padding: 0 $size-8 4em;
+    padding: 0 0.8em 4em;
     margin-top: auto;
+
+    @include bp-sm-phone {
+        padding-right: 1.4em !important;
+    }
 
     @include bp-md-tablet {
         padding-bottom: 0 !important;

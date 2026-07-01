@@ -611,7 +611,7 @@ header {
         width: $size-11;
         height: $size-8;
         padding-left: 0.4em;
-        margin: $size-4;
+        margin: $size-1;
         cursor: pointer;
         border-radius: 100px;
 
@@ -621,6 +621,10 @@ header {
 
         @include theme-light {
             background-color: $color-primary;
+        }
+
+        @include bp-sm-phone {
+            margin: $size-4;
         }
 
         .toggle-input {
