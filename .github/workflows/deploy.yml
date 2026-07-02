@@ -1,46 +1,52 @@
 name: Deploy Client to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
 
-      - name: Install dependencies
-        run: bun install
+            - name: Install dependencies
+              run: bun install
 
-      - name: Build application
-        run: bun run build
-        env:
-          VITE_SERVICE_ID: ${{ secrets.VITE_SERVICE_ID }}
-          VITE_TEMPLATE_ID: ${{ secrets.VITE_TEMPLATE_ID }}
-          VITE_PUBLIC_KEY: ${{ secrets.VITE_PUBLIC_KEY }}
+            - name: Build application
+              run: bun run build
+              env:
+                  VITE_SERVICE_ID: ${{ secrets.VITE_SERVICE_ID }}
+                  VITE_TEMPLATE_ID: ${{ secrets.VITE_TEMPLATE_ID }}
+                  VITE_PUBLIC_KEY: ${{ secrets.VITE_PUBLIC_KEY }}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+            - name: Setup Pages
+              uses: actions/configure-pages@v5
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  name: github-pages-${{ github.run_attempt }}
+                  path: ./dist
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: github-pages-${{ github.run_attempt }}
