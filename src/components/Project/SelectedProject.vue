@@ -34,7 +34,7 @@ defineExpose({ el, overlay });
         <button @click="() => emit('close-project')" class="close-btn">
             <CloseIcon />
         </button>
-        <div class="selected-project">
+        <div class="selected-project" :class="{ 'no-video': !activeProject.video }">
             <div class="project-header">
                 <div class="project-header-info">
                     <div class="project-title">
@@ -183,7 +183,7 @@ p {
     flex-direction: column;
     gap: $size-2;
     width: 95vw;
-    max-width: 84em;
+    max-width: 93em;
     max-height: 95dvh;
     padding: 2.4em $size-11;
     margin: $size-8 0;
@@ -191,6 +191,10 @@ p {
     border: 1px solid rgb(255 255 255 / 12%);
     border-radius: 20px;
     box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
+
+    &.no-video {
+        max-width: 84em;
+    }
 
     @include theme-dark {
         background: linear-gradient(0deg, #212529ea 30%, #212529aa 60%, #212529ea 90%);
@@ -301,7 +305,7 @@ p {
                 transition: fill 0.3s ease-in-out;
 
                 @include theme-dark {
-                    stroke: color-mix(in srgb, var(--color-text-muted) 85%, white 15%);
+                    stroke: lighten-color($color-text-muted, 15%);
                 }
 
                 @include theme-light {
@@ -309,29 +313,19 @@ p {
                 }
             }
         }
-    }
 
-    .no-fill {
-        &:deep(button) svg {
-            stroke-width: 0 !important;
-
+        &:hover :deep(button) svg {
             @include theme-dark {
-                fill: color-mix(in srgb, var(--color-text-muted) 85%, white 15%) !important;
+                fill: lighten-color($color-text-muted, 15%) !important;
             }
 
             @include theme-light {
                 fill: $color-primary-darker !important;
             }
         }
-    }
 
-    a:hover :deep(button) svg {
-        @include theme-dark {
-            fill: color-mix(in srgb, var(--color-text-muted) 85%, white 15%) !important;
-        }
-
-        @include theme-light {
-            fill: $color-primary-darker !important;
+        &.no-fill:hover :deep(button) svg {
+            fill: transparent !important;
         }
     }
 }
