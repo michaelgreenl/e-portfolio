@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
-import Navbar from '@/components/Navbar.vue';
+import Navbar from '@/components/Navbar/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import BgSVG from '@/components/SVGs/BgSVG.vue';
 
