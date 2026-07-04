@@ -249,7 +249,6 @@ const navMobileRouteTo = (key) => {
     background-color: $color-bg-secondary;
     border-radius: $size-4;
     box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
-    transform: translateY(150px) scaleX(0);
 
     @include bp-xsm-phone {
         font-size: 1.2em;

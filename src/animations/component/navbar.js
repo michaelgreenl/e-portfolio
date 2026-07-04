@@ -1,13 +1,40 @@
+import { gsap } from 'gsap';
 import { TIMING } from '@/animations/constants/timing.js';
 
 export const navbarAnimations = {
     enterMobileNavbar: ({ tl }) => {
+        gsap.set('.nav-mobile', { y: 100, width: '1em' });
+        gsap.set('.nav-mobile > *', { opacity: 0 });
+
         tl.to('.nav-mobile', {
             duration: TIMING.duration.normal,
-            ease: TIMING.easing.smooth,
+            ease: TIMING.easing.linear,
             y: 0,
-            scaleX: 1,
-        });
+        })
+            .to('.nav-mobile', {
+                duration: TIMING.duration.normal,
+                ease: TIMING.easing.organic,
+                width: 'auto',
+            })
+            .to(
+                '.nav-mobile > .active-item-bg',
+                {
+                    duration: TIMING.duration.fast,
+                    ease: TIMING.easing.linear,
+                    opacity: 1,
+                },
+                `<${TIMING.duration.normal - 0.1}`,
+            )
+            .to(
+                '.nav-mobile > .mobile-nav-button',
+                {
+                    duration: TIMING.duration.moderate,
+                    ease: TIMING.easing.linear,
+                    stagger: TIMING.stagger.tight,
+                    opacity: 1,
+                },
+                `<`,
+            );
     },
 
     enterLogoTheme: ({ tl }) => {
