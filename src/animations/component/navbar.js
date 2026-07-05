@@ -8,7 +8,7 @@ export const navbarAnimations = {
 
         tl.to('.nav-mobile', {
             duration: TIMING.duration.normal,
-            ease: TIMING.easing.linear,
+            ease: TIMING.easing.organic,
             y: 0,
         })
             .to('.nav-mobile', {
