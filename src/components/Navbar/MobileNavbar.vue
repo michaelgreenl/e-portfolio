@@ -246,6 +246,7 @@ const navMobileRouteTo = (key) => {
     height: $size-10;
     padding: $size-2;
     margin: 0 auto;
+    color: $color-accent;
     background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
     border-radius: $size-4;
     box-shadow:
@@ -284,13 +285,19 @@ const navMobileRouteTo = (key) => {
         bottom: 0;
         left: -0.2em;
         content: '';
-
         border-radius: $size-3;
         box-shadow:
             inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 30%, transparent),
             inset 0 -1px 0 color-mix(in srgb, darken-color($color-bg-secondary, 22%) 36%, transparent),
             0 2px 5px 0 rgb(0 0 0 / 28%);
-        backdrop-filter: blur(8px) saturate(112%);
+
+        @include theme-dark {
+            background-color: $color-bg-secondary;
+        }
+
+        @include theme-light {
+            background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
+        }
     }
 }
 
@@ -358,15 +365,21 @@ const navMobileRouteTo = (key) => {
         @include bp-xsm-phone {
             font-size: clamp(0.9em, 3.7vw, 1em);
         }
+
+        @include theme-light {
+            color: $color-gray3;
+        }
     }
 
     &.active {
-        @include theme-dark {
-            color: $color-primary-light;
-        }
+        .nav-label {
+            @include theme-dark {
+                color: $color-primary-light;
+            }
 
-        @include theme-light {
-            color: $color-gray2;
+            @include theme-light {
+                color: $color-gray2;
+            }
         }
 
         .icon {
