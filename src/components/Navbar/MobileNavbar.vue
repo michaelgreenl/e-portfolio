@@ -247,9 +247,6 @@ const navMobileRouteTo = (key) => {
     padding: $size-2;
     margin: 0 auto;
     background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
-
-    // background-image: linear-gradient(135deg, rgb(255 255 255 / 18%), rgb(255 255 255 / 6%));
-    // border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 44%, transparent);
     border-radius: $size-4;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
@@ -283,18 +280,11 @@ const navMobileRouteTo = (key) => {
     &::before {
         position: absolute;
         top: 0;
-        right: -$size-1;
+        right: -0.2em;
         bottom: 0;
-        left: -$size-1;
+        left: -0.2em;
         content: '';
 
-        // background-color: color-mix(in srgb, darken-color($color-bg-secondary, 12%) 84%, transparent);
-        // // background-image: linear-gradient(
-        //     180deg,
-        //     color-mix(in srgb, lighten-color($color-bg-secondary, 26%) 18%, transparent),
-        //     color-mix(in srgb, darken-color($color-bg-secondary, 12%) 18%, transparent)
-        // );
-        // border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 38%) 62%, transparent);
         border-radius: $size-3;
         box-shadow:
             inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 30%, transparent),
@@ -302,14 +292,6 @@ const navMobileRouteTo = (key) => {
             0 2px 5px 0 rgb(0 0 0 / 28%);
         backdrop-filter: blur(8px) saturate(112%);
     }
-}
-
-.nav-mobile:has(.mobile-nav-button:first-of-type.active) .active-item-bg::before {
-    left: 0;
-}
-
-.nav-mobile:has(.mobile-nav-button:last-of-type.active) .active-item-bg::before {
-    right: 0;
 }
 
 .mobile-nav-button {
