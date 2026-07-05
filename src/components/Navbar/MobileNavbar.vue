@@ -246,9 +246,10 @@ const navMobileRouteTo = (key) => {
     height: $size-10;
     padding: $size-2;
     margin: 0 auto;
-    background-color: color-mix(in srgb, $color-bg-secondary 68%, transparent);
-    background-image: linear-gradient(135deg, rgb(255 255 255 / 18%), rgb(255 255 255 / 6%));
-    border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 44%, transparent);
+    background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
+
+    // background-image: linear-gradient(135deg, rgb(255 255 255 / 18%), rgb(255 255 255 / 6%));
+    // border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 44%, transparent);
     border-radius: $size-4;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
@@ -271,25 +272,44 @@ const navMobileRouteTo = (key) => {
 
 .active-item-bg {
     position: absolute;
-    top: $size-2;
-    bottom: $size-2;
+    top: 0.35em;
+    bottom: 0.35em;
     left: 0;
     z-index: 1;
     width: 0;
     pointer-events: none;
-    background-color: color-mix(in srgb, darken-color($color-bg-secondary, 8%) 86%, transparent);
-    background-image: linear-gradient(
-        135deg,
-        color-mix(in srgb, lighten-color($color-bg-secondary, 34%) 28%, transparent),
-        color-mix(in srgb, $color-bg-secondary 10%, transparent)
-    );
-    border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 32%) 50%, transparent);
-    border-radius: 14px;
-    box-shadow:
-        inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 36%) 32%, transparent),
-        0 1px 8px 0 rgb(0 0 0 / 30%);
-    backdrop-filter: blur(10px) saturate(120%);
     will-change: transform, width;
+
+    &::before {
+        position: absolute;
+        top: 0;
+        right: -$size-1;
+        bottom: 0;
+        left: -$size-1;
+        content: '';
+
+        // background-color: color-mix(in srgb, darken-color($color-bg-secondary, 12%) 84%, transparent);
+        // // background-image: linear-gradient(
+        //     180deg,
+        //     color-mix(in srgb, lighten-color($color-bg-secondary, 26%) 18%, transparent),
+        //     color-mix(in srgb, darken-color($color-bg-secondary, 12%) 18%, transparent)
+        // );
+        // border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 38%) 62%, transparent);
+        border-radius: $size-3;
+        box-shadow:
+            inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 30%, transparent),
+            inset 0 -1px 0 color-mix(in srgb, darken-color($color-bg-secondary, 22%) 36%, transparent),
+            0 2px 5px 0 rgb(0 0 0 / 28%);
+        backdrop-filter: blur(8px) saturate(112%);
+    }
+}
+
+.nav-mobile:has(.mobile-nav-button:first-of-type.active) .active-item-bg::before {
+    left: 0;
+}
+
+.nav-mobile:has(.mobile-nav-button:last-of-type.active) .active-item-bg::before {
+    right: 0;
 }
 
 .mobile-nav-button {
