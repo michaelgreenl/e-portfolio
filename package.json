@@ -9,7 +9,8 @@
         "preview": "vite preview",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
-        "lint:style": "stylelint '**/*.{vue,css,scss}' --fix",
+        "lint:style": "stylelint '**/*.{vue,css,scss}'",
+        "lint:style:fix": "stylelint '**/*.{vue,css,scss}' --fix",
         "format": "prettier --check .",
         "format:fix": "prettier --write .",
         "deploy": "gh-pages -d dist"

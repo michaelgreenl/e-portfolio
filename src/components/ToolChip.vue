@@ -166,7 +166,8 @@ const tools = {
 
 <style lang="scss" scoped>
 .chip-container {
-    @include flexCenterAll;
+    @include flex-center-all;
+
     gap: $size-2;
     height: 1em;
     padding: 0.85em 1em;

@@ -30,7 +30,7 @@ defineProps({
 
 <style lang="scss" scoped>
 button {
-    @include flexCenterAll;
+    @include flex-center-all;
 
     font-family: $primary-font-stack;
     font-size: 1em;

@@ -92,7 +92,7 @@ body,
     margin: 0 auto;
     font-size: 0.9em;
     color: $color-text-primary;
-    @include flexCenterAll;
+    @include flex-center-all;
 }
 
 .hero-line,

@@ -209,7 +209,7 @@ function closeProject() {
 }
 
 .page-header {
-    @include flexCenterAll;
+    @include flex-center-all;
 
     flex-direction: column;
     padding: 0 $size-4;

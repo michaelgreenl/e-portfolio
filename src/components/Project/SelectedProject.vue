@@ -97,7 +97,7 @@ p {
 
 .selected-container,
 .close-btn {
-    @include flexCenterAll;
+    @include flex-center-all;
 }
 
 .project-title,

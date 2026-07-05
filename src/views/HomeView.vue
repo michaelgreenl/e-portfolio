@@ -126,8 +126,8 @@ h1 {
         max-width: 100vw;
         padding-bottom: $size-1;
         margin: 0 auto;
-        line-height: 1ch;
         font-size: clamp(4.2em, 13.2vw, 5.2em);
+        line-height: 1ch;
     }
 
     @include bp-md-tablet {
@@ -139,12 +139,12 @@ h1 {
     }
 
     .hero-title-2 {
-        margin-left: 1.4em;
         display: inherit;
+        margin-left: 1.4em;
 
         @include bp-custom-min($hero-tablet-bp) {
-            margin-left: 0 !important;
             display: inline-block;
+            margin-left: 0 !important;
         }
 
         @include theme-dark {
@@ -205,6 +205,29 @@ p {
 
     @include bp-custom-min($hero-tablet-bp) {
         max-width: 100vw;
+    }
+}
+
+.site-nav {
+    display: none;
+    flex-wrap: wrap-reverse;
+    gap: $size-4;
+    align-items: center;
+    align-self: flex-end;
+    justify-content: flex-end;
+    width: 90%;
+
+    @include bp-md-tablet {
+        display: flex;
+    }
+
+    :deep(button) {
+        padding: 0 $size-1;
+        font-size: 1.3em;
+
+        &::after {
+            height: 2px;
+        }
     }
 }
 
@@ -272,29 +295,6 @@ p {
 
     :deep(button) {
         font-weight: 400;
-    }
-}
-
-.site-nav {
-    display: none;
-    flex-wrap: wrap-reverse;
-    gap: $size-4;
-    align-items: center;
-    align-self: flex-end;
-    justify-content: flex-end;
-    width: 90%;
-
-    @include bp-md-tablet {
-        display: flex;
-    }
-
-    :deep(button) {
-        padding: 0 $size-1;
-        font-size: 1.3em;
-
-        &::after {
-            height: 2px;
-        }
     }
 }
 
