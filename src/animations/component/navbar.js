@@ -3,7 +3,7 @@ import { TIMING } from '@/animations/constants/timing.js';
 
 export const navbarAnimations = {
     enterMobileNavbar: ({ tl }) => {
-        gsap.set('.nav-mobile', { y: 100, width: '1em' });
+        gsap.set('.nav-mobile', { y: 200, width: '1em' });
         gsap.set('.nav-mobile > *', { opacity: 0 });
 
         tl.to('.nav-mobile', {
