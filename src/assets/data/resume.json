@@ -23,11 +23,11 @@
             "location": "Troy MI",
             "dates": "January 2022 - August 2022",
             "info": [
-                "Developed interactive expo activations for Fortune 500 clients including Salesforce, Waymo, and Essilor Luxottica (Oakley and Vogue).",
+                "Developed interactive expo activations for major brands including Salesforce, Waymo, and Essilor Luxottica (Oakley and Vogue).",
                 "Created the Oakley expo activation that Essilor Luxottica named their favorite of 4 experiences at the event, delivered as the first client assignment of the internship.",
-                "Independently took 4 live experiential activations from UI mockup to deployed production within 2-4 weeks each.",
-                "Built a full-featured analytics dashboard UI for an internal expo reporting tool, including data display and CSV export, that remained in active company use following the internship.",
-                "Engineered touch-aware Vue.js interfaces for experiential activations, engineering for non-standard screen dimensions and touch input patterns across varied expo display hardware."
+                "Served as the sole frontend developer on 4 experiential activations, coordinating directly with the Experiential Team Lead to take Vue.js interfaces from UI mockup to deployed production within 2–4 weeks each.",
+                "Implemented Pinia store and Vue Router patterns during the frontend team’s Vue 2-to-Vue 3 migration.",
+                "Built a full-featured analytics dashboard UI for an internal expo reporting tool, including data display and CSV export, that remained in active company use following the internship."
             ]
         }
     },

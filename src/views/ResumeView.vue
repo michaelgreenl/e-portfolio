@@ -178,7 +178,7 @@ onMounted(() => {
     flex-grow: 1;
     align-items: center;
     width: 100%;
-    max-width: 32em;
+    max-width: 33em;
     padding: $size-4;
     margin: 0 auto;
     font-size: 0.9em;
