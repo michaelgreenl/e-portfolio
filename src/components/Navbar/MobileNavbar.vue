@@ -332,8 +332,6 @@ const navMobileRouteTo = (key) => {
             flex: 0 0 $size-6;
             width: $size-6;
             height: $size-6;
-            fill: $color-accent;
-            stroke: $color-accent;
         }
     }
 
