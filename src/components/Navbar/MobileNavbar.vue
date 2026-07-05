@@ -253,7 +253,7 @@ const navMobileRouteTo = (key) => {
         inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
         inset 0 0 0 1px color-mix(in srgb, darken-color($color-bg-secondary, 12%) 22%, transparent),
         0 18px 36px 4px rgb(0 0 0 / 30%);
-    backdrop-filter: blur(18px) saturate(130%);
+    backdrop-filter: blur(15px) saturate(130%);
 
     @include bp-xsm-phone {
         font-size: 1.2em;
@@ -367,7 +367,7 @@ const navMobileRouteTo = (key) => {
         }
 
         @include theme-light {
-            color: $color-gray3;
+            color: $color-gray2;
         }
     }
 
