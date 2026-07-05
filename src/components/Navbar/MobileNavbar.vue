@@ -246,9 +246,15 @@ const navMobileRouteTo = (key) => {
     height: $size-10;
     padding: $size-2;
     margin: 0 auto;
-    background-color: $color-bg-secondary;
+    background-color: color-mix(in srgb, $color-bg-secondary 68%, transparent);
+    background-image: linear-gradient(135deg, rgb(255 255 255 / 18%), rgb(255 255 255 / 6%));
+    border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 44%, transparent);
     border-radius: $size-4;
-    box-shadow: 0 20px 40px 5px rgb(0 0 0 / 33.3%);
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, darken-color($color-bg-secondary, 12%) 22%, transparent),
+        0 18px 36px 4px rgb(0 0 0 / 30%);
+    backdrop-filter: blur(18px) saturate(130%);
 
     @include bp-xsm-phone {
         font-size: 1.2em;
@@ -271,9 +277,18 @@ const navMobileRouteTo = (key) => {
     z-index: 1;
     width: 0;
     pointer-events: none;
-    background-color: lighten-color($color-bg-secondary, 10%);
+    background-color: color-mix(in srgb, darken-color($color-bg-secondary, 8%) 86%, transparent);
+    background-image: linear-gradient(
+        135deg,
+        color-mix(in srgb, lighten-color($color-bg-secondary, 34%) 28%, transparent),
+        color-mix(in srgb, $color-bg-secondary 10%, transparent)
+    );
+    border: 1px solid color-mix(in srgb, lighten-color($color-bg-secondary, 32%) 50%, transparent);
     border-radius: 14px;
-    box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 36%) 32%, transparent),
+        0 1px 8px 0 rgb(0 0 0 / 30%);
+    backdrop-filter: blur(10px) saturate(120%);
     will-change: transform, width;
 }
 
