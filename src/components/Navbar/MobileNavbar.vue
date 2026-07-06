@@ -332,6 +332,16 @@ const navMobileRouteTo = (key) => {
             flex: 0 0 $size-6;
             width: $size-6;
             height: $size-6;
+
+            @include theme-dark {
+                fill: $color-primary-light;
+                stroke: $color-primary-light;
+            }
+
+            @include theme-light {
+                fill: $color-gray2;
+                stroke: $color-gray2;
+            }
         }
     }
 
