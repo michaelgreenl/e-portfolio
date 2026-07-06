@@ -289,11 +289,11 @@ const navMobileRouteTo = (key) => {
             0 2px 5px 0 rgb(0 0 0 / 28%);
 
         @include theme-dark {
-            background-color: $color-bg-secondary;
+            background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
         }
 
         @include theme-light {
-            background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
+            background-color: color-mix(in srgb, #002136 45%, transparent);
         }
     }
 }
