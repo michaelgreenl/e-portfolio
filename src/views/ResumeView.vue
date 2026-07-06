@@ -174,8 +174,8 @@ onMounted(() => {
 
     position: relative;
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
+    flex-direction: column;
     align-items: center;
     width: 100%;
     max-width: 33em;

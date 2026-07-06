@@ -135,8 +135,8 @@ onUnmounted(clearLoadTimer);
 
 .demo-video-poster {
     object-fit: cover;
-    filter: blur(12px) saturate(0.92);
     opacity: 0.82;
+    filter: blur(12px) saturate(0.92);
     transform: scale(1.06);
 }
 
