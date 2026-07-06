@@ -312,8 +312,8 @@ p {
         &:active {
             border-radius: 12px;
             box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
-            transform: scale(1.01) !important;
             backdrop-filter: blur(2px);
+            transform: scale(1.01) !important;
 
             .card-footer {
                 :deep(.see-more) {
@@ -546,8 +546,7 @@ $inset-width: 12px;
     position: relative;
     gap: $size-6;
     padding-bottom: $size-2;
-    overflow-x: scroll;
-    overflow-y: hidden;
+    overflow: scroll hidden;
     font-size: 1.1em;
 
     :deep(.chip-container) {

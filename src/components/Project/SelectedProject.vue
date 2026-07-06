@@ -109,10 +109,7 @@ p {
 
 .overlay {
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
     z-index: 1;
     width: 100vw;
     height: 100vh;
@@ -141,10 +138,10 @@ p {
     height: $size-10;
     padding: 0.9em;
     font-size: 1.2em;
+    outline: 0;
     background: transparent;
     border: 0;
     border-radius: 100%;
-    outline: 0;
 
     @include bp-xl-desktop {
         top: $size-4;

@@ -32,7 +32,7 @@ document.documentElement.setAttribute('data-theme', theme);
 </template>
 
 <style lang="scss">
-@use './assets/styles/_variables.scss';
+@use './assets/styles/variables';
 
 *,
 *::before,
@@ -86,8 +86,8 @@ body,
 }
 
 .page-shell {
-    flex-direction: column;
     flex-grow: 1;
+    flex-direction: column;
     width: 100%;
     margin: 0 auto;
     font-size: 0.9em;

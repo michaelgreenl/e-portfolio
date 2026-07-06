@@ -280,10 +280,7 @@ const navMobileRouteTo = (key) => {
 
     &::before {
         position: absolute;
-        top: 0;
-        right: -0.2em;
-        bottom: 0;
-        left: -0.2em;
+        inset: 0 -0.2em;
         content: '';
         border-radius: $size-3;
         box-shadow:

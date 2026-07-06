@@ -383,8 +383,8 @@ const clearStatus = () => {
     border: 2px solid transparent;
 
     &:focus {
-        border-color: $color-primary !important;
         outline: none;
+        border-color: $color-primary !important;
         box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
         backdrop-filter: blur(4px);
     }
