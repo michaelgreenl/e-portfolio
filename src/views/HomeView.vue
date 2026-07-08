@@ -57,7 +57,8 @@ onMounted(() => {
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                Simplicity is not the absence of complexity; it is its resolution, the clarity distilled from its chaos.
+                I build full-stack Vue/TypeScript apps with real-time collaboration, offline-first sync, secure APIs,
+                and polished interfaces.
             </p>
 
             <div class="cta">
@@ -178,17 +179,14 @@ h3 {
 }
 
 p {
-    max-width: 32ch;
+    max-width: 36ch;
     margin: 0 auto;
     text-align: center;
     text-wrap: auto !important;
 
-    @include bp-xsm-phone {
-        font-size: 1.1em;
-    }
-
     @include bp-custom-min($hero-tablet-bp) {
-        max-width: 47ch;
+        width: 102%;
+        max-width: 50ch;
     }
 
     @include bp-md-tablet {
