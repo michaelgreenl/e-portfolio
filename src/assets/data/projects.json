@@ -28,8 +28,8 @@
             "express",
             "postgres"
         ],
-        "shortDate": "January 2026 - March 2026",
-        "longDate": "January 2026 - March 2026",
+        "shortDate": "January 2026 - Present",
+        "longDate": "January 2026 - Present",
         "description": {
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
             "long": [
@@ -158,8 +158,8 @@
         "slug": "mawm",
         "stackText": ["TypeScript", "LangGraph", "Node", "OpenCode", "Vitest"],
         "stack": ["typescript", "langgraph", "node", "opencode", "vitest"],
-        "shortDate": "May 2026 - Present",
-        "longDate": "May 2026 - Active Development",
+        "shortDate": "May 2026 - June 2026",
+        "longDate": "May 2026 - June 2026",
         "description": {
             "short": "A TypeScript CLI for packaging, installing, and running LangGraph workflow templates with manifest-based distribution and bundled OpenCode execution assets.",
             "long": [
