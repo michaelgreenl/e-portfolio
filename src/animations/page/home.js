@@ -73,7 +73,7 @@ export const homeAnimations = {
                     ease: TIMING.easing.smooth,
                     opacity: 0,
                     x: 50,
-                    stagger: TIMING.stagger.tight,
+                    stagger: -TIMING.stagger.tight,
                 },
                 0,
             )
