@@ -19,6 +19,7 @@ export function useGsap(scope) {
                 delay: 0,
                 onComplete: () => {},
                 onStart: () => {},
+                reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
                 ...userOptions,
             };
 
