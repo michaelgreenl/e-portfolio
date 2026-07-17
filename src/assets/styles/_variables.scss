@@ -77,6 +77,14 @@ $ternary-font-stack:
     --color-text-primary: var(--color-gray8);
     --color-text-secondary: var(--color-gray6);
     --color-text-muted: var(--color-gray5);
+
+    // glass
+    --color-glass-surface: color-mix(in srgb, #002136 45%, transparent);
+    --color-glass-surface-hover: color-mix(in srgb, #002136 55%, transparent);
+    --color-glass-text: var(--color-gray2);
+    --color-glass-highlight: rgb(255 255 255 / 30%);
+    --color-glass-shade: rgb(0 0 0 / 24%);
+    --color-glass-shadow: rgb(0 0 0 / 28%);
 }
 
 // dark-mode
@@ -100,6 +108,14 @@ $ternary-font-stack:
     --color-text-primary: var(--color-gray4);
     --color-text-secondary: var(--color-gray5);
     --color-text-muted: var(--color-gray7);
+
+    // glass
+    --color-glass-surface: color-mix(in srgb, var(--color-bg-secondary) 60%, transparent);
+    --color-glass-surface-hover: color-mix(in srgb, var(--color-bg-secondary) 75%, transparent);
+    --color-glass-text: var(--color-primary-light);
+    --color-glass-highlight: rgb(255 255 255 / 18%);
+    --color-glass-shade: rgb(0 0 0 / 36%);
+    --color-glass-shadow: rgb(0 0 0 / 32%);
 }
 
 $color-white: var(--color-white);
@@ -127,6 +143,12 @@ $color-bg-secondary: var(--color-bg-secondary);
 $color-text-primary: var(--color-text-primary);
 $color-text-secondary: var(--color-text-secondary);
 $color-text-muted: var(--color-text-muted);
+$color-glass-surface: var(--color-glass-surface);
+$color-glass-surface-hover: var(--color-glass-surface-hover);
+$color-glass-text: var(--color-glass-text);
+$color-glass-highlight: var(--color-glass-highlight);
+$color-glass-shade: var(--color-glass-shade);
+$color-glass-shadow: var(--color-glass-shadow);
 
 // Spacing
 // Fixed rem values keep layout rhythm independent from component font sizing.

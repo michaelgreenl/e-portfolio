@@ -243,7 +243,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     @click.stop="projectSelected ? closeProject() : openProject()"
                     :text="`See ${projectSelected ? 'Less' : 'More'}`"
                     :iconRight="ArrowIcon"
-                    preset="primary"
+                            preset="glass"
                 />
                 <Button
                     v-else
@@ -251,7 +251,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     @click.stop="openProject()"
                     text="See More"
                     :iconRight="BoxArrowIcon"
-                    preset="primary"
+                    preset="glass"
                 />
             </div>
         </div>
@@ -315,34 +315,12 @@ p {
             backdrop-filter: blur(2px);
             transform: scale(1.01) !important;
 
-            .card-footer {
-                :deep(.see-more) {
-                    color: $color-bg-primary !important;
-
-                    .icon {
-                        fill: $color-bg-primary !important;
-                    }
-                }
-            }
-
             @include theme-dark {
                 background: linear-gradient(90deg, #21252922, #21252900);
-
-                .card-footer {
-                    :deep(.see-more) {
-                        background: $color-text-primary;
-                    }
-                }
             }
 
             @include theme-light {
                 background: linear-gradient(90deg, #dee2e622, #dee2e600);
-
-                .card-footer {
-                    :deep(.see-more) {
-                        background: $color-primary-darker;
-                    }
-                }
             }
         }
     }

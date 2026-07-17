@@ -282,19 +282,12 @@ const navMobileRouteTo = (key) => {
         position: absolute;
         inset: 0 -0.2em;
         content: '';
+        background-color: $color-glass-surface;
         border-radius: $radius-md;
         box-shadow:
-            inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 30%, transparent),
-            inset 0 -1px 0 color-mix(in srgb, darken-color($color-bg-secondary, 22%) 36%, transparent),
-            0 2px 5px 0 rgb(0 0 0 / 28%);
-
-        @include theme-dark {
-            background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
-        }
-
-        @include theme-light {
-            background-color: color-mix(in srgb, #002136 45%, transparent);
-        }
+            inset 0 1px 0 $color-glass-highlight,
+            inset 0 -1px 0 $color-glass-shade,
+            0 2px 5px 0 $color-glass-shadow;
     }
 }
 
