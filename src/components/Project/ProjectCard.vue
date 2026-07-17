@@ -442,12 +442,18 @@ p {
         }
     }
 
+    @include bp-xsm-phone {
+        padding: $space-4 $size-6;
+    }
+
     @include bp-sm-phone {
         flex-direction: row;
         gap: $space-4;
     }
 
     @include bp-md-tablet {
+        border-radius: $radius-md;
+
         @include theme-dark {
             border: solid 1px $color-bg-secondary !important;
         }
@@ -455,8 +461,9 @@ p {
         @include theme-light {
             border: solid 1px #cdd0d3 !important;
         }
-
-        border-radius: $radius-md;
+    }
+    @include bp-lg-laptop {
+        padding: $space-4 $space-5;
     }
 }
 
