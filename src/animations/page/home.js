@@ -16,10 +16,8 @@ export const homeAnimations = {
             y: reducedMotion ? 0 : 18,
         });
         gsap.set('.nav-link', {
-            autoAlpha: 0,
-            rotation: reducedMotion ? 0 : 2,
-            scale: reducedMotion ? 1 : 0.92,
-            x: reducedMotion ? 0 : 56,
+            opacity: 0,
+            x: reducedMotion ? 0 : 50,
         });
         gsap.set('.hero-line, .nav-links-line', {
             autoAlpha: 0,
@@ -87,15 +85,13 @@ export const homeAnimations = {
             .to(
                 '.nav-link',
                 {
-                    autoAlpha: 1,
-                    duration,
+                    duration: reducedMotion ? 0.01 : TIMING.duration.normal,
                     ease: TIMING.easing.organic,
-                    rotation: 0,
-                    scale: 1,
+                    opacity: 1,
                     stagger: reducedMotion ? 0 : TIMING.stagger.normal,
                     x: 0,
                 },
-                reducedMotion ? 0 : 'hero+=0.24',
+                0,
             )
             .to(
                 '.contact-link',
@@ -135,12 +131,11 @@ export const homeAnimations = {
             .to(
                 '.nav-link',
                 {
-                    autoAlpha: 0,
-                    duration,
+                    duration: reducedMotion ? 0.01 : TIMING.duration.normal,
                     ease: TIMING.easing.smooth,
-                    scale: reducedMotion ? 1 : 0.94,
-                    stagger: reducedMotion ? 0 : -TIMING.stagger.instant,
-                    x: reducedMotion ? 0 : 40,
+                    opacity: 0,
+                    stagger: reducedMotion ? 0 : -TIMING.stagger.tight,
+                    x: reducedMotion ? 0 : 50,
                 },
                 0,
             )
