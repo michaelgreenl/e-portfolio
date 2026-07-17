@@ -202,7 +202,7 @@ const clearStatus = () => {
                     type="text"
                     class="form-input"
                     :class="{ error: errors.subject }"
-                    placeholder="What's this about?"
+                    placeholder="e.g., Project inquiry"
                     required
                     @input="handleFieldInput('subject')"
                     @blur="handleFieldBlur('subject')"
@@ -218,7 +218,7 @@ const clearStatus = () => {
                     v-model="form.message"
                     class="form-textarea"
                     :class="{ error: errors.message }"
-                    placeholder="What's up?"
+                    placeholder="Tell me about your project, question, or opportunity."
                     rows="6"
                     required
                     @input="handleFieldInput('message')"
