@@ -202,7 +202,7 @@ const clearStatus = () => {
                     type="text"
                     class="form-input"
                     :class="{ error: errors.subject }"
-                    placeholder="What's this about?"
+                    placeholder="e.g., Project inquiry"
                     required
                     @input="handleFieldInput('subject')"
                     @blur="handleFieldBlur('subject')"
@@ -218,7 +218,7 @@ const clearStatus = () => {
                     v-model="form.message"
                     class="form-textarea"
                     :class="{ error: errors.message }"
-                    placeholder="What's up?"
+                    placeholder="Tell me about your project, question, or opportunity."
                     rows="6"
                     required
                     @input="handleFieldInput('message')"
@@ -270,13 +270,13 @@ const clearStatus = () => {
 <style lang="scss" scoped>
 .contact-container {
     position: relative;
-    padding: $size-2 $size-4;
+    padding: $space-2 $space-4;
 }
 
 .contact-header {
     width: 90%;
     max-width: 27em;
-    margin: $size-6 0 $size-6;
+    margin: $space-6 0;
     text-align: center;
 
     h1,
@@ -299,7 +299,7 @@ const clearStatus = () => {
 
     hr {
         width: 100%;
-        margin: $size-3 auto $size-2;
+        margin: $space-3 auto $space-2;
     }
 
     p {
@@ -316,7 +316,7 @@ const clearStatus = () => {
 .contact-form {
     display: flex;
     flex-wrap: wrap;
-    gap: $size-4;
+    gap: $space-4;
     width: 100%;
     max-width: 33em;
 
@@ -325,7 +325,7 @@ const clearStatus = () => {
     }
 
     @include bp-lg-laptop {
-        gap: $size-5;
+        gap: $space-5;
         max-width: 40em;
     }
 }
@@ -334,7 +334,7 @@ const clearStatus = () => {
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: $size-2;
+    gap: $space-2;
     min-width: 18em;
 }
 
@@ -362,7 +362,7 @@ const clearStatus = () => {
 .form-input,
 .form-textarea,
 .status-message {
-    border-radius: 8px;
+    border-radius: $radius-sm;
 }
 
 .form-textarea {
@@ -377,7 +377,7 @@ const clearStatus = () => {
 
 .form-input,
 .form-textarea {
-    padding: $size-3 $size-4;
+    padding: $space-3 $space-4;
     font-size: 1em;
     background-color: transparent;
     border: 2px solid transparent;
@@ -435,7 +435,7 @@ const clearStatus = () => {
 }
 
 .status-message {
-    padding: 0 $size-4;
+    padding: 0 $space-4;
     font-size: 0.8em;
     font-weight: 500;
     white-space: nowrap;
@@ -476,7 +476,7 @@ const clearStatus = () => {
     justify-content: space-between;
     width: 100%;
     max-width: 33em;
-    padding: $size-5 $size-3;
+    padding: $space-5 $space-3;
     font-size: 0.95em;
 
     @include bp-md-tablet {
@@ -489,7 +489,7 @@ const clearStatus = () => {
 
     .contact-links {
         display: flex;
-        gap: $size-1;
+        gap: $space-2;
         font-size: 1.8em;
 
         a :deep(button) {
@@ -504,7 +504,7 @@ const clearStatus = () => {
     }
 
     :deep(button) {
-        gap: $size-2;
+        gap: $space-2;
 
         &.primary {
             font-size: 1.15em;

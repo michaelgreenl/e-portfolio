@@ -6,21 +6,26 @@ const getSelectedProjectDetailTargets = (target) => [
 ];
 
 export const projectAnimations = {
-    showSelectedProject: ({ tl, targets }) => {
-        gsap.set(targets, { opacity: 0 });
+    showSelectedProject: ({ tl, targets, reducedMotion }) => {
+        gsap.set(targets, {
+            autoAlpha: 0,
+            scale: reducedMotion ? 1 : 0.98,
+        });
 
         tl.to(targets, {
-            duration: TIMING.duration.normal,
+            autoAlpha: 1,
+            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
             ease: TIMING.easing.smooth,
-            opacity: 1,
+            scale: 1,
         });
     },
 
-    hideSelectedProject: ({ tl, targets, onComplete }) => {
+    hideSelectedProject: ({ tl, targets, onComplete, reducedMotion }) => {
         tl.to(targets, {
-            duration: TIMING.duration.normal,
+            autoAlpha: 0,
+            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
             ease: TIMING.easing.smooth,
-            opacity: 0,
+            scale: reducedMotion ? 1 : 0.98,
             onComplete,
         });
     },

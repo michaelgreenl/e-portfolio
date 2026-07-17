@@ -236,19 +236,19 @@ const navMobileRouteTo = (key) => {
 <style lang="scss" scoped>
 .nav-mobile {
     position: fixed;
-    right: $size-2;
-    bottom: $size-2;
-    left: $size-2;
+    right: $space-2;
+    bottom: $space-2;
+    left: $space-2;
     z-index: 9;
     display: flex;
     justify-content: space-between;
     max-width: 347px;
     height: $size-10;
-    padding: $size-2;
+    padding: $space-2;
     margin: 0 auto;
     color: $color-accent;
     background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
-    border-radius: $size-4;
+    border-radius: 1em;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
         inset 0 0 0 1px color-mix(in srgb, darken-color($color-bg-secondary, 12%) 22%, transparent),
@@ -270,7 +270,7 @@ const navMobileRouteTo = (key) => {
 
 .active-item-bg {
     position: absolute;
-    top: 0.35em;
+    top: 0.3em;
     bottom: 0.35em;
     left: 0;
     z-index: 1;
@@ -280,21 +280,14 @@ const navMobileRouteTo = (key) => {
 
     &::before {
         position: absolute;
-        inset: 0 -0.2em;
+        inset: 0 -0.1em;
         content: '';
-        border-radius: $size-3;
+        background-color: $color-glass-surface;
+        border-radius: 0.75em;
         box-shadow:
-            inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 30%, transparent),
-            inset 0 -1px 0 color-mix(in srgb, darken-color($color-bg-secondary, 22%) 36%, transparent),
-            0 2px 5px 0 rgb(0 0 0 / 28%);
-
-        @include theme-dark {
-            background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
-        }
-
-        @include theme-light {
-            background-color: color-mix(in srgb, #002136 45%, transparent);
-        }
+            inset 0 1px 0 $color-glass-highlight,
+            inset 0 -1px 0 $color-glass-shade,
+            0 2px 5px 0 $color-glass-shadow;
     }
 }
 
@@ -304,13 +297,13 @@ const navMobileRouteTo = (key) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: $size-2 $size-3;
+    padding: $space-2 $space-3;
     font-family: $primary-font-stack;
     font-weight: 600;
     color: $color-accent;
     background-color: transparent;
     border: 0;
-    border-radius: $size-4;
+    border-radius: $radius-lg;
 
     @include bp-xsm-phone {
         gap: 0;
@@ -357,7 +350,7 @@ const navMobileRouteTo = (key) => {
         &.active {
             .mobile-nav-icon-slot {
                 max-width: $size-6;
-                margin-right: $size-2;
+                margin-right: $space-2;
             }
         }
     }

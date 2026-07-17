@@ -38,10 +38,10 @@ button {
     background: transparent;
 
     &.primary {
-        gap: 0.3em;
-        padding: $size-2 $size-4;
+        gap: $size-2;
+        padding: $space-2 $space-4;
         letter-spacing: 0.1ch;
-        border-radius: 12px;
+        border-radius: $radius-md;
         transition: transform 0.3s ease;
 
         .icon {
@@ -107,7 +107,7 @@ button {
 
     &.secondary {
         position: relative;
-        gap: $size-2;
+        gap: $space-2;
         padding: 0;
         border: 0;
 
@@ -124,7 +124,7 @@ button {
             height: $size-5;
 
             @include theme-dark {
-                fill: $color-gray6;
+                fill: lighten-color($color-gray6, 5%);
             }
 
             @include theme-light {

@@ -92,8 +92,8 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .home-container {
-    gap: 12vh;
-    padding: $size-8 $size-4 0;
+    gap: $space-page-section;
+    padding: $space-8 $space-4 0;
 
     @include bp-xsm-phone {
         font-size: 1em;
@@ -101,7 +101,7 @@ onMounted(() => {
 
     @include bp-md-tablet {
         align-items: flex-start;
-        padding: 0 $size-12;
+        padding: 0 $space-page-gutter;
     }
 
     @include bp-lg-laptop {
@@ -116,16 +116,16 @@ onMounted(() => {
 $hero-tablet-bp: 525;
 
 h1 {
-    padding-bottom: $size-1;
+    padding-bottom: $space-1;
     margin: 0;
     font-size: clamp(4.5em, 21vw, 5.2em);
     line-height: 0.8ch;
 
     @include bp-custom-min($hero-tablet-bp) {
         display: flex;
-        gap: 12px;
+        gap: $space-3;
         max-width: 100vw;
-        padding-bottom: $size-1;
+        padding-bottom: $space-1;
         margin: 0 auto;
         font-size: clamp(4.2em, 13.2vw, 5.2em);
         line-height: 1ch;
@@ -170,7 +170,7 @@ h2 {
 }
 
 h3 {
-    margin: 0 2px $size-2;
+    margin: 0 2px $space-2;
 
     @include bp-custom-min($hero-tablet-bp) {
         margin: 0 2px !important;
@@ -198,7 +198,7 @@ p {
 .hero-content {
     display: flex;
     flex-direction: column;
-    gap: $size-2;
+    gap: $space-2;
     max-width: 370px;
 
     @include bp-custom-min($hero-tablet-bp) {
@@ -209,7 +209,7 @@ p {
 .site-nav {
     display: none;
     flex-wrap: wrap-reverse;
-    gap: $size-4;
+    gap: $space-4;
     align-items: center;
     align-self: flex-end;
     justify-content: flex-end;
@@ -220,7 +220,7 @@ p {
     }
 
     :deep(button) {
-        padding: 0 $size-1;
+        padding: 0 $space-1;
         font-size: 1.3em;
 
         &::after {
@@ -231,10 +231,10 @@ p {
 
 .contact-links {
     position: absolute;
-    top: $size-3;
-    right: $size-2;
+    top: $space-3;
+    right: $space-3;
     display: flex;
-    gap: $size-2;
+    gap: $space-3;
     justify-content: flex-end;
     width: 100vw;
     font-size: 1.7em;
@@ -258,7 +258,7 @@ p {
     }
 
     @include bp-custom-min($hero-tablet-bp) {
-        gap: 0.6em;
+        gap: $space-3;
         font-size: 1.8em;
     }
 
@@ -273,7 +273,7 @@ p {
 
 .hero-line {
     width: 95%;
-    margin: 0 auto $size-2;
+    margin: 0 auto $space-2;
 
     @include bp-md-tablet {
         display: none;
@@ -282,9 +282,9 @@ p {
 
 .cta {
     display: flex;
-    gap: $size-4;
+    gap: $space-4;
     justify-content: center;
-    margin-top: $size-2;
+    margin-top: $space-2;
     font-size: 1.1em;
 
     @include bp-md-tablet {

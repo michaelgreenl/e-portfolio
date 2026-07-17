@@ -21,7 +21,7 @@ import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 import { TIMING } from '@/animations/constants/timing';
 
 const routeStore = useRouteStore();
-const { fadeIn, headerReveal, headerDismiss } = useUtilAnimations();
+const { revealIn, headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
 const { registerAnim } = useGsap();
@@ -68,7 +68,7 @@ watch(
 
 onMounted(() => {
     headerReveal({ headerEl: pageHeader.value });
-    fadeIn({
+    revealIn({
         selector: '.project-card',
         opts: { delay: 0.2, duration: TIMING.duration.moderate, stagger: TIMING.stagger.loose },
     });
@@ -160,7 +160,7 @@ function closeProject() {
 <style lang="scss" scoped>
 .projects-container {
     position: relative;
-    padding: $size-12 0 $size-4;
+    padding: $space-10 0 $space-3;
     font-size: 0.6em;
 
     @include bp-md-tablet {
@@ -183,7 +183,7 @@ function closeProject() {
 
     h2 {
         display: flex;
-        gap: 6px;
+        gap: $space-2;
         align-items: center;
 
         @include theme-dark {
@@ -204,7 +204,7 @@ function closeProject() {
 
     hr {
         width: 100%;
-        margin: $size-2 auto $size-6;
+        margin: $space-1 auto $space-4;
     }
 }
 
@@ -212,8 +212,8 @@ function closeProject() {
     @include flex-center-all;
 
     flex-direction: column;
-    padding: 0 $size-4;
-    margin: $size-12 0 $size-20;
+    padding: 0 $space-3;
+    margin: $space-10 0 $space-20;
 
     h1 {
         @include bp-lg-laptop {
@@ -239,20 +239,22 @@ function closeProject() {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    padding: $size-5;
+    padding: $space-1;
 
     @include bp-xsm-phone {
         max-width: 58em;
+        padding: $space-2;
     }
 
     @include bp-sm-phone {
         max-width: 110em;
+        padding: $space-3;
     }
 
     @include bp-md-tablet {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: $size-6;
+        gap: $space-4;
         align-items: stretch;
         width: 100%;
         max-width: 92em;

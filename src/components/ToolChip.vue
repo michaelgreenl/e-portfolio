@@ -168,10 +168,10 @@ const tools = {
 .chip-container {
     @include flex-center-all;
 
-    gap: $size-2;
-    height: 1em;
-    padding: 0.85em 1em;
-    border-radius: 7px;
+    gap: $space-2;
+    height: 1.8em;
+    padding: $space-3 $space-4;
+    border-radius: $radius-sm;
 }
 
 .icon {
