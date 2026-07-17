@@ -239,14 +239,16 @@ function closeProject() {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    padding: $space-3;
+    padding: $space-1;
 
     @include bp-xsm-phone {
         max-width: 58em;
+        padding: $space-2;
     }
 
     @include bp-sm-phone {
         max-width: 110em;
+        padding: $space-3;
     }
 
     @include bp-md-tablet {
