@@ -79,6 +79,7 @@ onMounted(() => {
             <div v-for="(route, key) in routeStore.routes" :key="key" class="nav-link">
                 <Button
                     v-if="key !== 'home'"
+                    class="home-nav-button"
                     @click="() => routeStore.toRoute(key)"
                     :text="route.meta.title"
                     :iconLeft="route.meta.icon"
@@ -219,12 +220,75 @@ p {
         display: flex;
     }
 
-    :deep(button) {
-        padding: 0 $space-1;
+    :deep(.home-nav-button) {
+        position: relative;
+        gap: $space-2;
+        padding: $space-2 $space-3;
+        overflow: hidden;
         font-size: 1.3em;
+        border: 1px solid transparent;
+        border-radius: $radius-md;
+        isolation: isolate;
+        transition:
+            color 0.2s ease,
+            transform 0.2s ease;
+
+        &::before {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            content: '';
+            background-color: $color-glass-surface;
+            border-radius: inherit;
+            box-shadow:
+                inset 0 1px 0 $color-glass-highlight,
+                inset 0 -1px 0 $color-glass-shade;
+            opacity: 0;
+            transform: scale(0.82);
+            transition:
+                opacity 0.2s ease,
+                transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
 
         &::after {
-            height: 2px;
+            right: $space-3;
+            bottom: $space-1;
+            left: $space-3;
+            height: 1px;
+            background-color: currentcolor;
+            opacity: 0.65;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.2s ease;
+        }
+
+        .icon {
+            transition: transform 0.2s ease;
+        }
+
+        @include interactive {
+            color: $color-glass-text;
+            transform: translateY(-3px);
+
+            &::before {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            &::after {
+                right: $space-3;
+                transform: scaleX(1);
+            }
+
+            .icon {
+                fill: currentcolor;
+                stroke: currentcolor;
+                transform: translateX(-2px) rotate(-4deg) scale(1.08);
+            }
+        }
+
+        &:active {
+            transform: translateY(0) scale(0.98);
         }
     }
 }

@@ -21,7 +21,7 @@ import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 import { TIMING } from '@/animations/constants/timing';
 
 const routeStore = useRouteStore();
-const { fadeIn, headerReveal, headerDismiss } = useUtilAnimations();
+const { revealIn, headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
 const { registerAnim } = useGsap();
@@ -68,7 +68,7 @@ watch(
 
 onMounted(() => {
     headerReveal({ headerEl: pageHeader.value });
-    fadeIn({
+    revealIn({
         selector: '.project-card',
         opts: { delay: 0.2, duration: TIMING.duration.moderate, stagger: TIMING.stagger.loose },
     });
