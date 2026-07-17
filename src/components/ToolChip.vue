@@ -168,9 +168,9 @@ const tools = {
 .chip-container {
     @include flex-center-all;
 
-    gap: $size-2;
+    gap: $space-2;
     height: 1em;
-    padding: 0.85em 1em;
+    padding: $space-3 $space-4;
     border-radius: 7px;
 }
 

@@ -281,13 +281,13 @@ p {
 
 .card-footer {
     justify-content: space-between;
-    margin-top: $size-1;
+    margin-top: $space-1;
     font-size: 1.3em;
 
     @include bp-md-tablet {
         flex-wrap: nowrap;
-        padding-top: $size-4;
-        margin-top: $size-2;
+        padding-top: $space-3;
+        margin-top: $space-2;
         border-top: solid 1px $color-text-muted;
     }
 
@@ -299,7 +299,7 @@ p {
 .project-card {
     align-items: center;
     justify-content: space-between;
-    padding: $size-6 $size-8;
+    padding: $space-4 $space-5;
     cursor: pointer;
     border-bottom: solid 1px $color-text-muted;
 
@@ -349,7 +349,7 @@ p {
 
     @include bp-sm-phone {
         flex-direction: row;
-        gap: $size-6;
+        gap: $space-4;
     }
 
     @include bp-md-tablet {
@@ -366,18 +366,18 @@ p {
 }
 
 .card-body {
-    gap: $size-2;
+    gap: $space-2;
     width: 100%;
 }
 
 .card-header {
     flex-wrap: wrap-reverse;
-    gap: $size-3;
+    gap: $space-2;
     justify-content: space-between;
 
     .card-title {
-        gap: 0.6em;
-        margin-right: 3em;
+        gap: $space-2;
+        margin-right: $space-8;
         font-size: 1.2em;
 
         @include bp-xsm-phone {
@@ -385,11 +385,11 @@ p {
         }
 
         @include bp-md-tablet {
-            margin-right: 8em;
+            margin-right: $space-24;
         }
 
         @include bp-xl-desktop {
-            margin-right: 4em;
+            margin-right: $space-12;
         }
 
         .project-logo {
@@ -421,12 +421,12 @@ p {
     }
 
     .card-date {
-        gap: $size-2;
+        gap: $space-2;
         margin-left: auto;
         font-size: 1.4em;
 
         @include bp-sm-phone {
-            margin-bottom: 1em;
+            margin-bottom: $space-3;
 
             @include bp-md-tablet {
                 margin-bottom: 0;
@@ -478,7 +478,7 @@ $inset-width: 12px;
 
 .tool-chips-container {
     position: relative;
-    margin-top: $size-2;
+    margin-top: $space-2;
     border-radius: 8px;
 
     &::before,
@@ -544,8 +544,8 @@ $inset-width: 12px;
 
 .card-tool-chips {
     position: relative;
-    gap: $size-6;
-    padding-bottom: $size-2;
+    gap: $space-4;
+    padding-bottom: $space-2;
     overflow: scroll hidden;
     font-size: 1.1em;
 
@@ -585,7 +585,7 @@ $inset-width: 12px;
     width: 100%;
     max-width: 50em;
     aspect-ratio: 16 / 9;
-    margin: $size-4 auto;
+    margin: $space-3 auto;
     border-radius: 12px;
 
     @include bp-xsm-phone {
@@ -598,21 +598,21 @@ $inset-width: 12px;
 }
 
 .selected-description {
-    gap: $size-2;
-    padding: $size-2 0 $size-2 $size-4;
+    gap: $space-2;
+    padding: $space-2 0 $space-2 $space-4;
     margin: 0;
     font-family: $secondary-font-stack;
     font-size: 1.5em;
     color: $color-text-secondary;
 
     @include bp-sm-phone {
-        padding: $size-3 0 0 $size-5;
+        padding: $space-3 0 0 $space-5;
         font-size: 1.6em;
     }
 }
 
 :deep(.see-more) {
-    gap: 0.6em;
+    gap: $space-2;
     border-width: 1px;
     border-radius: 7px;
 
@@ -650,7 +650,7 @@ $inset-width: 12px;
             white-space: nowrap;
 
             @include bp-md-tablet {
-                gap: $size-2;
+                gap: $space-2;
             }
 
             svg {
@@ -672,7 +672,7 @@ $inset-width: 12px;
 
     &-card {
         display: flex;
-        gap: $size-4;
+        gap: $space-4;
         font-size: 1.1em;
     }
 

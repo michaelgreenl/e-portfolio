@@ -236,15 +236,15 @@ const navMobileRouteTo = (key) => {
 <style lang="scss" scoped>
 .nav-mobile {
     position: fixed;
-    right: $size-2;
-    bottom: $size-2;
-    left: $size-2;
+    right: $space-2;
+    bottom: $space-2;
+    left: $space-2;
     z-index: 9;
     display: flex;
     justify-content: space-between;
     max-width: 347px;
     height: $size-10;
-    padding: $size-2;
+    padding: $space-2;
     margin: 0 auto;
     color: $color-accent;
     background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
@@ -304,7 +304,7 @@ const navMobileRouteTo = (key) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: $size-2 $size-3;
+    padding: $space-2 $space-3;
     font-family: $primary-font-stack;
     font-weight: 600;
     color: $color-accent;
@@ -357,7 +357,7 @@ const navMobileRouteTo = (key) => {
         &.active {
             .mobile-nav-icon-slot {
                 max-width: $size-6;
-                margin-right: $size-2;
+            margin-right: $space-2;
             }
         }
     }

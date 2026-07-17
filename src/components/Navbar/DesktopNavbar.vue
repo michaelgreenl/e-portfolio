@@ -24,7 +24,7 @@ const routeStore = useRouteStore();
 <style lang="scss" scoped>
 .nav-desktop {
     display: none;
-    gap: $size-3;
+    gap: $space-3;
 
     @include bp-md-tablet {
         display: flex;
@@ -34,9 +34,9 @@ const routeStore = useRouteStore();
 .nav-item {
     position: relative;
     display: flex;
-    gap: $size-3;
+    gap: $space-3;
     align-items: center;
-    padding: $size-3 $size-5;
+    padding: $space-3 $space-5;
     font-family: $primary-font-stack;
     font-size: 0.85em;
     background-color: transparent;

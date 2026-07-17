@@ -144,14 +144,14 @@ watch(
     align-items: center;
     justify-content: space-between;
     height: $size-13;
-    padding: 0 $size-2;
+    padding: 0 $space-2;
 
     .theme-toggle {
         display: inline-flex;
         width: $size-11;
         height: $size-8;
         padding-left: 0.4em;
-        margin: $size-1;
+        margin: $space-1;
         cursor: pointer;
         border-radius: 100px;
         box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
@@ -165,7 +165,7 @@ watch(
         }
 
         @include bp-sm-phone {
-            margin: $size-4;
+            margin: $space-4;
         }
 
         .toggle-input {

@@ -10,11 +10,11 @@
 <style lang="scss" scoped>
 div {
     display: flex;
-    padding-left: $size-2;
+    padding-left: $space-2;
     font-family: $primary-font-stack;
 
     @include bp-sm-phone {
-        padding-left: $size-4;
+        padding-left: $space-4;
     }
 }
 
