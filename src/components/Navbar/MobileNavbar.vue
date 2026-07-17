@@ -248,7 +248,7 @@ const navMobileRouteTo = (key) => {
     margin: 0 auto;
     color: $color-accent;
     background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
-    border-radius: $radius-lg;
+    border-radius: 1em;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
         inset 0 0 0 1px color-mix(in srgb, darken-color($color-bg-secondary, 12%) 22%, transparent),
@@ -280,10 +280,10 @@ const navMobileRouteTo = (key) => {
 
     &::before {
         position: absolute;
-        inset: 0 -0.2em;
+        inset: 0 -0.1em;
         content: '';
         background-color: $color-glass-surface;
-        border-radius: $radius-md;
+        border-radius: 0.75em;
         box-shadow:
             inset 0 1px 0 $color-glass-highlight,
             inset 0 -1px 0 $color-glass-shade,
@@ -350,7 +350,7 @@ const navMobileRouteTo = (key) => {
         &.active {
             .mobile-nav-icon-slot {
                 max-width: $size-6;
-            margin-right: $space-2;
+                margin-right: $space-2;
             }
         }
     }
