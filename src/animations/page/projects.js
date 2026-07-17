@@ -10,7 +10,6 @@ export const projectAnimations = {
         gsap.set(targets, {
             autoAlpha: 0,
             scale: reducedMotion ? 1 : 0.98,
-            y: reducedMotion ? 0 : 16,
         });
 
         tl.to(targets, {
@@ -18,7 +17,6 @@ export const projectAnimations = {
             duration: reducedMotion ? 0.01 : TIMING.duration.normal,
             ease: TIMING.easing.smooth,
             scale: 1,
-            y: 0,
         });
     },
 
@@ -28,7 +26,6 @@ export const projectAnimations = {
             duration: reducedMotion ? 0.01 : TIMING.duration.normal,
             ease: TIMING.easing.smooth,
             scale: reducedMotion ? 1 : 0.98,
-            y: reducedMotion ? 0 : 12,
             onComplete,
         });
     },
