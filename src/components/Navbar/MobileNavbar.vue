@@ -270,7 +270,7 @@ const navMobileRouteTo = (key) => {
 
 .active-item-bg {
     position: absolute;
-    top: 0.35em;
+    top: 0.3em;
     bottom: 0.35em;
     left: 0;
     z-index: 1;

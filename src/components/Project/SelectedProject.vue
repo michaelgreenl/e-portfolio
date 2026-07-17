@@ -136,7 +136,7 @@ p {
     z-index: 100;
     width: $size-10;
     height: $size-10;
-    padding: $space-4;
+    padding: $space-3;
     font-size: 1.2em;
     outline: 0;
     background: transparent;

@@ -38,7 +38,7 @@ button {
     background: transparent;
 
     &.primary {
-        gap: $space-1;
+        gap: $size-2;
         padding: $space-2 $space-4;
         letter-spacing: 0.1ch;
         border-radius: $radius-md;
