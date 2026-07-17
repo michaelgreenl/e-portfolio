@@ -156,45 +156,5 @@ button {
             }
         }
     }
-
-    &.glass {
-        gap: $space-2;
-        padding: $space-2 $space-4;
-        font-weight: 500;
-        color: $color-glass-text;
-        background-color: $color-glass-surface;
-        border: 1px solid transparent;
-        border-top-color: $color-glass-highlight;
-        border-bottom-color: $color-glass-shade;
-        border-radius: $radius-md;
-        box-shadow:
-            inset 0 1px 0 $color-glass-highlight,
-            inset 0 -1px 0 $color-glass-shade,
-            0 2px 5px $color-glass-shadow;
-        backdrop-filter: blur(15px) saturate(130%);
-        transition:
-            background-color 0.2s ease,
-            box-shadow 0.2s ease,
-            transform 0.2s ease;
-
-        .icon {
-            height: $size-4;
-            fill: currentcolor;
-            stroke: currentcolor;
-        }
-
-        @include interactive {
-            background-color: $color-glass-surface-hover;
-            box-shadow:
-                inset 0 1px 0 $color-glass-highlight,
-                inset 0 -1px 0 $color-glass-shade,
-                0 6px 14px $color-glass-shadow;
-            transform: translateY(-2px);
-        }
-
-        &:active {
-            transform: translateY(0) scale(0.98);
-        }
-    }
 }
 </style>
