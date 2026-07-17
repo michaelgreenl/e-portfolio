@@ -13,18 +13,18 @@
         // $color-bg-primary
         --bg: #212529;
         --grid: rgb(255 255 255 / 3.5%);
-        --spot-a: rgb(107 143 158 / 20%);
-        --spot-b: rgb(111 185 201 / 14%);
-        --spot-c: rgb(132 105 180 / 12%);
+        --spot-a: rgb(255 255 255 / 7%);
+        --spot-b: rgb(137 207 240 / 6%);
+        --spot-c: rgb(180 220 210 / 5%);
     }
 
     @include theme-light {
         // $color-bg-primary
         --bg: #dee2e6;
         --grid: rgb(0 0 0 / 4%);
-        --spot-a: rgb(107 143 158 / 22%);
-        --spot-b: rgb(120 190 210 / 20%);
-        --spot-c: rgb(150 125 205 / 10%);
+        --spot-a: rgb(0 0 0 / 3%);
+        --spot-b: rgb(173 216 230 / 10%);
+        --spot-c: rgb(144 238 144 / 5%);
     }
 
     background:
