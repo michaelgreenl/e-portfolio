@@ -124,7 +124,7 @@ button {
             height: $size-5;
 
             @include theme-dark {
-                fill: $color-gray6;
+                fill: lighten-color($color-gray6, 5%);
             }
 
             @include theme-light {

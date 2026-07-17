@@ -232,9 +232,9 @@ p {
 .contact-links {
     position: absolute;
     top: $space-3;
-    right: $space-2;
+    right: $space-3;
     display: flex;
-    gap: $space-2;
+    gap: $space-3;
     justify-content: flex-end;
     width: 100vw;
     font-size: 1.7em;
