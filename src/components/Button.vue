@@ -152,7 +152,7 @@ button {
 
         @include interactive {
             &::after {
-                right: 0;
+                right: 2px;
             }
         }
     }
