@@ -146,7 +146,7 @@ onUnmounted(clearLoadTimer);
     height: 2.25em;
     border: 2px solid rgb(255 255 255 / 24%);
     border-top-color: $color-primary-light;
-    border-radius: 50%;
+    border-radius: $radius-round;
     animation: demo-video-spin 0.9s linear infinite;
 }
 

@@ -362,7 +362,7 @@ const clearStatus = () => {
 .form-input,
 .form-textarea,
 .status-message {
-    border-radius: 8px;
+    border-radius: $radius-sm;
 }
 
 .form-textarea {
