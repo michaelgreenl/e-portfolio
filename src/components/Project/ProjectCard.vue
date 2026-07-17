@@ -394,7 +394,7 @@ p {
 .project-card {
     align-items: center;
     justify-content: space-between;
-    padding: $space-4 $space-5;
+    padding: $space-4 $size-4;
     cursor: pointer;
     border-bottom: solid 1px $color-text-muted;
 
