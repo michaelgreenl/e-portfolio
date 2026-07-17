@@ -131,12 +131,12 @@ p {
 
 .close-btn {
     position: absolute !important;
-    top: $size-3;
-    right: $size-4;
+    top: $space-3;
+    right: $space-4;
     z-index: 100;
     width: $size-10;
     height: $size-10;
-    padding: 0.9em;
+    padding: $space-4;
     font-size: 1.2em;
     outline: 0;
     background: transparent;
@@ -144,8 +144,8 @@ p {
     border-radius: 100%;
 
     @include bp-xl-desktop {
-        top: $size-4;
-        right: $size-5;
+        top: $space-4;
+        right: $space-5;
     }
 
     svg {
@@ -178,12 +178,12 @@ p {
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: $size-2;
+    gap: $space-2;
     width: 95vw;
     max-width: 85em;
     max-height: 95dvh;
-    padding: 2.4em $size-11;
-    margin: $size-8 0;
+    padding: $space-10 $space-12;
+    margin: $space-8 0;
     overflow-y: auto;
     border: 1px solid rgb(255 255 255 / 12%);
     border-radius: 20px;
@@ -200,7 +200,7 @@ p {
 
 .project-header {
     display: flex;
-    gap: $size-7;
+    gap: $space-8;
 }
 
 .project-header-info {
@@ -209,7 +209,7 @@ p {
 }
 
 .project-title {
-    gap: $size-2;
+    gap: $space-2;
     font-size: 1.2em;
 
     svg {
@@ -249,14 +249,14 @@ p {
 
 .project-body {
     display: flex;
-    gap: $size-9;
-    padding: $size-8 0;
-    margin: $size-4 0;
+    gap: $space-10;
+    padding: $space-8 0;
+    margin: $space-4 0;
     border-top: solid 1px $color-text-muted;
     border-bottom: solid 1px $color-text-muted;
 
     @include bp-lg-laptop {
-        gap: $size-10;
+        gap: $space-12;
     }
 }
 
@@ -269,18 +269,18 @@ p {
 .project-footer {
     display: flex;
     justify-content: space-between;
-    padding: 0 $size-2;
+    padding: 0 $space-2;
 }
 
 .external-links {
     display: flex;
-    gap: $size-6;
+    gap: $space-6;
     font-size: 1.5em;
 
     a {
         &:deep(button) {
             @include bp-md-tablet {
-                gap: $size-2;
+                gap: $space-2;
             }
 
             span {
@@ -326,16 +326,16 @@ p {
 .tool-container {
     display: flex;
     flex-direction: column;
-    gap: 2em;
+    gap: $space-8;
     justify-content: center;
     min-width: 46%;
 }
 
 .tool-chips {
     flex-wrap: wrap;
-    gap: $size-4;
+    gap: $space-4;
     justify-content: center;
-    padding-right: $size-3;
+    padding-right: $space-3;
     font-size: 1.2em;
 
     .chip {
@@ -349,7 +349,7 @@ p {
 }
 
 .date {
-    gap: $size-2;
+    gap: $space-2;
     font-size: 1.3em;
     white-space: nowrap;
 }
@@ -360,14 +360,14 @@ p {
     color: $color-text-secondary;
 
     &-short {
-        margin: $size-1 0 0;
+        margin: $space-1 0 0;
     }
 
     &-long {
         display: flex;
         flex: 1.2;
         flex-direction: column;
-        gap: $size-2;
+        gap: $space-2;
         justify-content: center;
         margin: 0;
         line-height: 2ch;

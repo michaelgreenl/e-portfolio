@@ -179,7 +179,7 @@ onMounted(() => {
     align-items: center;
     width: 100%;
     max-width: 33em;
-    padding: $size-4;
+    padding: $space-4;
     margin: 0 auto;
     font-size: 0.9em;
     color: $color-text-primary;
@@ -259,7 +259,7 @@ h3 span {
 }
 
 p {
-    margin: $size-1 0;
+    margin: $space-1 0;
 
     @include theme-light {
         color: var(--resume-light-muted);
@@ -272,8 +272,8 @@ p {
 }
 
 ul {
-    padding: 0 $size-5;
-    margin: $size-1 0;
+    padding: 0 $space-5;
+    margin: $space-1 0;
 }
 
 li {
@@ -289,23 +289,23 @@ li {
 .page-header {
     display: flex;
     flex-wrap: wrap;
-    gap: $size-4;
+    gap: $space-4;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: $size-3 0 $size-5;
-    margin-bottom: $size-1;
+    padding: $space-3 0 $space-5;
+    margin-bottom: $space-1;
 
     @include bp-xsm-phone {
-        gap: $size-3;
-        padding-bottom: $size-4;
+        gap: $space-3;
+        padding-bottom: $space-4;
     }
 }
 
 .page-title {
     display: flex;
     flex-direction: column;
-    gap: $size-1;
+    gap: $space-1;
     min-width: 0;
 }
 
@@ -333,7 +333,7 @@ li {
     }
 
     :deep(button.primary) {
-        gap: 0.4em !important;
+        gap: $space-2 !important;
         min-height: 2.75em;
         border-radius: 10px;
 
@@ -354,20 +354,20 @@ li {
 .resume-body {
     display: flex;
     flex-direction: column;
-    gap: $size-6;
+    gap: $space-6;
     width: 100%;
 }
 
 .section {
     display: flex;
     flex-direction: column;
-    gap: $size-2;
+    gap: $space-2;
     width: 100%;
 }
 
 .section-content {
     width: 100%;
-    padding: $size-4 $size-5;
+    padding: $space-4 $space-5;
     border: solid 1px transparent;
     border-radius: 12px;
     backdrop-filter: blur(2px);
@@ -394,7 +394,7 @@ li {
 }
 
 .section-header {
-    padding-left: $size-1;
+    padding-left: $space-1;
     font-weight: 600;
     letter-spacing: 1px;
 
@@ -407,15 +407,15 @@ li {
 .segment-details {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: $space-1;
 }
 
 .section-segment {
-    padding: $size-1 0 0;
+    padding: $space-1 0 0;
 
     & + & {
-        padding-top: $size-3;
-        margin-top: $size-2;
+        padding-top: $space-3;
+        margin-top: $space-2;
         border-top: solid 1px transparent;
 
         @include theme-dark {
@@ -428,7 +428,7 @@ li {
     }
 
     &-skills {
-        gap: $size-1;
+        gap: $space-1;
 
         p {
             line-height: 2ch;
@@ -456,7 +456,7 @@ li {
 .segment-header {
     display: flex;
     flex-wrap: wrap-reverse;
-    gap: $size-2;
+    gap: $space-2;
     justify-content: space-between;
 }
 
@@ -464,13 +464,13 @@ li {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin-right: $size-5;
+    margin-right: $space-5;
     font-size: 1.3em;
     font-weight: 600;
     line-height: 1.25;
 
     @include bp-custom-min(489) {
-        gap: $size-1;
+        gap: $space-1;
     }
 
     &-projects {
@@ -492,7 +492,7 @@ li {
 
 .segment-dates {
     display: flex;
-    gap: $size-2;
+    gap: $space-2;
     align-items: center;
     margin-left: auto;
     font-size: 0.9em;
@@ -504,7 +504,7 @@ li {
 
     :deep(svg) {
         height: 1em;
-        margin-bottom: 4px;
+        margin-bottom: $space-1;
         stroke: $color-text-primary;
         will-change: opacity;
 
@@ -521,7 +521,7 @@ li {
 }
 
 .segment-info {
-    padding-right: $size-2;
-    padding-left: $size-5;
+    padding-right: $space-2;
+    padding-left: $space-5;
 }
 </style>
