@@ -489,7 +489,7 @@ const clearStatus = () => {
 
     .contact-links {
         display: flex;
-        gap: $space-1;
+        gap: $space-2;
         font-size: 1.8em;
 
         a :deep(button) {
