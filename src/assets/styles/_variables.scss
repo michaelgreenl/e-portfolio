@@ -147,6 +147,14 @@ $space-32: 8rem;
 $space-page-gutter: clamp($space-4, 4vw, $space-12);
 $space-page-section: clamp($space-12, 8vw, $space-24);
 
+// Radius
+$radius-sm: 0.5rem;
+$radius-md: 0.75rem;
+$radius-lg: 1rem;
+$radius-xl: 1.25rem;
+$radius-pill: 999px;
+$radius-round: 50%;
+
 // Relative component sizes
 $size-1: 0.25em;
 $size-2: 0.5em;

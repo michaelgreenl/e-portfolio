@@ -171,7 +171,7 @@ const tools = {
     gap: $space-2;
     height: 1em;
     padding: $space-3 $space-4;
-    border-radius: 7px;
+    border-radius: $radius-sm;
 }
 
 .icon {

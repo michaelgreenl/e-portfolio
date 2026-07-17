@@ -310,7 +310,7 @@ p {
     @media (hover: hover) and (pointer: fine) {
         &:hover,
         &:active {
-            border-radius: 12px;
+            border-radius: $radius-md;
             box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
             backdrop-filter: blur(2px);
             transform: scale(1.01) !important;
@@ -361,7 +361,7 @@ p {
             border: solid 1px #cdd0d3 !important;
         }
 
-        border-radius: 12px;
+        border-radius: $radius-md;
     }
 }
 
@@ -479,7 +479,7 @@ $inset-width: 12px;
 .tool-chips-container {
     position: relative;
     margin-top: $space-2;
-    border-radius: 8px;
+    border-radius: $radius-sm;
 
     &::before,
     &::after {
@@ -586,7 +586,7 @@ $inset-width: 12px;
     max-width: 50em;
     aspect-ratio: 16 / 9;
     margin: $space-3 auto;
-    border-radius: 12px;
+    border-radius: $radius-md;
 
     @include bp-xsm-phone {
         width: 95%;
@@ -614,7 +614,6 @@ $inset-width: 12px;
 :deep(.see-more) {
     gap: $space-2;
     border-width: 1px;
-    border-radius: 7px;
 
     @include bp-md-tablet {
         flex-shrink: 0;

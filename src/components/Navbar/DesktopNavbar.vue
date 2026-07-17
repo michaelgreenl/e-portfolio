@@ -41,7 +41,7 @@ const routeStore = useRouteStore();
     font-size: 0.85em;
     background-color: transparent;
     border: 0;
-    border-radius: $size-3;
+    border-radius: $radius-md;
     opacity: 0;
     transform: translateX(-50px) scaleX(0.5);
 
@@ -62,7 +62,7 @@ const routeStore = useRouteStore();
         width: 0;
         height: 1px;
         content: '';
-        border-radius: $size-4;
+        border-radius: $radius-pill;
         transition: width 0.15s ease-in-out;
 
         @include theme-dark {

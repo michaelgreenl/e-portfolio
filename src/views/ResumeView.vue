@@ -335,7 +335,7 @@ li {
     :deep(button.primary) {
         gap: $space-2 !important;
         min-height: 2.75em;
-        border-radius: 10px;
+        border-radius: $radius-md;
 
         span {
             display: none;
@@ -369,7 +369,7 @@ li {
     width: 100%;
     padding: $space-4 $space-5;
     border: solid 1px transparent;
-    border-radius: 12px;
+    border-radius: $radius-md;
     backdrop-filter: blur(2px);
     transition:
         background-color 0.15s ease-in-out,

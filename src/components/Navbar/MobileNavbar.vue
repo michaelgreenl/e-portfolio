@@ -248,7 +248,7 @@ const navMobileRouteTo = (key) => {
     margin: 0 auto;
     color: $color-accent;
     background-color: color-mix(in srgb, $color-bg-secondary 60%, transparent);
-    border-radius: $size-4;
+    border-radius: $radius-lg;
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 46%) 30%, transparent),
         inset 0 0 0 1px color-mix(in srgb, darken-color($color-bg-secondary, 12%) 22%, transparent),
@@ -282,7 +282,7 @@ const navMobileRouteTo = (key) => {
         position: absolute;
         inset: 0 -0.2em;
         content: '';
-        border-radius: $size-3;
+        border-radius: $radius-md;
         box-shadow:
             inset 0 1px 0 color-mix(in srgb, lighten-color($color-bg-secondary, 42%) 30%, transparent),
             inset 0 -1px 0 color-mix(in srgb, darken-color($color-bg-secondary, 22%) 36%, transparent),
@@ -310,7 +310,7 @@ const navMobileRouteTo = (key) => {
     color: $color-accent;
     background-color: transparent;
     border: 0;
-    border-radius: $size-4;
+    border-radius: $radius-lg;
 
     @include bp-xsm-phone {
         gap: 0;

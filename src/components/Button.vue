@@ -41,7 +41,7 @@ button {
         gap: $space-1;
         padding: $space-2 $space-4;
         letter-spacing: 0.1ch;
-        border-radius: 12px;
+        border-radius: $radius-md;
         transition: transform 0.3s ease;
 
         .icon {

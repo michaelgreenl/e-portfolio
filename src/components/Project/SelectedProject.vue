@@ -141,7 +141,7 @@ p {
     outline: 0;
     background: transparent;
     border: 0;
-    border-radius: 100%;
+    border-radius: $radius-round;
 
     @include bp-xl-desktop {
         top: $space-4;
@@ -186,7 +186,7 @@ p {
     margin: $space-8 0;
     overflow-y: auto;
     border: 1px solid rgb(255 255 255 / 12%);
-    border-radius: 20px;
+    border-radius: $radius-xl;
     box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
 
     @include theme-dark {
@@ -263,7 +263,7 @@ p {
 .demo-video {
     align-self: center;
     width: 45%;
-    border-radius: 12px;
+    border-radius: $radius-md;
 }
 
 .project-footer {
