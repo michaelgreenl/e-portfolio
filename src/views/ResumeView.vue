@@ -346,7 +346,7 @@ li {
         }
 
         svg {
-            height: 1.35em;
+            height: 1.2em;
         }
     }
 }

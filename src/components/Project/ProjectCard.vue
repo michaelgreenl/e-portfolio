@@ -355,6 +355,10 @@ p {
     margin-top: $space-1;
     font-size: 1.3em;
 
+    @include bp-sm-phone {
+        font-size: 1.4em;
+    }
+
     @include bp-md-tablet {
         flex-wrap: nowrap;
         padding-top: $space-3;
@@ -362,8 +366,17 @@ p {
         border-top: solid 1px $color-text-muted;
     }
 
-    @include bp-sm-phone {
-        font-size: 1.4em;
+    :deep(.see-more) {
+        gap: 0.4rem;
+
+        .icon {
+            height: 1.5em !important;
+
+            @include bp-md-tablet {
+                height: 1.2em !important;
+                margin-left: 0.1rem;
+            }
+        }
     }
 }
 
