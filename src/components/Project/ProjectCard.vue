@@ -83,7 +83,9 @@ function measureVisibleTools() {
 
     const availableWidth = listEl.clientWidth;
     const gap = Number.parseFloat(getComputedStyle(listEl).columnGap) || 0;
+    listEl.classList.add('is-measuring');
     const chipWidths = chipElements.map((chip) => chip.getBoundingClientRect().width);
+    listEl.classList.remove('is-measuring');
     const allChipsWidth = chipWidths.reduce((total, width) => total + width, 0) + gap * (chipWidths.length - 1);
 
     let nextVisibleCount = chipWidths.length;
@@ -550,8 +552,7 @@ p {
 
 .card-tool-chips {
     position: relative;
-    gap: $space-4;
-    padding-bottom: $space-2;
+    gap: $space-2;
     overflow: hidden;
     font-size: 1.1em;
 
@@ -559,17 +560,25 @@ p {
         max-width: none !important;
     }
 
+    @include bp-xsm-phone {
+        gap: $space-3;
+    }
+
     @include bp-sm-phone {
         font-size: 1.3em;
     }
 
     @include bp-md-tablet {
-        height: $size-8;
+        gap: $space-4;
     }
 
     .chip {
-        flex: 0 0 auto;
+        flex: 1 0 auto;
         font-size: 1.2em;
+    }
+
+    &.is-measuring .chip {
+        flex-grow: 0;
     }
 
     .is-hidden {
@@ -583,14 +592,13 @@ p {
     @include flex-center-all;
 
     flex: 0 0 auto;
-    height: 1em;
+    height: 1.8em;
     padding: $space-3 $space-4;
     font-family: $secondary-font-stack;
     font-size: 1.2em;
     color: $color-text-primary;
     white-space: nowrap;
     background-color: color-mix(in srgb, $color-primary 18%, transparent);
-    border: 1px solid color-mix(in srgb, $color-primary 24%, transparent);
     border-radius: $radius-sm;
 }
 

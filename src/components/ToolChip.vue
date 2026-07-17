@@ -169,7 +169,7 @@ const tools = {
     @include flex-center-all;
 
     gap: $space-2;
-    height: 1em;
+    height: 1.8em;
     padding: $space-3 $space-4;
     border-radius: $radius-sm;
 }
