@@ -367,14 +367,25 @@ p {
     }
 
     :deep(.see-more) {
-        gap: 0.4rem;
-
         .icon {
-            height: 1.5em !important;
+            height: 1.2em !important;
 
             @include bp-md-tablet {
-                height: 1.2em !important;
-                margin-left: 0.1rem;
+                height: 1.1em !important;
+                margin-bottom: 0.1rem;
+            }
+        }
+
+        @include theme-light {
+            gap: 0.4rem;
+
+            .icon {
+                height: 1.4em !important;
+
+                @include bp-md-tablet {
+                    height: 1.1em !important;
+                    margin: 0 0 0.1rem 0.1rem;
+                }
             }
         }
     }
