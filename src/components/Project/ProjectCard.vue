@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, useTemplateRef, watch, nextTick } from 'vue';
-import { useElementBounding, useWindowSize } from '@vueuse/core';
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
+import { useResizeObserver } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { useGsap } from '@/composables/useGsap.js';
 import { projectAnimations } from '@/animations/page/projects.js';
@@ -58,28 +58,79 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 const cardEl = ref(null);
 const { registerAnim } = useGsap(cardEl);
 const toolChipsContainer = useTemplateRef('toolChipsContainer');
+const toolChipList = useTemplateRef('toolChipList');
+const toolChips = useTemplateRef('toolChips');
+const toolOverflow = useTemplateRef('toolOverflow');
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
+const visibleToolCount = shallowRef(props.project.stack.length);
+
+const hiddenToolCount = computed(() => props.project.stack.length - visibleToolCount.value);
+const hiddenToolsLabel = computed(() => props.project.stack.slice(visibleToolCount.value).join(', '));
+
+let toolMeasurementFrame;
+
+function getToolChipElements() {
+    return (toolChips.value ?? []).map((chip) => chip?.$el ?? chip).filter((chip) => chip instanceof HTMLElement);
+}
+
+function measureVisibleTools() {
+    const listEl = toolChipList.value;
+    const overflowEl = toolOverflow.value;
+    const chipElements = getToolChipElements();
+
+    if (!listEl || !overflowEl || chipElements.length === 0) return;
+
+    const availableWidth = listEl.clientWidth;
+    const gap = Number.parseFloat(getComputedStyle(listEl).columnGap) || 0;
+    const chipWidths = chipElements.map((chip) => chip.getBoundingClientRect().width);
+    const allChipsWidth = chipWidths.reduce((total, width) => total + width, 0) + gap * (chipWidths.length - 1);
+
+    let nextVisibleCount = chipWidths.length;
+
+    if (allChipsWidth > availableWidth) {
+        const overflowWidth = overflowEl.getBoundingClientRect().width;
+        let usedWidth = overflowWidth;
+
+        nextVisibleCount = 0;
+        chipWidths.some((width) => {
+            const nextWidth = usedWidth + gap + width;
+
+            if (nextWidth > availableWidth) return true;
+
+            usedWidth = nextWidth;
+            nextVisibleCount += 1;
+            return false;
+        });
+
+        nextVisibleCount = Math.max(nextVisibleCount, 1);
+    }
+
+    if (visibleToolCount.value !== nextVisibleCount) {
+        visibleToolCount.value = nextVisibleCount;
+        nextTick(scheduleVisibleToolMeasurement);
+    }
+}
+
+function scheduleVisibleToolMeasurement() {
+    cancelAnimationFrame(toolMeasurementFrame);
+    toolMeasurementFrame = requestAnimationFrame(measureVisibleTools);
+}
+
+useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
+
+onMounted(async () => {
+    await nextTick();
+    await document.fonts?.ready;
+    scheduleVisibleToolMeasurement();
+});
+
+onUnmounted(() => cancelAnimationFrame(toolMeasurementFrame));
 
 const anims = {
     showSelectedProjectDetails: registerAnim(projectAnimations.showSelectedProjectDetails),
     hideSelectedProjectDetails: registerAnim(projectAnimations.hideSelectedProjectDetails),
 };
-
-const { top: toolChipTop } = useElementBounding(toolChipsContainer);
-const { height: viewportHeight } = useWindowSize();
-
-const toolChipsYValue = computed(() => {
-    if (!toolChipsContainer.value) return undefined;
-
-    if (toolChipTop.value <= viewportHeight.value * 0.45) {
-        return 'top-third';
-    } else if (toolChipTop.value <= viewportHeight.value * 0.65) {
-        return 'middle-third';
-    }
-
-    return undefined;
-});
 
 const shouldSkipSelectedDetailsAnimation = () =>
     bp.isLaptop.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -195,9 +246,27 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div ref="toolChipsContainer" class="tool-chips-container" :class="`${toolChipsYValue}`">
-                <div class="card-tool-chips">
-                    <ToolChip v-for="tool in project.stack" :key="tool" :tool="tool" class="chip" />
+            <div ref="toolChipsContainer" class="tool-chips-container">
+                <div ref="toolChipList" class="card-tool-chips">
+                    <ToolChip
+                        v-for="(tool, index) in project.stack"
+                        ref="toolChips"
+                        :key="tool"
+                        :tool="tool"
+                        class="chip"
+                        :class="{ 'is-hidden': index >= visibleToolCount }"
+                        :aria-hidden="index >= visibleToolCount"
+                    />
+
+                    <span
+                        ref="toolOverflow"
+                        class="tool-overflow"
+                        :class="{ 'is-hidden': hiddenToolCount === 0 }"
+                        :aria-label="`${hiddenToolCount} more tools: ${hiddenToolsLabel}`"
+                        :title="hiddenToolsLabel"
+                    >
+                        +{{ hiddenToolCount }}
+                    </span>
                 </div>
             </div>
 
@@ -243,7 +312,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     @click.stop="projectSelected ? closeProject() : openProject()"
                     :text="`See ${projectSelected ? 'Less' : 'More'}`"
                     :iconRight="ArrowIcon"
-                            preset="glass"
+                    preset="glass"
                 />
                 <Button
                     v-else
@@ -452,95 +521,20 @@ p {
     width: 100%;
 }
 
-$inset-width: 12px;
-
 .tool-chips-container {
-    position: relative;
     margin-top: $space-2;
     border-radius: $radius-sm;
-
-    &::before,
-    &::after {
-        background-color: #272c3099;
-
-        @include bp-md-tablet {
-            display: none;
-        }
-
-        @include theme-light {
-            background-color: #dee2e699;
-        }
-    }
-
-    &::before {
-        position: absolute;
-        top: 0;
-        bottom: 3px;
-        left: -1px; // account for coverage when card's scale increases on hover
-        z-index: 100;
-        width: $inset-width;
-        content: '';
-        mask-image: linear-gradient(-90deg, transparent, #000);
-    }
-
-    &::after {
-        position: absolute;
-        top: 0;
-        right: -1px; // account for coverage when card's scale increases on hover
-        bottom: 3px;
-        z-index: 100;
-        width: $inset-width;
-        content: '';
-        mask-image: linear-gradient(90deg, transparent, #000);
-    }
-
-    @include theme-dark {
-        &.top-third {
-            &::before,
-            &::after {
-                background-color: #2e363b99;
-            }
-        }
-
-        &.middle-third {
-            &::before,
-            &::after {
-                background-color: #2d323699;
-            }
-        }
-    }
-
-    @include theme-light {
-        &.top-third {
-            &::before,
-            &::after {
-                background-color: #d7dde385;
-            }
-        }
-    }
 }
 
 .card-tool-chips {
     position: relative;
     gap: $space-4;
     padding-bottom: $space-2;
-    overflow: scroll hidden;
+    overflow: hidden;
     font-size: 1.1em;
 
     :deep(.chip-container) {
         max-width: none !important;
-
-        &:first-child {
-            margin-left: calc($inset-width - 4px);
-        }
-
-        &:last-child {
-            margin-right: calc($inset-width - 4px);
-        }
-
-        @include bp-md-tablet {
-            margin: 0 !important;
-        }
     }
 
     @include bp-sm-phone {
@@ -548,15 +542,34 @@ $inset-width: 12px;
     }
 
     @include bp-md-tablet {
-        flex-wrap: wrap;
         height: $size-8;
-        overflow: hidden;
     }
 
     .chip {
-        flex: 1;
+        flex: 0 0 auto;
         font-size: 1.2em;
     }
+
+    .is-hidden {
+        position: absolute;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+.tool-overflow {
+    @include flex-center-all;
+
+    flex: 0 0 auto;
+    height: 1em;
+    padding: $space-3 $space-4;
+    font-family: $secondary-font-stack;
+    font-size: 1.2em;
+    color: $color-text-primary;
+    white-space: nowrap;
+    background-color: color-mix(in srgb, $color-primary 18%, transparent);
+    border: 1px solid color-mix(in srgb, $color-primary 24%, transparent);
+    border-radius: $radius-sm;
 }
 
 .demo-video {
