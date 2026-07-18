@@ -63,6 +63,7 @@ const cardEl = ref(null);
 const { registerAnim } = useGsap(cardEl);
 const toolChipList = useTemplateRef('toolChipList');
 const toolOverflow = useTemplateRef('toolOverflow');
+const toolOverflowMeasure = useTemplateRef('toolOverflowMeasure');
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
@@ -75,9 +76,58 @@ const isMobileToolRowRevealed = computed(() => toolsRevealed.value && hiddenTool
 const toolListId = `${props.project.slug}-tool-list`;
 
 let toolMeasurementFrame;
+let isUnmounted = false;
 let toolRevealRun = 0;
 let activeToolReveal;
 let toolRevealMaxWidths;
+
+function toPixels(value) {
+    return Number.parseFloat(value) || 0;
+}
+
+function getBorderBoxWidth(element) {
+    const styles = getComputedStyle(element);
+    const width = toPixels(styles.width);
+
+    if (styles.boxSizing === 'border-box') return width;
+
+    return (
+        width +
+        toPixels(styles.paddingLeft) +
+        toPixels(styles.paddingRight) +
+        toPixels(styles.borderLeftWidth) +
+        toPixels(styles.borderRightWidth)
+    );
+}
+
+function getContentBoxWidth(element) {
+    const styles = getComputedStyle(element);
+
+    return (
+        getBorderBoxWidth(element) -
+        toPixels(styles.paddingLeft) -
+        toPixels(styles.paddingRight) -
+        toPixels(styles.borderLeftWidth) -
+        toPixels(styles.borderRightWidth)
+    );
+}
+
+function getNaturalToolWidths(listEl) {
+    const chipElements = [...listEl.querySelectorAll(':scope > .chip')];
+
+    listEl.classList.add('is-measuring');
+
+    try {
+        return chipElements.map(getBorderBoxWidth);
+    } finally {
+        listEl.classList.remove('is-measuring');
+    }
+}
+
+function getOverflowWidth(overflowMeasureEl, hiddenCount) {
+    overflowMeasureEl.textContent = `+${hiddenCount}`;
+    return getBorderBoxWidth(overflowMeasureEl);
+}
 
 function getToolChipElements() {
     return Array.from(toolChipList.value?.querySelectorAll(':scope > .chip') ?? []);
@@ -239,7 +289,7 @@ function onToolRowKeydown(event) {
     listEl.scrollLeft += direction * Math.max(listEl.clientWidth / 2, 48);
 }
 
-useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
+useResizeObserver(toolChipList, scheduleVisibleToolMeasurement);
 
 onMounted(async () => {
     await nextTick();
@@ -253,8 +303,10 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+    isUnmounted = true;
     toolRevealRun += 1;
     cancelAnimationFrame(toolMeasurementFrame);
+    document.fonts?.removeEventListener('loadingdone', scheduleVisibleToolMeasurement);
 });
 
 const anims = {
@@ -385,7 +437,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div ref="toolChipsContainer" class="tool-chips-container">
+            <div class="tool-chips-container">
                 <div
                     :id="toolListId"
                     ref="toolChipList"
@@ -790,7 +842,17 @@ p {
         font-size: 1.2em;
     }
 
-    &.is-measuring .chip,
+    &.is-measuring {
+        .chip {
+            display: flex;
+            flex: 0 0 auto;
+        }
+
+        .tool-overflow:not(.tool-overflow-measure) {
+            display: none;
+        }
+    }
+
     &.is-scrollable .chip {
         flex-grow: 0;
     }
@@ -839,6 +901,14 @@ p {
         outline: 2px solid $color-primary-light;
         outline-offset: 2px;
     }
+}
+
+.tool-overflow-measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .demo-video {
