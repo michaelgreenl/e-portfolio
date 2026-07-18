@@ -116,7 +116,7 @@ onMounted(() => {
 $hero-tablet-bp: 525;
 
 h1 {
-    padding-bottom: $space-1;
+    padding-bottom: $size-1;
     margin: 0;
     font-size: clamp(4.5em, 21vw, 5.2em);
     line-height: 0.8ch;
@@ -125,7 +125,7 @@ h1 {
         display: flex;
         gap: $space-3;
         max-width: 100vw;
-        padding-bottom: $space-1;
+        padding-bottom: $size-1;
         margin: 0 auto;
         font-size: clamp(4.2em, 13.2vw, 5.2em);
         line-height: 1ch;
@@ -136,6 +136,7 @@ h1 {
     }
 
     .hero-title-1 {
+        display: inherit;
         color: $color-primary-darker;
     }
 
