@@ -3,7 +3,11 @@ import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, useTemplat
 import { useResizeObserver } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { useGsap } from '@/composables/useGsap.js';
-import { projectAnimations } from '@/animations/page/projects.js';
+import {
+    cancelProjectToolChipAnimations,
+    captureProjectToolChipState,
+    projectAnimations,
+} from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
@@ -58,66 +62,30 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 const cardEl = ref(null);
 const { registerAnim } = useGsap(cardEl);
 const toolChipList = useTemplateRef('toolChipList');
-const toolOverflowMeasure = useTemplateRef('toolOverflowMeasure');
+const toolOverflow = useTemplateRef('toolOverflow');
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
+const toolsRevealed = shallowRef(false);
+const toolsRevealing = shallowRef(false);
 
 const hiddenToolCount = computed(() => props.project.stack.length - visibleToolCount.value);
 const hiddenToolsLabel = computed(() => props.project.stack.slice(visibleToolCount.value).join(', '));
+const isMobileToolRowRevealed = computed(() => toolsRevealed.value && hiddenToolCount.value > 0 && !bp.isLaptop.value);
+const toolListId = `${props.project.slug}-tool-list`;
 
 let toolMeasurementFrame;
-let isUnmounted = false;
+let toolRevealRun = 0;
+let activeToolReveal;
+let toolRevealMaxWidths;
 
-function toPixels(value) {
-    return Number.parseFloat(value) || 0;
-}
-
-function getBorderBoxWidth(element) {
-    const styles = getComputedStyle(element);
-    const width = toPixels(styles.width);
-
-    if (styles.boxSizing === 'border-box') return width;
-
-    return (
-        width +
-        toPixels(styles.paddingLeft) +
-        toPixels(styles.paddingRight) +
-        toPixels(styles.borderLeftWidth) +
-        toPixels(styles.borderRightWidth)
-    );
-}
-
-function getContentBoxWidth(element) {
-    const styles = getComputedStyle(element);
-
-    return (
-        getBorderBoxWidth(element) -
-        toPixels(styles.paddingLeft) -
-        toPixels(styles.paddingRight) -
-        toPixels(styles.borderLeftWidth) -
-        toPixels(styles.borderRightWidth)
-    );
-}
-
-function getNaturalToolWidths(listEl) {
-    const chipElements = [...listEl.querySelectorAll(':scope > .chip')];
-
-    listEl.classList.add('is-measuring');
-
-    try {
-        return chipElements.map(getBorderBoxWidth);
-    } finally {
-        listEl.classList.remove('is-measuring');
-    }
-}
-
-function getOverflowWidth(overflowMeasureEl, hiddenCount) {
-    overflowMeasureEl.textContent = `+${hiddenCount}`;
-    return getBorderBoxWidth(overflowMeasureEl);
+function getToolChipElements() {
+    return Array.from(toolChipList.value?.querySelectorAll(':scope > .chip') ?? []);
 }
 
 function measureVisibleTools() {
+    if (toolsRevealing.value) return;
+
     const listEl = toolChipList.value;
     const overflowMeasureEl = toolOverflowMeasure.value;
 
@@ -164,7 +132,114 @@ function scheduleVisibleToolMeasurement() {
     toolMeasurementFrame = requestAnimationFrame(measureVisibleTools);
 }
 
-useResizeObserver(toolChipList, scheduleVisibleToolMeasurement);
+function focusRevealedToolList() {
+    const listEl = toolChipList.value;
+    if (!listEl) return;
+
+    listEl.scrollLeft = 0;
+    listEl.focus({ preventScroll: true });
+}
+
+function finishToolReveal(runId) {
+    if (runId !== toolRevealRun) return;
+
+    activeToolReveal = null;
+    toolRevealMaxWidths = null;
+    toolsRevealing.value = false;
+    scheduleVisibleToolMeasurement();
+}
+
+async function showRevealedTools(runId, initialToolCount) {
+    if (runId !== toolRevealRun) return;
+
+    const initialTargets = getToolChipElements().slice(0, initialToolCount);
+    const flipState = captureProjectToolChipState(initialTargets);
+
+    toolsRevealed.value = true;
+    await nextTick();
+
+    if (runId !== toolRevealRun) return;
+
+    const enteringTargets = getToolChipElements().slice(initialToolCount);
+
+    focusRevealedToolList();
+    activeToolReveal = anims.revealToolRow({
+        enteringTargets,
+        flipState,
+        initialTargets,
+        onComplete: () => finishToolReveal(runId),
+        overflowTarget: toolOverflow.value,
+    });
+}
+
+async function showRevealedToolsWithoutMotion(runId) {
+    toolsRevealed.value = true;
+    await nextTick();
+
+    if (runId !== toolRevealRun) return;
+
+    focusRevealedToolList();
+    finishToolReveal(runId);
+}
+
+function revealTools() {
+    if (bp.isLaptop.value || hiddenToolCount.value === 0 || toolsRevealing.value) return;
+
+    const runId = ++toolRevealRun;
+    const initialToolCount = visibleToolCount.value;
+
+    toolRevealMaxWidths = getToolChipElements().map((chip) => chip.style.maxWidth);
+    toolsRevealing.value = true;
+
+    if (prefersReducedMotion()) {
+        showRevealedToolsWithoutMotion(runId);
+        return;
+    }
+
+    activeToolReveal = anims.hideToolOverflow({
+        onComplete: () => showRevealedTools(runId, initialToolCount),
+        target: toolOverflow.value,
+    });
+}
+
+function resetTools() {
+    toolRevealRun += 1;
+
+    if (activeToolReveal || toolsRevealing.value) {
+        cancelProjectToolChipAnimations({
+            maxWidths: toolRevealMaxWidths,
+            overflowTarget: toolOverflow.value,
+            targets: getToolChipElements(),
+            timeline: activeToolReveal,
+        });
+    }
+
+    activeToolReveal = null;
+    toolRevealMaxWidths = null;
+    toolsRevealed.value = false;
+    toolsRevealing.value = false;
+
+    if (toolChipList.value) toolChipList.value.scrollLeft = 0;
+}
+
+function stopRevealedToolInteraction(event) {
+    if (isMobileToolRowRevealed.value) event.stopPropagation();
+}
+
+function onToolRowKeydown(event) {
+    if (!isMobileToolRowRevealed.value || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+
+    const listEl = toolChipList.value;
+    if (!listEl) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    listEl.scrollLeft += direction * Math.max(listEl.clientWidth / 2, 48);
+}
+
+useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
 
 onMounted(async () => {
     await nextTick();
@@ -178,18 +253,19 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-    isUnmounted = true;
+    toolRevealRun += 1;
     cancelAnimationFrame(toolMeasurementFrame);
-    document.fonts?.removeEventListener('loadingdone', scheduleVisibleToolMeasurement);
 });
 
 const anims = {
+    hideToolOverflow: registerAnim(projectAnimations.hideToolOverflow),
+    revealToolRow: registerAnim(projectAnimations.revealToolRow),
     showSelectedProjectDetails: registerAnim(projectAnimations.showSelectedProjectDetails),
     hideSelectedProjectDetails: registerAnim(projectAnimations.hideSelectedProjectDetails),
 };
 
-const shouldSkipSelectedDetailsAnimation = () =>
-    bp.isLaptop.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const shouldSkipSelectedDetailsAnimation = () => bp.isLaptop.value || prefersReducedMotion();
 
 function onSelectedDetailsEnter(el, done) {
     if (shouldSkipSelectedDetailsAnimation()) {
@@ -260,6 +336,9 @@ function closeProject() {
 
 // ensures window resizing doesn't result in unwanted UI layouts
 watch(bp.isLaptop, (newVal) => {
+    resetTools();
+    nextTick(scheduleVisibleToolMeasurement);
+
     if (projectSelected.value && !newVal) {
         projectSelected.value = false;
         emit('close-selected');
@@ -267,6 +346,10 @@ watch(bp.isLaptop, (newVal) => {
         closeProject();
         projectSelected.value = false;
     }
+});
+
+watch(hiddenToolCount, (count) => {
+    if (count === 0) resetTools();
 });
 
 defineExpose({ openProject, projectSelected, scrollToSelectedCard });
@@ -280,8 +363,8 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
         role="button"
         tabindex="0"
         @click="projectSelected && !bp.isLaptop.value ? undefined : openProject()"
-        @keydown.enter="emit('open-project', project)"
-        @keydown.space.prevent="emit('open-project', project)"
+        @keydown.enter.self="emit('open-project', project)"
+        @keydown.space.self.prevent="emit('open-project', project)"
     >
         <div class="card-body">
             <div class="card-header">
@@ -302,21 +385,60 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div class="tool-chips-container">
-                <div ref="toolChipList" class="card-tool-chips">
+            <div ref="toolChipsContainer" class="tool-chips-container">
+                <div
+                    :id="toolListId"
+                    ref="toolChipList"
+                    class="card-tool-chips"
+                    :class="{
+                        'is-mobile-tool-row': !bp.isLaptop.value,
+                        'is-scrollable': isMobileToolRowRevealed,
+                    }"
+                    :tabindex="isMobileToolRowRevealed ? 0 : undefined"
+                    :role="isMobileToolRowRevealed ? 'region' : undefined"
+                    :aria-label="
+                        isMobileToolRowRevealed
+                            ? `All ${project.stack.length} tools used for ${project.title}. Scroll horizontally.`
+                            : undefined
+                    "
+                    @click="stopRevealedToolInteraction"
+                    @keydown="onToolRowKeydown"
+                >
                     <ToolChip
                         v-for="(tool, index) in project.stack"
                         :key="tool"
                         :tool="tool"
                         class="chip"
-                        :class="{ 'is-hidden': index >= visibleToolCount }"
-                        :aria-hidden="index >= visibleToolCount"
+                        :class="{ 'is-hidden': !isMobileToolRowRevealed && index >= visibleToolCount }"
+                        :aria-hidden="!isMobileToolRowRevealed && index >= visibleToolCount"
                     />
 
+                    <button
+                        v-if="!bp.isLaptop.value"
+                        ref="toolOverflow"
+                        type="button"
+                        class="tool-overflow tool-overflow-button"
+                        :class="{ 'is-hidden': isMobileToolRowRevealed || hiddenToolCount === 0 }"
+                        :aria-hidden="isMobileToolRowRevealed || hiddenToolCount === 0"
+                        :aria-controls="toolListId"
+                        :aria-disabled="toolsRevealing || undefined"
+                        :aria-expanded="toolsRevealing || isMobileToolRowRevealed"
+                        :aria-label="`Show ${hiddenToolCount} more tools: ${hiddenToolsLabel}`"
+                        :title="hiddenToolsLabel"
+                        :tabindex="hiddenToolCount > 0 && !isMobileToolRowRevealed && !toolsRevealing ? 0 : -1"
+                        @click.stop="revealTools"
+                        @keydown.enter.stop.prevent="revealTools"
+                        @keydown.space.stop.prevent="revealTools"
+                    >
+                        +{{ hiddenToolCount }}
+                    </button>
+
                     <span
+                        v-else
                         ref="toolOverflow"
                         class="tool-overflow"
                         :class="{ 'is-hidden': hiddenToolCount === 0 }"
+                        :aria-hidden="hiddenToolCount === 0"
                         :aria-label="`${hiddenToolCount} more tools: ${hiddenToolsLabel}`"
                         :title="hiddenToolsLabel"
                     >
@@ -636,8 +758,8 @@ p {
 }
 
 .tool-chips-container {
+    min-width: 0;
     margin-top: $space-2;
-    border-radius: $radius-sm;
 }
 
 .card-tool-chips {
@@ -647,7 +769,7 @@ p {
     min-width: 0;
     font-size: 1.1em;
 
-    :deep(.chip-container) {
+    &:not(.is-scrollable) :deep(.chip-container) {
         max-width: none !important;
     }
 
@@ -668,14 +790,18 @@ p {
         font-size: 1.2em;
     }
 
-    &.is-measuring {
-        .chip {
-            display: flex;
-            flex: 0 0 auto;
-        }
+    &.is-measuring .chip,
+    &.is-scrollable .chip {
+        flex-grow: 0;
+    }
 
-        .tool-overflow:not(.tool-overflow-measure) {
-            display: none;
+    &.is-scrollable {
+        overflow: auto hidden;
+        overscroll-behavior-x: contain;
+
+        &:focus-visible {
+            outline: 2px solid $color-primary-light;
+            outline-offset: 2px;
         }
     }
 
@@ -689,7 +815,7 @@ p {
 
     flex: 0 0 auto;
     height: 1.8em;
-    padding: $space-3 $space-4;
+    padding: $space-3 $space-3;
     font-family: $secondary-font-stack;
     font-size: 1.2em;
     color: $color-text-primary;
@@ -698,12 +824,21 @@ p {
     border-radius: $radius-sm;
 }
 
-.tool-overflow-measure {
-    position: absolute;
-    top: 0;
-    left: 0;
-    visibility: hidden;
-    pointer-events: none;
+.tool-overflow-button {
+    min-width: 24px;
+    min-height: 24px;
+    appearance: none;
+    cursor: pointer;
+    border: 0;
+
+    @include interactive {
+        background-color: color-mix(in srgb, $color-primary 32%, transparent);
+    }
+
+    &:focus-visible {
+        outline: 2px solid $color-primary-light;
+        outline-offset: 2px;
+    }
 }
 
 .demo-video {
