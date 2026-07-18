@@ -1,6 +1,12 @@
+<script setup>
+import { useId } from 'vue';
+
+const clipPathId = `vitest-clip-${useId()}`;
+</script>
+
 <template>
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 100 100">
-        <g clip-path="url(#a)">
+        <g :clip-path="`url(#${clipPathId})`">
             <path
                 fill="#fcc72b"
                 d="M75.045 31.659 51.138 66.224a2.058 2.058 0 0 1-3.389-.005 2.04 2.04 0 0 1-.352-1.251l.957-19.084-15.447-3.276a2.05 2.05 0 0 1-1.478-1.242 2.03 2.03 0 0 1 .218-1.914L55.554 4.886a2.06 2.06 0 0 1 2.35-.78 2.045 2.045 0 0 1 1.391 2.036l-.956 19.085 15.446 3.275c.33.07.637.22.895.437a2.036 2.036 0 0 1 .365 2.72"
@@ -16,7 +22,7 @@
             />
         </g>
         <defs>
-            <clipPath id="a"><path fill="#fff" d="M0 0h100v100H0z" /></clipPath>
+            <clipPath :id="clipPathId"><path fill="#fff" d="M0 0h100v100H0z" /></clipPath>
         </defs>
     </svg>
 </template>

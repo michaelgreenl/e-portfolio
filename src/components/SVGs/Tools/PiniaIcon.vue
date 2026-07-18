@@ -1,3 +1,10 @@
+<script setup>
+import { useId } from 'vue';
+
+const instanceId = useId();
+const gradientIds = [0, 1, 2, 3].map((index) => `pinia-gradient-${index}-${instanceId}`);
+</script>
+
 <template>
     <div>
         <svg viewBox="0 0 78 100" xmlns="http://www.w3.org/2000/svg">
@@ -5,25 +12,25 @@
                 fill-rule="evenodd"
                 clip-rule="evenodd"
                 d="M33.3188 49.1517C40.0068 42.7795 37.966 34.8985 31.9088 25.3485C25.8515 15.7986 13.6583 12.4011 11.3836 14.5683C9.10885 16.7356 8.60466 32.2308 14.6619 41.7807C20.7191 51.3306 26.6307 55.5238 33.3188 49.1517Z"
-                fill="url(#paint0_linear_790_3026)"
+                :fill="`url(#${gradientIds[0]})`"
             />
             <path
                 fill-rule="evenodd"
                 clip-rule="evenodd"
                 d="M39.1016 50.0337C44.0495 57.8346 50.6642 54.9823 58.8519 47.1814C67.0395 39.3806 70.4345 24.4375 68.7517 21.7843C67.0688 19.1311 54.2803 19.2641 46.0926 27.065C37.905 34.8659 34.1538 42.2329 39.1016 50.0337Z"
-                fill="url(#paint1_linear_790_3026)"
+                :fill="`url(#${gradientIds[1]})`"
             />
             <path
                 fill-rule="evenodd"
                 clip-rule="evenodd"
                 d="M36.3963 45.742C44.6121 46.7508 47.843 39.1607 49.3494 26.8919C50.8558 14.623 44.6459 1.65564 41.8516 1.31254C39.0573 0.969446 29.6696 12.0217 28.1631 24.2905C26.6567 36.5594 28.1806 44.7332 36.3963 45.742Z"
-                fill="url(#paint2_linear_790_3026)"
+                :fill="`url(#${gradientIds[2]})`"
             />
             <path
                 fill-rule="evenodd"
                 clip-rule="evenodd"
                 d="M34.3274 99.9981C51.5526 99.9981 65.522 94.9943 65.522 72.3019C65.522 49.6095 51.5526 30.9883 34.3274 30.9883C17.1021 30.9883 3.14374 49.6095 3.14374 72.3019C3.14374 94.9943 17.1021 99.9981 34.3274 99.9981Z"
-                fill="url(#paint3_linear_790_3026)"
+                :fill="`url(#${gradientIds[3]})`"
             />
             <path
                 d="M50.0828 67.6691C52.5436 67.6691 54.5384 66.7413 54.5384 65.5968C54.5384 64.4522 52.5436 63.5244 50.0828 63.5244C47.6221 63.5244 45.6273 64.4522 45.6273 65.5968C45.6273 66.7413 47.6221 67.6691 50.0828 67.6691Z"
@@ -84,7 +91,7 @@
             <path d="M38.4776 49.3286L28.323 39.174" stroke="#FFC73B" stroke-width="2.2796" stroke-linecap="round" />
             <defs>
                 <linearGradient
-                    id="paint0_linear_790_3026"
+                    :id="gradientIds[0]"
                     x1="3351.04"
                     y1="-2594.67"
                     x2="6120.73"
@@ -95,7 +102,7 @@
                     <stop offset="1" stop-color="#51A256" />
                 </linearGradient>
                 <linearGradient
-                    id="paint1_linear_790_3026"
+                    :id="gradientIds[1]"
                     x1="2682.69"
                     y1="3367.46"
                     x2="-5067.25"
@@ -106,7 +113,7 @@
                     <stop offset="1" stop-color="#51A256" />
                 </linearGradient>
                 <linearGradient
-                    id="paint2_linear_790_3026"
+                    :id="gradientIds[2]"
                     x1="3410.36"
                     y1="414.913"
                     x2="1880"
@@ -117,7 +124,7 @@
                     <stop offset="1" stop-color="#52CE63" />
                 </linearGradient>
                 <linearGradient
-                    id="paint3_linear_790_3026"
+                    :id="gradientIds[3]"
                     x1="10226.6"
                     y1="5782.55"
                     x2="8573.34"
@@ -131,3 +138,10 @@
         </svg>
     </div>
 </template>
+
+<style scoped>
+svg {
+    width: 100%;
+    height: 100%;
+}
+</style>

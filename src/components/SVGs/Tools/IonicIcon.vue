@@ -1,6 +1,12 @@
+<script setup>
+import { useId } from 'vue';
+
+const clipPathId = `ionic-clip-${useId()}`;
+</script>
+
 <template>
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 100 100">
-        <g clip-path="url(#a)">
+        <g :clip-path="`url(#${clipPathId})`">
             <path
                 fill="#3880ff"
                 fill-rule="evenodd"
@@ -9,7 +15,7 @@
             />
         </g>
         <defs>
-            <clipPath id="a"><path fill="#fff" d="M0 0h100v100H0z" /></clipPath>
+            <clipPath :id="clipPathId"><path fill="#fff" d="M0 0h100v100H0z" /></clipPath>
         </defs>
     </svg>
 </template>
