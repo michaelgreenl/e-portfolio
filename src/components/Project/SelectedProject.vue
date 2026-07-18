@@ -179,10 +179,10 @@ p {
     display: flex;
     flex-direction: column;
     gap: $space-2;
-    width: 95vw;
+    width: 98vw;
     max-width: 85em;
     max-height: 95dvh;
-    padding: $space-10 $space-12;
+    padding: $size-9 $size-8;
     margin: $space-8 0;
     overflow-y: auto;
     border: 1px solid rgb(255 255 255 / 12%);
@@ -195,6 +195,10 @@ p {
 
     @include theme-light {
         background: linear-gradient(0deg, #dee2e6ea 40%, #dee2e6aa 60%, #dee2e6ea 90%);
+    }
+
+    @include bp-lg-laptop {
+        padding: $size-10 $size-12;
     }
 }
 
