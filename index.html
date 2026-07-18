@@ -40,6 +40,20 @@
         <title>Michael Green | Full-Stack Developer</title>
 
         <script>
+            (function () {
+                const key = 'THEME';
+                let theme = localStorage.getItem(key);
+
+                if (theme !== 'dark' && theme !== 'light') {
+                    theme = 'dark';
+                    localStorage.setItem(key, theme);
+                }
+
+                document.documentElement.setAttribute('data-theme', theme);
+            })();
+        </script>
+
+        <script>
             (function (location) {
                 if (location.search[1] !== '/') return;
 
