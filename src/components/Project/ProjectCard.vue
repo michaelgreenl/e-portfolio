@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
-import { useResizeObserver } from '@vueuse/core';
+import { useElementBounding, useResizeObserver, useWindowSize } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { useGsap } from '@/composables/useGsap.js';
 import { projectAnimations } from '@/animations/page/projects.js';
@@ -61,12 +61,24 @@ const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const toolChipList = useTemplateRef('toolChipList');
 const toolChips = useTemplateRef('toolChips');
 const toolOverflow = useTemplateRef('toolOverflow');
+const { height: toolChipsHeight, top: toolChipsTop } = useElementBounding(toolChipsContainer, {
+    updateTiming: 'next-frame',
+});
+const { height: viewportHeight } = useWindowSize();
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
+const toolsRevealed = shallowRef(false);
+const hasPreviousTools = shallowRef(false);
+const hasMoreTools = shallowRef(false);
 
 const hiddenToolCount = computed(() => props.project.stack.length - visibleToolCount.value);
 const hiddenToolsLabel = computed(() => props.project.stack.slice(visibleToolCount.value).join(', '));
+const isMobileToolRowRevealed = computed(() => toolsRevealed.value && hiddenToolCount.value > 0 && !bp.isLaptop.value);
+const isToolRowInTopHalf = computed(
+    () => toolChipsHeight.value > 0 && toolChipsTop.value + toolChipsHeight.value / 2 < viewportHeight.value / 2,
+);
+const toolListId = `${props.project.slug}-tool-list`;
 
 let toolMeasurementFrame;
 
@@ -112,11 +124,68 @@ function measureVisibleTools() {
         visibleToolCount.value = nextVisibleCount;
         nextTick(scheduleVisibleToolMeasurement);
     }
+
+    nextTick(updateToolScrollEdges);
 }
 
 function scheduleVisibleToolMeasurement() {
     cancelAnimationFrame(toolMeasurementFrame);
     toolMeasurementFrame = requestAnimationFrame(measureVisibleTools);
+}
+
+function updateToolScrollEdges() {
+    const listEl = toolChipList.value;
+
+    if (!listEl || !isMobileToolRowRevealed.value) {
+        hasPreviousTools.value = false;
+        hasMoreTools.value = false;
+        return;
+    }
+
+    const remainingScroll = listEl.scrollWidth - listEl.clientWidth - listEl.scrollLeft;
+
+    hasPreviousTools.value = listEl.scrollLeft > 1;
+    hasMoreTools.value = remainingScroll > 1;
+}
+
+async function revealTools() {
+    if (bp.isLaptop.value || hiddenToolCount.value === 0) return;
+
+    toolsRevealed.value = true;
+    await nextTick();
+
+    const listEl = toolChipList.value;
+    if (!listEl) return;
+
+    listEl.scrollLeft = 0;
+    updateToolScrollEdges();
+    listEl.focus({ preventScroll: true });
+}
+
+function resetTools() {
+    toolsRevealed.value = false;
+    hasPreviousTools.value = false;
+    hasMoreTools.value = false;
+
+    if (toolChipList.value) toolChipList.value.scrollLeft = 0;
+}
+
+function stopRevealedToolInteraction(event) {
+    if (isMobileToolRowRevealed.value) event.stopPropagation();
+}
+
+function onToolRowKeydown(event) {
+    if (!isMobileToolRowRevealed.value || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+
+    const listEl = toolChipList.value;
+    if (!listEl) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    listEl.scrollLeft += direction * Math.max(listEl.clientWidth / 2, 48);
+    updateToolScrollEdges();
 }
 
 useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
@@ -206,6 +275,9 @@ function closeProject() {
 
 // ensures window resizing doesn't result in unwanted UI layouts
 watch(bp.isLaptop, (newVal) => {
+    resetTools();
+    nextTick(scheduleVisibleToolMeasurement);
+
     if (projectSelected.value && !newVal) {
         projectSelected.value = false;
         emit('close-selected');
@@ -213,6 +285,10 @@ watch(bp.isLaptop, (newVal) => {
         closeProject();
         projectSelected.value = false;
     }
+});
+
+watch(hiddenToolCount, (count) => {
+    if (count === 0) resetTools();
 });
 
 defineExpose({ openProject, projectSelected, scrollToSelectedCard });
@@ -226,8 +302,8 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
         role="button"
         tabindex="0"
         @click="projectSelected && !bp.isLaptop.value ? undefined : openProject()"
-        @keydown.enter="emit('open-project', project)"
-        @keydown.space.prevent="emit('open-project', project)"
+        @keydown.enter.self="emit('open-project', project)"
+        @keydown.space.self.prevent="emit('open-project', project)"
     >
         <div class="card-body">
             <div class="card-header">
@@ -248,22 +324,70 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div ref="toolChipsContainer" class="tool-chips-container">
-                <div ref="toolChipList" class="card-tool-chips">
+            <div
+                ref="toolChipsContainer"
+                class="tool-chips-container"
+                :class="{
+                    'can-scroll-left': isMobileToolRowRevealed && hasPreviousTools,
+                    'can-scroll-right': isMobileToolRowRevealed && hasMoreTools,
+                    'is-in-top-half': isToolRowInTopHalf,
+                }"
+            >
+                <div
+                    :id="toolListId"
+                    ref="toolChipList"
+                    class="card-tool-chips"
+                    :class="{
+                        'has-hidden-tools': hiddenToolCount > 0,
+                        'is-mobile-tool-row': !bp.isLaptop.value,
+                        'is-scrollable': isMobileToolRowRevealed,
+                    }"
+                    :tabindex="isMobileToolRowRevealed ? 0 : undefined"
+                    :role="isMobileToolRowRevealed ? 'region' : undefined"
+                    :aria-label="
+                        isMobileToolRowRevealed
+                            ? `All ${project.stack.length} tools used for ${project.title}. Scroll horizontally.`
+                            : undefined
+                    "
+                    @click="stopRevealedToolInteraction"
+                    @keydown="onToolRowKeydown"
+                    @scroll.passive="updateToolScrollEdges"
+                >
                     <ToolChip
                         v-for="(tool, index) in project.stack"
                         ref="toolChips"
                         :key="tool"
                         :tool="tool"
                         class="chip"
-                        :class="{ 'is-hidden': index >= visibleToolCount }"
-                        :aria-hidden="index >= visibleToolCount"
+                        :class="{ 'is-hidden': !isMobileToolRowRevealed && index >= visibleToolCount }"
+                        :aria-hidden="!isMobileToolRowRevealed && index >= visibleToolCount"
                     />
 
+                    <button
+                        v-if="!bp.isLaptop.value"
+                        ref="toolOverflow"
+                        type="button"
+                        class="tool-overflow tool-overflow-button"
+                        :class="{ 'is-hidden': isMobileToolRowRevealed || hiddenToolCount === 0 }"
+                        :aria-hidden="isMobileToolRowRevealed || hiddenToolCount === 0"
+                        :aria-controls="toolListId"
+                        :aria-expanded="isMobileToolRowRevealed"
+                        :aria-label="`Show ${hiddenToolCount} more tools: ${hiddenToolsLabel}`"
+                        :title="hiddenToolsLabel"
+                        :tabindex="hiddenToolCount > 0 && !isMobileToolRowRevealed ? 0 : -1"
+                        @click.stop="revealTools"
+                        @keydown.enter.stop.prevent="revealTools"
+                        @keydown.space.stop.prevent="revealTools"
+                    >
+                        +{{ hiddenToolCount }}
+                    </button>
+
                     <span
+                        v-else
                         ref="toolOverflow"
                         class="tool-overflow"
                         :class="{ 'is-hidden': hiddenToolCount === 0 }"
+                        :aria-hidden="hiddenToolCount === 0"
                         :aria-label="`${hiddenToolCount} more tools: ${hiddenToolsLabel}`"
                         :title="hiddenToolsLabel"
                     >
@@ -577,8 +701,46 @@ p {
 }
 
 .tool-chips-container {
+    --tool-fade-color: #{$color-bg-primary};
+
+    position: relative;
+    min-width: 0;
     margin-top: $space-2;
     border-radius: $radius-sm;
+
+    &::before,
+    &::after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        z-index: 1;
+        width: $space-8;
+        pointer-events: none;
+        content: '';
+    }
+
+    &::before {
+        left: 0;
+        background: linear-gradient(90deg, var(--tool-fade-color), transparent);
+    }
+
+    &::after {
+        right: 0;
+        background: linear-gradient(90deg, transparent, var(--tool-fade-color));
+    }
+
+    &:not(.can-scroll-left)::before,
+    &:not(.can-scroll-right)::after {
+        visibility: hidden;
+    }
+
+    @include theme-dark {
+        --tool-fade-color: #272c30;
+
+        &.is-in-top-half {
+            --tool-fade-color: #33383f;
+        }
+    }
 }
 
 .card-tool-chips {
@@ -608,8 +770,23 @@ p {
         font-size: 1.2em;
     }
 
-    &.is-measuring .chip {
+    &.is-measuring .chip,
+    &.is-mobile-tool-row.has-hidden-tools .chip {
         flex-grow: 0;
+    }
+
+    &.is-mobile-tool-row.has-hidden-tools:not(.is-scrollable) .tool-overflow-button {
+        margin-inline-start: auto;
+    }
+
+    &.is-scrollable {
+        overflow: auto hidden;
+        overscroll-behavior-x: contain;
+
+        &:focus-visible {
+            outline: 2px solid $color-primary-light;
+            outline-offset: 2px;
+        }
     }
 
     .is-hidden {
@@ -624,13 +801,30 @@ p {
 
     flex: 0 0 auto;
     height: 1.8em;
-    padding: $space-3 $space-4;
+    padding: $space-3 $space-3;
     font-family: $secondary-font-stack;
     font-size: 1.2em;
     color: $color-text-primary;
     white-space: nowrap;
     background-color: color-mix(in srgb, $color-primary 18%, transparent);
     border-radius: $radius-sm;
+}
+
+.tool-overflow-button {
+    min-width: 24px;
+    min-height: 24px;
+    appearance: none;
+    cursor: pointer;
+    border: 0;
+
+    @include interactive {
+        background-color: color-mix(in srgb, $color-primary 32%, transparent);
+    }
+
+    &:focus-visible {
+        outline: 2px solid $color-primary-light;
+        outline-offset: 2px;
+    }
 }
 
 .demo-video {
