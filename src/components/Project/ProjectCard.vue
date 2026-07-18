@@ -1,6 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
-import { useElementBounding, useResizeObserver, useWindowSize } from '@vueuse/core';
+import { useResizeObserver } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { useGsap } from '@/composables/useGsap.js';
 import {
@@ -64,24 +64,15 @@ const { registerAnim } = useGsap(cardEl);
 const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const toolChipList = useTemplateRef('toolChipList');
 const toolOverflow = useTemplateRef('toolOverflow');
-const { height: toolChipsHeight, top: toolChipsTop } = useElementBounding(toolChipsContainer, {
-    updateTiming: 'next-frame',
-});
-const { height: viewportHeight } = useWindowSize();
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
 const toolsRevealed = shallowRef(false);
 const toolsRevealing = shallowRef(false);
-const hasPreviousTools = shallowRef(false);
-const hasMoreTools = shallowRef(false);
 
 const hiddenToolCount = computed(() => props.project.stack.length - visibleToolCount.value);
 const hiddenToolsLabel = computed(() => props.project.stack.slice(visibleToolCount.value).join(', '));
 const isMobileToolRowRevealed = computed(() => toolsRevealed.value && hiddenToolCount.value > 0 && !bp.isLaptop.value);
-const isToolRowInTopHalf = computed(
-    () => toolChipsHeight.value > 0 && toolChipsTop.value + toolChipsHeight.value / 2 < viewportHeight.value / 2,
-);
 const toolListId = `${props.project.slug}-tool-list`;
 
 let toolMeasurementFrame;
@@ -133,8 +124,6 @@ function measureVisibleTools() {
         visibleToolCount.value = nextVisibleCount;
         nextTick(scheduleVisibleToolMeasurement);
     }
-
-    nextTick(updateToolScrollEdges);
 }
 
 function scheduleVisibleToolMeasurement() {
@@ -142,27 +131,11 @@ function scheduleVisibleToolMeasurement() {
     toolMeasurementFrame = requestAnimationFrame(measureVisibleTools);
 }
 
-function updateToolScrollEdges() {
-    const listEl = toolChipList.value;
-
-    if (!listEl || !isMobileToolRowRevealed.value) {
-        hasPreviousTools.value = false;
-        hasMoreTools.value = false;
-        return;
-    }
-
-    const remainingScroll = listEl.scrollWidth - listEl.clientWidth - listEl.scrollLeft;
-
-    hasPreviousTools.value = listEl.scrollLeft > 1;
-    hasMoreTools.value = remainingScroll > 1;
-}
-
 function focusRevealedToolList() {
     const listEl = toolChipList.value;
     if (!listEl) return;
 
     listEl.scrollLeft = 0;
-    updateToolScrollEdges();
     listEl.focus({ preventScroll: true });
 }
 
@@ -172,7 +145,6 @@ function finishToolReveal(runId) {
     activeToolReveal = null;
     toolRevealMaxWidths = null;
     toolsRevealing.value = false;
-    updateToolScrollEdges();
     scheduleVisibleToolMeasurement();
 }
 
@@ -245,8 +217,6 @@ function resetTools() {
     toolRevealMaxWidths = null;
     toolsRevealed.value = false;
     toolsRevealing.value = false;
-    hasPreviousTools.value = false;
-    hasMoreTools.value = false;
 
     if (toolChipList.value) toolChipList.value.scrollLeft = 0;
 }
@@ -266,7 +236,6 @@ function onToolRowKeydown(event) {
 
     const direction = event.key === 'ArrowRight' ? 1 : -1;
     listEl.scrollLeft += direction * Math.max(listEl.clientWidth / 2, 48);
-    updateToolScrollEdges();
 }
 
 useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
@@ -410,15 +379,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div
-                ref="toolChipsContainer"
-                class="tool-chips-container"
-                :class="{
-                    'can-scroll-left': isMobileToolRowRevealed && hasPreviousTools,
-                    'can-scroll-right': isMobileToolRowRevealed && hasMoreTools,
-                    'is-in-top-half': isToolRowInTopHalf,
-                }"
-            >
+            <div ref="toolChipsContainer" class="tool-chips-container">
                 <div
                     :id="toolListId"
                     ref="toolChipList"
@@ -436,7 +397,6 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     "
                     @click="stopRevealedToolInteraction"
                     @keydown="onToolRowKeydown"
-                    @scroll.passive="updateToolScrollEdges"
                 >
                     <ToolChip
                         v-for="(tool, index) in project.stack"
@@ -786,46 +746,8 @@ p {
 }
 
 .tool-chips-container {
-    --tool-fade-color: #{$color-bg-primary};
-
-    position: relative;
     min-width: 0;
     margin-top: $space-2;
-    border-radius: $radius-sm;
-
-    &::before,
-    &::after {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        z-index: 1;
-        width: $space-8;
-        pointer-events: none;
-        content: '';
-    }
-
-    &::before {
-        left: 0;
-        background: linear-gradient(90deg, var(--tool-fade-color), transparent);
-    }
-
-    &::after {
-        right: 0;
-        background: linear-gradient(90deg, transparent, var(--tool-fade-color));
-    }
-
-    &:not(.can-scroll-left)::before,
-    &:not(.can-scroll-right)::after {
-        visibility: hidden;
-    }
-
-    @include theme-dark {
-        --tool-fade-color: #272c30;
-
-        &.is-in-top-half {
-            --tool-fade-color: #33383f;
-        }
-    }
 }
 
 .card-tool-chips {

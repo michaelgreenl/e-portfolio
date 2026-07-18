@@ -67,14 +67,18 @@ export const projectAnimations = {
         );
 
         if (enteringTargets.length) {
-            tl.to(enteringTargets, {
-                autoAlpha: 1,
-                clearProps: 'opacity,visibility,transform',
-                duration: reducedMotion ? 0.01 : TIMING.duration.fast,
-                ease: TIMING.easing.smooth,
-                stagger: reducedMotion ? 0 : TIMING.stagger.instant,
-                xPercent: 0,
-            });
+            tl.to(
+                enteringTargets,
+                {
+                    autoAlpha: 1,
+                    clearProps: 'opacity,visibility,transform',
+                    duration: reducedMotion ? 0.01 : TIMING.duration.fast,
+                    ease: TIMING.easing.smooth,
+                    stagger: reducedMotion ? 0 : TIMING.stagger.instant,
+                    xPercent: 0,
+                },
+                '<',
+            );
         }
     },
 
