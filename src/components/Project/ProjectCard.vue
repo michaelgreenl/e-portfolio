@@ -57,10 +57,8 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 
 const cardEl = ref(null);
 const { registerAnim } = useGsap(cardEl);
-const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const toolChipList = useTemplateRef('toolChipList');
-const toolChips = useTemplateRef('toolChips');
-const toolOverflow = useTemplateRef('toolOverflow');
+const toolOverflowMeasure = useTemplateRef('toolOverflowMeasure');
 const projectSelected = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
@@ -69,65 +67,121 @@ const hiddenToolCount = computed(() => props.project.stack.length - visibleToolC
 const hiddenToolsLabel = computed(() => props.project.stack.slice(visibleToolCount.value).join(', '));
 
 let toolMeasurementFrame;
+let isUnmounted = false;
 
-function getToolChipElements() {
-    return (toolChips.value ?? []).map((chip) => chip?.$el ?? chip).filter((chip) => chip instanceof HTMLElement);
+function toPixels(value) {
+    return Number.parseFloat(value) || 0;
+}
+
+function getBorderBoxWidth(element) {
+    const styles = getComputedStyle(element);
+    const width = toPixels(styles.width);
+
+    if (styles.boxSizing === 'border-box') return width;
+
+    return (
+        width +
+        toPixels(styles.paddingLeft) +
+        toPixels(styles.paddingRight) +
+        toPixels(styles.borderLeftWidth) +
+        toPixels(styles.borderRightWidth)
+    );
+}
+
+function getContentBoxWidth(element) {
+    const styles = getComputedStyle(element);
+
+    return (
+        getBorderBoxWidth(element) -
+        toPixels(styles.paddingLeft) -
+        toPixels(styles.paddingRight) -
+        toPixels(styles.borderLeftWidth) -
+        toPixels(styles.borderRightWidth)
+    );
+}
+
+function getNaturalToolWidths(listEl) {
+    const chipElements = [...listEl.querySelectorAll(':scope > .chip')];
+
+    listEl.classList.add('is-measuring');
+
+    try {
+        return chipElements.map(getBorderBoxWidth);
+    } finally {
+        listEl.classList.remove('is-measuring');
+    }
+}
+
+function getOverflowWidth(overflowMeasureEl, hiddenCount) {
+    overflowMeasureEl.textContent = `+${hiddenCount}`;
+    return getBorderBoxWidth(overflowMeasureEl);
 }
 
 function measureVisibleTools() {
     const listEl = toolChipList.value;
-    const overflowEl = toolOverflow.value;
-    const chipElements = getToolChipElements();
+    const overflowMeasureEl = toolOverflowMeasure.value;
 
-    if (!listEl || !overflowEl || chipElements.length === 0) return;
+    if (!listEl || !overflowMeasureEl) return;
 
-    const availableWidth = listEl.clientWidth;
+    const availableWidth = getContentBoxWidth(listEl);
     const gap = Number.parseFloat(getComputedStyle(listEl).columnGap) || 0;
-    listEl.classList.add('is-measuring');
-    const chipWidths = chipElements.map((chip) => chip.getBoundingClientRect().width);
-    listEl.classList.remove('is-measuring');
-    const allChipsWidth = chipWidths.reduce((total, width) => total + width, 0) + gap * (chipWidths.length - 1);
+    const chipWidths = getNaturalToolWidths(listEl);
 
+    if (availableWidth <= 0 || chipWidths.length === 0) return;
+
+    const allChipsWidth = chipWidths.reduce((total, width) => total + width, 0) + gap * (chipWidths.length - 1);
     let nextVisibleCount = chipWidths.length;
 
     if (allChipsWidth > availableWidth) {
-        const overflowWidth = overflowEl.getBoundingClientRect().width;
-        let usedWidth = overflowWidth;
+        let visibleChipsWidth = 0;
 
         nextVisibleCount = 0;
-        chipWidths.some((width) => {
-            const nextWidth = usedWidth + gap + width;
+        chipWidths.some((width, index) => {
+            const candidateVisibleCount = index + 1;
+            const hiddenCount = chipWidths.length - candidateVisibleCount;
 
-            if (nextWidth > availableWidth) return true;
+            visibleChipsWidth += width;
 
-            usedWidth = nextWidth;
-            nextVisibleCount += 1;
+            const overflowWidth = getOverflowWidth(overflowMeasureEl, hiddenCount);
+            const requiredWidth = visibleChipsWidth + gap * candidateVisibleCount + overflowWidth;
+
+            if (requiredWidth > availableWidth) return true;
+
+            nextVisibleCount = candidateVisibleCount;
             return false;
         });
-
-        nextVisibleCount = Math.max(nextVisibleCount, 1);
     }
 
     if (visibleToolCount.value !== nextVisibleCount) {
         visibleToolCount.value = nextVisibleCount;
-        nextTick(scheduleVisibleToolMeasurement);
     }
 }
 
 function scheduleVisibleToolMeasurement() {
+    if (isUnmounted) return;
+
     cancelAnimationFrame(toolMeasurementFrame);
     toolMeasurementFrame = requestAnimationFrame(measureVisibleTools);
 }
 
-useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
+useResizeObserver(toolChipList, scheduleVisibleToolMeasurement);
 
 onMounted(async () => {
     await nextTick();
-    await document.fonts?.ready;
     scheduleVisibleToolMeasurement();
+
+    if (document.fonts) {
+        document.fonts.addEventListener('loadingdone', scheduleVisibleToolMeasurement);
+        await document.fonts.ready;
+        scheduleVisibleToolMeasurement();
+    }
 });
 
-onUnmounted(() => cancelAnimationFrame(toolMeasurementFrame));
+onUnmounted(() => {
+    isUnmounted = true;
+    cancelAnimationFrame(toolMeasurementFrame);
+    document.fonts?.removeEventListener('loadingdone', scheduleVisibleToolMeasurement);
+});
 
 const anims = {
     showSelectedProjectDetails: registerAnim(projectAnimations.showSelectedProjectDetails),
@@ -248,11 +302,10 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <p class="card-description">{{ project.description.short }}</p>
 
-            <div ref="toolChipsContainer" class="tool-chips-container">
+            <div class="tool-chips-container">
                 <div ref="toolChipList" class="card-tool-chips">
                     <ToolChip
                         v-for="(tool, index) in project.stack"
-                        ref="toolChips"
                         :key="tool"
                         :tool="tool"
                         class="chip"
@@ -269,6 +322,12 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     >
                         +{{ hiddenToolCount }}
                     </span>
+
+                    <span
+                        ref="toolOverflowMeasure"
+                        class="tool-overflow tool-overflow-measure"
+                        aria-hidden="true"
+                    ></span>
                 </div>
             </div>
 
@@ -584,7 +643,8 @@ p {
 .card-tool-chips {
     position: relative;
     gap: $space-2;
-    overflow: hidden;
+    width: 100%;
+    min-width: 0;
     font-size: 1.1em;
 
     :deep(.chip-container) {
@@ -608,14 +668,19 @@ p {
         font-size: 1.2em;
     }
 
-    &.is-measuring .chip {
-        flex-grow: 0;
+    &.is-measuring {
+        .chip {
+            display: flex;
+            flex: 0 0 auto;
+        }
+
+        .tool-overflow:not(.tool-overflow-measure) {
+            display: none;
+        }
     }
 
     .is-hidden {
-        position: absolute;
-        visibility: hidden;
-        pointer-events: none;
+        display: none;
     }
 }
 
@@ -631,6 +696,14 @@ p {
     white-space: nowrap;
     background-color: color-mix(in srgb, $color-primary 18%, transparent);
     border-radius: $radius-sm;
+}
+
+.tool-overflow-measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .demo-video {
