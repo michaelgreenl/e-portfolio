@@ -67,7 +67,7 @@ export function useUtilAnimations() {
             scale: reducedMotion ? 1 : 0.98,
             y: reducedMotion ? 0 : 18,
         });
-        gsap.set(hr, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
+        gsap.set(hr, { autoAlpha: 0, scaleX: 0 });
 
         tl.to(copy, {
             autoAlpha: 1,
@@ -108,24 +108,29 @@ export function useUtilAnimations() {
         const copy = headerEl.querySelectorAll('h1, p');
         const hr = headerEl.querySelector('hr');
         const duration = reducedMotion ? 0.01 : TIMING.duration.fast;
+        const stagger = reducedMotion ? 0 : { amount: TIMING.stagger.tight };
+        const targets = [...copy, ...gsap.utils.toArray(extraTargets)];
 
-        tl.to([...copy, ...extraTargets], {
-            autoAlpha: 0,
-            duration,
-            ease: TIMING.easing.smooth,
-            scale: reducedMotion ? 1 : 0.98,
-            stagger: reducedMotion ? 0 : TIMING.stagger.instant,
-            y: reducedMotion ? 0 : -10,
-        }).to(
-            hr,
-            {
+        tl.set(targets, { transition: 'none' })
+            .to(targets, {
                 autoAlpha: 0,
                 duration,
-                ease: TIMING.easing.bounce,
-                scaleX: 0,
-            },
-            0,
-        );
+                ease: TIMING.easing.smooth,
+                scale: reducedMotion ? 1 : 0.98,
+                stagger,
+                y: reducedMotion ? 0 : -10,
+            })
+            .to(
+                hr,
+                {
+                    autoAlpha: 0,
+                    duration,
+                    ease: TIMING.easing.bounce,
+                    scaleX: 0,
+                },
+                0,
+            )
+            .set(targets, { clearProps: 'transition' });
     });
 
     return {

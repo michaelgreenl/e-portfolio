@@ -22,7 +22,6 @@ export const homeAnimations = {
         gsap.set('.hero-line, .nav-links-line', {
             autoAlpha: 0,
             scaleX: 0,
-            transformOrigin: 'left center',
         });
         gsap.set('.contact-link', {
             autoAlpha: 0,
@@ -44,7 +43,7 @@ export const homeAnimations = {
                     duration: reducedMotion ? 0.01 : TIMING.duration.slow,
                     ease: TIMING.easing.smooth,
                     scale: 1,
-                    stagger,
+                    stagger: TIMING.stagger.loose,
                     x: 0,
                 },
                 reducedMotion ? 0 : 'hero+=0.06',
@@ -109,13 +108,16 @@ export const homeAnimations = {
 
     exitPage: ({ tl, reducedMotion }) => {
         const duration = reducedMotion ? 0.01 : TIMING.duration.fast;
+        const stagger = reducedMotion ? 0 : { amount: TIMING.stagger.tight };
+        const ctaButton = '.cta > button';
 
-        tl.to('.hero-line, .nav-links-line', {
-            autoAlpha: 0,
-            duration,
-            ease: TIMING.easing.bounce,
-            scaleX: 0,
-        })
+        tl.set(ctaButton, { transition: 'none' })
+            .to('.hero-line, .nav-links-line', {
+                autoAlpha: 0,
+                duration,
+                ease: TIMING.easing.bounce,
+                scaleX: 0,
+            })
             .to(
                 '.cta > a, .cta > button, .hero-content > p, .hero-content > h2, .hero-title-2, .hero-title-1, .hero-content > h3',
                 {
@@ -123,7 +125,7 @@ export const homeAnimations = {
                     duration,
                     ease: TIMING.easing.smooth,
                     scale: reducedMotion ? 1 : 0.98,
-                    stagger: reducedMotion ? 0 : TIMING.stagger.instant,
+                    stagger,
                     y: reducedMotion ? 0 : -10,
                 },
                 0,
@@ -150,6 +152,7 @@ export const homeAnimations = {
                     y: reducedMotion ? 0 : -8,
                 },
                 0,
-            );
+            )
+            .set(ctaButton, { clearProps: 'transition' });
     },
 };
