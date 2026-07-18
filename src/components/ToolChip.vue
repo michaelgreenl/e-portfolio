@@ -174,11 +174,19 @@ const tools = {
     border-radius: $radius-sm;
 }
 
+.icon-container {
+    @include flex-center-all;
+
+    flex: 0 0 $size-4;
+    width: $size-4;
+    height: $size-4;
+}
+
 .icon {
     display: flex;
     align-items: center;
-    width: $size-4;
-    height: $size-4;
+    width: 100%;
+    height: 100%;
 
     @include theme-light {
         fill: $color-text-primary;

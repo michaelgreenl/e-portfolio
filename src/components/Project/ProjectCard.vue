@@ -61,7 +61,6 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 
 const cardEl = ref(null);
 const { registerAnim } = useGsap(cardEl);
-const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const toolChipList = useTemplateRef('toolChipList');
 const toolOverflow = useTemplateRef('toolOverflow');
 const projectSelected = ref(false);
@@ -88,45 +87,47 @@ function measureVisibleTools() {
     if (toolsRevealing.value) return;
 
     const listEl = toolChipList.value;
-    const overflowEl = toolOverflow.value;
-    const chipElements = getToolChipElements();
+    const overflowMeasureEl = toolOverflowMeasure.value;
 
-    if (!listEl || !overflowEl || chipElements.length === 0) return;
+    if (!listEl || !overflowMeasureEl) return;
 
-    const availableWidth = listEl.clientWidth;
+    const availableWidth = getContentBoxWidth(listEl);
     const gap = Number.parseFloat(getComputedStyle(listEl).columnGap) || 0;
-    listEl.classList.add('is-measuring');
-    const chipWidths = chipElements.map((chip) => chip.getBoundingClientRect().width);
-    listEl.classList.remove('is-measuring');
-    const allChipsWidth = chipWidths.reduce((total, width) => total + width, 0) + gap * (chipWidths.length - 1);
+    const chipWidths = getNaturalToolWidths(listEl);
 
+    if (availableWidth <= 0 || chipWidths.length === 0) return;
+
+    const allChipsWidth = chipWidths.reduce((total, width) => total + width, 0) + gap * (chipWidths.length - 1);
     let nextVisibleCount = chipWidths.length;
 
     if (allChipsWidth > availableWidth) {
-        const overflowWidth = overflowEl.getBoundingClientRect().width;
-        let usedWidth = overflowWidth;
+        let visibleChipsWidth = 0;
 
         nextVisibleCount = 0;
-        chipWidths.some((width) => {
-            const nextWidth = usedWidth + gap + width;
+        chipWidths.some((width, index) => {
+            const candidateVisibleCount = index + 1;
+            const hiddenCount = chipWidths.length - candidateVisibleCount;
 
-            if (nextWidth > availableWidth) return true;
+            visibleChipsWidth += width;
 
-            usedWidth = nextWidth;
-            nextVisibleCount += 1;
+            const overflowWidth = getOverflowWidth(overflowMeasureEl, hiddenCount);
+            const requiredWidth = visibleChipsWidth + gap * candidateVisibleCount + overflowWidth;
+
+            if (requiredWidth > availableWidth) return true;
+
+            nextVisibleCount = candidateVisibleCount;
             return false;
         });
-
-        nextVisibleCount = Math.max(nextVisibleCount, 1);
     }
 
     if (visibleToolCount.value !== nextVisibleCount) {
         visibleToolCount.value = nextVisibleCount;
-        nextTick(scheduleVisibleToolMeasurement);
     }
 }
 
 function scheduleVisibleToolMeasurement() {
+    if (isUnmounted) return;
+
     cancelAnimationFrame(toolMeasurementFrame);
     toolMeasurementFrame = requestAnimationFrame(measureVisibleTools);
 }
@@ -242,8 +243,13 @@ useResizeObserver(toolChipsContainer, scheduleVisibleToolMeasurement);
 
 onMounted(async () => {
     await nextTick();
-    await document.fonts?.ready;
     scheduleVisibleToolMeasurement();
+
+    if (document.fonts) {
+        document.fonts.addEventListener('loadingdone', scheduleVisibleToolMeasurement);
+        await document.fonts.ready;
+        scheduleVisibleToolMeasurement();
+    }
 });
 
 onUnmounted(() => {
@@ -438,6 +444,12 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     >
                         +{{ hiddenToolCount }}
                     </span>
+
+                    <span
+                        ref="toolOverflowMeasure"
+                        class="tool-overflow tool-overflow-measure"
+                        aria-hidden="true"
+                    ></span>
                 </div>
             </div>
 
@@ -753,7 +765,8 @@ p {
 .card-tool-chips {
     position: relative;
     gap: $space-2;
-    overflow: hidden;
+    width: 100%;
+    min-width: 0;
     font-size: 1.1em;
 
     &:not(.is-scrollable) :deep(.chip-container) {
@@ -793,9 +806,7 @@ p {
     }
 
     .is-hidden {
-        position: absolute;
-        visibility: hidden;
-        pointer-events: none;
+        display: none;
     }
 }
 

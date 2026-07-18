@@ -1,8 +1,16 @@
+<script setup>
+import { useId } from 'vue';
+
+const instanceId = useId();
+const clipPathId = `opencode-clip-${instanceId}`;
+const maskId = `opencode-mask-${instanceId}`;
+</script>
+
 <template>
     <svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300" fill="none">
-        <g clip-path="url(#clip0_1401_86283)">
+        <g :clip-path="`url(#${clipPathId})`">
             <mask
-                id="mask0_1401_86283"
+                :id="maskId"
                 style="mask-type: luminance"
                 maskUnits="userSpaceOnUse"
                 x="0"
@@ -12,13 +20,13 @@
             >
                 <path d="M240 0H0V300H240V0Z" fill="white" />
             </mask>
-            <g mask="url(#mask0_1401_86283)">
+            <g :mask="`url(#${maskId})`">
                 <path d="M180 240H60V120H180V240Z" fill="#4B4646" />
                 <path d="M180 60H60V240H180V60ZM240 300H0V0H240V300Z" fill="#F1ECEC" />
             </g>
         </g>
         <defs>
-            <clipPath id="clip0_1401_86283"><rect width="240" height="300" fill="white" /></clipPath>
+            <clipPath :id="clipPathId"><rect width="240" height="300" fill="white" /></clipPath>
         </defs>
     </svg>
 </template>
