@@ -3,7 +3,11 @@ import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, useTemplat
 import { useElementBounding, useResizeObserver, useWindowSize } from '@vueuse/core';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { useGsap } from '@/composables/useGsap.js';
-import { projectAnimations } from '@/animations/page/projects.js';
+import {
+    cancelProjectToolChipAnimations,
+    captureProjectToolChipState,
+    projectAnimations,
+} from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
@@ -59,7 +63,6 @@ const cardEl = ref(null);
 const { registerAnim } = useGsap(cardEl);
 const toolChipsContainer = useTemplateRef('toolChipsContainer');
 const toolChipList = useTemplateRef('toolChipList');
-const toolChips = useTemplateRef('toolChips');
 const toolOverflow = useTemplateRef('toolOverflow');
 const { height: toolChipsHeight, top: toolChipsTop } = useElementBounding(toolChipsContainer, {
     updateTiming: 'next-frame',
@@ -69,6 +72,7 @@ const projectSelected = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
 const toolsRevealed = shallowRef(false);
+const toolsRevealing = shallowRef(false);
 const hasPreviousTools = shallowRef(false);
 const hasMoreTools = shallowRef(false);
 
@@ -81,12 +85,17 @@ const isToolRowInTopHalf = computed(
 const toolListId = `${props.project.slug}-tool-list`;
 
 let toolMeasurementFrame;
+let toolRevealRun = 0;
+let activeToolReveal;
+let toolRevealMaxWidths;
 
 function getToolChipElements() {
-    return (toolChips.value ?? []).map((chip) => chip?.$el ?? chip).filter((chip) => chip instanceof HTMLElement);
+    return Array.from(toolChipList.value?.querySelectorAll(':scope > .chip') ?? []);
 }
 
 function measureVisibleTools() {
+    if (toolsRevealing.value) return;
+
     const listEl = toolChipList.value;
     const overflowEl = toolOverflow.value;
     const chipElements = getToolChipElements();
@@ -148,12 +157,7 @@ function updateToolScrollEdges() {
     hasMoreTools.value = remainingScroll > 1;
 }
 
-async function revealTools() {
-    if (bp.isLaptop.value || hiddenToolCount.value === 0) return;
-
-    toolsRevealed.value = true;
-    await nextTick();
-
+function focusRevealedToolList() {
     const listEl = toolChipList.value;
     if (!listEl) return;
 
@@ -162,8 +166,85 @@ async function revealTools() {
     listEl.focus({ preventScroll: true });
 }
 
+function finishToolReveal(runId) {
+    if (runId !== toolRevealRun) return;
+
+    activeToolReveal = null;
+    toolRevealMaxWidths = null;
+    toolsRevealing.value = false;
+    updateToolScrollEdges();
+    scheduleVisibleToolMeasurement();
+}
+
+async function showRevealedTools(runId, initialToolCount) {
+    if (runId !== toolRevealRun) return;
+
+    const initialTargets = getToolChipElements().slice(0, initialToolCount);
+    const flipState = captureProjectToolChipState(initialTargets);
+
+    toolsRevealed.value = true;
+    await nextTick();
+
+    if (runId !== toolRevealRun) return;
+
+    const enteringTargets = getToolChipElements().slice(initialToolCount);
+
+    focusRevealedToolList();
+    activeToolReveal = anims.revealToolRow({
+        enteringTargets,
+        flipState,
+        initialTargets,
+        onComplete: () => finishToolReveal(runId),
+        overflowTarget: toolOverflow.value,
+    });
+}
+
+async function showRevealedToolsWithoutMotion(runId) {
+    toolsRevealed.value = true;
+    await nextTick();
+
+    if (runId !== toolRevealRun) return;
+
+    focusRevealedToolList();
+    finishToolReveal(runId);
+}
+
+function revealTools() {
+    if (bp.isLaptop.value || hiddenToolCount.value === 0 || toolsRevealing.value) return;
+
+    const runId = ++toolRevealRun;
+    const initialToolCount = visibleToolCount.value;
+
+    toolRevealMaxWidths = getToolChipElements().map((chip) => chip.style.maxWidth);
+    toolsRevealing.value = true;
+
+    if (prefersReducedMotion()) {
+        showRevealedToolsWithoutMotion(runId);
+        return;
+    }
+
+    activeToolReveal = anims.hideToolOverflow({
+        onComplete: () => showRevealedTools(runId, initialToolCount),
+        target: toolOverflow.value,
+    });
+}
+
 function resetTools() {
+    toolRevealRun += 1;
+
+    if (activeToolReveal || toolsRevealing.value) {
+        cancelProjectToolChipAnimations({
+            maxWidths: toolRevealMaxWidths,
+            overflowTarget: toolOverflow.value,
+            targets: getToolChipElements(),
+            timeline: activeToolReveal,
+        });
+    }
+
+    activeToolReveal = null;
+    toolRevealMaxWidths = null;
     toolsRevealed.value = false;
+    toolsRevealing.value = false;
     hasPreviousTools.value = false;
     hasMoreTools.value = false;
 
@@ -196,15 +277,20 @@ onMounted(async () => {
     scheduleVisibleToolMeasurement();
 });
 
-onUnmounted(() => cancelAnimationFrame(toolMeasurementFrame));
+onUnmounted(() => {
+    toolRevealRun += 1;
+    cancelAnimationFrame(toolMeasurementFrame);
+});
 
 const anims = {
+    hideToolOverflow: registerAnim(projectAnimations.hideToolOverflow),
+    revealToolRow: registerAnim(projectAnimations.revealToolRow),
     showSelectedProjectDetails: registerAnim(projectAnimations.showSelectedProjectDetails),
     hideSelectedProjectDetails: registerAnim(projectAnimations.hideSelectedProjectDetails),
 };
 
-const shouldSkipSelectedDetailsAnimation = () =>
-    bp.isLaptop.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const shouldSkipSelectedDetailsAnimation = () => bp.isLaptop.value || prefersReducedMotion();
 
 function onSelectedDetailsEnter(el, done) {
     if (shouldSkipSelectedDetailsAnimation()) {
@@ -338,7 +424,6 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     ref="toolChipList"
                     class="card-tool-chips"
                     :class="{
-                        'has-hidden-tools': hiddenToolCount > 0,
                         'is-mobile-tool-row': !bp.isLaptop.value,
                         'is-scrollable': isMobileToolRowRevealed,
                     }"
@@ -355,7 +440,6 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                 >
                     <ToolChip
                         v-for="(tool, index) in project.stack"
-                        ref="toolChips"
                         :key="tool"
                         :tool="tool"
                         class="chip"
@@ -371,10 +455,11 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                         :class="{ 'is-hidden': isMobileToolRowRevealed || hiddenToolCount === 0 }"
                         :aria-hidden="isMobileToolRowRevealed || hiddenToolCount === 0"
                         :aria-controls="toolListId"
-                        :aria-expanded="isMobileToolRowRevealed"
+                        :aria-disabled="toolsRevealing || undefined"
+                        :aria-expanded="toolsRevealing || isMobileToolRowRevealed"
                         :aria-label="`Show ${hiddenToolCount} more tools: ${hiddenToolsLabel}`"
                         :title="hiddenToolsLabel"
-                        :tabindex="hiddenToolCount > 0 && !isMobileToolRowRevealed ? 0 : -1"
+                        :tabindex="hiddenToolCount > 0 && !isMobileToolRowRevealed && !toolsRevealing ? 0 : -1"
                         @click.stop="revealTools"
                         @keydown.enter.stop.prevent="revealTools"
                         @keydown.space.stop.prevent="revealTools"
@@ -749,7 +834,7 @@ p {
     overflow: hidden;
     font-size: 1.1em;
 
-    :deep(.chip-container) {
+    &:not(.is-scrollable) :deep(.chip-container) {
         max-width: none !important;
     }
 
@@ -771,12 +856,8 @@ p {
     }
 
     &.is-measuring .chip,
-    &.is-mobile-tool-row.has-hidden-tools .chip {
+    &.is-scrollable .chip {
         flex-grow: 0;
-    }
-
-    &.is-mobile-tool-row.has-hidden-tools:not(.is-scrollable) .tool-overflow-button {
-        margin-inline-start: auto;
     }
 
     &.is-scrollable {
