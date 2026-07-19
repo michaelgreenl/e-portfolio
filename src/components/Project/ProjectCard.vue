@@ -821,7 +821,8 @@ p {
     min-width: 0;
     font-size: 1.1em;
 
-    &:not(.is-scrollable) :deep(.chip-container) {
+    &:not(.is-scrollable) :deep(.chip-container),
+    &.is-measuring :deep(.chip-container) {
         max-width: none !important;
     }
 
