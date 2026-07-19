@@ -913,7 +913,7 @@ p {
 
 .demo-video {
     width: 100%;
-    max-width: 50em;
+    max-width: 60em;
     aspect-ratio: 16 / 9;
     margin: $space-3 auto;
     border-radius: $radius-md;
