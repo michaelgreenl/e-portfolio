@@ -821,7 +821,8 @@ p {
     min-width: 0;
     font-size: 1.1em;
 
-    &:not(.is-scrollable) :deep(.chip-container) {
+    &:not(.is-scrollable) :deep(.chip-container),
+    &.is-measuring :deep(.chip-container) {
         max-width: none !important;
     }
 
@@ -913,7 +914,7 @@ p {
 
 .demo-video {
     width: 100%;
-    max-width: 50em;
+    max-width: 60em;
     aspect-ratio: 16 / 9;
     margin: $space-3 auto;
     border-radius: $radius-md;
