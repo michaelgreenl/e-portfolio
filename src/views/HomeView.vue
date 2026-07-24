@@ -36,18 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="home-container page-shell">
-        <div class="contact-links">
-            <a href="https://github.com/michaelgreenl" target="_blank">
-                <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
-            </a>
-            <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
-            </a>
-            <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-                <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
-            </a>
-        </div>
+    <div class="home-container page page-shell">
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
             <h1>
@@ -88,10 +77,22 @@ onMounted(() => {
             </div>
         </div>
     </div>
+    <div class="contact-links">
+        <a href="https://github.com/michaelgreenl" target="_blank">
+            <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+        </a>
+        <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
+            <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+        </a>
+        <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
+            <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
+        </a>
+    </div>
 </template>
 
 <style lang="scss" scoped>
 .home-container {
+    z-index: 5;
     gap: $space-page-section;
     padding: $space-8 $space-4 0;
 
@@ -232,7 +233,8 @@ p {
 
 .contact-links {
     position: absolute;
-    top: $space-3;
+    z-index: 5;
+    top: $size-11;
     right: $space-3;
     display: flex;
     gap: $space-3;
@@ -259,7 +261,7 @@ p {
     }
 
     @include bp-custom-min($hero-tablet-bp) {
-        gap: $space-3;
+        gap: $space-4;
         font-size: 1.8em;
     }
 

@@ -36,7 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="resume-container">
+    <div class="resume-container page">
         <div class="page-header">
             <div class="page-title">
                 <span class="page-eyebrow">Michael L. Green</span>

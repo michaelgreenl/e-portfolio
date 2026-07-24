@@ -13,7 +13,7 @@ const routeStore = useRouteStore();
 
     <Navbar />
     <RouterView v-slot="{ Component }">
-        <component :is="Component" :key="routeStore.activePath" class="page" />
+        <component :is="Component" :key="routeStore.activePath" />
     </RouterView>
     <Footer />
 </template>
