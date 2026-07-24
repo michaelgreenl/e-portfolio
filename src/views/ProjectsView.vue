@@ -122,7 +122,7 @@ function closeProject() {
 </script>
 
 <template>
-    <div class="projects-container page-shell">
+    <div class="projects-container page page-shell">
         <SelectedProject
             v-if="activeProject"
             ref="selectedProject"

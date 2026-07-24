@@ -170,7 +170,7 @@ const clearStatus = () => {
 </script>
 
 <template>
-    <div ref="pageElement" class="contact-container page-shell">
+    <div ref="pageElement" class="contact-container page page-shell">
         <div ref="pageHeader" class="contact-header">
             <h1>Get in Touch!</h1>
             <hr />
