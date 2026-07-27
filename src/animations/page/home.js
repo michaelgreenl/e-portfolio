@@ -1,10 +1,18 @@
 import { gsap } from 'gsap';
 import { TIMING } from '@/animations/constants/timing.js';
 
+const DESKTOP_CONTACT_TARGET = '.contact-links-desktop';
+const DESKTOP_CONTACT_LINK_TARGETS = `${DESKTOP_CONTACT_TARGET} .contact-link`;
+const MOBILE_CONTACT_TARGETS = '.contact-links-mobile .contact-link';
+
 export const homeAnimations = {
     enterPage: ({ tl, reducedMotion }) => {
         const duration = reducedMotion ? 0.01 : TIMING.duration.moderate;
         const stagger = reducedMotion ? 0 : TIMING.stagger.tight;
+        const desktopContactTarget = document.querySelector(DESKTOP_CONTACT_TARGET);
+        const desktopContactHeight = desktopContactTarget?.offsetHeight;
+        const desktopContactLinkTargets = gsap.utils.toArray(DESKTOP_CONTACT_LINK_TARGETS);
+        const mobileContactTargets = gsap.utils.toArray(MOBILE_CONTACT_TARGETS);
 
         gsap.set('.hero-content > h3', { autoAlpha: 0, y: reducedMotion ? 0 : -16 });
         gsap.set('.hero-title-1', { autoAlpha: 0, scale: reducedMotion ? 1 : 0.96, x: reducedMotion ? 0 : -48 });
@@ -23,11 +31,23 @@ export const homeAnimations = {
             autoAlpha: 0,
             scaleX: 0,
         });
-        gsap.set('.contact-link', {
-            autoAlpha: 0,
-            scale: reducedMotion ? 1 : 0.8,
-            y: reducedMotion ? 0 : -12,
-        });
+        if (desktopContactTarget) {
+            gsap.set(desktopContactTarget, {
+                height: 0,
+                overflow: 'hidden',
+            });
+            gsap.set(desktopContactLinkTargets, {
+                opacity: 0,
+                x: reducedMotion ? 0 : 50,
+            });
+        }
+        if (mobileContactTargets.length) {
+            gsap.set(mobileContactTargets, {
+                autoAlpha: 0,
+                scale: reducedMotion ? 1 : 0.8,
+                y: reducedMotion ? 0 : -12,
+            });
+        }
 
         tl.addLabel('hero')
             .to('.hero-content > h3', {
@@ -91,9 +111,37 @@ export const homeAnimations = {
                     x: 0,
                 },
                 0,
-            )
-            .to(
-                '.contact-link',
+            );
+
+        if (desktopContactTarget) {
+            tl.addLabel('desktopSeparator', '>-=0.2')
+                .to(
+                    desktopContactTarget,
+                    {
+                        duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+                        ease: TIMING.easing.bounce,
+                        height: desktopContactHeight,
+                    },
+                    'desktopSeparator',
+                )
+                .set(desktopContactTarget, { clearProps: 'height,overflow' })
+                .addLabel('desktopContacts')
+                .to(
+                    desktopContactLinkTargets,
+                    {
+                        duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+                        ease: TIMING.easing.organic,
+                        opacity: 1,
+                        stagger: reducedMotion ? 0 : TIMING.stagger.normal,
+                        x: 0,
+                    },
+                    'desktopContacts-=0.2',
+                );
+        }
+
+        if (mobileContactTargets.length) {
+            tl.to(
+                mobileContactTargets,
                 {
                     autoAlpha: 1,
                     duration,
@@ -104,20 +152,42 @@ export const homeAnimations = {
                 },
                 reducedMotion ? 0 : 'hero+=0.18',
             );
+        }
     },
 
     exitPage: ({ tl, reducedMotion }) => {
         const duration = reducedMotion ? 0.01 : TIMING.duration.fast;
         const stagger = reducedMotion ? 0 : { amount: TIMING.stagger.tight };
         const ctaButton = '.cta > button';
+        const desktopContactTarget = document.querySelector(DESKTOP_CONTACT_TARGET);
+        const desktopContactLinkTargets = gsap.utils.toArray(DESKTOP_CONTACT_LINK_TARGETS);
+        const mobileContactTargets = gsap.utils.toArray(MOBILE_CONTACT_TARGETS);
+
+        if (desktopContactTarget) {
+            tl.to(
+                desktopContactLinkTargets,
+                {
+                    duration: TIMING.duration.tight,
+                    ease: TIMING.easing.smooth,
+                    opacity: 0,
+                    stagger: reducedMotion ? 0 : { each: TIMING.stagger.instant, from: 'end' },
+                    x: reducedMotion ? 0 : 50,
+                },
+                // 0,
+            ).to(
+                desktopContactTarget,
+                {
+                    duration: TIMING.duration.instant,
+                    ease: TIMING.easing.bounceIn,
+                    height: 0,
+                    overflow: 'hidden',
+                },
+                // reducedMotion ? 0 : 0.01,
+                0,
+            );
+        }
 
         tl.set(ctaButton, { transition: 'none' })
-            .to('.hero-line, .nav-links-line', {
-                autoAlpha: 0,
-                duration,
-                ease: TIMING.easing.bounce,
-                scaleX: 0,
-            })
             .to(
                 '.cta > a, .cta > button, .hero-content > p, .hero-content > h2, .hero-title-2, .hero-title-1, .hero-content > h3',
                 {
@@ -128,21 +198,32 @@ export const homeAnimations = {
                     stagger,
                     y: reducedMotion ? 0 : -10,
                 },
-                0,
+            )
+            .to(
+                '.hero-line, .nav-links-line',
+                {
+                    autoAlpha: 0,
+                    duration: duration + 0.5,
+                    ease: TIMING.easing.bounce,
+                    scaleX: 0,
+                },
+                0.05,
             )
             .to(
                 '.nav-link',
                 {
-                    duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+                    duration: reducedMotion ? 0.01 : TIMING.duration.fast,
                     ease: TIMING.easing.smooth,
                     opacity: 0,
-                    stagger: reducedMotion ? 0 : -TIMING.stagger.tight,
+                    stagger: reducedMotion ? 0 : TIMING.stagger.fast,
                     x: reducedMotion ? 0 : 50,
                 },
-                0,
-            )
-            .to(
-                '.contact-link',
+                0.15,
+            );
+
+        if (mobileContactTargets.length) {
+            tl.to(
+                mobileContactTargets,
                 {
                     autoAlpha: 0,
                     duration,
@@ -152,7 +233,9 @@ export const homeAnimations = {
                     y: reducedMotion ? 0 : -8,
                 },
                 0,
-            )
-            .set(ctaButton, { clearProps: 'transition' });
+            );
+        }
+
+        tl.set(ctaButton, { clearProps: 'transition' });
     },
 };
