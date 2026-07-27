@@ -182,7 +182,6 @@ export const homeAnimations = {
                     height: 0,
                     overflow: 'hidden',
                 },
-                // reducedMotion ? 0 : 0.01,
                 0,
             );
         }
