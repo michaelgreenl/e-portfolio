@@ -164,17 +164,13 @@ export const homeAnimations = {
         const mobileContactTargets = gsap.utils.toArray(MOBILE_CONTACT_TARGETS);
 
         if (desktopContactTarget) {
-            tl.to(
-                desktopContactLinkTargets,
-                {
-                    duration: TIMING.duration.tight,
-                    ease: TIMING.easing.smooth,
-                    opacity: 0,
-                    stagger: reducedMotion ? 0 : { each: TIMING.stagger.instant, from: 'end' },
-                    x: reducedMotion ? 0 : 50,
-                },
-                // 0,
-            ).to(
+            tl.to(desktopContactLinkTargets, {
+                duration: TIMING.duration.tight,
+                ease: TIMING.easing.smooth,
+                opacity: 0,
+                stagger: reducedMotion ? 0 : { each: TIMING.stagger.instant, from: 'end' },
+                x: reducedMotion ? 0 : 50,
+            }).to(
                 desktopContactTarget,
                 {
                     duration: TIMING.duration.instant,
