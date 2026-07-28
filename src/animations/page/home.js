@@ -5,12 +5,13 @@ const DESKTOP_CONTACT_TARGET = '.contact-links-desktop';
 const DESKTOP_CONTACT_LINK_TARGETS = `${DESKTOP_CONTACT_TARGET} .contact-link`;
 const MOBILE_CONTACT_TARGETS = '.contact-links-mobile .contact-link';
 
+const isDesktopNavVisible = () => document.querySelector('.site-nav')?.offsetParent !== null;
+
 export const homeAnimations = {
     enterPage: ({ tl, reducedMotion }) => {
         const duration = reducedMotion ? 0.01 : TIMING.duration.moderate;
         const stagger = reducedMotion ? 0 : TIMING.stagger.tight;
-        const desktopContactTarget = document.querySelector(DESKTOP_CONTACT_TARGET);
-        const desktopContactHeight = desktopContactTarget?.offsetHeight;
+        const animateDesktopNav = isDesktopNavVisible();
         const desktopContactLinkTargets = gsap.utils.toArray(DESKTOP_CONTACT_LINK_TARGETS);
         const mobileContactTargets = gsap.utils.toArray(MOBILE_CONTACT_TARGETS);
 
@@ -23,18 +24,18 @@ export const homeAnimations = {
             scale: reducedMotion ? 1 : 0.94,
             y: reducedMotion ? 0 : 18,
         });
-        gsap.set('.nav-link', {
-            opacity: 0,
-            x: reducedMotion ? 0 : 50,
-        });
-        gsap.set('.hero-line, .nav-links-line', {
+        gsap.set('.hero-line', {
             autoAlpha: 0,
             scaleX: 0,
         });
-        if (desktopContactTarget) {
-            gsap.set(desktopContactTarget, {
-                height: 0,
-                overflow: 'hidden',
+        if (animateDesktopNav) {
+            gsap.set('.nav-link', {
+                opacity: 0,
+                x: reducedMotion ? 0 : 50,
+            });
+            gsap.set('.nav-links-line', {
+                autoAlpha: 0,
+                scaleX: 0,
             });
             gsap.set(desktopContactLinkTargets, {
                 opacity: 0,
@@ -92,7 +93,7 @@ export const homeAnimations = {
                 reducedMotion ? 0 : 'hero+=0.26',
             )
             .to(
-                '.hero-line, .nav-links-line',
+                '.hero-line',
                 {
                     autoAlpha: 1,
                     duration: reducedMotion ? 0.01 : TIMING.duration.slow,
@@ -100,8 +101,19 @@ export const homeAnimations = {
                     scaleX: 1,
                 },
                 reducedMotion ? 0 : 'hero+=0.12',
-            )
-            .to(
+            );
+
+        if (animateDesktopNav) {
+            tl.to(
+                '.nav-links-line',
+                {
+                    autoAlpha: 1,
+                    duration: reducedMotion ? 0.01 : TIMING.duration.slow,
+                    ease: TIMING.easing.bounce,
+                    scaleX: 1,
+                },
+                reducedMotion ? 0 : 'hero+=0.12',
+            ).to(
                 '.nav-link',
                 {
                     duration: reducedMotion ? 0.01 : TIMING.duration.normal,
@@ -112,31 +124,20 @@ export const homeAnimations = {
                 },
                 0,
             );
+        }
 
-        if (desktopContactTarget) {
-            tl.addLabel('desktopSeparator', '>-=0.2')
-                .to(
-                    desktopContactTarget,
-                    {
-                        duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-                        ease: TIMING.easing.bounce,
-                        height: desktopContactHeight,
-                    },
-                    'desktopSeparator',
-                )
-                .set(desktopContactTarget, { clearProps: 'height,overflow' })
-                .addLabel('desktopContacts')
-                .to(
-                    desktopContactLinkTargets,
-                    {
-                        duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-                        ease: TIMING.easing.organic,
-                        opacity: 1,
-                        stagger: reducedMotion ? 0 : TIMING.stagger.normal,
-                        x: 0,
-                    },
-                    'desktopContacts-=0.2',
-                );
+        if (desktopContactLinkTargets.length) {
+            tl.to(
+                desktopContactLinkTargets,
+                {
+                    duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+                    ease: TIMING.easing.organic,
+                    opacity: 1,
+                    stagger: reducedMotion ? 0 : TIMING.stagger.normal,
+                    x: 0,
+                },
+                reducedMotion ? 0 : 'hero+=0.18',
+            );
         }
 
         if (mobileContactTargets.length) {
@@ -159,31 +160,18 @@ export const homeAnimations = {
         const duration = reducedMotion ? 0.01 : TIMING.duration.fast;
         const stagger = reducedMotion ? 0 : { amount: TIMING.stagger.tight };
         const ctaButton = '.cta > button';
-        const desktopContactTarget = document.querySelector(DESKTOP_CONTACT_TARGET);
+        const animateDesktopNav = isDesktopNavVisible();
         const desktopContactLinkTargets = gsap.utils.toArray(DESKTOP_CONTACT_LINK_TARGETS);
         const mobileContactTargets = gsap.utils.toArray(MOBILE_CONTACT_TARGETS);
 
-        if (desktopContactTarget) {
-            tl.to(
-                desktopContactLinkTargets,
-                {
-                    duration: TIMING.duration.tight,
-                    ease: TIMING.easing.smooth,
-                    opacity: 0,
-                    stagger: reducedMotion ? 0 : { each: TIMING.stagger.instant, from: 'end' },
-                    x: reducedMotion ? 0 : 50,
-                },
-                // 0,
-            ).to(
-                desktopContactTarget,
-                {
-                    duration: TIMING.duration.instant,
-                    ease: TIMING.easing.bounceIn,
-                    height: 0,
-                    overflow: 'hidden',
-                },
-                0,
-            );
+        if (desktopContactLinkTargets.length) {
+            tl.to(desktopContactLinkTargets, {
+                duration: TIMING.duration.tight,
+                ease: TIMING.easing.smooth,
+                opacity: 0,
+                stagger: reducedMotion ? 0 : { each: TIMING.stagger.instant, from: 'end' },
+                x: reducedMotion ? 0 : 50,
+            });
         }
 
         tl.set(ctaButton, { transition: 'none' })
@@ -199,7 +187,7 @@ export const homeAnimations = {
                 },
             )
             .to(
-                '.hero-line, .nav-links-line',
+                '.hero-line',
                 {
                     autoAlpha: 0,
                     duration: duration + 0.5,
@@ -207,8 +195,19 @@ export const homeAnimations = {
                     scaleX: 0,
                 },
                 0.05,
-            )
-            .to(
+            );
+
+        if (animateDesktopNav) {
+            tl.to(
+                '.nav-links-line',
+                {
+                    autoAlpha: 0,
+                    duration: duration + 0.5,
+                    ease: TIMING.easing.bounce,
+                    scaleX: 0,
+                },
+                0.05,
+            ).to(
                 '.nav-link',
                 {
                     duration: reducedMotion ? 0.01 : TIMING.duration.fast,
@@ -219,6 +218,7 @@ export const homeAnimations = {
                 },
                 0.15,
             );
+        }
 
         if (mobileContactTargets.length) {
             tl.to(
