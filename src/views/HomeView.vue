@@ -79,7 +79,7 @@ onMounted(() => {
                 />
             </div>
 
-            <div v-if="isLaptop" class="contact-links contact-links-desktop">
+            <div v-show="isLaptop" class="contact-links contact-links-desktop">
                 <a href="https://github.com/michaelgreenl" target="_blank">
                     <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
                 </a>
@@ -92,7 +92,7 @@ onMounted(() => {
             </div>
         </div>
     </div>
-    <div v-if="!isLaptop" class="contact-links contact-links-mobile">
+    <div v-show="!isLaptop" class="contact-links contact-links-mobile">
         <a href="https://github.com/michaelgreenl" target="_blank">
             <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
         </a>
