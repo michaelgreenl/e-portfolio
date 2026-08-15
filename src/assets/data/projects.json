@@ -126,8 +126,8 @@
         "slug": "algo-visualizer",
         "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "shortDate": "May 2022 ~ July 2025",
-        "longDate": "May 2022 ~ July 2025",
+        "shortDate": "May 2022 / July 2025",
+        "longDate": "May  2022  (Core) / July 2025 (Enhancements)",
         "description": {
             "short": "An algorithm visualization prototype featuring an insertion-sort visualizer using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
             "long": [
