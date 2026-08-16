@@ -33,9 +33,18 @@
         "description": {
             "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
             "long": [
-                "Architected an offline-first architecture with optimistic UI, durable command queue, background sync, and server-side idempotency to safely replay mutations after network failures/app restarts.",
-                "Designed access/refresh token auth with rotation and dual delivery (HTTP-only cookies for web, Bearer tokens for native) including automatic refresh/retry and concurrent refresh de-duplication in the API client.",
-                "Engineered a real-time collaboration layer for shared counters with server-authoritative participant resolution and client-side state reconciliation to keep multiple devices consistent during concurrent updates."
+                {
+                    "label": "Project and Experience",
+                    "text": "Tally is a cross-platform counter app for personal and shared tracking. Users can update counters immediately, invite participants through deep links, and continue working through poor connectivity."
+                },
+                {
+                    "label": "System Design",
+                    "text": "Actions update local state first and enter a durable command queue. The API, database, and real-time layer coordinate replay and synchronization across reconnects, restarts, and concurrent devices."
+                },
+                {
+                    "label": "Decisions and Tradeoffs",
+                    "text": "Offline support shaped authentication, idempotency, state reconciliation, and web/native token delivery. I accepted additional coordination logic to keep the interface responsive and recoverable."
+                }
             ]
         },
         "fontFamily": "ClashDisplay",
@@ -65,9 +74,18 @@
         "description": {
             "short": "A reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
             "long": [
-                "Built a Vue 3/Pinia reaction-time game UI with configurable target size/speed, recent scores, profile history, and GSAP-driven transitions across game/profile states.",
-                "Structured the Express/PostgreSQL API around Sequelize models and repository modules for users, games, stats, and settings.",
-                "Implemented cookie-based JWT login with HTTP-only cookies, rate limiting, and saved per-game settings snapshots for filtered performance history."
+                {
+                    "label": "Project and Experience",
+                    "text": "Reaction is a training app built around configurable reaction-time drills. Players can adjust each drill, receive animated feedback, and review results across recent sessions and their full profile history."
+                },
+                {
+                    "label": "System Design",
+                    "text": "Vue and Pinia manage the game flow while GSAP coordinates feedback and transitions between game states. An Express and PostgreSQL API stores accounts, results, statistics, and the settings used for each attempt."
+                },
+                {
+                    "label": "Decisions and Tradeoffs",
+                    "text": "Saving a settings snapshot with every result preserves the context behind historical scores and makes filtered comparisons reliable. Cookie-based authentication and rate limiting protect the account flow without adding friction to each drill."
+                }
             ]
         },
         "fontFamily": "AudioWide",
@@ -98,9 +116,18 @@
         "description": {
             "short": "A real-time tic-tac-toe lobby with JWT-authenticated Socket.IO sessions, server-side move validation, rematches, forfeits, and disconnect recovery.",
             "long": [
-                "Built server-authoritative Node.js/Socket.IO game handlers for tic-tac-toe move validation, turn enforcement, win/draw resolution, forfeits, and rematches.",
-                "Implemented JWT-authenticated Socket.IO connections with user-to-socket session tracking for multi-tab support and reconnect/soft-disconnect handling.",
-                "Persisted user and game records with Prisma/PostgreSQL and added Socket.IO integration tests for auth, lobby lifecycle, win/draw outcomes, rematches, and disconnect behavior."
+                {
+                    "label": "Project and Experience",
+                    "text": "GameLobby turns tic-tac-toe into a complete multiplayer flow with authenticated lobbies, live matches, rematches, forfeits, and recovery from temporary disconnects."
+                },
+                {
+                    "label": "System Design",
+                    "text": "Socket.IO connects each player to a server-authoritative game session that validates moves, turns, and match outcomes. User-to-socket tracking supports reconnects and multiple tabs, while Prisma and PostgreSQL persist users and games."
+                },
+                {
+                    "label": "Decisions and Tradeoffs",
+                    "text": "Keeping match rules on the server prevents clients from creating conflicting game states. Soft-disconnect handling adds session complexity, but it avoids ending a match whenever a connection briefly drops."
+                }
             ]
         },
         "fontFamily": "BitCount",
@@ -126,14 +153,23 @@
         "slug": "algo-visualizer",
         "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
         "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "shortDate": "May 2022 / July 2025",
-        "longDate": "May  2022  (Core) / July 2025 (Enhancements)",
+        "shortDate": "Built May 2022 · Enhanced July 2025",
+        "longDate": "Built May 2022 · Enhanced July 2025",
         "description": {
             "short": "An algorithm visualization prototype featuring an insertion-sort visualizer using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
             "long": [
-                "Built a Nuxt 3/Vue 3 visualization shell with category navigation, searchable module lists, and dynamic component loading around an implemented insertion-sort visualizer.",
-                "Created GSAP timeline controls for play/pause, step navigation, restart, speed changes, and TextPlugin-powered explanations synchronized with visual algorithm steps.",
-                "Optimized animation state by using Pinia and Vue's markRaw to keep heavy GSAP timeline objects out of reactivity."
+                {
+                    "label": "Project and Experience",
+                    "text": "AlgoVisualizer explores how interactive animation can make algorithm steps easier to follow. The insertion-sort module supports playback, scrubbing, speed controls, and explanations synchronized with each visual change."
+                },
+                {
+                    "label": "System Design",
+                    "text": "A Nuxt and Vue shell provides category navigation, search, and dynamic visualization modules. Pinia coordinates interface state while a GSAP timeline acts as the playback engine for animation and explanatory text."
+                },
+                {
+                    "label": "Decisions and Tradeoffs",
+                    "text": "The playback timeline stays outside Vue's reactive system because it is an animation controller rather than interface data. This keeps state updates predictable while preserving precise control over navigation and timing."
+                }
             ]
         },
         "fontFamily": "Futura",
@@ -163,9 +199,18 @@
         "description": {
             "short": "A TypeScript CLI for packaging, installing, and running LangGraph workflow templates with manifest-based distribution and bundled OpenCode execution assets.",
             "long": [
-                "Built @mawm/cli, a TypeScript ESM CLI with typed command definitions, workflow metadata validation, manifest management, and install/update/remove/list flows.",
-                "Designed a workflow template distribution model with global installs, project-local planning assets, and scaffolded LangGraph workflow packages.",
-                "Bundled OpenCode execution assets that start local LangGraph workflow servers, manage run state, support thread resume, and summarize workflow results."
+                {
+                    "label": "Project and Experience",
+                    "text": "MAWM is a CLI for packaging, installing, and running reusable LangGraph workflow templates. It gives projects a consistent way to add planning assets, start workflows, resume threads, and review results."
+                },
+                {
+                    "label": "System Design",
+                    "text": "Typed commands and validated metadata drive manifest-based install, update, removal, and listing flows. Installed templates combine scaffolded LangGraph packages with OpenCode assets that manage local servers and workflow run state."
+                },
+                {
+                    "label": "Decisions and Tradeoffs",
+                    "text": "Global template installs encourage reuse, while project-local assets preserve the context needed for each codebase. Bundling the execution assets increases package scope, but removes repeated setup from every workflow."
+                }
             ]
         },
         "fontFamily": "ClashDisplay",

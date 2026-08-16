@@ -59,8 +59,8 @@ defineExpose({ el, overlay });
                 <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
 
                 <ul class="description description-long" :class="{ 'contains-video': activeProject.video }">
-                    <li v-for="description in activeProject.description?.long" :key="description">
-                        {{ description }}
+                    <li v-for="detail in activeProject.description?.long" :key="detail.label">
+                        <strong>{{ detail.label }}:</strong> {{ detail.text }}
                     </li>
                 </ul>
             </div>
@@ -379,6 +379,11 @@ p {
         &.contains-video {
             padding: 0;
             font-size: clamp(1.3em, 1.7vw, 1.4em);
+        }
+
+        strong {
+            font-family: $secondary-font-stack;
+            font-weight: 700;
         }
     }
 }

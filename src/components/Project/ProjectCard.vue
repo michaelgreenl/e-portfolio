@@ -510,8 +510,8 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     <ProjectDemoVideo v-if="project.video" :project="project" :autoplay="autoplayVideo" />
 
                     <ul class="selected-description">
-                        <li v-for="description in project.description?.long" :key="description">
-                            {{ description }}
+                        <li v-for="detail in project.description?.long" :key="detail.label">
+                            <strong>{{ detail.label }}:</strong> {{ detail.text }}
                         </li>
                     </ul>
                 </div>
@@ -939,6 +939,11 @@ p {
     @include bp-sm-phone {
         padding: $space-3 0 0 $space-5;
         font-size: 1.6em;
+    }
+
+    strong {
+        font-family: $secondary-font-stack;
+        font-weight: 700;
     }
 }
 
