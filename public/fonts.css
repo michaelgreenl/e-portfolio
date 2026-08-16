@@ -33,6 +33,14 @@
 }
 
 @font-face {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 700;
+    src: url('/fonts/inter/Inter-Bold.woff2') format('woff2');
+    font-display: block;
+}
+
+@font-face {
     font-family: Spartan;
     font-style: normal;
     font-weight: 400;

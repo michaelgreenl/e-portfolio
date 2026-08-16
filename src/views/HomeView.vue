@@ -3,6 +3,7 @@ import { onMounted, watch } from 'vue';
 import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
+import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { homeAnimations } from '@/animations/page/home.js';
 import Button from '@/components/Button.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
@@ -10,6 +11,8 @@ import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
 import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
 import MailSquareIcon from '@/components/SVGs/MailSquareIcon.vue';
+
+const { isLaptop } = useBreakpoints();
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -75,9 +78,21 @@ onMounted(() => {
                     preset="secondary"
                 />
             </div>
+
+            <div v-show="isLaptop" class="contact-links contact-links-desktop">
+                <a href="https://github.com/michaelgreenl" target="_blank">
+                    <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+                </a>
+                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
+                    <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+                </a>
+                <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
+                    <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
+                </a>
+            </div>
         </div>
     </div>
-    <div class="contact-links">
+    <div v-show="!isLaptop" class="contact-links contact-links-mobile">
         <a href="https://github.com/michaelgreenl" target="_blank">
             <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
         </a>
@@ -215,7 +230,8 @@ p {
     align-items: center;
     align-self: flex-end;
     justify-content: flex-end;
-    width: 90%;
+    width: 94%;
+    height: 2.75em;
 
     @include bp-md-tablet {
         display: flex;
@@ -232,15 +248,34 @@ p {
 }
 
 .contact-links {
-    position: absolute;
-    z-index: 5;
-    top: $size-11;
-    right: $space-3;
     display: flex;
     gap: $space-3;
     justify-content: flex-end;
-    width: 100vw;
     font-size: 1.7em;
+
+    &-mobile {
+        position: absolute;
+        top: 5.5rem;
+        right: $space-3;
+        z-index: 5;
+        width: 100vw;
+    }
+
+    &-desktop {
+        gap: $space-2;
+        align-items: center;
+        height: $size-9;
+        padding-left: 1rem;
+        font-size: 1.1em;
+
+        @include theme-dark {
+            border-left: solid 1px $color-gray6;
+        }
+
+        @include theme-light {
+            border-left: solid 1px $color-gray5;
+        }
+    }
 
     a :deep(button) {
         gap: 0;
@@ -260,17 +295,9 @@ p {
         }
     }
 
-    @include bp-custom-min($hero-tablet-bp) {
-        gap: $space-4;
-        font-size: 1.8em;
-    }
-
     @include bp-sm-phone {
+        top: 6.25rem;
         right: 0.85em;
-    }
-
-    @include bp-lg-laptop {
-        font-size: 1.7em;
     }
 }
 
