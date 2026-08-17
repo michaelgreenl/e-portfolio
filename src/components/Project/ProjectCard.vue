@@ -29,7 +29,7 @@ const bp = useBreakpoints();
 const externalLinkRespText = (projectSlug, externalLinks) => {
     const className = 'responsive-link-text';
 
-    const TWO_COLUMN_CARD = 'game-lobby';
+    const TWO_COLUMN_CARD = 'reaction';
 
     if (bp.isXlLaptop.value) {
         return 'undefined';
@@ -719,14 +719,6 @@ p {
             font-size: 1.4em;
         }
 
-        @include bp-md-tablet {
-            margin-right: $space-24;
-        }
-
-        @include bp-xl-desktop {
-            margin-right: $space-12;
-        }
-
         .project-logo {
             display: flex;
             align-items: center;
@@ -743,7 +735,7 @@ p {
 
         h2 {
             margin: 0 !important;
-            font-size: 2.2em;
+            font-size: clamp(1.8em, 7vw, 2.2em);
 
             @include theme-dark {
                 color: $color-gray3;

@@ -1,5 +1,72 @@
 [
     {
+        "title": "Job Search Facilitator",
+        "slug": "jsf",
+        "stackText": [
+            "Vue",
+            "TypeScript",
+            "Node",
+            "Codex",
+            "Docker",
+            "Pinia",
+            "Sass",
+            "Prisma",
+            "Zod",
+            "Vitest",
+            "Express",
+            "Postgres"
+        ],
+        "stack": [
+            "vue",
+            "typescript",
+            "node",
+            "codex",
+            "docker",
+            "pinia",
+            "sass",
+            "prisma",
+            "zod",
+            "vitest",
+            "express",
+            "postgres"
+        ],
+        "shortDate": "July 2026 - Present",
+        "longDate": "July 2026 - Present",
+        "description": {
+            "short": "A full-stack, local-first web app that turns AI-sourced job leads into an organized application pipeline. It offers a focused, feature-rich interface for the modern job search.",
+            "long": [
+                {
+                    "label": "Project and Experience",
+                    "text": "Job Search Facilitator turns job discovery into one review, application, outreach, and tracking workflow. Users can assess ranked roles, set priorities, manage application files, find contacts, draft messages, and track follow-ups."
+                },
+                {
+                    "label": "System Design",
+                    "text": "A Vue and Pinia client uses an Express, Prisma, and PostgreSQL API for durable workflow data. A host-side bridge streams structured Codex tasks, while isolated agents discover jobs and judge candidates through validated artifacts."
+                },
+                {
+                    "label": "Decisions and Tradeoffs",
+                    "text": "I separated the Docker data service from the macOS agent bridge and isolated discovery from final judgment. This adds services and artifact handoffs, but keeps browser access local, reduces evaluation bias, and validates results before storage."
+                }
+            ]
+        },
+        "fontFamily": "ClashDisplay",
+        "img": "tally_blurred.webp",
+        "video": "1166819858",
+        "externalLinks": {
+            "github": {
+                "href": "https://github.com/michaelgreenl/job-search-facilitator",
+                "text": "Repository"
+            },
+            "demoVideo": {
+                "href": "https://michaelgreenl.net/projects?slug=jsf&autoplay=true",
+                "text": "Demo Video"
+            },
+            "porfolioLink": {
+                "href": "https://michaelgreenl.net/projects?slug=jsf&autoplay=false"
+            }
+        }
+    },
+    {
         "title": "Tally Tracker",
         "slug": "tally",
         "stackText": [
@@ -186,45 +253,6 @@
             },
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=algo-visualizer&autoplay=false"
-            }
-        }
-    },
-    {
-        "title": "MAWM",
-        "slug": "mawm",
-        "stackText": ["TypeScript", "LangGraph", "Node", "OpenCode", "Vitest"],
-        "stack": ["typescript", "langgraph", "node", "opencode", "vitest"],
-        "shortDate": "May 2026 - June 2026",
-        "longDate": "May 2026 - June 2026",
-        "description": {
-            "short": "A TypeScript CLI for packaging, installing, and running LangGraph workflow templates with manifest-based distribution and bundled OpenCode execution assets.",
-            "long": [
-                {
-                    "label": "Project and Experience",
-                    "text": "MAWM is a CLI for packaging, installing, and running reusable LangGraph workflow templates. It gives projects a consistent way to add planning assets, start workflows, resume threads, and review results."
-                },
-                {
-                    "label": "System Design",
-                    "text": "Typed commands and validated metadata drive manifest-based install, update, removal, and listing flows. Installed templates combine scaffolded LangGraph packages with OpenCode assets that manage local servers and workflow run state."
-                },
-                {
-                    "label": "Decisions and Tradeoffs",
-                    "text": "Global template installs encourage reuse, while project-local assets preserve the context needed for each codebase. Bundling the execution assets increases package scope, but removes repeated setup from every workflow."
-                }
-            ]
-        },
-        "fontFamily": "ClashDisplay",
-        "externalLinks": {
-            "github": {
-                "href": "https://github.com/michaelgreenl/mawm",
-                "text": "Repository"
-            },
-            "npm": {
-                "href": "https://www.npmjs.com/package/@mawm/cli",
-                "text": "Package"
-            },
-            "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=mawm&autoplay=false"
             }
         }
     }
