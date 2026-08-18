@@ -181,7 +181,6 @@ p {
     width: 2.25rem;
     height: 2.25rem;
     padding: 0.8em;
-    margin-bottom: $size-1;
     color: $color-text-secondary;
     background: transparent;
     border: 0;
@@ -340,7 +339,7 @@ p {
     display: flex;
     gap: $space-2;
     align-items: center;
-    margin-bottom: $size-4;
+    margin-bottom: $size-2;
     font-size: 1.4em;
     white-space: nowrap;
 
