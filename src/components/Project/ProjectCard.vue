@@ -631,13 +631,17 @@ p {
     cursor: pointer;
     border-bottom: solid 1px $color-text-muted;
 
+    &.is-page-transitioning {
+        pointer-events: none;
+    }
+
     &:first-child {
         border-top: solid 1px $color-text-muted;
     }
 
     @media (hover: hover) and (pointer: fine) {
-        &:hover,
-        &:active {
+        &:not(.is-page-transitioning):hover,
+        &:not(.is-page-transitioning):active {
             border-radius: $radius-md;
             box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
             backdrop-filter: blur(2px);
