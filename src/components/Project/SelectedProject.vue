@@ -4,6 +4,7 @@ import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
 
+import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
 defineProps({
@@ -31,11 +32,13 @@ defineExpose({ el, overlay });
         :aria-label="activeProject.title"
         @keydown.esc="emit('close-project')"
     >
-        <button @click="() => emit('close-project')" class="close-btn">
-            <CloseIcon />
-        </button>
         <div class="selected-project">
-            <div class="project-header">
+            <div class="project-overview">
+                <div class="date">
+                    <CalendarIcon aria-hidden="true" />
+                    <p>{{ activeProject.longDate }}</p>
+                </div>
+
                 <div class="project-header-info">
                     <div class="project-title">
                         <component :is="projectLogos[activeProject.slug]" />
@@ -48,41 +51,43 @@ defineExpose({ el, overlay });
                     <p class="description description-short">{{ activeProject.description.short }}</p>
                 </div>
 
+                <div class="project-media">
+                    <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
+
+                    <div class="external-links">
+                        <a
+                            v-for="[key, link] in Object.entries(activeProject.externalLinks).filter(
+                                ([key]) => key !== 'demoVideo' && key !== 'porfolioLink',
+                            )"
+                            :key="key"
+                            :class="{ 'no-fill': key === 'liveSite' }"
+                            :href="link.href"
+                            :aria-label="link.text"
+                            :title="link.text"
+                            target="_blank"
+                        >
+                            <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-details">
+                <button class="close-btn" type="button" aria-label="Close project" @click="emit('close-project')">
+                    <CloseIcon />
+                </button>
+
                 <div class="tool-container">
                     <div class="tool-chips" :class="{ 'large-stack': activeProject.stack.length > 5 }">
                         <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
                     </div>
                 </div>
-            </div>
-
-            <div class="project-body">
-                <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
 
                 <ul class="description description-long" :class="{ 'contains-video': activeProject.video }">
                     <li v-for="detail in activeProject.description?.long" :key="detail.label">
                         <strong>{{ detail.label }}:</strong> {{ detail.text }}
                     </li>
                 </ul>
-            </div>
-
-            <div class="project-footer">
-                <div class="external-links">
-                    <a
-                        v-for="[key, link] in Object.entries(activeProject.externalLinks).filter(
-                            ([key]) => key !== 'demoVideo' && key !== 'porfolioLink',
-                        )"
-                        :key="key"
-                        :class="{ 'no-fill': key === 'liveSite' }"
-                        :href="link.href"
-                        target="_blank"
-                    >
-                        <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
-                    </a>
-                </div>
-
-                <div class="date">
-                    <p>{{ activeProject.longDate }}</p>
-                </div>
             </div>
         </div>
 
@@ -95,14 +100,12 @@ p {
     margin: 0;
 }
 
-.selected-container,
-.close-btn {
+.selected-container {
     @include flex-center-all;
 }
 
 .project-title,
-.tool-chips,
-.date {
+.tool-chips {
     display: flex;
     align-items: center;
 }
@@ -129,60 +132,16 @@ p {
     }
 }
 
-.close-btn {
-    position: absolute !important;
-    top: $space-3;
-    right: $space-4;
-    z-index: 100;
-    width: $size-10;
-    height: $size-10;
-    padding: $space-3;
-    font-size: 1.2em;
-    outline: 0;
-    background: transparent;
-    border: 0;
-    border-radius: $radius-round;
-
-    @include bp-xl-desktop {
-        top: $space-4;
-        right: $space-5;
-    }
-
-    svg {
-        @include theme-dark {
-            fill: $color-gray4 !important;
-        }
-
-        @include theme-light {
-            fill: $color-gray8 !important;
-        }
-    }
-
-    @include interactive {
-        @include theme-dark {
-            background-color: #49505750;
-        }
-
-        @include theme-light {
-            background-color: #49505710;
-        }
-    }
-
-    &::after {
-        display: none !important;
-    }
-}
-
 .selected-project {
     position: relative;
     z-index: 2;
-    display: flex;
-    flex-direction: column;
-    gap: $space-2;
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    gap: $space-3 $space-6;
     width: 98vw;
-    max-width: 85em;
+    max-width: 86em;
     max-height: 95dvh;
-    padding: $size-9 $size-8;
+    padding: $size-9 $size-10;
     margin: $space-8 0;
     overflow-y: auto;
     border: 1px solid rgb(255 255 255 / 12%);
@@ -198,13 +157,46 @@ p {
     }
 
     @include bp-lg-laptop {
-        padding: $size-10 $size-12;
+        column-gap: $space-10;
+        padding: $size-9 $size-12;
     }
 }
 
-.project-header {
+.project-overview,
+.project-details,
+.project-media {
     display: flex;
-    gap: $space-8;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.project-details {
+    justify-content: space-evenly;
+}
+
+.close-btn {
+    @include flex-center-all;
+
+    align-self: flex-end;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.8em;
+    margin-bottom: $size-1;
+    color: $color-text-secondary;
+    background: transparent;
+    border: 0;
+    border-radius: $radius-round;
+    transform: translate(5px, -9px);
+
+    svg {
+        width: 100%;
+        height: 100%;
+        fill: currentcolor;
+    }
+
+    @include interactive {
+        background-color: rgb(73 80 87 / 20%);
+    }
 }
 
 .project-header-info {
@@ -232,6 +224,8 @@ p {
     h2 {
         margin: 0 !important;
         font-size: 2em;
+        line-height: 0.95;
+        text-wrap: balance;
 
         @include theme-dark {
             color: $color-gray3;
@@ -251,38 +245,33 @@ p {
     }
 }
 
-.project-body {
-    display: flex;
-    gap: $space-10;
-    padding: $space-8 0;
-    margin: $space-4 0;
-    border-top: solid 1px $color-text-muted;
-    border-bottom: solid 1px $color-text-muted;
+.project-media,
+.description-long {
+    margin-top: $space-6;
+}
 
-    @include bp-lg-laptop {
-        gap: $space-12;
-    }
+.project-media {
+    flex: 1;
+    gap: $space-8;
 }
 
 .demo-video {
-    align-self: center;
-    width: 45%;
+    width: 100%;
     border-radius: $radius-md;
-}
-
-.project-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 $space-2;
 }
 
 .external-links {
     display: flex;
-    gap: $space-6;
+    gap: $space-4;
+    margin-top: auto;
     font-size: 1.5em;
 
     a {
+        min-width: 0;
+
         &:deep(button) {
+            white-space: nowrap;
+
             @include bp-md-tablet {
                 gap: $space-2;
             }
@@ -328,18 +317,13 @@ p {
 }
 
 .tool-container {
-    display: flex;
-    flex-direction: column;
-    gap: $space-8;
-    justify-content: center;
-    min-width: 46%;
+    min-width: 0;
 }
 
 .tool-chips {
     flex-wrap: wrap;
     gap: $space-4;
     justify-content: center;
-    padding-right: $space-3;
     font-size: 1.2em;
 
     .chip {
@@ -353,9 +337,18 @@ p {
 }
 
 .date {
+    display: flex;
     gap: $space-2;
-    font-size: 1.3em;
+    align-items: center;
+    margin-bottom: $size-4;
+    font-size: 1.4em;
     white-space: nowrap;
+
+    svg {
+        width: $size-4;
+        height: $size-4;
+        stroke: $color-text-secondary;
+    }
 }
 
 .description {
@@ -369,15 +362,13 @@ p {
 
     &-long {
         display: flex;
-        flex: 1.2;
         flex-direction: column;
         gap: $space-2;
-        justify-content: center;
-        margin: 0;
+        padding-left: $space-6;
+        margin-bottom: 0;
         line-height: 2ch;
 
         &.contains-video {
-            padding: 0;
             font-size: clamp(1.3em, 1.7vw, 1.4em);
         }
 
