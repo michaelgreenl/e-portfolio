@@ -18,7 +18,7 @@ let loadTimer;
 const videoSrc = computed(() => {
     if (!props.project.video) return undefined;
 
-    return `https://player.vimeo.com/video/${props.project.video}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=${props.autoplay ? '1' : '0'}&muted=1`;
+    return `https://player.vimeo.com/video/${props.project.video}?badge=0&autopause=0&player_id=0&app_id=58479&texttrack=en-US&autoplay=${props.autoplay ? '1' : '0'}&muted=1`;
 });
 
 const posterSrc = computed(() => {
