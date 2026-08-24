@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
     preset: {
-        type: String, // primary, primary-accent, secondary
+        type: String, // primary, primary-accent, secondary, contact-link
     },
     text: {
         type: String,
@@ -156,8 +156,18 @@ button {
             }
         }
 
-        &:active::after {
+        &:active::after,
+        &:focus::after {
+            right: 2px;
             left: calc(100% - 2px);
+        }
+    }
+
+    &.contact-link {
+        transition: transform 0.3s ease;
+
+        &:active {
+            transform: scale(0.95);
         }
     }
 }
