@@ -155,6 +155,10 @@ button {
                 right: 2px;
             }
         }
+
+        &:active::after {
+            left: calc(100% - 2px);
+        }
     }
 }
 </style>
