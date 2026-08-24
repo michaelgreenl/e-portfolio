@@ -19,7 +19,11 @@ defineProps({
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }">
+    <button
+        :class="preset"
+        :style="{ ...styles }"
+        @click="$event.currentTarget.classList.add('is-clicked')"
+    >
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}
@@ -157,7 +161,7 @@ button {
         }
 
         &:active::after,
-        &:focus::after {
+        &.is-clicked::after {
             right: 2px;
             left: calc(100% - 2px);
         }
