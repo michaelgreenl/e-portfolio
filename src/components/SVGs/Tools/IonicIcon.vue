@@ -1,5 +1,5 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 -2 100 110">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 100 100">
         <path
             fill="#3880ff"
             fill-rule="evenodd"
