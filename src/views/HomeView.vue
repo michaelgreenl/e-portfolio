@@ -49,8 +49,8 @@ onMounted(() => {
             <hr class="hero-line" />
             <h2>Full-Stack Developer</h2>
             <p>
-                I build full-stack Vue/TypeScript apps with real-time collaboration, offline-first sync, secure APIs,
-                and polished interfaces.
+                I build full-stack applications with real-time collaboration, offline-first sync, secure APIs, and
+                polished interfaces.
             </p>
 
             <div class="cta">
