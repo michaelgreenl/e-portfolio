@@ -40,7 +40,7 @@ const tools = {
         text: 'Codex',
         icon: markRaw(OpenAIIcon),
         lightColor: '#4B4646',
-        darkColor: '#F1ECEC',
+        darkColor: '#CFD5DC',
         maxWidth: '7em',
     },
     opencode: {

@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
     preset: {
-        type: String, // primary, primary-accent, secondary
+        type: String, // primary, primary-accent, secondary, contact-link
     },
     text: {
         type: String,
@@ -19,7 +19,11 @@ defineProps({
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }">
+    <button
+        :class="preset"
+        :style="{ ...styles }"
+        @click="$event.currentTarget.classList.add('is-clicked')"
+    >
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}
@@ -154,6 +158,20 @@ button {
             &::after {
                 right: 2px;
             }
+        }
+
+        &:active::after,
+        &.is-clicked::after {
+            right: 2px;
+            left: calc(100% - 2px);
+        }
+    }
+
+    &.contact-link {
+        transition: transform 0.3s ease;
+
+        &:active {
+            transform: scale(0.95);
         }
     }
 }

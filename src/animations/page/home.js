@@ -129,6 +129,7 @@ export const homeAnimations = {
                 .to(
                     desktopContactLinkTargets,
                     {
+                        clearProps: 'transform',
                         duration: reducedMotion ? 0.01 : TIMING.duration.normal,
                         ease: TIMING.easing.organic,
                         opacity: 1,
@@ -144,6 +145,7 @@ export const homeAnimations = {
                 mobileContactTargets,
                 {
                     autoAlpha: 1,
+                    clearProps: 'transform',
                     duration,
                     ease: TIMING.easing.smooth,
                     scale: 1,

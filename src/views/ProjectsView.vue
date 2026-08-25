@@ -52,6 +52,7 @@ const externalIcons = {
 const activeProject = ref();
 const scrollPosition = ref();
 const autoplayVideo = ref(false);
+const enteringProjectSlugs = ref(new Set(projectsData.map(({ slug }) => slug)));
 
 watch(
     () => routeStore.isLeaving,
@@ -70,7 +71,16 @@ onMounted(() => {
     headerReveal({ headerEl: pageHeader.value });
     revealIn({
         selector: '.project-card',
-        opts: { delay: 0.2, duration: TIMING.duration.moderate, stagger: TIMING.stagger.loose },
+        opts: {
+            delay: 0.2,
+            duration: TIMING.duration.moderate,
+            stagger: {
+                each: TIMING.stagger.loose,
+                onComplete() {
+                    enteringProjectSlugs.value.delete(this.targets()[0].dataset.projectSlug);
+                },
+            },
+        },
     });
 
     const query = routeStore.currentRoute.query;
@@ -150,6 +160,8 @@ function closeProject() {
                 :project="project"
                 :project-logos="projectLogos"
                 :external-icons="externalIcons"
+                :data-project-slug="project.slug"
+                :class="{ 'is-page-transitioning': enteringProjectSlugs.has(project.slug) || routeStore.isLeaving }"
                 @open-project="openProject"
                 @close-selected="closeProject"
             />

@@ -81,26 +81,26 @@ onMounted(() => {
 
             <div v-show="isLaptop" class="contact-links contact-links-desktop">
                 <a href="https://github.com/michaelgreenl" target="_blank">
-                    <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+                    <Button :iconLeft="GithubFillIcon" preset="secondary contact-link" />
                 </a>
                 <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                    <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+                    <Button :iconLeft="LinkedInIcon" preset="secondary contact-link" />
                 </a>
                 <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-                    <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
+                    <Button :iconLeft="MailSquareIcon" preset="secondary contact-link" />
                 </a>
             </div>
         </div>
     </div>
     <div v-show="!isLaptop" class="contact-links contact-links-mobile">
         <a href="https://github.com/michaelgreenl" target="_blank">
-            <Button class="contact-link" :iconLeft="GithubFillIcon" preset="secondary" />
+            <Button :iconLeft="GithubFillIcon" preset="secondary contact-link" />
         </a>
         <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-            <Button class="contact-link" :iconLeft="LinkedInIcon" preset="secondary" />
+            <Button :iconLeft="LinkedInIcon" preset="secondary contact-link" />
         </a>
         <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-            <Button class="contact-link" :iconLeft="MailSquareIcon" preset="secondary" />
+            <Button :iconLeft="MailSquareIcon" preset="secondary contact-link" />
         </a>
     </div>
 </template>
