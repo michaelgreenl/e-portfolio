@@ -70,9 +70,8 @@
         "title": "Tally Tracker",
         "slug": "tally",
         "stackText": [
-            "Vue",
             "TypeScript",
-            "Ionic",
+            "React-Native",
             "Node",
             "Socket.IO",
             "Prisma",
@@ -83,9 +82,8 @@
             "Postgres"
         ],
         "stack": [
-            "vue",
             "typescript",
-            "ionic",
+            "react-native",
             "node",
             "socket",
             "prisma",

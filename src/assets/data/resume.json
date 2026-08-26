@@ -41,9 +41,8 @@
             "list": [
                 "Vue",
                 "Nuxt",
-                "Ionic",
-                "Capacitor",
                 "React",
+                "React Native",
                 "Express",
                 "Socket.IO",
                 "GSAP",

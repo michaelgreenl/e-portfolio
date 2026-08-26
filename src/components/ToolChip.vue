@@ -25,6 +25,7 @@ import VitestIcon from '@/components/SVGs/Tools/VitestIcon.vue';
 import ZodIcon from '@/components/SVGs/Tools/ZodIcon.vue';
 import OpenCodeIcon from '@/components/SVGs/Tools/OpenCodeIcon.vue';
 import OpenAIIcon from '@/components/SVGs/Tools/OpenAIIcon.vue';
+import ReactIcon from '@/components/SVGs/Tools/ReactIcon.vue';
 
 defineProps({
     tool: {
@@ -36,6 +37,14 @@ const themeStore = useThemeStore();
 
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '7em' },
+    'react-native': {
+        text: 'React Native',
+        icon: markRaw(ReactIcon),
+        lightColor: '#61dafb',
+        darkColor: '#61dafb',
+        maxWidth: '11em',
+        minWidth: '10em',
+    },
     codex: {
         text: 'Codex',
         icon: markRaw(OpenAIIcon),
@@ -160,6 +169,7 @@ const tools = {
             backgroundColor:
                 themeStore.theme === 'light' ? `${tools[tool].lightColor}30` : `${tools[tool].darkColor}30`,
             maxWidth: `${tools[tool].maxWidth}`,
+            minWidth: `${tools[tool].minWidth}`,
         }"
     >
         <div class="icon-container">
