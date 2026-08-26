@@ -7,7 +7,7 @@ const gradientIds = [0, 1, 2, 3].map((index) => `pinia-gradient-${index}-${insta
 
 <template>
     <div>
-        <svg viewBox="0 2 78 100" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 78 100" xmlns="http://www.w3.org/2000/svg">
             <path
                 fill-rule="evenodd"
                 clip-rule="evenodd"
