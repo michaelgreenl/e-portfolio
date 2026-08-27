@@ -26,6 +26,7 @@ import ZodIcon from '@/components/SVGs/Tools/ZodIcon.vue';
 import OpenCodeIcon from '@/components/SVGs/Tools/OpenCodeIcon.vue';
 import OpenAIIcon from '@/components/SVGs/Tools/OpenAIIcon.vue';
 import ReactIcon from '@/components/SVGs/Tools/ReactIcon.vue';
+import ExpoIcon from '@/components/SVGs/Tools/ExpoIcon.vue';
 
 defineProps({
     tool: {
@@ -37,10 +38,17 @@ const themeStore = useThemeStore();
 
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '7em' },
+    expo: {
+        text: 'Expo',
+        icon: markRaw(ExpoIcon),
+        lightColor: '#111111',
+        darkColor: '#ffffff',
+        maxWidth: '7em',
+    },
     'react-native': {
         text: 'React Native',
         icon: markRaw(ReactIcon),
-        lightColor: '#61dafb',
+        lightColor: '#53b9d5',
         darkColor: '#61dafb',
         maxWidth: '11em',
         minWidth: '10em',
