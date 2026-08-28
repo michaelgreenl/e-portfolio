@@ -139,7 +139,7 @@ p {
     grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
     gap: $space-3 $space-6;
     width: 98vw;
-    max-width: 86em;
+    max-width: 90em;
     max-height: 95dvh;
     padding: $size-9 $size-10;
     margin: $space-8 0;
