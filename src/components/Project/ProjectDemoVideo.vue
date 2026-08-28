@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onUnmounted, shallowRef, watch } from 'vue';
+import { computed, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue';
 
 const props = defineProps({
     project: { required: true, type: Object },
@@ -13,6 +13,8 @@ const projectImages = import.meta.glob('../../assets/images/*_blurred.webp', {
 });
 
 const isLoaded = shallowRef(false);
+const videoFrame = useTemplateRef('videoFrame');
+const vimeoOrigin = 'https://player.vimeo.com';
 let loadTimer;
 
 const videoSrc = computed(() => {
@@ -36,7 +38,31 @@ function clearLoadTimer() {
     loadTimer = undefined;
 }
 
+function onPlayerMessage(event) {
+    if (event.origin !== vimeoOrigin || event.source !== videoFrame.value?.contentWindow) return;
+
+    const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+    if (data?.event === 'timeupdate') {
+        videoFrame.value.contentWindow?.postMessage(
+            { method: 'enableTextTrack', value: { kind: 'captions', language: 'en-US', showing: true } },
+            vimeoOrigin,
+        );
+        videoFrame.value.contentWindow?.postMessage(
+            { method: 'removeEventListener', value: 'timeupdate' },
+            vimeoOrigin,
+        );
+        return;
+    }
+
+    if (data?.event !== 'ready' && data?.method !== 'ping') return;
+
+    videoFrame.value.contentWindow?.postMessage({ method: 'addEventListener', value: 'timeupdate' }, vimeoOrigin);
+}
+
 function onFrameLoad() {
+    videoFrame.value.contentWindow?.postMessage({ method: 'ping' }, vimeoOrigin);
+
     clearLoadTimer();
 
     loadTimer = window.setTimeout(() => {
@@ -44,6 +70,8 @@ function onFrameLoad() {
         loadTimer = undefined;
     }, 160);
 }
+
+onMounted(() => window.addEventListener('message', onPlayerMessage));
 
 watch(
     videoSrc,
@@ -54,13 +82,17 @@ watch(
     { immediate: true },
 );
 
-onUnmounted(clearLoadTimer);
+onUnmounted(() => {
+    clearLoadTimer();
+    window.removeEventListener('message', onPlayerMessage);
+});
 </script>
 
 <template>
     <div class="demo-video" :class="{ 'is-loaded': isLoaded }" :aria-busy="!isLoaded">
         <iframe
             v-if="videoSrc"
+            ref="videoFrame"
             class="demo-video-player"
             :src="videoSrc"
             frameborder="0"
