@@ -194,7 +194,7 @@ onMounted(() => {
     }
 
     @include bp-xl-desktop {
-        max-width: 56em;
+        max-width: 58em;
     }
 
     @include bp-xsm-phone {
