@@ -113,6 +113,21 @@ onMounted(() => {
             </div>
 
             <div class="section">
+                <h2 class="section-header">Technical Skills</h2>
+
+                <div class="section-content">
+                    <div class="section-segment section-segment-skills">
+                        <p v-for="skills in resumeData.skills" :key="skills.category">
+                            <span class="skill-category">{{ skills.category }}:</span>&nbsp;
+                            <span v-for="(skill, i) in skills.list" :key="skill" class="skill-name"
+                                >{{ skill }}{{ i < skills.list.length - 1 ? ', ' : '' }}</span
+                            >
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
                 <h2 class="section-header">Projects</h2>
 
                 <div class="section-content">
@@ -144,20 +159,6 @@ onMounted(() => {
                                 {{ project.description.short }}
                             </li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="section">
-                <h2 class="section-header">Technical Skills</h2>
-
-                <div class="section-content">
-                    <div class="section-segment section-segment-skills">
-                        <p v-for="skills in resumeData.skills" :key="skills.category">
-                            <span class="skill-category">{{ skills.category }}:</span>&nbsp;
-                            <span v-for="(skill, i) in skills.list" :key="skill" class="skill-name"
-                                >{{ skill }}{{ i < skills.list.length - 1 ? ', ' : '' }}</span
-                            >
-                        </p>
                     </div>
                 </div>
             </div>
