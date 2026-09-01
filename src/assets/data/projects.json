@@ -33,11 +33,11 @@
         "shortDate": "July 2026 - Present",
         "longDate": "July 2026 - Present",
         "description": {
-            "short": "A full-stack, local-first web app that turns AI-sourced job leads into a focused pipeline for reviewing roles, managing applications, and tracking outreach.",
+            "short": "A local full-stack web app that turns AI-sourced job leads into a focused pipeline for reviewing roles, managing applications, and tracking outreach.",
             "long": [
                 {
                     "label": "Project and Experience",
-                    "text": "Job Search Facilitator turns job discovery into one review, application, outreach, and tracking workflow. Users can assess ranked roles, set priorities, manage application files, find contacts, draft messages, and track follow-ups."
+                    "text": "Job Search Facilitator turns job discovery into one review, application, outreach, and tracking workflow. Users can review ranked roles, set priorities, manage application files, find contacts, draft messages, and track follow-ups."
                 },
                 {
                     "label": "System Design",
@@ -98,11 +98,11 @@
         "shortDate": "January 2026 - Present",
         "longDate": "January 2026 - Present",
         "description": {
-            "short": "A cross-platform offline-first application utilizing a custom synchronization queue for network resilience, featuring real-time shared counters and native deep linking integration.",
+            "short": "Offline-first counter app for iOS, Android, and web. Offline mutiations queue locally and replay on reconnect; shared counters sync in real time, with native invite deep links.",
             "long": [
                 {
                     "label": "Project and Experience",
-                    "text": "Tally is a cross-platform counter app for personal and shared tracking. Users can update counters immediately, invite participants through deep links, and continue working through poor connectivity."
+                    "text": "Tally Tracker is a cross-platform counter app for personal and shared tracking. Users can track counters, invite participants through deep links, and continue working through disconnects."
                 },
                 {
                     "label": "System Design",
@@ -110,7 +110,7 @@
                 },
                 {
                     "label": "Decisions and Tradeoffs",
-                    "text": "Offline support shaped authentication, idempotency, state reconciliation, and web/native token delivery. I accepted additional coordination logic to keep the interface responsive and recoverable."
+                    "text": "Offline support shaped authentication, idempotency, state reconciliation, and web/native token delivery. I accepted added synchronization complexity so the app could stay responsive and recover cleanly after connection loss."
                 }
             ]
         },
@@ -143,7 +143,7 @@
             "long": [
                 {
                     "label": "Project and Experience",
-                    "text": "Reaction is a training app built around configurable reaction-time drills. Players can adjust each drill, receive animated feedback, and review results across recent sessions and their full profile history."
+                    "text": "Reaction is a training app built around configurable reaction-time drills. Players can adjust settings for each drill, receive animated feedback, and review results across recent sessions and their full profile history."
                 },
                 {
                     "label": "System Design",
@@ -223,7 +223,7 @@
         "shortDate": "Built May 2022 · Enhanced July 2025",
         "longDate": "Built May 2022 · Enhanced July 2025",
         "description": {
-            "short": "An algorithm visualization prototype featuring an insertion-sort visualizer using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
+            "short": "An algorithm visualization prototype featuring an insertion-sort visualizer, using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
             "long": [
                 {
                     "label": "Project and Experience",
