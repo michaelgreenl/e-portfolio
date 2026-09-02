@@ -33,7 +33,7 @@
         "shortDate": "July 2026 - Present",
         "longDate": "July 2026 - Present",
         "description": {
-            "short": "Job Search Facilitator is a web app for turning job leads into a focused application workflow. Users can review and prioritize roles, manage application materials, and track outreach and follow-ups in one place.",
+            "short": "A local full-stack web app that turns AI-sourced job leads into a focused pipeline for reviewing roles, managing applications, and tracking outreach.",
             "long": [
                 {
                     "label": "Project and Experience",
@@ -98,7 +98,7 @@
         "shortDate": "January 2026 - Present",
         "longDate": "January 2026 - Present",
         "description": {
-            "short": "Tally Tracker is a cross-platform app for keeping personal or shared counts on iOS, Android, and the web. Users can track multiple counters, collaborate on shared counters in real time, and continue counting offline.",
+            "short": "Tally Tracker is a cross-platform app for personal and shared counts. Users can track multiple counters, collaborate in real time, and continue counting offline.",
             "long": [
                 {
                     "label": "Project and Experience",
@@ -139,7 +139,7 @@
         "shortDate": "Sep. '25 - Dec. '25",
         "longDate": "September 2025 - December 2025",
         "description": {
-            "short": "Reaction is a training app for practicing and measuring visual reaction time. Players can configure each drill, respond to timed targets, and review recent scores and their full performance history.",
+            "short": "A reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
             "long": [
                 {
                     "label": "Project and Experience",
@@ -181,7 +181,7 @@
         "shortDate": "June 2025 - July 2025",
         "longDate": "June 2025 - July 2025",
         "description": {
-            "short": "GameLobby is a real-time web app for playing two-player tic-tac-toe through shared online lobbies. Players can create or join games, request rematches, and reconnect to active matches after temporary connection loss.",
+            "short": "A real-time tic-tac-toe lobby with JWT-authenticated Socket.IO sessions, server-side move validation, rematches, forfeits, and disconnect recovery.",
             "long": [
                 {
                     "label": "Project and Experience",
@@ -223,7 +223,7 @@
         "shortDate": "Built May 2022 · Enhanced July 2025",
         "longDate": "Built May 2022 · Enhanced July 2025",
         "description": {
-            "short": "AlgoVisualizer is an interactive prototype for following insertion sort one step at a time. Users can play or scrub through the animation, adjust its speed and settings, and read explanations synchronized with each step.",
+            "short": "An algorithm visualization prototype featuring an insertion-sort visualizer, using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
             "long": [
                 {
                     "label": "Project and Experience",
