@@ -98,7 +98,7 @@
         "shortDate": "January 2026 - Present",
         "longDate": "January 2026 - Present",
         "description": {
-            "short": "Tally Tracker is a cross-platform app for personal and shared counts. Users can track multiple counters, collaborate in real time, and continue counting offline.",
+            "short": "Tally Tracker is a cross-platform app for personal and shared counters on iOS, Android, and web, with real-time collaboration and offline synchronization.",
             "long": [
                 {
                     "label": "Project and Experience",
