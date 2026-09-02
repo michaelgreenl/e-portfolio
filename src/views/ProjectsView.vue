@@ -272,10 +272,10 @@ function closeProject() {
         max-width: 92em;
         margin-inline: auto;
 
-        :deep(.project-card:nth-child(3)) {
-            grid-row: 2;
-            grid-column: 1 / span 2;
-        }
+        // :deep(.project-card:nth-child(3)) {
+        //     grid-row: 2;
+        //     grid-column: 1 / span 2;
+        // }
     }
 
     @include bp-xl-desktop {

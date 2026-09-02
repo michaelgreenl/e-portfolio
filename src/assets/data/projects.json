@@ -214,46 +214,5 @@
                 "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=false"
             }
         }
-    },
-    {
-        "title": "AlgoVisualizer",
-        "slug": "algo-visualizer",
-        "stackText": ["Vue", "Nuxt", "GSAP", "Pinia", "Sass", "Node"],
-        "stack": ["vue", "nuxt", "gsap", "pinia", "sass", "node"],
-        "shortDate": "Built May 2022 · Enhanced July 2025",
-        "longDate": "Built May 2022 · Enhanced July 2025",
-        "description": {
-            "short": "An algorithm visualization prototype featuring an insertion-sort visualizer, using Pinia and GSAP for playback, scrubbing, animation settings, and synchronized explanatory text.",
-            "long": [
-                {
-                    "label": "Project and Experience",
-                    "text": "AlgoVisualizer explores how interactive animation can make algorithm steps easier to follow. The insertion-sort module supports playback, scrubbing, speed controls, and explanations synchronized with each visual change."
-                },
-                {
-                    "label": "System Design",
-                    "text": "A Nuxt and Vue shell provides category navigation, search, and dynamic visualization modules. Pinia coordinates interface state while a GSAP timeline acts as the playback engine for animation and explanatory text."
-                },
-                {
-                    "label": "Decisions and Tradeoffs",
-                    "text": "The playback timeline stays outside Vue's reactive system because it is an animation controller rather than interface data. This keeps state updates predictable while preserving precise control over navigation and timing."
-                }
-            ]
-        },
-        "fontFamily": "Futura",
-        "img": "algo-visualizer_blurred.webp",
-        "video": "1149531735",
-        "externalLinks": {
-            "github": {
-                "href": "https://github.com/michaelgreenl/algovisualizer",
-                "text": "Repository"
-            },
-            "demoVideo": {
-                "href": "https://michaelgreenl.net/projects?slug=algo-visualizer&autoplay=true",
-                "text": "Demo Video"
-            },
-            "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=algo-visualizer&autoplay=false"
-            }
-        }
     }
 ]
