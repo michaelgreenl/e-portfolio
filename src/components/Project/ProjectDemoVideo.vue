@@ -45,7 +45,7 @@ function onPlayerMessage(event) {
 
     if (data?.event === 'timeupdate') {
         videoFrame.value.contentWindow?.postMessage(
-            { method: 'enableTextTrack', value: { kind: 'captions', language: 'en-US', showing: true } },
+            { method: 'enableTextTrack', value: { language: 'en', showing: true } },
             vimeoOrigin,
         );
         videoFrame.value.contentWindow?.postMessage(
