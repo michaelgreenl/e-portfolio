@@ -44,8 +44,8 @@
                     "text": "A Vue and Pinia client uses an Express, Prisma, and PostgreSQL API for durable workflow data. A host-side bridge streams structured Codex tasks, while isolated agents discover jobs and judge candidates through validated artifacts."
                 },
                 {
-                    "label": "Decisions and Tradeoffs",
-                    "text": "I separated the Docker data service from the macOS agent bridge and isolated discovery from final judgment. This adds services and artifact handoffs, but keeps browser access local, reduces evaluation bias, and validates results before storage."
+                    "label": "Controlled Agent Workflows",
+                    "text": "The bridge turns Codex activity into visible, recoverable application state, including reasoning, failures, and browser permission requests. Read-only execution and schema-validated artifacts keep job imports and outreach results inside explicit access and data boundaries."
                 }
             ]
         },
@@ -150,8 +150,8 @@
                     "text": "Vue and Pinia manage the game flow while GSAP coordinates feedback and transitions between game states. An Express and PostgreSQL API stores accounts, results, statistics, and the settings used for each attempt."
                 },
                 {
-                    "label": "Decisions and Tradeoffs",
-                    "text": "Saving a settings snapshot with every result preserves the context behind historical scores and makes filtered comparisons reliable. Cookie-based authentication and rate limiting protect the account flow without adding friction to each drill."
+                    "label": "Interaction Design",
+                    "text": "GSAP timelines coordinate countdowns, target feedback, score changes, settings, and end screens without mixing animation into gameplay logic. Flip transitions reorganize profile filters and history columns while preserving continuity across responsive layouts."
                 }
             ]
         },
@@ -192,8 +192,8 @@
                     "text": "Socket.IO connects each player to a server-authoritative game session that validates moves, turns, and match outcomes. User-to-socket tracking supports reconnects and multiple tabs, while Prisma and PostgreSQL persist users and games."
                 },
                 {
-                    "label": "Decisions and Tradeoffs",
-                    "text": "Keeping match rules on the server prevents clients from creating conflicting game states. Soft-disconnect handling adds session complexity, but it avoids ending a match whenever a connection briefly drops."
+                    "label": "Verified Multiplayer Flow",
+                    "text": "Socket-level tests connect real clients through authentication, game creation, joining, wins, draws, forfeits, rematches, and disconnects. They exercise the same event handlers that coordinate live matches, not only isolated board rules."
                 }
             ]
         },
