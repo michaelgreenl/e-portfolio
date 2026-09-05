@@ -47,7 +47,7 @@ onMounted(() => {
                 <span class="hero-title hero-title-2">Green</span>
             </h1>
             <hr class="hero-line" />
-            <h2>Full-Stack Developer</h2>
+            <h2>Software Engineer</h2>
             <p>
                 I build full-stack applications with real-time collaboration, offline-first sync, secure APIs, and
                 polished interfaces.
