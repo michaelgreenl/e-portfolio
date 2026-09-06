@@ -71,6 +71,7 @@ onMounted(() => {
             <div v-for="(route, key) in routeStore.routes" :key="key" class="nav-link">
                 <Button
                     v-if="key !== 'home'"
+                    :class="{ 'is-leaving': routeStore.isLeaving }"
                     @click="() => routeStore.toRoute(key)"
                     :text="route.meta.title"
                     :iconLeft="route.meta.icon"

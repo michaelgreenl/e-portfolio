@@ -157,6 +157,7 @@ button {
         }
 
         &:active::after,
+        &.is-leaving::after,
         &.is-clicked:not(:hover)::after {
             right: 2px;
             left: calc(100% - 2px);
