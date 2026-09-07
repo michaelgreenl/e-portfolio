@@ -8,8 +8,6 @@ import { navbarAnimations } from '@/animations/component/navbar.js';
 import DesktopNavbar from '@/components/Navbar/DesktopNavbar.vue';
 import Logo from '@/components/Logo.vue';
 import MobileNavbar from '@/components/Navbar/MobileNavbar.vue';
-import MoonIcon from '@/components/SVGs/MoonIcon.vue';
-import SunIcon from '@/components/SVGs/SunIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -73,18 +71,34 @@ watch(
                 class="toggle-input"
                 type="checkbox"
                 id="theme"
-                true-value="dark"
-                false-value="light"
-                aria-label="Toggle theme"
-                @click="themeStore.toggleTheme()"
+                role="switch"
+                aria-label="Dark theme"
+                :checked="themeStore.theme === 'dark'"
+                @change="themeStore.toggleTheme()"
             />
 
-            <div class="toggle-thumb" :class="{ active: themeStore.theme === 'dark' }">
-                <Transition name="icon" mode="out-in">
-                    <MoonIcon v-if="themeStore.theme === 'dark'" class="icon" />
-                    <SunIcon v-else class="icon" />
-                </Transition>
-            </div>
+            <span class="toggle-thumb" :class="{ active: themeStore.theme === 'dark' }">
+                <svg class="icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                    <g class="icon-body" fill="currentColor">
+                        <path
+                            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <circle class="sun-disc" cx="12" cy="12" r="10.1" />
+                    </g>
+                    <path
+                        class="sun-rays"
+                        d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </span>
         </label>
     </header>
 
@@ -94,25 +108,6 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-.icon-enter-active,
-.icon-leave-active {
-    transition: all 0.1s ease-in-out;
-}
-
-.icon-enter-from {
-    transform: rotate(-45deg);
-}
-
-.icon-leave-to {
-    transform: rotate(45deg);
-}
-
-.icon-enter-to,
-.icon-leave-from {
-    opacity: 1;
-    transform: rotate(0deg);
-}
-
 // Not setting these initial properties creates awkward flashing on page load when running enter animations.
 .logo,
 .theme-toggle {
@@ -147,10 +142,13 @@ watch(
     padding: 0 $space-2;
 
     .theme-toggle {
+        position: relative;
         display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
         width: $size-11;
         height: $size-8;
-        padding-left: 0.4em;
+        padding: $size-1;
         margin: $space-1;
         cursor: pointer;
         border-radius: $radius-pill;
@@ -168,61 +166,74 @@ watch(
             margin: $space-4;
         }
 
+        &:has(.toggle-input:focus-visible) {
+            outline: 2px solid $color-primary-darker;
+            outline-offset: 4px;
+        }
+
         .toggle-input {
-            /* Hide the native checkbox visually but keep it accessible */
             position: absolute;
-            width: 0;
-            height: 0;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            border-width: 0;
+            inset: -6px 0;
+            width: 100%;
+            height: calc(100% + 12px);
+            margin: 0;
+            cursor: pointer;
+            opacity: 0;
         }
 
         .toggle-thumb {
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: $size-6;
+            height: $size-6;
+            pointer-events: none;
+            background-color: $color-gray3;
             border-radius: $radius-round;
-            transition: all 0.3s ease;
+            box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
+            transition:
+                transform 0.36s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s ease;
 
-            &::before {
-                position: absolute;
-                width: $size-6;
-                height: $size-6;
-                content: '';
-                border-radius: $radius-round;
-                box-shadow: 0 1px 6px 0 rgb(0 0 0 / 33.3%);
-                transition: transform 0.3s;
+            .icon {
+                width: $size-5;
+                height: $size-5;
+                color: #b6ad23;
 
                 @include theme-dark {
-                    background-color: $color-gray4;
-                }
-
-                @include theme-light {
-                    background-color: $color-bg-primary;
+                    color: $color-bg-secondary;
                 }
             }
 
-            .icon {
-                position: relative;
+            .icon-body,
+            .sun-disc,
+            .sun-rays {
+                transform-origin: 12px 12px;
+                transition:
+                    transform 0.36s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+            }
 
-                @include theme-dark {
-                    height: $size-5;
-                    fill: $color-bg-secondary;
-                    stroke: $color-bg-secondary;
-                }
-
-                @include theme-light {
-                    height: 1.15em;
-                    fill: #b6ad23;
-                    stroke: #b6ad23;
-                }
+            .icon-body {
+                transform: scale(0.5);
             }
 
             &.active {
-                transform: translateX(115%);
+                background-color: $color-gray4;
+                transform: translateX(100%);
+
+                .icon-body {
+                    transform: scale(1);
+                }
+
+                .sun-disc {
+                    transform: scale(0);
+                }
+
+                .sun-rays {
+                    opacity: 0;
+                    transform: scale(0.65);
+                }
             }
         }
     }
