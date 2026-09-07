@@ -185,7 +185,6 @@ const clearStatus = () => {
                     type="email"
                     class="form-input"
                     :class="{ error: errors.email }"
-                    placeholder="your.email@example.com"
                     required
                     @input="handleFieldInput('email')"
                     @blur="handleFieldBlur('email')"
@@ -202,7 +201,6 @@ const clearStatus = () => {
                     type="text"
                     class="form-input"
                     :class="{ error: errors.subject }"
-                    placeholder="e.g., Project inquiry"
                     required
                     @input="handleFieldInput('subject')"
                     @blur="handleFieldBlur('subject')"
@@ -218,7 +216,6 @@ const clearStatus = () => {
                     v-model="form.message"
                     class="form-textarea"
                     :class="{ error: errors.message }"
-                    placeholder="Tell me about your project, question, or opportunity."
                     rows="6"
                     required
                     @input="handleFieldInput('message')"
