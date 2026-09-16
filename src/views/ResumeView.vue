@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import projectsData from '@/assets/data/projects.json';
 import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
@@ -7,6 +7,7 @@ import { useThemeStore } from '@/stores/themeStore.js';
 import { useGsap } from '@/composables/useGsap.js';
 import { resumeAnimations } from '@/animations/page/resume.js';
 import Button from '@/components/Button.vue';
+import SelectedWindow from '@/components/SelectedWindow.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
@@ -14,6 +15,8 @@ import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+const showInternship = ref(false);
+const internshipWindow = ref(null);
 
 const { registerAnim } = useGsap();
 
@@ -26,6 +29,7 @@ watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
+            internshipWindow.value?.close();
             anims.exitPage();
         }
     },
@@ -38,6 +42,13 @@ onMounted(() => {
 
 <template>
     <div class="resume-container page">
+        <SelectedWindow
+            v-if="showInternship"
+            ref="internshipWindow"
+            label="24G internship"
+            @close="showInternship = false"
+        />
+
         <div class="page-header">
             <div class="page-title">
                 <span class="page-eyebrow">Michael L. Green</span>
@@ -81,7 +92,13 @@ onMounted(() => {
                         </ul>
 
                         <div v-if="key === '24g'" class="segment-footer">
-                            <Button text="See More" :iconRight="BoxArrowIcon" preset="primary" type="button" />
+                            <Button
+                                text="See More"
+                                :iconRight="BoxArrowIcon"
+                                preset="primary"
+                                type="button"
+                                @click="showInternship = true"
+                            />
                         </div>
                     </div>
                 </div>

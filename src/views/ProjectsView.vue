@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
-import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
-import { projectAnimations } from '@/animations/page/projects.js';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import projectsData from '@/assets/data/projects.json';
@@ -24,12 +22,6 @@ const routeStore = useRouteStore();
 const { revealIn, headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
-const { registerAnim } = useGsap();
-
-const anims = {
-    showSelectedProject: registerAnim(projectAnimations.showSelectedProject),
-    hideSelectedProject: registerAnim(projectAnimations.hideSelectedProject),
-};
 
 const pageHeader = ref(null);
 const selectedProject = ref(null);
@@ -50,7 +42,6 @@ const externalIcons = {
 };
 
 const activeProject = ref();
-const scrollPosition = ref();
 const autoplayVideo = ref(false);
 const enteringProjectSlugs = ref(new Set(projectsData.map(({ slug }) => slug)));
 
@@ -59,7 +50,7 @@ watch(
     (newVal) => {
         if (newVal) {
             if (activeProject.value) {
-                closeProject();
+                selectedProject.value?.close();
             }
 
             headerDismiss({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
@@ -99,34 +90,10 @@ async function openProject(project, autoplay = false) {
 
     if (isLaptop.value) {
         activeProject.value = project;
-
-        scrollPosition.value = window.scrollY;
-        document.body.classList.add('no-scroll');
-        document.body.style.top = `-${scrollPosition.value}px`;
-
-        await nextTick();
-        selectedProject.value.el.focus();
-        anims.showSelectedProject({ targets: [selectedProject.value.el, selectedProject.value.overlay] });
     } else {
         queriedProjectRef.openProject(autoplay);
         await nextTick();
         queriedProjectRef.scrollToSelectedCard();
-    }
-}
-
-function closeProject() {
-    document.body.classList.remove('no-scroll');
-    document.body.style.top = '';
-    window.scrollTo(0, scrollPosition.value);
-
-    if (selectedProject.value) {
-        anims.hideSelectedProject({
-            targets: [selectedProject.value.el, selectedProject.value.overlay],
-            onComplete: () => {
-                selectedProject.value.el.blur();
-                activeProject.value = null;
-            },
-        });
     }
 }
 </script>
@@ -140,7 +107,7 @@ function closeProject() {
             :autoplay-video="autoplayVideo"
             :project-logos="projectLogos"
             :external-icons="externalIcons"
-            @close-project="closeProject()"
+            @close-project="activeProject = null"
         />
 
         <div ref="pageHeader" class="page-header">
@@ -163,7 +130,7 @@ function closeProject() {
                 :data-project-slug="project.slug"
                 :class="{ 'is-page-transitioning': enteringProjectSlugs.has(project.slug) || routeStore.isLeaving }"
                 @open-project="openProject"
-                @close-selected="closeProject"
+                @close-selected="selectedProject?.close()"
             />
         </div>
     </div>

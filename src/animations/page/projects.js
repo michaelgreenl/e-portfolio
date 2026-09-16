@@ -82,30 +82,6 @@ export const projectAnimations = {
         }
     },
 
-    showSelectedProject: ({ tl, targets, reducedMotion }) => {
-        gsap.set(targets, {
-            autoAlpha: 0,
-            scale: reducedMotion ? 1 : 0.98,
-        });
-
-        tl.to(targets, {
-            autoAlpha: 1,
-            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-            ease: TIMING.easing.smooth,
-            scale: 1,
-        });
-    },
-
-    hideSelectedProject: ({ tl, targets, onComplete, reducedMotion }) => {
-        tl.to(targets, {
-            autoAlpha: 0,
-            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-            ease: TIMING.easing.smooth,
-            scale: reducedMotion ? 1 : 0.98,
-            onComplete,
-        });
-    },
-
     showSelectedProjectDetails: ({ tl, target, onComplete }) => {
         const detailTargets = getSelectedProjectDetailTargets(target);
 

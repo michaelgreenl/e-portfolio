@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import SelectedWindow from '@/components/SelectedWindow.vue';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
 import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
@@ -16,22 +17,14 @@ defineProps({
 
 const emit = defineEmits(['close-project']);
 
-const el = ref(null);
-const overlay = ref(null);
+const selectedWindow = ref(null);
+const close = () => selectedWindow.value.close();
 
-defineExpose({ el, overlay });
+defineExpose({ close });
 </script>
 
 <template>
-    <div
-        ref="el"
-        class="selected-container"
-        tabindex="0"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="activeProject.title"
-        @keydown.esc="emit('close-project')"
-    >
+    <SelectedWindow ref="selectedWindow" :label="activeProject.title" @close="emit('close-project')">
         <div class="selected-project">
             <div class="project-overview">
                 <div class="date">
@@ -73,7 +66,7 @@ defineExpose({ el, overlay });
             </div>
 
             <div class="project-details">
-                <button class="close-btn" type="button" aria-label="Close project" @click="emit('close-project')">
+                <button class="close-btn" type="button" aria-label="Close project" @click="close">
                     <CloseIcon />
                 </button>
 
@@ -90,18 +83,12 @@ defineExpose({ el, overlay });
                 </ul>
             </div>
         </div>
-
-        <div ref="overlay" class="overlay" @click="emit('close-project')"></div>
-    </div>
+    </SelectedWindow>
 </template>
 
 <style lang="scss" scoped>
 p {
     margin: 0;
-}
-
-.selected-container {
-    @include flex-center-all;
 }
 
 .project-title,
@@ -110,55 +97,13 @@ p {
     align-items: center;
 }
 
-.overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    width: 100vw;
-    height: 100vh;
-}
-
-.selected-container {
-    position: fixed;
-    top: 0;
-    z-index: 2;
-    width: 100vw;
-    height: 100vh;
-    font-size: 1.1em;
-    backdrop-filter: blur(5px);
-
-    @include theme-dark {
-        background-color: rgb(0 0 0 / 40%);
-    }
-}
-
 .selected-project {
-    position: relative;
-    z-index: 2;
     display: grid;
     grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
     gap: $space-3 $space-6;
-    width: 98vw;
-    max-width: 90em;
-    max-height: 95dvh;
-    padding: $size-9 $size-10;
-    margin: $space-8 0;
-    overflow-y: auto;
-    border: 1px solid rgb(255 255 255 / 12%);
-    border-radius: $radius-xl;
-    box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
-
-    @include theme-dark {
-        background: linear-gradient(0deg, #212529ea 30%, #212529aa 60%, #212529ea 90%);
-    }
-
-    @include theme-light {
-        background: linear-gradient(0deg, #dee2e6ea 40%, #dee2e6aa 60%, #dee2e6ea 90%);
-    }
 
     @include bp-lg-laptop {
         column-gap: $space-10;
-        padding: $size-9 $size-12;
     }
 }
 
