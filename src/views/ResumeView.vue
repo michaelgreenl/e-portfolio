@@ -10,6 +10,7 @@ import Button from '@/components/Button.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
+import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -57,7 +58,7 @@ onMounted(() => {
                 <h2 class="section-header">Experience</h2>
 
                 <div class="section-content">
-                    <div v-for="experience in resumeData.experience" :key="experience.title" class="section-segment">
+                    <div v-for="(experience, key) in resumeData.experience" :key="key" class="section-segment">
                         <div class="segment-header">
                             <h3 class="segment-title">{{ experience.title }}</h3>
 
@@ -78,6 +79,10 @@ onMounted(() => {
                                 {{ info }}
                             </li>
                         </ul>
+
+                        <div v-if="key === '24g'" class="segment-footer">
+                            <Button text="See More" :iconRight="BoxArrowIcon" preset="primary" type="button" />
+                        </div>
                     </div>
                 </div>
             </div>
