@@ -8,6 +8,7 @@ import { useGsap } from '@/composables/useGsap.js';
 import { resumeAnimations } from '@/animations/page/resume.js';
 import Button from '@/components/Button.vue';
 import SelectedWindow from '@/components/SelectedWindow.vue';
+import SelectedProject from '@/components/Project/SelectedProject.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
@@ -15,6 +16,7 @@ import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+const activeInternshipProject = ref(null);
 const showInternship = ref(false);
 const internshipWindow = ref(null);
 
@@ -41,11 +43,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="resume-container page">
+    <div class="resume-container page" :class="{ 'window-open': showInternship }">
+        <SelectedProject
+            v-if="showInternship && activeInternshipProject"
+            ref="internshipWindow"
+            class="experience-project-window"
+            :active-project="activeInternshipProject"
+            fullscreen-on-mobile
+            @close-project="showInternship = false"
+        />
         <SelectedWindow
-            v-if="showInternship"
+            v-else-if="showInternship"
             ref="internshipWindow"
             label="24G internship"
+            fullscreen-on-mobile
+            show-close-button
             @close="showInternship = false"
         />
 
@@ -92,13 +104,47 @@ onMounted(() => {
                         </ul>
 
                         <div v-if="key === '24g'" class="segment-footer">
+                            <h4 class="experience-projects-heading">Featured Work</h4>
                             <Button
                                 text="See More"
                                 :iconRight="BoxArrowIcon"
+                                :styles="{ margin: '0.25rem 0 0.75rem' }"
                                 preset="primary"
                                 type="button"
-                                @click="showInternship = true"
+                                @click="
+                                    activeInternshipProject = null;
+                                    showInternship = true;
+                                "
                             />
+                        </div>
+
+                        <div v-if="experience.projects" class="experience-projects">
+                            <div v-for="project in experience.projects" :key="project.title" class="section-segment">
+                                <div class="segment-header segment-header-projects">
+                                    <h4 class="segment-title segment-title-projects">
+                                        <button
+                                            class="project-link"
+                                            type="button"
+                                            aria-haspopup="dialog"
+                                            @click="
+                                                activeInternshipProject = project;
+                                                showInternship = true;
+                                            "
+                                        >
+                                            {{ project.title }}
+                                        </button>
+                                    </h4>
+
+                                    <div class="segment-dates">
+                                        <CalendarIcon />
+                                        <h3>{{ project.longDate }}</h3>
+                                    </div>
+                                </div>
+
+                                <ul class="segment-info">
+                                    <li>{{ project.description.short }}</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -189,6 +235,14 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.experience-project-window {
+    font-size: 0.75em;
+
+    @include bp-md-tablet {
+        font-size: 0.66em;
+    }
+}
+
 .resume-container {
     --resume-light-ink: #2f3940;
     --resume-light-heading: #2f4858;
@@ -206,6 +260,12 @@ onMounted(() => {
     margin: 0 auto;
     font-size: 0.9em;
     color: $color-text-primary;
+
+    &.window-open {
+        @include bp-custom-max(847) {
+            z-index: 10;
+        }
+    }
 
     @include theme-light {
         color: var(--resume-light-ink);
@@ -267,6 +327,7 @@ h2 {
 }
 
 h3,
+h4,
 p span {
     font-family: $ternary-font-stack;
 }
@@ -498,8 +559,13 @@ li {
 
     &-projects {
         .project-link {
+            padding: 0;
+            font: inherit;
             font-size: 1.1em;
             color: inherit;
+            text-align: left;
+            background: transparent;
+            border: 0;
 
             &:focus-visible {
                 outline: 2px solid $color-primary;
@@ -537,10 +603,44 @@ li {
     }
 }
 
+.experience-projects {
+    margin: 0.25rem 0 0;
+    border-top: solid 1px transparent;
+
+    @include theme-dark {
+        border-color: #adb5bd22;
+    }
+
+    @include theme-light {
+        border-color: #3d505c22;
+    }
+
+    > .section-segment {
+        gap: 0;
+        padding: 1rem 0.5rem 0;
+    }
+
+    .segment-title {
+        line-height: 1;
+    }
+}
+
 .segment-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
+}
+
+.experience-projects-heading {
+    align-self: flex-end;
+    font-size: 1.25em;
+    font-weight: 600;
+    line-height: 1.25;
+    color: $color-primary-light;
+
+    @include theme-light {
+        color: var(--resume-light-heading);
+    }
 }
 
 .segment-info {

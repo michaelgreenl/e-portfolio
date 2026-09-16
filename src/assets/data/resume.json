@@ -27,6 +27,57 @@
                 "Designed and implemented custom page transitions beyond the supplied mockups for Oakley’s Vue.js interface, coordinating with the design team to adapt supporting assets.",
                 "Delivered the frontend for an Oakley expo activation that Essilor Luxottica named its favorite of four event experiences and expressed intent to reuse with better placement to increase visibility and participation.",
                 "Built an analytics dashboard for an internal expo reporting tool, including data display and CSV export, that remained in active company use following the internship."
+            ],
+            "projects": [
+                {
+                    "title": "Oakley / Essilor Luxottica",
+                    "slug": "oakley",
+                    "description": {
+                        "short": "An interactive photo kiosk with athlete selection, custom animated transitions, timed photo capture, and QR codes for downloading the finished image.",
+                        "long": [
+                            {
+                                "label": "My Contribution",
+                                "text": "I was the sole frontend developer, taking the supplied mockups through implementation and coordinating with the Experiential Team Lead."
+                            },
+                            {
+                                "label": "Interaction Design",
+                                "text": "I designed custom page transitions beyond the supplied mockups and worked with the design team on supporting assets. The interface coordinated athlete videos, camera countdowns, and photo capture."
+                            },
+                            {
+                                "label": "Client Feedback",
+                                "text": "Essilor Luxottica named Oakley its favorite of the event’s four experiences and expressed intent to reuse it with more prominent placement."
+                            }
+                        ]
+                    },
+                    "stack": ["vue", "sass"],
+                    "portrait": true,
+                    "previewAlt": "Oakley kiosk showing four athletes to choose from before taking a photo.",
+                    "preview": "oakley-preview.jpg"
+                },
+                {
+                    "title": "Campaign Manager",
+                    "slug": "campaign-manager",
+                    "description": {
+                        "short": "An internal dashboard for reviewing event and activation data through social, lead, and interaction reports, with filters, pagination, and CSV exports.",
+                        "long": [
+                            {
+                                "label": "My Contribution",
+                                "text": "I built the reporting interface and contributed to its backend during my 24G internship. The tool remained in active company use after the internship."
+                            },
+                            {
+                                "label": "Reporting Workflow",
+                                "text": "Staff select an event and activation, narrow reports by date and time zone, and move between social, lead, and interaction data. I implemented pagination, report-specific columns, and CSV downloads."
+                            },
+                            {
+                                "label": "System Design",
+                                "text": "The Vue interface requests reports from an Express API backed by Sequelize and MySQL. Filters and pagination control the displayed records, while CSV export retrieves the full filtered report."
+                            }
+                        ]
+                    },
+                    "stack": ["vue", "sass", "node", "express", "sequelize", "mysql"],
+                    "video": "1220947923",
+                    "img": "jsf_blurred.webp"
+                }
             ]
         }
     },

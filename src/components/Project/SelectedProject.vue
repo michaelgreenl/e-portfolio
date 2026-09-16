@@ -10,9 +10,16 @@ import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
 defineProps({
     activeProject: { required: true, type: Object },
-    autoplayVideo: { required: true, type: Boolean },
-    projectLogos: { required: true, type: Object },
-    externalIcons: { required: true, type: Object },
+    autoplayVideo: { default: false, type: Boolean },
+    projectLogos: { default: () => ({}), type: Object },
+    externalIcons: { default: () => ({}), type: Object },
+    fullscreenOnMobile: { default: false, type: Boolean },
+});
+
+const previews = import.meta.glob('../../assets/images/*-preview.jpg', {
+    eager: true,
+    import: 'default',
+    query: '?url',
 });
 
 const emit = defineEmits(['close-project']);
@@ -24,10 +31,19 @@ defineExpose({ close });
 </script>
 
 <template>
-    <SelectedWindow ref="selectedWindow" :label="activeProject.title" @close="emit('close-project')">
-        <div class="selected-project">
+    <SelectedWindow
+        ref="selectedWindow"
+        :label="activeProject.title"
+        :fullscreen-on-mobile="fullscreenOnMobile"
+        :trap-focus="fullscreenOnMobile"
+        @close="emit('close-project')"
+    >
+        <div
+            class="selected-project"
+            :class="{ portrait: activeProject.portrait, oakley: activeProject.slug === 'oakley' }"
+        >
             <div class="project-overview">
-                <div class="date">
+                <div v-if="activeProject.longDate" class="date">
                     <CalendarIcon aria-hidden="true" />
                     <p>{{ activeProject.longDate }}</p>
                 </div>
@@ -37,7 +53,11 @@ defineExpose({ close });
                         <component :is="projectLogos[activeProject.slug]" />
 
                         <h2 :style="{ fontFamily: activeProject.fontFamily }">
-                            {{ activeProject.title }}
+                            {{
+                                activeProject.slug === 'oakley'
+                                    ? activeProject.title.replace(' / ', ' /\n')
+                                    : activeProject.title
+                            }}
                         </h2>
                     </div>
 
@@ -46,8 +66,16 @@ defineExpose({ close });
 
                 <div class="project-media">
                     <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
+                    <img
+                        v-else-if="activeProject.preview"
+                        class="demo-video project-preview"
+                        :src="previews[`../../assets/images/${activeProject.preview}`]"
+                        :alt="activeProject.previewAlt"
+                        width="540"
+                        height="960"
+                    />
 
-                    <div class="external-links">
+                    <div v-if="activeProject.externalLinks" class="external-links">
                         <a
                             v-for="[key, link] in Object.entries(activeProject.externalLinks).filter(
                                 ([key]) => key !== 'demoVideo' && key !== 'porfolioLink',
@@ -76,7 +104,10 @@ defineExpose({ close });
                     </div>
                 </div>
 
-                <ul class="description description-long" :class="{ 'contains-video': activeProject.video }">
+                <ul
+                    class="description description-long"
+                    :class="{ 'contains-video': activeProject.video || activeProject.preview }"
+                >
                     <li v-for="detail in activeProject.description?.long" :key="detail.label">
                         <strong>{{ detail.label }}:</strong> {{ detail.text }}
                     </li>
@@ -202,6 +233,159 @@ p {
 .demo-video {
     width: 100%;
     border-radius: $radius-md;
+}
+
+.project-preview {
+    height: auto;
+    object-fit: contain;
+}
+
+.portrait .demo-video {
+    align-self: center;
+    width: min(100%, calc(60dvh * 9 / 16));
+    aspect-ratio: 9 / 16;
+}
+
+.selected-project.oakley {
+    .project-title h2 {
+        white-space: pre-line;
+    }
+
+    .project-media {
+        padding-top: $space-2;
+    }
+
+    .demo-video {
+        width: min(100%, 37.75dvh);
+    }
+
+    .description-long {
+        padding-left: $space-3;
+    }
+
+    @include bp-custom-min(848) {
+        position: relative;
+        grid-template:
+            'date .' auto
+            'heading media' auto
+            'stack media' auto
+            'description media' 1fr / minmax(0, 1.2fr) minmax(0, 0.8fr);
+        align-items: start;
+
+        .project-overview,
+        .project-details {
+            display: contents;
+        }
+
+        .date {
+            grid-area: date;
+            margin-bottom: 0;
+        }
+
+        .project-header-info {
+            grid-area: heading;
+        }
+
+        .project-media {
+            grid-area: media;
+            margin-top: 0;
+        }
+
+        .tool-container {
+            grid-area: stack;
+            margin-top: $space-1;
+        }
+
+        .description-long {
+            grid-area: description;
+            margin-top: $space-2;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}
+
+.fullscreen-mobile {
+    .project-details {
+        gap: $space-6;
+        justify-content: flex-start;
+    }
+
+    .description {
+        line-height: 1.5;
+    }
+
+    .description-long {
+        margin-top: 0;
+    }
+
+    @include bp-custom-max(847) {
+        .selected-project {
+            grid-template-columns: minmax(0, 1fr);
+            gap: $space-6;
+        }
+
+        .project-overview {
+            grid-row: 2;
+        }
+
+        .project-title h2 {
+            font-size: clamp(1.75rem, 5vw, 2.75rem) !important;
+        }
+
+        .description,
+        .description-long.contains-video {
+            font-size: 1rem;
+        }
+
+        .tool-chips {
+            font-size: 1rem;
+
+            .chip {
+                font-size: 1em;
+            }
+        }
+
+        .project-details {
+            display: contents;
+        }
+
+        .close-btn {
+            position: sticky;
+            top: env(safe-area-inset-top, 0);
+            z-index: 3;
+            grid-row: 1;
+            justify-self: end;
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: $space-3;
+            background-color: $color-bg-primary;
+            transform: none;
+        }
+
+        .tool-container {
+            grid-row: 3;
+        }
+
+        .description-long {
+            grid-row: 4;
+        }
+
+        .selected-project.oakley {
+            .date {
+                font-size: 0.875rem;
+            }
+
+            .project-title h2 {
+                font-size: clamp(2rem, 6vw, 3rem) !important;
+                white-space: normal;
+            }
+        }
+    }
 }
 
 .external-links {
