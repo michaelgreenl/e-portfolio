@@ -6,6 +6,7 @@ import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useGsap } from '@/composables/useGsap.js';
 import { resumeAnimations } from '@/animations/page/resume.js';
+import { useMediaQuery } from '@vueuse/core';
 import Button from '@/components/Button.vue';
 import SelectedWindow from '@/components/SelectedWindow.vue';
 import SelectedProject from '@/components/Project/SelectedProject.vue';
@@ -21,6 +22,8 @@ const showInternship = ref(false);
 const internshipWindow = ref(null);
 
 const { registerAnim } = useGsap();
+
+const uniLocationWrapping = useMediaQuery('(min-width: 477px)');
 
 const anims = {
     enterPage: registerAnim(resumeAnimations.enterPage),
@@ -157,7 +160,10 @@ onMounted(() => {
                     <div v-for="education in resumeData.education" :key="education.title" class="section-segment">
                         <div class="segment-header">
                             <h3 class="segment-title">
-                                {{ education.title }} <span v-if="education.location"> {{ education.location }}</span>
+                                {{ education.title }}
+                                <span v-if="education.location">
+                                    <span v-if="uniLocationWrapping">,</span> {{ education.location }}</span
+                                >
                             </h3>
 
                             <div class="segment-dates">
@@ -553,8 +559,10 @@ li {
     font-weight: 600;
     line-height: 1.25;
 
-    @include bp-custom-min(489) {
-        gap: $space-1;
+    @include bp-custom-min(477) {
+        // gap: $space-1;
+        min-width: 20em;
+        // max-width: 19em;
     }
 
     &-projects {

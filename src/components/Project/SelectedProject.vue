@@ -40,7 +40,11 @@ defineExpose({ close });
     >
         <div
             class="selected-project"
-            :class="{ portrait: activeProject.portrait, oakley: activeProject.slug === 'oakley' }"
+            :class="{
+                portrait: activeProject.portrait,
+                oakley: activeProject.slug === 'oakley',
+                'campaign-manager': activeProject.slug === 'campaign-manager',
+            }"
         >
             <div class="project-overview">
                 <div v-if="activeProject.longDate" class="date">
@@ -63,6 +67,8 @@ defineExpose({ close });
 
                     <p class="description description-short">{{ activeProject.description.short }}</p>
                 </div>
+
+                <hr v-if="fullscreenOnMobile" class="project-separator" />
 
                 <div class="project-media">
                     <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
@@ -97,6 +103,8 @@ defineExpose({ close });
                 <button class="close-btn" type="button" aria-label="Close project" @click="close">
                     <CloseIcon />
                 </button>
+
+                <hr v-if="fullscreenOnMobile" class="project-separator" />
 
                 <div class="tool-container">
                     <div class="tool-chips" :class="{ 'large-stack': activeProject.stack.length > 5 }">
@@ -256,7 +264,11 @@ p {
     }
 
     .demo-video {
-        width: min(100%, 37.75dvh);
+        width: min(100%, 34.75dvh);
+
+        @include bp-lg-laptop {
+            width: min(100%, 36.75dvh);
+        }
     }
 
     .description-long {
@@ -310,9 +322,36 @@ p {
 }
 
 .fullscreen-mobile {
+    .project-separator {
+        display: none;
+    }
+
+    .date {
+        gap: 0.3rem;
+        align-items: flex-end;
+
+        p {
+            line-height: 1;
+        }
+    }
+
+    .project-title h2 {
+        font-size: clamp(2rem, 9vw, 2.8rem) !important;
+    }
+
     .project-details {
         gap: $space-6;
         justify-content: flex-start;
+    }
+
+    @include bp-md-tablet {
+        .selected-project.campaign-manager .project-details {
+            gap: 0;
+        }
+
+        .selected-project.campaign-manager .tool-chips {
+            margin: $space-2 0 $space-4;
+        }
     }
 
     .description {
@@ -326,15 +365,33 @@ p {
     @include bp-custom-max(847) {
         .selected-project {
             grid-template-columns: minmax(0, 1fr);
-            gap: $space-6;
+            gap: $space-2;
         }
 
         .project-overview {
-            grid-row: 2;
+            grid-area: 1 / 1;
         }
 
-        .project-title h2 {
-            font-size: clamp(1.75rem, 5vw, 2.75rem) !important;
+        .project-overview .project-media {
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        @include bp-custom-min(450) {
+            .selected-project:not(.portrait) .project-media {
+                padding-inline: $space-8;
+            }
+        }
+
+        .project-overview .project-separator {
+            margin: $space-4 auto $space-6;
+        }
+
+        .date {
+            min-height: 2.75rem;
+            padding-right: calc(2.75rem + $space-2);
+            font-size: 1.2em;
+            white-space: normal;
         }
 
         .description,
@@ -344,6 +401,12 @@ p {
 
         .tool-chips {
             font-size: 1rem;
+
+            &.large-stack {
+                max-width: 33rem;
+                margin: 0 auto;
+                font-size: 1.2em;
+            }
 
             .chip {
                 font-size: 1em;
@@ -358,8 +421,8 @@ p {
             position: sticky;
             top: env(safe-area-inset-top, 0);
             z-index: 3;
-            grid-row: 1;
-            justify-self: end;
+            grid-area: 1 / 1;
+            place-self: start end;
             width: 2.75rem;
             height: 2.75rem;
             padding: $space-3;
@@ -371,17 +434,28 @@ p {
             grid-row: 3;
         }
 
+        .project-separator {
+            display: block;
+            width: 98%;
+            margin: $space-4 auto $space-3;
+            border: 0;
+            border-top: solid 1px transparent;
+
+            @include theme-dark {
+                border-color: #adb5bd22;
+            }
+
+            @include theme-light {
+                border-color: #3d505c22;
+            }
+        }
+
         .description-long {
-            grid-row: 4;
+            grid-row: 5;
         }
 
         .selected-project.oakley {
-            .date {
-                font-size: 0.875rem;
-            }
-
             .project-title h2 {
-                font-size: clamp(2rem, 6vw, 3rem) !important;
                 white-space: normal;
             }
         }
