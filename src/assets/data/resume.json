@@ -32,6 +32,9 @@
                 {
                     "title": "Oakley / Essilor Luxottica",
                     "slug": "oakley",
+                    "stack": ["vue", "sass", "javascript"],
+                    "shortDate": "March 2022 - April 2022",
+                    "longDate": "March 2022 - April 2022",
                     "description": {
                         "short": "An interactive photo kiosk with athlete selection, custom animated transitions, timed photo capture, and QR codes for downloading the finished image.",
                         "long": [
@@ -49,7 +52,6 @@
                             }
                         ]
                     },
-                    "stack": ["vue", "sass"],
                     "portrait": true,
                     "previewAlt": "Oakley kiosk showing four athletes to choose from before taking a photo.",
                     "preview": "oakley-preview.jpg"
@@ -57,6 +59,9 @@
                 {
                     "title": "Campaign Manager",
                     "slug": "campaign-manager",
+                    "stack": ["vue", "sass", "node", "express", "sequelize", "mysql", "javascript"],
+                    "shortDate": "January 2022 - March 2022",
+                    "longDate": "January 2022 - March 2022",
                     "description": {
                         "short": "An internal dashboard for reviewing event and activation data through social, lead, and interaction reports, with filters, pagination, and CSV exports.",
                         "long": [
@@ -74,7 +79,6 @@
                             }
                         ]
                     },
-                    "stack": ["vue", "sass", "node", "express", "sequelize", "mysql"],
                     "video": "1220947923",
                     "img": "jsf_blurred.webp"
                 }

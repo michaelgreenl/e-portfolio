@@ -27,6 +27,7 @@ import OpenCodeIcon from '@/components/SVGs/Tools/OpenCodeIcon.vue';
 import OpenAIIcon from '@/components/SVGs/Tools/OpenAIIcon.vue';
 import ReactIcon from '@/components/SVGs/Tools/ReactIcon.vue';
 import ExpoIcon from '@/components/SVGs/Tools/ExpoIcon.vue';
+import JavascriptIcon from './SVGs/Tools/JavascriptIcon.vue';
 
 defineProps({
     tool: {
@@ -38,6 +39,13 @@ const themeStore = useThemeStore();
 
 const tools = {
     vue: { text: 'Vue', icon: markRaw(VueIcon), lightColor: '#41B883', darkColor: '#41B883', maxWidth: '7em' },
+    javascript: {
+        text: 'Javascript',
+        icon: markRaw(JavascriptIcon),
+        lightColor: '#F7DF1F',
+        darkColor: '#F7DF1F',
+        maxWidth: '9.5em',
+    },
     expo: {
         text: 'Expo',
         icon: markRaw(ExpoIcon),
@@ -164,7 +172,7 @@ const tools = {
         icon: markRaw(SequelizeIcon),
         lightColor: '#027099',
         darkColor: '#03afef',
-        maxWidth: '7.5em',
+        maxWidth: '8.5em',
     },
     mysql: { text: 'MySQL', icon: markRaw(MySQLIcon), lightColor: '#0081A5', darkColor: '#0081A5', maxWidth: '7em' },
 };
