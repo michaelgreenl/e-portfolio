@@ -352,6 +352,24 @@ p {
         .selected-project.campaign-manager .tool-chips {
             margin: $space-2 0 $space-4;
         }
+
+        @include bp-custom-max(1099) {
+            .selected-project.campaign-manager {
+                column-gap: $space-4;
+
+                .project-title h2 {
+                    font-size: clamp(2.25rem, 4vw, 2.8rem) !important;
+                }
+
+                .tool-chips {
+                    gap: $space-3 $space-2;
+
+                    .chip {
+                        padding-inline: $space-2;
+                    }
+                }
+            }
+        }
     }
 
     .description {
@@ -457,6 +475,93 @@ p {
         .selected-project.oakley {
             .project-title h2 {
                 white-space: normal;
+            }
+        }
+
+        @include bp-custom-min(550) {
+            .selected-project.campaign-manager {
+                .project-overview,
+                .tool-container,
+                .description-long {
+                    justify-self: center;
+                    width: 100%;
+                    max-width: 34rem;
+                }
+
+                .project-details .project-separator {
+                    max-width: calc(34rem * 0.98);
+                }
+
+                .project-media {
+                    align-items: center;
+                    padding-inline: 0;
+                }
+
+                .demo-video {
+                    max-width: 28rem;
+                }
+            }
+
+            .selected-project.oakley {
+                grid-template:
+                    'date date' auto
+                    'heading heading' auto
+                    'separator separator' auto
+                    'stack media' auto
+                    'description media' 1fr / minmax(0, 1fr) minmax(0, min(15rem, 35vw, 42dvh));
+                gap: $space-4 clamp($space-3, 3vw, $space-6);
+                align-items: start;
+
+                .project-overview {
+                    display: contents;
+                }
+
+                .date,
+                .close-btn {
+                    grid-area: date;
+                }
+
+                .date {
+                    margin-bottom: 0;
+                }
+
+                .project-header-info {
+                    grid-area: heading;
+                }
+
+                .project-media {
+                    grid-area: media;
+                    align-self: center;
+                }
+
+                .demo-video {
+                    width: 100%;
+                }
+
+                .project-overview .project-separator {
+                    grid-area: separator;
+                    margin: $space-2 auto;
+                }
+
+                .project-details .project-separator {
+                    display: none;
+                }
+
+                .tool-container {
+                    grid-area: stack;
+                }
+
+                .tool-chips {
+                    gap: $space-2;
+
+                    .chip {
+                        padding-inline: $space-2;
+                    }
+                }
+
+                .description-long {
+                    grid-area: description;
+                }
             }
         }
     }
