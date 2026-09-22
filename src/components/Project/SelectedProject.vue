@@ -108,7 +108,13 @@ defineExpose({ close });
 
                 <div class="tool-container">
                     <div class="tool-chips" :class="{ 'large-stack': activeProject.stack.length > 5 }">
-                        <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
+                        <ToolChip
+                            v-for="tool in activeProject.stack"
+                            :key="tool"
+                            :tool="tool"
+                            class="chip"
+                            :class="`chip-${tool}`"
+                        />
                     </div>
                 </div>
 
@@ -366,6 +372,14 @@ p {
 
                     .chip {
                         padding-inline: $space-2;
+                    }
+
+                    .chip-vue {
+                        flex-grow: 0.85;
+                    }
+
+                    .chip-express {
+                        flex-grow: 1.15;
                     }
                 }
             }
