@@ -562,6 +562,7 @@ li {
     @include bp-custom-min(477) {
         // gap: $space-1;
         min-width: 20em;
+
         // max-width: 19em;
     }
 
@@ -629,6 +630,8 @@ li {
     }
 
     .segment-title {
+        min-width: 0;
+        margin-right: 0;
         line-height: 1;
     }
 }
