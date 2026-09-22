@@ -506,8 +506,8 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     <ProjectDemoVideo v-if="project.video" :project="project" :autoplay="autoplayVideo" />
 
                     <ul class="selected-description">
-                        <li v-for="detail in project.description?.long" :key="detail.label">
-                            <strong>{{ detail.label }}:</strong> {{ detail.text }}
+                        <li v-for="detail in project.description?.long" :key="detail">
+                            {{ detail }}
                         </li>
                     </ul>
                 </div>

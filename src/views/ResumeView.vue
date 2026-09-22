@@ -8,12 +8,10 @@ import { useGsap } from '@/composables/useGsap.js';
 import { resumeAnimations } from '@/animations/page/resume.js';
 import { useMediaQuery } from '@vueuse/core';
 import Button from '@/components/Button.vue';
-import SelectedWindow from '@/components/SelectedWindow.vue';
 import SelectedProject from '@/components/Project/SelectedProject.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
-import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -54,14 +52,6 @@ onMounted(() => {
             :active-project="activeInternshipProject"
             fullscreen-on-mobile
             @close-project="showInternship = false"
-        />
-        <SelectedWindow
-            v-else-if="showInternship"
-            ref="internshipWindow"
-            label="24G internship"
-            fullscreen-on-mobile
-            show-close-button
-            @close="showInternship = false"
         />
 
         <div class="page-header">
@@ -108,17 +98,6 @@ onMounted(() => {
 
                         <div v-if="key === '24g'" class="segment-footer">
                             <h4 class="experience-projects-heading">Featured Work</h4>
-                            <Button
-                                text="See More"
-                                :iconRight="BoxArrowIcon"
-                                :styles="{ margin: '0.25rem 0 0.75rem' }"
-                                preset="primary"
-                                type="button"
-                                @click="
-                                    activeInternshipProject = null;
-                                    showInternship = true;
-                                "
-                            />
                         </div>
 
                         <div v-if="experience.projects" class="experience-projects">
@@ -546,8 +525,12 @@ li {
 .segment-header {
     display: flex;
     flex-wrap: wrap-reverse;
-    gap: $space-2;
+    column-gap: $space-2;
     justify-content: space-between;
+
+    &:not(.segment-header-projects) {
+        row-gap: $space-2;
+    }
 }
 
 .segment-title {
@@ -640,6 +623,7 @@ li {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: $space-2;
 }
 
 .experience-projects-heading {

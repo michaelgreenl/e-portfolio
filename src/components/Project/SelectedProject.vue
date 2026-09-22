@@ -122,8 +122,8 @@ defineExpose({ close });
                     class="description description-long"
                     :class="{ 'contains-video': activeProject.video || activeProject.preview }"
                 >
-                    <li v-for="detail in activeProject.description?.long" :key="detail.label">
-                        <strong>{{ detail.label }}:</strong> {{ detail.text }}
+                    <li v-for="detail in activeProject.description?.long" :key="detail">
+                        {{ detail }}
                     </li>
                 </ul>
             </div>
@@ -271,10 +271,6 @@ p {
 
     .demo-video {
         width: min(100%, 34.75dvh);
-
-        @include bp-lg-laptop {
-            width: min(100%, 36.75dvh);
-        }
     }
 
     .description-long {
@@ -305,8 +301,17 @@ p {
         }
 
         .project-media {
+            display: grid;
             grid-area: media;
+            place-items: center;
+            align-self: stretch;
+            min-height: 0;
             margin-top: 0;
+            container-type: size;
+        }
+
+        .demo-video {
+            width: min(100cqw, calc(100cqh * 9 / 16));
         }
 
         .tool-container {
@@ -350,7 +355,27 @@ p {
         justify-content: flex-start;
     }
 
+    .selected-project.oakley .chip {
+        flex-basis: auto;
+    }
+
     @include bp-md-tablet {
+        .selected-project.oakley {
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+
+            .description-long {
+                gap: $space-2;
+            }
+        }
+
+        .selected-project.campaign-manager {
+            column-gap: clamp($space-4, 2.5vw, $space-10);
+
+            .project-title h2 {
+                font-size: clamp(2.25rem, 4vw, 2.8rem) !important;
+            }
+        }
+
         .selected-project.campaign-manager .project-details {
             gap: 0;
         }
@@ -361,12 +386,6 @@ p {
 
         @include bp-custom-max(1099) {
             .selected-project.campaign-manager {
-                column-gap: $space-4;
-
-                .project-title h2 {
-                    font-size: clamp(2.25rem, 4vw, 2.8rem) !important;
-                }
-
                 .tool-chips {
                     gap: $space-3 $space-2;
 
@@ -392,6 +411,11 @@ p {
 
     .description-long {
         margin-top: 0;
+
+        &.contains-video {
+            gap: $space-3;
+            font-size: clamp(1rem, 1.8vw, 1.125rem);
+        }
     }
 
     @include bp-custom-max(847) {
@@ -426,8 +450,7 @@ p {
             white-space: normal;
         }
 
-        .description,
-        .description-long.contains-video {
+        .description {
             font-size: 1rem;
         }
 
@@ -493,26 +516,29 @@ p {
         }
 
         @include bp-custom-min(550) {
+            .description {
+                font-size: clamp(1rem, 2.5vw, 1.0625rem);
+            }
+
             .selected-project.campaign-manager {
                 .project-overview,
                 .tool-container,
                 .description-long {
                     justify-self: center;
                     width: 100%;
-                    max-width: 34rem;
+                    max-width: 40rem;
                 }
 
                 .project-details .project-separator {
-                    max-width: calc(34rem * 0.98);
+                    max-width: calc(40rem * 0.98);
                 }
 
                 .project-media {
                     align-items: center;
-                    padding-inline: 0;
                 }
 
                 .demo-video {
-                    max-width: 28rem;
+                    max-width: 35rem;
                 }
             }
 
@@ -522,9 +548,12 @@ p {
                     'heading heading' auto
                     'separator separator' auto
                     'stack media' auto
-                    'description media' 1fr / minmax(0, 1fr) minmax(0, min(15rem, 35vw, 42dvh));
+                    'description media' 1fr / minmax(0, 1fr) minmax(0, min(13rem, 32vw, 42dvh));
                 gap: $space-4 clamp($space-3, 3vw, $space-6);
                 align-items: start;
+                width: 100%;
+                max-width: 42rem;
+                margin-inline: auto;
 
                 .project-overview {
                     display: contents;
@@ -541,11 +570,14 @@ p {
 
                 .project-header-info {
                     grid-area: heading;
+                    margin-top: -$space-2;
                 }
 
                 .project-media {
+                    position: sticky;
+                    top: calc(2.75rem + $space-4);
                     grid-area: media;
-                    align-self: center;
+                    align-self: start;
                 }
 
                 .demo-video {

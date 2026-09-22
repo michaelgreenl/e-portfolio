@@ -23,7 +23,7 @@
             "location": "Troy MI",
             "dates": "January 2022 - August 2022",
             "info": [
-                "Delivered four Vue.js expo interfaces as the sole frontend developer for Salesforce, Waymo, and Essilor Luxottica, coordinating with the Experiential Team Lead to take each interface from mockup to production in 2–4 weeks.",
+                "Delivered four Vue.js expo interfaces as the sole frontend developer for Salesforce, Waymo, and Essilor Luxottica, coordinating with the Experiential Team Lead to take each interface from mockup to production in 4–8 weeks.",
                 "Designed and implemented custom page transitions beyond the supplied mockups for Oakley’s Vue.js interface, coordinating with the design team to adapt supporting assets.",
                 "Delivered the frontend for an Oakley expo activation that Essilor Luxottica named its favorite of four event experiences and expressed intent to reuse with better placement to increase visibility and participation.",
                 "Built an analytics dashboard for an internal expo reporting tool, including data display and CSV export, that remained in active company use following the internship."
@@ -38,18 +38,9 @@
                     "description": {
                         "short": "An interactive photo kiosk with athlete selection, custom animated transitions, timed photo capture, and QR codes for downloading the finished image.",
                         "long": [
-                            {
-                                "label": "My Contribution",
-                                "text": "I was the sole frontend developer, taking the supplied mockups through implementation and coordinating with the Experiential Team Lead."
-                            },
-                            {
-                                "label": "Interaction Design",
-                                "text": "I designed custom page transitions beyond the supplied mockups and worked with the design team on supporting assets. The interface coordinated athlete videos, camera countdowns, and photo capture."
-                            },
-                            {
-                                "label": "Client Feedback",
-                                "text": "Essilor Luxottica named Oakley its favorite of the event’s four experiences and expressed intent to reuse it with more prominent placement."
-                            }
+                            "As the sole frontend developer, I built the kiosk from supplied visual mockups and owned the interaction design and API integration.",
+                            "I requested separate text assets from the design team to animate elements embedded in the mockup’s background. I used them in staggered transitions and coordinated the video cuts, countdown, and photo capture as one sequence.",
+                            "Essilor Luxottica named Oakley its favorite of the four experiences at the event and expressed interest in using it again with more prominent placement."
                         ]
                     },
                     "portrait": true,
@@ -65,18 +56,8 @@
                     "description": {
                         "short": "An internal dashboard for reviewing event and activation data through social, lead, and interaction reports, with filters, pagination, and CSV exports.",
                         "long": [
-                            {
-                                "label": "My Contribution",
-                                "text": "I built the reporting interface and contributed to its backend during my 24G internship. The tool remained in active company use after the internship."
-                            },
-                            {
-                                "label": "Reporting Workflow",
-                                "text": "Staff select an event and activation, narrow reports by date and time zone, and move between social, lead, and interaction data. I implemented pagination, report-specific columns, and CSV downloads."
-                            },
-                            {
-                                "label": "System Design",
-                                "text": "The Vue interface requests reports from an Express API backed by Sequelize and MySQL. Filters and pagination control the displayed records, while CSV export retrieves the full filtered report."
-                            }
+                            "I took ownership of most of Campaign Manager’s frontend while working with the other interns at 24G. I built the reporting interface and integrated the team’s APIs, contributing to a tool that remained in active company use after my internship.",
+                            "The download flow gave me room to shape an interaction within an otherwise established interface. I used sliding file entries and an animated completion checkmark to show when the application was preparing a report and when the file was ready."
                         ]
                     },
                     "video": "1220947923",
