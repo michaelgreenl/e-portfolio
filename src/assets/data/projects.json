@@ -35,9 +35,9 @@
         "description": {
             "short": "A local full-stack web app that turns AI-sourced job leads into a focused pipeline for reviewing roles, managing applications, and tracking outreach.",
             "long": [
-                "I built this to keep each opportunity and its history together. Job postings, application files, and outreach stay connected as a role moves from review to application and follow-up.",
-                "Codex researches roles and contacts from inside the app. The interface shows its progress, failures, and requests for browser access, so the user can follow what it is doing.",
-                "I separated the agents that find jobs from the one that evaluates their fit. Their results must match an expected data structure before the app saves them to the database."
+                "Job discovery and evaluation use separate agents, so the researcher gathering leads doesn’t also decide which ones qualify. Their handoffs preserve supporting evidence, with schema checks validating the results before they become saved job records.",
+                "Research runs in the background, with progress, failures, and browser-access requests shown in the interface. Active tasks remain available across navigation and reloads, so reviewing a role or preparing an application doesn’t interrupt the research.",
+                "Codex needs local access to Chrome, so I separated agent execution from the application’s data service. A Node bridge manages research tasks and browser permissions, while the API preserves job records and application history in PostgreSQL."
             ]
         },
         "fontFamily": "ClashDisplay",
@@ -91,9 +91,9 @@
         "description": {
             "short": "Tally Tracker is a cross-platform app for personal and shared counters on iOS, Android, and web, with real-time collaboration and offline synchronization.",
             "long": [
-                "A counter should respond as soon as you tap it. I made updates happen on the device first, with pending changes saved locally until they can reach the server.",
-                "Reconnecting can send the same update more than once. The server recognizes repeated requests so a retry does not count the same change twice, while live updates keep shared counters in sync.",
-                "I also had to account for how sign-in differs across platforms. Browser sessions use cookies; mobile sessions use secure device storage. Both can refresh an expired session before retrying a request."
+                "Counting works offline as well as online, so updates happen locally before reaching the API. I used a persistent queue to retain pending changes through lost connections and app restarts.",
+                "A lost response can leave the client unsure whether an update was saved. Stable operation IDs let the server recognize retries and avoid applying the same increment twice.",
+                "Web and native clients share an authentication API, with HTTP-only cookies in the browser and secure device storage on native. When access tokens expire, concurrent requests share a single refresh request before retrying, with refresh-token rotation handled by the API."
             ]
         },
         "fontFamily": "ClashDisplay",
@@ -123,8 +123,9 @@
         "description": {
             "short": "A reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
             "long": [
-                "I used GSAP to coordinate the countdown, target feedback, and results screen while keeping animation separate from the game rules. The same approach carries into the profile, where filters and history columns move into place as the view changes.",
-                "A score is more useful when you know how it was earned. I built the API to save the drill settings with each result, so players can revisit an attempt and compare results from similar drills."
+                "Animation carries the interface from setup through the countdown and into each round. GSAP timelines coordinate screen transitions with target and score feedback, including the shift from active play to the final result.",
+                "Each result keeps a snapshot of the settings used for that attempt. I carried that context into the profile’s filters, so results can be compared by their original target size and timing even after account preferences change.",
+                "The profile combines filtering and pagination with optional columns for saved settings. Its layout changes as those controls expand, so I used GSAP Flip to animate the reflow and adapted the controls for smaller screens."
             ]
         },
         "fontFamily": "AudioWide",
@@ -155,9 +156,9 @@
         "description": {
             "short": "A real-time tic-tac-toe lobby with JWT-authenticated Socket.IO sessions, server-side move validation, rematches, forfeits, and disconnect recovery.",
             "long": [
-                "I built the client and server around one shared version of each match. The server checks whose turn it is and whether a move is valid before sending the updated board to both players.",
-                "A brief connection loss gives the player 30 seconds to return before forfeiting. I also track connections per user so opening another tab does not replace the existing session.",
-                "The tests play matches through actual socket connections. They cover the path from joining a game to wins, draws, and rematches through the same handlers that run live play."
+                "The server validates each move before either client receives the updated board. I kept turn order and match outcomes there as well, giving both players a single source of game state.",
+                "Disconnects have a 30-second grace period before a match is forfeited. Returning players reconnect to their existing game, and session tracking accounts for multiple tabs so closing one does not remove a player who is still connected.",
+                "Full-match tests run two connected clients through moves, rematches, and forfeits. They check both players’ events and final state, covering the exchanges between clients as well as the rules on the server."
             ]
         },
         "fontFamily": "BitCount",

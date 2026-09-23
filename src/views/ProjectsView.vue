@@ -103,6 +103,7 @@ async function openProject(project, autoplay = false) {
         <SelectedProject
             v-if="activeProject"
             ref="selectedProject"
+            class="portfolio-project-window"
             :active-project="activeProject"
             :autoplay-video="autoplayVideo"
             :project-logos="projectLogos"
@@ -137,6 +138,17 @@ async function openProject(project, autoplay = false) {
 </template>
 
 <style lang="scss" scoped>
+.portfolio-project-window {
+    :deep(.project-details) {
+        gap: $space-4;
+        justify-content: space-between;
+    }
+
+    :deep(.project-details .description-long) {
+        margin-top: 0;
+    }
+}
+
 .projects-container {
     position: relative;
     padding: $space-10 0 $space-3;
