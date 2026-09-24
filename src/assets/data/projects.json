@@ -55,10 +55,16 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=jsf&autoplay=false"
             }
-        }
+        },
+        "gallery": [
+            {
+                "src": "jsf_blurred.webp",
+                "alt": "Job Search Facilitator preview placeholder."
+            }
+        ]
     },
     {
-        "title": "Tally Tracker",
+        "title": "Tally",
         "slug": "tally",
         "stackText": [
             "TypeScript",
@@ -111,7 +117,13 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=tally&autoplay=false"
             }
-        }
+        },
+        "gallery": [
+            {
+                "src": "tally_blurred.webp",
+                "alt": "Tally Tracker preview placeholder."
+            }
+        ]
     },
     {
         "title": "Reaction",
@@ -144,7 +156,13 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=reaction&autoplay=false"
             }
-        }
+        },
+        "gallery": [
+            {
+                "src": "reaction_blurred.webp",
+                "alt": "Reaction preview placeholder."
+            }
+        ]
     },
     {
         "title": "GameLobby",
@@ -177,6 +195,12 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=false"
             }
-        }
+        },
+        "gallery": [
+            {
+                "src": "game-lobby_blurred.webp",
+                "alt": "GameLobby preview placeholder."
+            }
+        ]
     }
 ]

@@ -10,7 +10,7 @@ import {
 } from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
-import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
+import ProjectMediaGallery from '@/components/Project/ProjectMediaGallery.vue';
 
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 import ArrowIcon from '@/components/SVGs/ArrowIcon.vue';
@@ -56,6 +56,7 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 };
 
 const cardEl = ref(null);
+const mediaGallery = useTemplateRef('mediaGallery');
 const { registerAnim } = useGsap(cardEl);
 const toolChipList = useTemplateRef('toolChipList');
 const toolOverflow = useTemplateRef('toolOverflow');
@@ -358,6 +359,8 @@ async function openProject(autoplay = false) {
         autoplayVideo.value = autoplay;
         await nextTick();
 
+        if (autoplay) mediaGallery.value?.showVideo();
+
         // Handling race condition with scrollTo getting viewportHeight and project-card grow animation completing
         if (props.project.slug === 'algo-visualizer' || props.project.slug === 'mawm') {
             setTimeout(() => {
@@ -419,7 +422,12 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                 <div class="card-title">
                     <component :is="projectLogos[project.slug]" class="project-logo" />
 
-                    <h2 :style="{ fontFamily: project.fontFamily }">
+                    <h2
+                        :style="{
+                            fontFamily: project.fontFamily,
+                            fontWeight: project.slug === 'tally' ? '500' : '400',
+                        }"
+                    >
                         {{ project.title }}
                     </h2>
                 </div>
@@ -503,7 +511,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
 
             <Transition :css="false" @enter="onSelectedDetailsEnter" @leave="onSelectedDetailsLeave">
                 <div v-if="projectSelected && !bp.isLaptop.value" class="selected-details">
-                    <ProjectDemoVideo v-if="project.video" :project="project" :autoplay="autoplayVideo" />
+                    <ProjectMediaGallery ref="mediaGallery" :project="project" :autoplay="autoplayVideo" />
 
                     <ul class="selected-description">
                         <li v-for="detail in project.description?.long" :key="detail">
@@ -711,8 +719,9 @@ p {
     justify-content: space-between;
 
     .card-title {
-        gap: $space-2;
+        gap: 0.45em;
         margin-right: $space-8;
+        margin-bottom: -$space-2;
         font-size: 1.2em;
 
         @include bp-xsm-phone {
@@ -722,7 +731,7 @@ p {
         .project-logo {
             display: flex;
             align-items: center;
-            height: 2.6em;
+            height: 2.2em;
 
             @include theme-dark {
                 fill: $color-gray3;
@@ -904,12 +913,10 @@ p {
     pointer-events: none;
 }
 
-.demo-video {
+.project-gallery {
     width: 100%;
     max-width: 60em;
-    aspect-ratio: 16 / 9;
     margin: $space-3 auto;
-    border-radius: $radius-md;
 
     @include bp-xsm-phone {
         width: 95%;

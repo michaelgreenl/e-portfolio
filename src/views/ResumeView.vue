@@ -542,13 +542,6 @@ li {
     font-weight: 600;
     line-height: 1.25;
 
-    @include bp-custom-min(477) {
-        // gap: $space-1;
-        min-width: 20em;
-
-        // max-width: 19em;
-    }
-
     &-projects {
         .project-link {
             padding: 0;

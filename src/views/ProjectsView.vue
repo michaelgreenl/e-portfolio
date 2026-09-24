@@ -104,6 +104,7 @@ async function openProject(project, autoplay = false) {
             v-if="activeProject"
             ref="selectedProject"
             class="portfolio-project-window"
+            :class="{ 'tally-project-window': activeProject.slug === 'tally' }"
             :active-project="activeProject"
             :autoplay-video="autoplayVideo"
             :project-logos="projectLogos"
@@ -139,13 +140,35 @@ async function openProject(project, autoplay = false) {
 
 <style lang="scss" scoped>
 .portfolio-project-window {
+    :deep(.selected-project) {
+        column-gap: $space-12;
+    }
+
     :deep(.project-details) {
         gap: $space-4;
         justify-content: space-between;
     }
 
+    :deep(.tool-chips) {
+        row-gap: $space-3;
+    }
+
+    &.tally-project-window :deep(.tool-chips) {
+        @include bp-custom-max(991) {
+            column-gap: $space-3;
+
+            .chip {
+                padding-inline: $space-3;
+            }
+        }
+    }
+
     :deep(.project-details .description-long) {
+        gap: $space-3;
+        padding-left: $space-4;
         margin-top: 0;
+        font-size: clamp(1.35em, 1.7vw, 1.45em);
+        line-height: 1.3;
     }
 }
 

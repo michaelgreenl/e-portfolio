@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import SelectedWindow from '@/components/SelectedWindow.vue';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
-import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
+import ProjectMediaGallery from '@/components/Project/ProjectMediaGallery.vue';
 
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
@@ -14,12 +14,6 @@ defineProps({
     projectLogos: { default: () => ({}), type: Object },
     externalIcons: { default: () => ({}), type: Object },
     fullscreenOnMobile: { default: false, type: Boolean },
-});
-
-const previews = import.meta.glob('../../assets/images/*-preview.jpg', {
-    eager: true,
-    import: 'default',
-    query: '?url',
 });
 
 const emit = defineEmits(['close-project']);
@@ -56,7 +50,12 @@ defineExpose({ close });
                     <div class="project-title">
                         <component :is="projectLogos[activeProject.slug]" />
 
-                        <h2 :style="{ fontFamily: activeProject.fontFamily }">
+                        <h2
+                            :style="{
+                                fontFamily: activeProject.fontFamily,
+                                fontWeight: activeProject.slug === 'tally' ? '500' : '400',
+                            }"
+                        >
                             {{
                                 activeProject.slug === 'oakley'
                                     ? activeProject.title.replace(' / ', ' /\n')
@@ -71,15 +70,7 @@ defineExpose({ close });
                 <hr v-if="fullscreenOnMobile" class="project-separator" />
 
                 <div class="project-media">
-                    <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
-                    <img
-                        v-else-if="activeProject.preview"
-                        class="demo-video project-preview"
-                        :src="previews[`../../assets/images/${activeProject.preview}`]"
-                        :alt="activeProject.previewAlt"
-                        width="540"
-                        height="960"
-                    />
+                    <ProjectMediaGallery :project="activeProject" :autoplay="autoplayVideo" />
 
                     <div v-if="activeProject.externalLinks" class="external-links">
                         <a
@@ -120,7 +111,9 @@ defineExpose({ close });
 
                 <ul
                     class="description description-long"
-                    :class="{ 'contains-video': activeProject.video || activeProject.preview }"
+                    :class="{
+                        'contains-video': activeProject.video || activeProject.preview || activeProject.gallery?.length,
+                    }"
                 >
                     <li v-for="detail in activeProject.description?.long" :key="detail">
                         {{ detail }}
@@ -244,20 +237,13 @@ p {
     gap: $space-8;
 }
 
-.demo-video {
+.project-gallery {
     width: 100%;
-    border-radius: $radius-md;
 }
 
-.project-preview {
-    height: auto;
-    object-fit: contain;
-}
-
-.portrait .demo-video {
+.portrait .project-gallery {
     align-self: center;
     width: min(100%, calc(60dvh * 9 / 16));
-    aspect-ratio: 9 / 16;
 }
 
 .selected-project.oakley {
@@ -269,7 +255,7 @@ p {
         padding-top: $space-2;
     }
 
-    .demo-video {
+    .project-gallery {
         width: min(100%, 34.75dvh);
     }
 
@@ -310,8 +296,8 @@ p {
             container-type: size;
         }
 
-        .demo-video {
-            width: min(100cqw, calc(100cqh * 9 / 16));
+        .project-gallery {
+            width: min(100cqw, calc((100cqh - var(--gallery-controls-height)) * 9 / 16));
         }
 
         .tool-container {
@@ -537,7 +523,7 @@ p {
                     align-items: center;
                 }
 
-                .demo-video {
+                .project-gallery {
                     max-width: 35rem;
                 }
             }
@@ -580,7 +566,7 @@ p {
                     align-self: start;
                 }
 
-                .demo-video {
+                .project-gallery {
                     width: 100%;
                 }
 

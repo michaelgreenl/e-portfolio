@@ -5,7 +5,7 @@ import { TIMING } from '@/animations/constants/timing.js';
 gsap.registerPlugin(Flip);
 
 const getSelectedProjectDetailTargets = (target) => [
-    ...target.querySelectorAll('.demo-video, .selected-description li'),
+    ...target.querySelectorAll('.project-gallery, .selected-description li'),
 ];
 
 export const captureProjectToolChipState = (targets) => Flip.getState(targets);
