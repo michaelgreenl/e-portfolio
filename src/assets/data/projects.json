@@ -95,7 +95,7 @@
         "shortDate": "January 2026 - Present",
         "longDate": "January 2026 - Present",
         "description": {
-            "short": "Tally Tracker is a cross-platform app for personal and shared counters on iOS, Android, and web, with real-time collaboration and offline synchronization.",
+            "short": "Tally is a cross-platform app for personal and shared counters on iOS, Android, and web, with real-time collaboration and offline synchronization.",
             "long": [
                 "Counting works offline as well as online, so updates happen locally before reaching the API. I used a persistent queue to retain pending changes through lost connections and app restarts.",
                 "A lost response can leave the client unsure whether an update was saved. Stable operation IDs let the server recognize retries and avoid applying the same increment twice.",
@@ -121,7 +121,7 @@
         "gallery": [
             {
                 "src": "tally_blurred.webp",
-                "alt": "Tally Tracker preview placeholder."
+                "alt": "Tally preview placeholder."
             }
         ]
     },
