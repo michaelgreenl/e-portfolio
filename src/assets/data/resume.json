@@ -36,7 +36,7 @@
                     "shortDate": "March 2022 - April 2022",
                     "longDate": "March 2022 - April 2022",
                     "description": {
-                        "short": "An interactive photo kiosk with athlete selection, custom animated transitions, timed photo capture, and QR codes for downloading the finished image.",
+                        "short": "An interactive photo experience with athlete selection, custom animated transitions, coordinated video and camera sequences, and QR codes for downloading the finished image.",
                         "long": [
                             "As the sole frontend developer, I built the kiosk from supplied visual mockups and owned the interaction design and API integration.",
                             "I requested separate text assets from the design team to animate elements embedded in the mockup’s background. I used them in staggered transitions and coordinated the video cuts, countdown, and photo capture as one sequence.",
