@@ -1,10 +1,12 @@
 <script setup>
 import { computed, ref, useId, watch } from 'vue';
 import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
+import SelectedWindow from '@/components/SelectedWindow.vue';
 
 const props = defineProps({
     project: { required: true, type: Object },
     autoplay: { default: false, type: Boolean },
+    expanded: { default: false, type: Boolean },
 });
 
 const images = import.meta.glob('../../assets/images/**/*.{png,jpg,jpeg,webp,avif,svg}', {
@@ -29,14 +31,21 @@ const slides = computed(() => {
     ];
 });
 
-const activeIndex = ref(0);
+const activeIndex = defineModel('activeIndex', { default: 0, type: Number });
+const isExpanded = ref(false);
+const expandButton = ref(null);
+const imageRatio = ref(props.project.portrait ? 9 / 16 : 16 / 9);
 const activeSlide = computed(() => slides.value[activeIndex.value]);
+const mediaRatio = computed(() =>
+    activeSlide.value?.type === 'image' ? imageRatio.value : props.project.portrait ? 9 / 16 : 16 / 9,
+);
 const hasNavigation = computed(() => slides.value.length > 1);
 const slideId = useId();
 
 watch(
     [() => props.project, () => props.autoplay],
     () => {
+        if (props.expanded) return;
         activeIndex.value = props.autoplay && props.project.video ? slides.value.length - 1 : 0;
     },
     { immediate: true },
@@ -48,6 +57,16 @@ function changeSlide(direction) {
 
 function showVideo() {
     if (props.project.video) activeIndex.value = slides.value.length - 1;
+}
+
+function enlarge() {
+    expandButton.value.focus({ preventScroll: true });
+    isExpanded.value = true;
+}
+
+function onImageLoad(event) {
+    const { naturalWidth, naturalHeight } = event.target;
+    if (naturalHeight) imageRatio.value = naturalWidth / naturalHeight;
 }
 
 defineExpose({ showVideo });
@@ -68,7 +87,8 @@ function onKeydown(event) {
     <div
         v-if="activeSlide"
         class="project-gallery"
-        :class="{ 'has-navigation': hasNavigation, 'is-portrait': project.portrait }"
+        :class="{ 'has-navigation': hasNavigation, 'is-portrait': project.portrait, 'is-expanded': expanded }"
+        :style="expanded ? { '--media-ratio': mediaRatio } : undefined"
         role="group"
         aria-roledescription="carousel"
         :aria-label="`${project.title} media`"
@@ -83,14 +103,29 @@ function onKeydown(event) {
                 aria-roledescription="slide"
                 :aria-label="`${activeIndex + 1} of ${slides.length}`"
             >
-                <ProjectDemoVideo v-if="activeSlide.type === 'video'" :project="project" :autoplay="autoplay" />
-                <img
-                    v-else
-                    :key="activeSlide.src"
-                    class="gallery-image"
-                    :src="activeSlide.src"
-                    :alt="activeSlide.alt"
+                <ProjectDemoVideo
+                    v-if="activeSlide.type === 'video' && !isExpanded"
+                    :project="project"
+                    :autoplay="autoplay"
                 />
+                <component
+                    v-else-if="activeSlide.type === 'image'"
+                    :is="expanded ? 'div' : 'button'"
+                    class="gallery-image-button"
+                    :type="expanded ? undefined : 'button'"
+                    :aria-label="expanded ? undefined : 'Enlarge image'"
+                    :aria-haspopup="expanded ? undefined : 'dialog'"
+                    data-testid="enlarge-image"
+                    @click.stop="!expanded && enlarge()"
+                >
+                    <img
+                        :key="activeSlide.src"
+                        class="gallery-image"
+                        :src="activeSlide.src"
+                        :alt="activeSlide.alt"
+                        @load="onImageLoad"
+                    />
+                </component>
             </div>
 
             <template v-if="hasNavigation">
@@ -113,28 +148,63 @@ function onKeydown(event) {
             </template>
         </div>
 
-        <div v-if="hasNavigation" class="gallery-indicators" role="group" aria-label="Choose media">
+        <div v-if="hasNavigation || !expanded" class="gallery-controls">
+            <div v-if="hasNavigation" class="gallery-indicators" role="group" aria-label="Choose media">
+                <button
+                    v-for="(slide, index) in slides"
+                    :key="index"
+                    class="gallery-indicator"
+                    type="button"
+                    :aria-label="slide.type === 'video' ? 'Show demo video' : `Show image ${index + 1}`"
+                    :aria-current="activeIndex === index ? 'true' : undefined"
+                    :aria-controls="slideId"
+                    @click.stop="activeIndex = index"
+                >
+                    <svg v-if="slide.type === 'video'" viewBox="0 0 163.861 163.861" aria-hidden="true">
+                        <path
+                            d="M34.857 3.613C20.084-4.861 8.107 2.081 8.107 19.106v125.637c0 17.042 11.977 23.975 26.75 15.509L144.67 97.275c14.778-8.477 14.778-22.211 0-30.686z"
+                        />
+                    </svg>
+                    <span v-else class="gallery-dot" aria-hidden="true"></span>
+                </button>
+            </div>
             <button
-                v-for="(slide, index) in slides"
-                :key="index"
-                class="gallery-indicator"
+                v-if="!expanded"
+                ref="expandButton"
+                class="gallery-expand"
                 type="button"
-                :aria-label="slide.type === 'video' ? 'Show demo video' : `Show image ${index + 1}`"
-                :aria-current="activeIndex === index ? 'true' : undefined"
-                :aria-controls="slideId"
-                @click.stop="activeIndex = index"
+                aria-label="Enlarge media"
+                aria-haspopup="dialog"
+                title="View larger"
+                data-testid="enlarge-media"
+                @click.stop="enlarge"
             >
-                <svg v-if="slide.type === 'video'" viewBox="0 0 163.861 163.861" aria-hidden="true">
-                    <path
-                        d="M34.857 3.613C20.084-4.861 8.107 2.081 8.107 19.106v125.637c0 17.042 11.977 23.975 26.75 15.509L144.67 97.275c14.778-8.477 14.778-22.211 0-30.686z"
-                    />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" />
                 </svg>
-                <span v-else class="gallery-dot" aria-hidden="true"></span>
             </button>
         </div>
         <span class="gallery-status" aria-live="polite" aria-atomic="true">
             {{ activeSlide.type === 'video' ? 'Demo video' : 'Image' }} {{ activeIndex + 1 }} of {{ slides.length }}
         </span>
+
+        <Teleport to="body">
+            <SelectedWindow
+                v-if="isExpanded"
+                :label="`${project.title} — enlarged media`"
+                fullscreen
+                show-close-button
+                data-testid="media-viewer"
+                @close="isExpanded = false"
+            >
+                <ProjectMediaGallery
+                    v-model:active-index="activeIndex"
+                    :project="project"
+                    :autoplay="autoplay"
+                    expanded
+                />
+            </SelectedWindow>
+        </Teleport>
     </div>
 </template>
 
@@ -175,8 +245,72 @@ function onKeydown(event) {
     object-fit: contain;
 }
 
+.gallery-image-button {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    cursor: zoom-in;
+    background: transparent;
+    border: 0;
+
+    &:focus-visible {
+        outline: 2px solid $color-primary;
+        outline-offset: -3px;
+    }
+}
+
+.is-expanded {
+    width: min(100%, calc((100dvh - 6rem - var(--gallery-controls-height)) * var(--media-ratio)));
+    margin: 0;
+
+    &.has-navigation {
+        --gallery-controls-height: 3.5rem;
+    }
+
+    .gallery-stage {
+        aspect-ratio: var(--media-ratio);
+    }
+
+    .gallery-image-button {
+        cursor: default;
+    }
+
+    .gallery-arrow {
+        top: calc(100% + $space-3);
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: $space-3;
+        background-color: transparent;
+        box-shadow: none;
+        transform: none;
+
+        &.previous {
+            right: auto;
+            left: 0;
+        }
+
+        &.next {
+            right: 0;
+            left: auto;
+        }
+    }
+
+    .gallery-controls {
+        @include flex-center-all;
+
+        min-height: 2.75rem;
+        margin-top: $space-3;
+    }
+
+    .gallery-indicators {
+        padding-inline: 3.25rem;
+    }
+}
+
 .gallery-arrow,
-.gallery-indicator {
+.gallery-indicator,
+.gallery-expand {
     display: grid;
     place-items: center;
     width: 1.75rem;
@@ -271,11 +405,55 @@ function onKeydown(event) {
     }
 }
 
+.gallery-controls {
+    position: relative;
+    min-height: 1.75rem;
+    margin-top: $space-2;
+}
+
 .gallery-indicators {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: $space-2;
+    padding-inline: 2rem;
+}
+
+.gallery-expand {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    &::after {
+        position: absolute;
+        inset: -0.5rem;
+        content: '';
+    }
+
+    svg {
+        fill: none;
+        transition: scale 0.15s ease;
+    }
+
+    @include interactive {
+        svg {
+            scale: 1.15;
+        }
+    }
+
+    &:active svg {
+        scale: 0.9;
+    }
+}
+
+.gallery-arrow,
+.gallery-expand {
+    @include theme-light {
+        color: $color-gray6;
+
+        @include interactive {
+            color: $color-text-primary;
+        }
+    }
 }
 
 .gallery-indicator {
@@ -313,7 +491,9 @@ function onKeydown(event) {
 @media (prefers-reduced-motion: reduce) {
     .gallery-arrow,
     .gallery-arrow svg,
-    .gallery-indicator {
+    .gallery-indicator,
+    .gallery-expand,
+    .gallery-expand svg {
         transition: none;
     }
 }

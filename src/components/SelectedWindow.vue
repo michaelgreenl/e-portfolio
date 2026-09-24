@@ -7,6 +7,7 @@ import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 const props = defineProps({
     label: { required: true, type: String },
     fullscreenOnMobile: { type: Boolean, default: false },
+    fullscreen: { type: Boolean, default: false },
     showCloseButton: { type: Boolean, default: false },
     trapFocus: { type: Boolean, default: false },
 });
@@ -24,9 +25,12 @@ let trigger;
 
 onMounted(() => {
     if (props.showCloseButton || props.trapFocus) trigger = document.activeElement;
-    scrollPosition = window.scrollY;
-    document.body.classList.add('no-scroll');
-    document.body.style.top = `-${scrollPosition}px`;
+    if (!document.body.classList.contains('no-scroll')) {
+        scrollPosition = window.scrollY;
+        document.body.classList.add('no-scroll');
+        document.body.style.top = `-${scrollPosition}px`;
+    }
+    if (props.fullscreen) el.value.showModal();
     showWindow({ targets: [el.value, overlay.value] }).eventCallback('onComplete', () => {
         if (!isClosing) (closeButton.value || el.value).focus({ preventScroll: true });
     });
@@ -49,7 +53,8 @@ function close() {
     hideWindow({
         targets: [el.value, overlay.value],
         onComplete: () => {
-            el.value.blur();
+            if (props.fullscreen) el.value.close();
+            else el.value.blur();
             emit('close');
             if (trigger?.isConnected) trigger.focus({ preventScroll: true });
         },
@@ -57,6 +62,7 @@ function close() {
 }
 
 function keepFocusInside(event) {
+    if (props.fullscreen) return;
     if (!props.showCloseButton && !props.trapFocus) return;
 
     const controls = [
@@ -76,18 +82,20 @@ defineExpose({ close });
 </script>
 
 <template>
-    <div
+    <component
+        :is="fullscreen ? 'dialog' : 'div'"
         ref="el"
         class="selected-container"
-        :class="{ 'fullscreen-mobile': fullscreenOnMobile }"
-        tabindex="0"
+        :class="{ 'fullscreen-mobile': fullscreenOnMobile, fullscreen }"
+        :tabindex="fullscreen ? -1 : 0"
         role="dialog"
         aria-modal="true"
         :aria-label="label"
-        @keydown.esc="close"
+        @keydown.esc.stop.prevent="close"
+        @cancel.prevent="close"
         @keydown.tab="keepFocusInside"
     >
-        <div class="selected-window">
+        <div class="selected-window" @click.self="fullscreen && close()">
             <button
                 v-if="showCloseButton"
                 ref="closeButton"
@@ -102,7 +110,7 @@ defineExpose({ close });
         </div>
 
         <div ref="overlay" class="overlay" @click="close"></div>
-    </div>
+    </component>
 </template>
 
 <style lang="scss" scoped>
@@ -216,6 +224,50 @@ defineExpose({ close });
             border-radius: 0;
             box-shadow: none;
         }
+    }
+}
+
+.fullscreen {
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    border: 0;
+
+    &::backdrop {
+        background: transparent;
+    }
+
+    .selected-window {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        max-height: none;
+        padding: max(4rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right))
+            max(2rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+        margin: 0;
+        overflow: hidden;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+
+        @include bp-sm-phone {
+            padding-inline: max(2.5rem, env(safe-area-inset-left)) max(2.5rem, env(safe-area-inset-right));
+        }
+    }
+
+    .window-close-btn {
+        position: absolute;
+        top: max($space-3, env(safe-area-inset-top));
+        right: max($space-3, env(safe-area-inset-right));
+        width: 2.5rem;
+        height: 2.5rem;
     }
 }
 </style>

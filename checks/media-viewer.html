@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex" />
+        <title>Media viewer check</title>
+        <link rel="stylesheet" href="/fonts.css" />
+    </head>
+    <body>
+        <div id="app"></div>
+        <dialog id="result"><pre role="status">Running media viewer check…</pre></dialog>
+        <script type="module">
+            // Run with Vite: open /checks/media-viewer.html at desktop and phone widths.
+            // This loads the real project page; it needs no test framework or sample data.
+            const result = document.querySelector('#result');
+            const assert = (condition, message) => {
+                if (!condition) throw new Error(message);
+            };
+            async function until(check, message) {
+                const deadline = performance.now() + 10000;
+                while (!check()) {
+                    assert(performance.now() < deadline, message);
+                    await new Promise(requestAnimationFrame);
+                }
+                return check();
+            }
+            const viewer = () => document.querySelector('[data-testid="media-viewer"]');
+            const locked = () => document.body.classList.contains('no-scroll');
+
+            try {
+                history.replaceState(null, '', '/projects?slug=tally&autoplay=false');
+                await import('/src/main.js');
+                const image = await until(
+                    () => document.querySelector('[data-testid="enlarge-image"]'),
+                    'Project gallery did not load',
+                );
+                const gallery = image.closest('[data-testid="project-gallery"]');
+                const trigger = gallery.querySelector('[data-testid="enlarge-media"]');
+                await until(
+                    () => trigger.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
+                    'Gallery controls did not become visible',
+                );
+                const project = gallery.closest('[role="dialog"]');
+                const parentLocked = locked();
+                image.click();
+
+                await until(
+                    () => viewer()?.querySelector('[aria-label="Close window"]') === document.activeElement,
+                    'Viewer did not open and focus its close button',
+                );
+                assert(viewer().matches(':modal') && locked(), 'Viewer must block background interaction');
+                const bounds = viewer().getBoundingClientRect();
+                assert(
+                    Math.abs(bounds.width - innerWidth) < 1 && Math.abs(bounds.height - innerHeight) < 1,
+                    'Viewer must fill the viewport',
+                );
+                const media = viewer().querySelector('[aria-roledescription="slide"]').getBoundingClientRect();
+                assert(
+                    media.left >= 0 && media.right <= innerWidth && media.top >= 0 && media.bottom <= innerHeight,
+                    'Enlarged media must fit the viewport',
+                );
+
+                viewer().querySelector('[aria-label="Next media"]').click();
+                await until(() => viewer().querySelector('iframe'), 'Gallery did not switch to video');
+                assert(document.querySelectorAll('iframe').length === 1, 'Do not load two video players');
+                const selected = viewer().querySelector('[aria-current="true"]').getAttribute('aria-label');
+                viewer().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+                await until(() => !viewer(), 'Escape did not close the viewer');
+                assert(
+                    document.activeElement === trigger,
+                    `Closing must return keyboard focus (found ${document.activeElement.tagName})`,
+                );
+                assert(locked() === parentLocked, 'Closing must preserve the parent scroll lock');
+                assert(
+                    gallery.querySelector('[aria-current="true"]').getAttribute('aria-label') === selected,
+                    'Closing must retain the selected gallery item',
+                );
+
+                trigger.click();
+                await until(() => viewer()?.querySelector('iframe'), 'Video expand control did not open');
+                viewer().querySelector('[aria-label="Close window"]').click();
+                await until(() => !viewer(), 'Close button did not close the viewer');
+                if (project) {
+                    project.querySelector('[aria-label="Close project"]').click();
+                    await until(() => !project.isConnected, 'Project did not close');
+                }
+                assert(!locked(), 'Closing all windows must restore page scrolling');
+                result.querySelector('pre').textContent = `PASS: media viewer at ${innerWidth} × ${innerHeight}`;
+            } catch (error) {
+                result.querySelector('pre').textContent = `FAIL: ${error.message}`;
+                console.error(error);
+            }
+            result.showModal();
+        </script>
+    </body>
+</html>
