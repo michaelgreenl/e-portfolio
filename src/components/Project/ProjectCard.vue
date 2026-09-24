@@ -916,7 +916,7 @@ p {
 .project-gallery {
     width: 100%;
     max-width: 60em;
-    margin: $space-3 auto;
+    margin: $space-3 auto 0;
 
     @include bp-xsm-phone {
         width: 95%;

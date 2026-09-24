@@ -228,13 +228,13 @@ function onKeydown(event) {
         right: -1rem;
     }
 
-    @include bp-custom-max(449) {
+    @include bp-custom-max(332) {
         &.previous {
-            left: 0;
+            left: -0.5rem;
         }
 
         &.next {
-            right: 0;
+            right: -0.5rem;
         }
     }
 
@@ -275,7 +275,7 @@ function onKeydown(event) {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: $space-3;
+    margin-top: $space-2;
 }
 
 .gallery-indicator {
