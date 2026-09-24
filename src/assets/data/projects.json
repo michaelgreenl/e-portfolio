@@ -35,8 +35,8 @@
         "description": {
             "short": "A local full-stack web app that turns AI-sourced job leads into a focused pipeline for reviewing roles, managing applications, and tracking outreach.",
             "long": [
+                "Agent tasks run research in the background, with progress, failures, and browser-access requests shown in the interface. Active tasks remain available across navigation and reloads, so reviewing a role or preparing an application doesn’t interrupt the research.",
                 "Job discovery and evaluation use separate agents, so the researcher gathering leads doesn’t also decide which ones qualify. Their handoffs preserve supporting evidence, with schema checks validating the results before they become saved job records.",
-                "Research runs in the background, with progress, failures, and browser-access requests shown in the interface. Active tasks remain available across navigation and reloads, so reviewing a role or preparing an application doesn’t interrupt the research.",
                 "Codex needs local access to Chrome, so I separated agent execution from the application’s data service. A Node bridge manages research tasks and browser permissions, while the API preserves job records and application history in PostgreSQL."
             ]
         },
