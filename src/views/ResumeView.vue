@@ -612,6 +612,10 @@ li {
         padding: 1rem 0.5rem 0;
     }
 
+    .segment-header-projects {
+        row-gap: $space-1;
+    }
+
     .segment-title {
         min-width: 0;
         margin-right: 0;
@@ -628,7 +632,7 @@ li {
 
 .experience-projects-heading {
     align-self: flex-end;
-    font-size: 1.25em;
+    font-size: 1.5rem;
     font-weight: 600;
     line-height: 1.25;
     color: $color-primary-light;
