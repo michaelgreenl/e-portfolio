@@ -2,6 +2,7 @@
 import { computed, ref, useId, watch } from 'vue';
 import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
 import SelectedWindow from '@/components/SelectedWindow.vue';
+import ChevronIcon from '@/components/SVGs/ChevronIcon.vue';
 
 const props = defineProps({
     project: { required: true, type: Object },
@@ -139,11 +140,7 @@ function onKeydown(event) {
                     :aria-controls="slideId"
                     @click.stop="changeSlide(direction)"
                 >
-                    <svg viewBox="0 0 512 512" aria-hidden="true">
-                        <path
-                            d="M367.954 213.588 160.67 5.872c-7.804-7.819-20.467-7.831-28.284-.029-7.819 7.802-7.832 20.465-.03 28.284l207.299 207.731c7.798 7.798 7.798 20.486-.015 28.299L132.356 477.873c-7.802 7.819-7.789 20.482.03 28.284A19.93 19.93 0 0 0 146.513 512c5.125 0 10.25-1.958 14.157-5.873l207.269-207.701c23.394-23.394 23.394-61.459.015-84.838"
-                        />
-                    </svg>
+                    <ChevronIcon aria-hidden="true" />
                 </button>
             </template>
         </div>

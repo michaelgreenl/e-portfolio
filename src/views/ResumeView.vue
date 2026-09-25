@@ -12,6 +12,7 @@ import SelectedProject from '@/components/Project/SelectedProject.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
+import ChevronIcon from '@/components/SVGs/ChevronIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -113,7 +114,8 @@ onMounted(() => {
                                                 showInternship = true;
                                             "
                                         >
-                                            {{ project.title }}
+                                            <span>{{ project.title }}</span>
+                                            <ChevronIcon aria-hidden="true" />
                                         </button>
                                     </h4>
 
@@ -613,6 +615,29 @@ li {
         min-width: 0;
         margin-right: 0;
         line-height: 1;
+    }
+
+    .project-link {
+        display: inline-flex;
+        gap: 0.4em;
+        align-items: center;
+        transition: color 0.15s ease;
+
+        @include interactive {
+            color: $color-primary-light;
+            text-decoration: none;
+
+            @include theme-light {
+                color: var(--resume-light-accent);
+            }
+        }
+
+        :deep(svg) {
+            flex-shrink: 0;
+            width: 0.7em;
+            height: 0.7em;
+            fill: currentcolor;
+        }
     }
 }
 
