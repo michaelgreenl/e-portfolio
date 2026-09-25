@@ -260,7 +260,7 @@ function onKeydown(event) {
 
 <style lang="scss" scoped>
 .project-gallery {
-    --gallery-controls-height: 0px;
+    --gallery-controls-height: 2.25rem;
 
     width: 100%;
     min-width: 0;
@@ -313,6 +313,8 @@ function onKeydown(event) {
 }
 
 .is-expanded {
+    --gallery-controls-height: 0px;
+
     width: min(100%, calc((100dvh - 6rem - var(--gallery-controls-height)) * var(--media-ratio)));
     margin: 0;
 
@@ -496,6 +498,33 @@ function onKeydown(event) {
 
     @include bp-md-tablet {
         padding-inline: 4rem;
+    }
+}
+
+// Keep portrait controls inside the narrow media column used on tablets.
+@include bp-custom-min(550) {
+    .is-portrait:not(.is-expanded) {
+        .gallery-arrow {
+            top: calc(100% + $space-2);
+            width: 1.75rem;
+            background: transparent;
+            box-shadow: none;
+            transform: none;
+
+            &.previous {
+                right: auto;
+                left: 0;
+            }
+
+            &.next {
+                right: auto;
+                left: 2rem;
+            }
+        }
+
+        .gallery-indicators {
+            padding-inline: 4rem 2rem;
+        }
     }
 }
 

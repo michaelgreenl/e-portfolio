@@ -44,8 +44,14 @@
                         ]
                     },
                     "portrait": true,
-                    "previewAlt": "Oakley kiosk showing four athletes to choose from before taking a photo.",
-                    "preview": "oakley-preview.jpg"
+                    "gallery": [
+                        {
+                            "src": "oakley-preview.jpg",
+                            "alt": "Oakley kiosk showing four athletes to choose from before taking a photo."
+                        }
+                    ],
+                    "video": "1220947923",
+                    "img": "jsf_blurred.webp"
                 },
                 {
                     "title": "Campaign Manager",
@@ -60,6 +66,12 @@
                             "The download flow gave me room to shape an interaction within an otherwise established interface. I used sliding file entries and an animated completion checkmark to show when the application was preparing a report and when the file was ready."
                         ]
                     },
+                    "gallery": [
+                        {
+                            "src": "jsf_blurred.webp",
+                            "alt": "Campaign Manager gallery placeholder."
+                        }
+                    ],
                     "video": "1220947923",
                     "img": "jsf_blurred.webp"
                 }
