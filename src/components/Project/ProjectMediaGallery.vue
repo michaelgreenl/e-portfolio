@@ -42,6 +42,54 @@ const mediaRatio = computed(() =>
 );
 const hasNavigation = computed(() => slides.value.length > 1);
 const slideId = useId();
+let swipeStart;
+let ignoreClickUntil = 0;
+
+function startSwipe(event) {
+    cancelSwipe();
+    ignoreClickUntil = 0;
+    if (!hasNavigation.value || event.pointerType !== 'touch' || !event.isPrimary) return;
+
+    swipeStart = { id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false };
+}
+
+function moveSwipe(event) {
+    if (!swipeStart || event.pointerId !== swipeStart.id) return;
+
+    const x = Math.abs(event.clientX - swipeStart.x);
+    const y = Math.abs(event.clientY - swipeStart.y);
+    if (!swipeStart.horizontal) {
+        if (Math.max(x, y) < 8) return;
+        if (y >= x) return cancelSwipe();
+        swipeStart.horizontal = true;
+    }
+}
+
+function endSwipe(event) {
+    if (!swipeStart || event.pointerId !== swipeStart.id) return;
+
+    const { x, y, horizontal } = swipeStart;
+    cancelSwipe();
+    if (!horizontal) return;
+
+    // A swipe must not also activate the image or a gallery button on release.
+    ignoreClickUntil = performance.now() + 500;
+    const distance = event.clientX - x;
+    if (Math.abs(distance) >= 48 && Math.abs(distance) > Math.abs(event.clientY - y)) {
+        changeSlide(distance < 0 ? 1 : -1);
+    }
+}
+
+function cancelSwipe() {
+    swipeStart = undefined;
+}
+
+function ignoreSwipeClick(event) {
+    if (event.detail > 0 && performance.now() < ignoreClickUntil) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}
 
 watch(
     [() => props.project, () => props.autoplay],
@@ -95,6 +143,11 @@ function onKeydown(event) {
         :aria-label="`${project.title} media`"
         data-testid="project-gallery"
         @keydown="onKeydown"
+        @pointerdown="startSwipe"
+        @pointermove="moveSwipe"
+        @pointerup="endSwipe"
+        @pointercancel="cancelSwipe"
+        @click.capture="ignoreSwipeClick"
     >
         <div class="gallery-stage">
             <div
@@ -214,6 +267,8 @@ function onKeydown(event) {
 
     &.has-navigation {
         --gallery-controls-height: 2.5rem;
+
+        touch-action: pan-y pinch-zoom;
     }
 }
 

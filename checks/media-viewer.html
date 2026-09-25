@@ -11,8 +11,12 @@
         <div id="app"></div>
         <dialog id="result"><pre role="status">Running media viewer check…</pre></dialog>
         <script type="module">
+            import { createApp, h, nextTick } from 'vue';
+            import ProjectMediaGallery from '/src/components/Project/ProjectMediaGallery.vue';
+            import projects from '/src/assets/data/projects.json';
+
             // Run with Vite: open /checks/media-viewer.html at desktop and phone widths.
-            // This loads the real project page; it needs no test framework or sample data.
+            // Synthetic pointer gestures run through the real gallery. Check physical-device scrolling separately.
             const result = document.querySelector('#result');
             const assert = (condition, message) => {
                 if (!condition) throw new Error(message);
@@ -27,6 +31,76 @@
             }
             const viewer = () => document.querySelector('[data-testid="media-viewer"]');
             const locked = () => document.body.classList.contains('no-scroll');
+            const frame = () => new Promise(requestAnimationFrame);
+            function pointer(target, type, x, y, options = {}) {
+                target.dispatchEvent(
+                    new PointerEvent(type, {
+                        bubbles: true,
+                        pointerType: 'touch',
+                        pointerId: 1,
+                        isPrimary: true,
+                        clientX: x,
+                        clientY: y,
+                        ...options,
+                    }),
+                );
+            }
+            async function swipe(target, x, y = 102, end = 'pointerup', options = {}) {
+                pointer(target, 'pointerdown', 180, 100, options);
+                pointer(target, 'pointermove', x, y, options);
+                pointer(target, end, x, y, options);
+                await frame();
+            }
+            async function checkSwipes(gallery) {
+                const slide = () => gallery.querySelector('[aria-roledescription="slide"]').getAttribute('aria-label');
+                const image = () => gallery.querySelector('[data-testid="enlarge-image"]');
+                const wasExpanded = Boolean(viewer());
+
+                assert(
+                    getComputedStyle(gallery).touchAction === 'pan-y pinch-zoom',
+                    'Gallery must allow vertical scrolling and pinch zoom',
+                );
+                for (const [name, x, y, end, options] of [
+                    ['Short drag', 160, 100],
+                    ['Vertical scroll', 176, 200],
+                    ['Cancelled swipe', 60, 102, 'pointercancel'],
+                    ['Mouse drag', 60, 102, 'pointerup', { pointerType: 'mouse' }],
+                ]) {
+                    await swipe(image(), x, y, end, options);
+                    assert(slide() === '1 of 3', `${name} changed the slide`);
+                }
+
+                pointer(image(), 'pointerdown', 180, 100);
+                pointer(image(), 'pointermove', 60, 102);
+                pointer(image(), 'pointerdown', 200, 100, { pointerId: 2, isPrimary: false });
+                pointer(image(), 'pointerup', 60, 102);
+                await frame();
+                assert(slide() === '1 of 3', 'A second finger did not cancel the swipe');
+
+                pointer(image(), 'pointerdown', 180, 100);
+                pointer(image(), 'pointermove', 180, 150);
+                pointer(image(), 'pointermove', 60, 150);
+                pointer(image(), 'pointerup', 60, 150);
+                await frame();
+                assert(slide() === '1 of 3', 'Scrolling turned into a gallery swipe');
+
+                await swipe(image(), 60);
+                assert(slide() === '2 of 3', 'Left swipe must show the next image');
+                image().dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+                await frame();
+                assert(Boolean(viewer()) === wasExpanded, 'Swipe release also enlarged the image');
+
+                await swipe(image(), 300);
+                assert(slide() === '1 of 3', 'Right swipe must show the previous image');
+                await swipe(image(), 300);
+                assert(slide() === '3 of 3' && gallery.querySelector('iframe'), 'Right swipe must wrap to video');
+                assert(
+                    getComputedStyle(gallery.querySelector('iframe')).pointerEvents !== 'none',
+                    'Swipes must not disable video controls',
+                );
+                await swipe(gallery.querySelector('[aria-label="Choose media"]'), 60);
+                assert(slide() === '1 of 3', 'Swipe below the video must wrap to the first image');
+            }
 
             try {
                 history.replaceState(null, '', '/projects?slug=tally&autoplay=false');
@@ -43,6 +117,31 @@
                 );
                 const project = gallery.closest('[role="dialog"]');
                 const parentLocked = locked();
+
+                // Three items make swipe direction and wraparound distinguishable without changing project data.
+                const fixture = document.body.appendChild(document.createElement('div'));
+                fixture.style.cssText = 'position: fixed; inset: 2rem; max-width: 40rem; z-index: 20';
+                const tally = projects.find((project) => project.slug === 'tally');
+                const secondImage = projects.find((project) => project.slug === 'reaction').gallery[0];
+                const fixtureApp = createApp({
+                    render: () =>
+                        h(ProjectMediaGallery, {
+                            project: { ...tally, gallery: [tally.gallery[0], secondImage] },
+                        }),
+                });
+                fixtureApp.mount(fixture);
+                await nextTick();
+                await checkSwipes(fixture.querySelector('[data-testid="project-gallery"]'));
+                const tapImage = fixture.querySelector('[data-testid="enlarge-image"]');
+                pointer(tapImage, 'pointerdown', 180, 100);
+                pointer(tapImage, 'pointerup', 180, 100);
+                tapImage.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+                await until(() => viewer(), 'Tap after a swipe did not enlarge the image');
+                await checkSwipes(viewer().querySelector('[data-testid="project-gallery"]'));
+                viewer().querySelector('[aria-label="Close window"]').click();
+                await until(() => !viewer(), 'Swipe check viewer did not close');
+                fixtureApp.unmount();
+                fixture.remove();
                 image.click();
 
                 await until(
@@ -61,7 +160,7 @@
                     'Enlarged media must fit the viewport',
                 );
 
-                viewer().querySelector('[aria-label="Next media"]').click();
+                viewer().querySelector('[aria-label="Show demo video"]').click();
                 await until(() => viewer().querySelector('iframe'), 'Gallery did not switch to video');
                 assert(document.querySelectorAll('iframe').length === 1, 'Do not load two video players');
                 const selected = viewer().querySelector('[aria-current="true"]').getAttribute('aria-label');
@@ -86,7 +185,8 @@
                     await until(() => !project.isConnected, 'Project did not close');
                 }
                 assert(!locked(), 'Closing all windows must restore page scrolling');
-                result.querySelector('pre').textContent = `PASS: media viewer at ${innerWidth} × ${innerHeight}`;
+                result.querySelector('pre').textContent =
+                    `PASS: media viewer and gallery swipes at ${innerWidth} × ${innerHeight}`;
             } catch (error) {
                 result.querySelector('pre').textContent = `FAIL: ${error.message}`;
                 console.error(error);
