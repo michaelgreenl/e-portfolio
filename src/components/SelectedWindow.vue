@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useMediaQuery } from '@vueuse/core';
 import { useGsap } from '@/composables/useGsap.js';
 import { selectedWindowAnimations } from '@/animations/component/selectedWindow.js';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
@@ -16,12 +17,73 @@ const emit = defineEmits(['close']);
 const el = ref(null);
 const overlay = ref(null);
 const closeButton = ref(null);
+const windowContent = ref(null);
+const isMobile = useMediaQuery('(max-width: 847px)');
+const swipeOffset = ref(0);
+const isDragging = ref(false);
 const { registerAnim } = useGsap();
 const showWindow = registerAnim(selectedWindowAnimations.show);
 const hideWindow = registerAnim(selectedWindowAnimations.hide);
 let scrollPosition;
 let isClosing = false;
 let trigger;
+let swipeStart;
+
+function cancelSwipe() {
+    swipeStart = undefined;
+    isDragging.value = false;
+    swipeOffset.value = 0;
+}
+
+function startSwipe(event) {
+    cancelSwipe();
+    if (
+        isClosing ||
+        event.touches.length !== 1 ||
+        windowContent.value.scrollTop > 0 ||
+        event.target.closest('button, a, input, textarea, select, [aria-roledescription="carousel"]') ||
+        window.getSelection()?.isCollapsed === false
+    ) {
+        return;
+    }
+    const { identifier, clientX, clientY } = event.touches[0];
+    swipeStart = { identifier, clientX, clientY };
+}
+
+function moveSwipe(event) {
+    if (!swipeStart) return;
+    const touch = event.touches[0];
+    if (event.touches.length !== 1 || touch.identifier !== swipeStart.identifier || !event.cancelable) {
+        cancelSwipe();
+        return;
+    }
+
+    const x = Math.abs(touch.clientX - swipeStart.clientX);
+    const y = touch.clientY - swipeStart.clientY;
+    if (!isDragging.value) {
+        if (Math.max(x, Math.abs(y)) < 8) return;
+        if (y <= x || windowContent.value.scrollTop > 0) {
+            cancelSwipe();
+            return;
+        }
+        isDragging.value = true;
+    }
+    event.preventDefault();
+    swipeOffset.value = Math.max(0, y);
+}
+
+function endSwipe() {
+    if (isDragging.value && swipeOffset.value >= 96) {
+        swipeStart = undefined;
+        isDragging.value = false;
+        swipeOffset.value = windowContent.value.clientHeight;
+        close();
+    } else {
+        cancelSwipe();
+    }
+}
+
+watch(isMobile, cancelSwipe);
 
 onMounted(() => {
     if (props.showCloseButton || props.trapFocus) trigger = document.activeElement;
@@ -95,7 +157,18 @@ defineExpose({ close });
         @cancel.prevent="close"
         @keydown.tab="keepFocusInside"
     >
-        <div class="selected-window" @click.self="fullscreen && close()">
+        <div
+            ref="windowContent"
+            class="selected-window"
+            :class="{ 'is-dragging': isDragging }"
+            :style="swipeOffset ? { translate: `0 ${swipeOffset}px` } : undefined"
+            v-on="
+                fullscreenOnMobile && isMobile
+                    ? { touchstart: startSwipe, touchmove: moveSwipe, touchend: endSwipe, touchcancel: cancelSwipe }
+                    : {}
+            "
+            @click.self="fullscreen && close()"
+        >
             <button
                 v-if="showCloseButton"
                 ref="closeButton"
@@ -223,6 +296,15 @@ defineExpose({ close });
             border: 0;
             border-radius: 0;
             box-shadow: none;
+            transition: translate 0.2s ease-out;
+
+            &.is-dragging {
+                transition: none;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
         }
     }
 }

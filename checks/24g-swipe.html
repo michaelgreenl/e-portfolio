@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex" />
+        <title>24G swipe check</title>
+        <link rel="stylesheet" href="/fonts.css" />
+    </head>
+    <body>
+        <div id="app"></div>
+        <dialog id="result"><pre role="status">Running swipe checks…</pre></dialog>
+        <script type="module">
+            // Open through Vite at phone, tablet, and desktop widths.
+            // Synthetic TouchEvents exercise the real UI handlers; device scrolling still needs a touch-device check.
+            const result = document.querySelector('#result');
+            const assert = (condition, message) => {
+                if (!condition) throw new Error(message);
+            };
+            const frame = () => new Promise(requestAnimationFrame);
+            async function until(check, message) {
+                const deadline = performance.now() + 5000;
+                while (!check()) {
+                    assert(performance.now() < deadline, message);
+                    await frame();
+                }
+                return check();
+            }
+            function touch(target, type, points = []) {
+                const touches = points.map(
+                    ([x, y, identifier = 1]) => new Touch({ identifier, target, clientX: x, clientY: y }),
+                );
+                const event = new TouchEvent(type, {
+                    bubbles: true,
+                    cancelable: true,
+                    touches,
+                    targetTouches: touches,
+                    changedTouches: touches,
+                });
+                target.dispatchEvent(event);
+                return event;
+            }
+            async function openProject(title) {
+                const trigger = [...document.querySelectorAll('button[aria-haspopup="dialog"]')].find(
+                    (button) => button.textContent.trim() === title,
+                );
+                trigger.click();
+                const project = await until(
+                    () => document.querySelector('.experience-project-window'),
+                    '24G project did not open',
+                );
+                await until(() => getComputedStyle(project).opacity === '1', 'Opening animation did not finish');
+                return {
+                    project,
+                    panel: project.querySelector('.selected-window'),
+                    target: project.querySelector('h2'),
+                };
+            }
+            async function remainsOpen(view, name) {
+                await frame();
+                await frame();
+                assert(
+                    view.project.isConnected && getComputedStyle(view.project).opacity === '1',
+                    `${name} closed the project`,
+                );
+                await until(
+                    () => !view.project.isConnected || Math.abs(view.panel.getBoundingClientRect().top) < 1,
+                    `${name} did not return to its starting position`,
+                );
+                assert(view.project.isConnected, `${name} closed the project`);
+            }
+
+            try {
+                history.replaceState(null, '', '/resume');
+                await import('/src/main.js');
+                const { default: resume } = await import('/src/assets/data/resume.json');
+                const projects = resume.experience['24g'].projects;
+                let scrollChecks = 0;
+                await until(() => document.querySelector('.experience-projects'), 'Resume did not load');
+
+                for (const project of projects) {
+                    const view = await openProject(project.title);
+                    if (innerWidth >= 848) {
+                        touch(view.target, 'touchstart', [[120, 100]]);
+                        const move = touch(view.target, 'touchmove', [[120, 260]]);
+                        touch(view.target, 'touchend');
+                        await frame();
+                        assert(
+                            !move.defaultPrevented && view.panel.style.translate === '',
+                            'Desktop gesture intercepted scrolling',
+                        );
+                        assert(view.project.isConnected, 'Desktop swipe closed the project');
+                        view.project.querySelector('[aria-label="Close project"]').click();
+                        await until(() => !view.project.isConnected, 'Close button did not work');
+                        continue;
+                    }
+
+                    for (const [name, x, y] of [
+                        ['Short pull', 122, 145],
+                        ['Upward scroll', 120, 30],
+                        ['Horizontal swipe', 280, 130],
+                    ]) {
+                        touch(view.target, 'touchstart', [[120, 100]]);
+                        touch(view.target, 'touchmove', [[x, y]]);
+                        touch(view.target, 'touchend');
+                        await remainsOpen(view, name);
+                    }
+
+                    touch(view.target, 'touchstart', [[120, 100]]);
+                    touch(view.target, 'touchmove', [[120, 260]]);
+                    touch(view.target, 'touchcancel');
+                    await remainsOpen(view, 'Cancelled touch');
+
+                    touch(view.target, 'touchstart', [[120, 100]]);
+                    touch(view.target, 'touchmove', [[120, 260]]);
+                    touch(view.target, 'touchstart', [
+                        [120, 260],
+                        [180, 260, 2],
+                    ]);
+                    touch(view.target, 'touchmove', [[120, 340]]);
+                    touch(view.target, 'touchend');
+                    await remainsOpen(view, 'Multi-touch');
+
+                    if (view.panel.scrollHeight > view.panel.clientHeight) {
+                        view.panel.scrollTop = 80;
+                        assert(view.panel.scrollTop > 0, 'Could not scroll the project');
+                        touch(view.target, 'touchstart', [[120, 100]]);
+                        view.panel.scrollTop = 0;
+                        const scroll = touch(view.target, 'touchmove', [[120, 260]]);
+                        touch(view.target, 'touchend');
+                        assert(!scroll.defaultPrevented, 'Scrolling back to the top was intercepted');
+                        await remainsOpen(view, 'Scroll back to top');
+                        scrollChecks += 1;
+                    }
+
+                    const media = view.project.querySelector('[data-testid="project-gallery"]');
+                    touch(media, 'touchstart', [[120, 100]]);
+                    const mediaMove = touch(media, 'touchmove', [[120, 260]]);
+                    touch(media, 'touchend');
+                    assert(!mediaMove.defaultPrevented, 'Gallery touch was intercepted');
+                    await remainsOpen(view, 'Gallery interaction');
+
+                    for (const type of ['pointerdown', 'pointermove', 'pointerup']) {
+                        view.target.dispatchEvent(
+                            new PointerEvent(type, {
+                                bubbles: true,
+                                pointerType: 'mouse',
+                                clientY: type === 'pointerdown' ? 100 : 260,
+                            }),
+                        );
+                    }
+                    await remainsOpen(view, 'Mouse drag');
+
+                    touch(view.target, 'touchstart', [[120, 100]]);
+                    const pull = touch(view.target, 'touchmove', [[125, 260]]);
+                    await frame();
+                    assert(
+                        pull.defaultPrevented && view.panel.getBoundingClientRect().top > 100,
+                        'Downward pull did not follow the touch',
+                    );
+                    touch(view.target, 'touchend');
+                    await until(() => !view.project.isConnected, 'Downward swipe did not close the project');
+                    assert(!document.body.classList.contains('no-scroll'), 'Swipe left page scrolling locked');
+                }
+                result.querySelector('pre').textContent =
+                    `PASS: 24G swipe checks at ${innerWidth} × ${innerHeight}; ${scrollChecks} scrollable projects checked`;
+                if (innerWidth < 848) {
+                    const preview = document.createElement('button');
+                    preview.textContent = 'Preview held swipe';
+                    preview.onclick = async () => {
+                        result.close();
+                        const view = await openProject(projects[0].title);
+                        touch(view.target, 'touchstart', [[120, 100]]);
+                        touch(view.target, 'touchmove', [[125, 260]]);
+                    };
+                    result.append(preview);
+                }
+            } catch (error) {
+                result.querySelector('pre').textContent = `FAIL: ${error.message}`;
+                console.error(error);
+            }
+            result.showModal();
+        </script>
+    </body>
+</html>
