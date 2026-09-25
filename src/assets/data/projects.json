@@ -58,8 +58,16 @@
         },
         "gallery": [
             {
-                "src": "jsf_blurred.webp",
-                "alt": "Job Search Facilitator preview placeholder."
+                "src": "jsf/phone-layouts.svg",
+                "alt": "Three phone views of Job Search Facilitator: the application queue, outreach research progress, and a saved outreach message."
+            },
+            {
+                "src": "jsf/tablet-applications.svg",
+                "alt": "Two tablet views of Job Search Facilitator: the job review list and application details with role evaluation and document uploads."
+            },
+            {
+                "src": "jsf/tablet-outreach.svg",
+                "alt": "Two tablet views of Job Search Facilitator: saved outreach contacts and application activity, alongside outreach research progress."
             }
         ]
     },
@@ -159,8 +167,12 @@
         },
         "gallery": [
             {
-                "src": "reaction_blurred.webp",
-                "alt": "Reaction preview placeholder."
+                "src": "reaction/phone-layouts.svg",
+                "alt": "Three phone views of Reaction: a round result, target and timing settings, and game history with filters."
+            },
+            {
+                "src": "reaction/tablet-layouts.svg",
+                "alt": "Two tablet views of Reaction: a round result with recent scores, and game history with saved settings and filters."
             }
         ]
     },
@@ -196,11 +208,6 @@
                 "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=false"
             }
         },
-        "gallery": [
-            {
-                "src": "game-lobby_blurred.webp",
-                "alt": "GameLobby preview placeholder."
-            }
-        ]
+        "gallery": false
     }
 ]

@@ -19,16 +19,18 @@ const images = import.meta.glob('../../assets/images/**/*.{png,jpg,jpeg,webp,avi
 const slides = computed(() => {
     // Gallery entries use { src, alt }; src can be an asset filename or a public URL.
     const screenshots =
-        props.project.gallery ??
-        (props.project.preview ? [{ src: props.project.preview, alt: props.project.previewAlt }] : []);
+        props.project.gallery === false
+            ? []
+            : (props.project.gallery ??
+              (props.project.preview ? [{ src: props.project.preview, alt: props.project.previewAlt }] : []));
 
     return [
+        ...(props.project.video ? [{ type: 'video' }] : []),
         ...screenshots.map((image) => ({
             ...image,
             src: images[`../../assets/images/${image.src}`] ?? image.src,
             type: 'image',
         })),
-        ...(props.project.video ? [{ type: 'video' }] : []),
     ];
 });
 
@@ -95,7 +97,7 @@ watch(
     [() => props.project, () => props.autoplay],
     () => {
         if (props.expanded) return;
-        activeIndex.value = props.autoplay && props.project.video ? slides.value.length - 1 : 0;
+        activeIndex.value = 0;
     },
     { immediate: true },
 );
@@ -105,7 +107,7 @@ function changeSlide(direction) {
 }
 
 function showVideo() {
-    if (props.project.video) activeIndex.value = slides.value.length - 1;
+    if (props.project.video) activeIndex.value = 0;
 }
 
 function enlarge() {
@@ -139,7 +141,7 @@ function onKeydown(event) {
         :class="{ 'has-navigation': hasNavigation, 'is-portrait': project.portrait, 'is-expanded': expanded }"
         :style="expanded ? { '--media-ratio': mediaRatio } : undefined"
         role="group"
-        aria-roledescription="carousel"
+        :aria-roledescription="hasNavigation ? 'carousel' : undefined"
         :aria-label="`${project.title} media`"
         data-testid="project-gallery"
         @keydown="onKeydown"
@@ -198,7 +200,7 @@ function onKeydown(event) {
             </template>
         </div>
 
-        <div v-if="hasNavigation || !expanded" class="gallery-controls">
+        <div v-if="project.gallery !== false && (hasNavigation || !expanded)" class="gallery-controls">
             <div v-if="hasNavigation" class="gallery-indicators" role="group" aria-label="Choose media">
                 <button
                     v-for="(slide, index) in slides"
@@ -285,7 +287,6 @@ function onKeydown(event) {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    background-color: $color-bg-secondary;
     border-radius: $radius-md;
 }
 
