@@ -634,8 +634,8 @@ li {
 
         :deep(svg) {
             flex-shrink: 0;
-            width: 0.5em;
-            height: 0.5em;
+            width: 0.4em;
+            height: 0.4em;
             overflow: visible;
             fill: currentcolor;
             stroke: currentcolor;
