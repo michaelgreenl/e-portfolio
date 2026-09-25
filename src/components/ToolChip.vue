@@ -192,9 +192,17 @@ const tools = {
             <component :is="tools[tool].icon" class="icon" />
         </div>
 
-        <span :style="{ color: themeStore.theme === 'light' ? tools[tool].lightColor : tools[tool].darkColor }">{{
-            tools[tool].text
-        }}</span>
+        <span
+            :style="{
+                color:
+                    tool === 'javascript' && themeStore.theme === 'light'
+                        ? '#343a40'
+                        : themeStore.theme === 'light'
+                          ? tools[tool].lightColor
+                          : tools[tool].darkColor,
+            }"
+            >{{ tools[tool].text }}</span
+        >
     </div>
 </template>
 
