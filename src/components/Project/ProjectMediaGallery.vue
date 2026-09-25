@@ -345,6 +345,11 @@ function onKeydown(event) {
         &.next {
             right: 0;
             left: auto;
+
+            @include bp-md-tablet {
+                right: auto;
+                left: 3rem;
+            }
         }
     }
 
@@ -357,6 +362,10 @@ function onKeydown(event) {
 
     .gallery-indicators {
         padding-inline: 3.25rem;
+
+        @include bp-md-tablet {
+            padding-inline: 6rem;
+        }
     }
 }
 
@@ -455,6 +464,22 @@ function onKeydown(event) {
             scale: 0.9;
         }
     }
+
+    @include bp-md-tablet {
+        top: calc(100% + $space-2);
+        width: 1.75rem;
+        transform: none;
+
+        &.previous {
+            right: auto;
+            left: 0;
+        }
+
+        &.next {
+            right: auto;
+            left: 2rem;
+        }
+    }
 }
 
 .gallery-controls {
@@ -468,6 +493,10 @@ function onKeydown(event) {
     flex-wrap: wrap;
     justify-content: center;
     padding-inline: 2rem;
+
+    @include bp-md-tablet {
+        padding-inline: 4rem;
+    }
 }
 
 .gallery-expand {

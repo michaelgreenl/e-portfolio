@@ -619,7 +619,7 @@ li {
 
     .project-link {
         display: inline-flex;
-        gap: 0.4em;
+        gap: 0.2em;
         align-items: center;
         transition: color 0.15s ease;
 
@@ -634,9 +634,12 @@ li {
 
         :deep(svg) {
             flex-shrink: 0;
-            width: 0.7em;
-            height: 0.7em;
+            width: 0.5em;
+            height: 0.5em;
+            overflow: visible;
             fill: currentcolor;
+            stroke: currentcolor;
+            stroke-width: 24;
         }
     }
 }
