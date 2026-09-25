@@ -527,7 +527,10 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                         v-for="[key, link] in Object.entries(project.externalLinks).filter(
                             ([key]) => key !== 'porfolioLink',
                         )"
-                        :class="externalLinkRespText(project.slug, project.externalLinks)"
+                        :class="[
+                            externalLinkRespText(project.slug, project.externalLinks),
+                            { 'no-fill': key === 'liveSite' },
+                        ]"
                         :key="link"
                         :href="key === 'demoVideo' ? null : link.href"
                         target="_blank"
@@ -1020,7 +1023,7 @@ p {
         }
     }
 
-    a:nth-child(3):hover :deep(button) svg {
+    a.no-fill:hover :deep(button) svg {
         fill: transparent !important;
     }
 }
