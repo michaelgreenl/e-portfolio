@@ -287,7 +287,7 @@ function onKeydown(event) {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    border-radius: $radius-md;
+    border-radius: 0.25rem;
 }
 
 .gallery-image,
@@ -414,11 +414,25 @@ function onKeydown(event) {
     box-shadow: 0 1px 6px rgb(0 0 0 / 18%);
     transform: translateY(-50%);
 
+    @include bp-custom-max(681.98) {
+        width: 2.25rem;
+        height: 2.25rem;
+
+        svg {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+    }
+
     &.previous {
         left: -1rem;
 
         svg {
             transform: rotate(180deg);
+
+            @include bp-custom-max(681.98) {
+                transform: rotate(180deg) translateX(1px);
+            }
         }
     }
 
