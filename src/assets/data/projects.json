@@ -118,6 +118,10 @@
                 "href": "https://github.com/michaelgreenl/tally-tracker",
                 "text": "Repository"
             },
+            "apple": {
+                "href": "https://github.com/michaelgreenl/tally-tracker",
+                "text": "App Store"
+            },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/projects?slug=tally&autoplay=true",
                 "text": "Demo Video"

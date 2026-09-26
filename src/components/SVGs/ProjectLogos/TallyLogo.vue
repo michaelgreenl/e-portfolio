@@ -12,7 +12,7 @@
 <style lang="scss" scoped>
 path {
     @include theme-dark {
-        fill: $color-text-primary;
+        fill: $color-gray3;
     }
 
     @include theme-light {
