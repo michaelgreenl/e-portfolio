@@ -5,18 +5,16 @@ import { useGsap } from '@/composables/useGsap.js';
 import { selectedWindowAnimations } from '@/animations/component/selectedWindow.js';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
-const props = defineProps({
+defineProps({
     label: { required: true, type: String },
     fullscreenOnMobile: { type: Boolean, default: false },
     fullscreen: { type: Boolean, default: false },
     showCloseButton: { type: Boolean, default: false },
-    trapFocus: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['close']);
 const el = ref(null);
 const overlay = ref(null);
-const closeButton = ref(null);
 const windowContent = ref(null);
 const isMobile = useMediaQuery('(max-width: 847px)');
 const swipeOffset = ref(0);
@@ -26,7 +24,6 @@ const showWindow = registerAnim(selectedWindowAnimations.show);
 const hideWindow = registerAnim(selectedWindowAnimations.hide);
 let scrollPosition;
 let isClosing = false;
-let trigger;
 let swipeStart;
 
 function cancelSwipe() {
@@ -86,16 +83,13 @@ function endSwipe() {
 watch(isMobile, cancelSwipe);
 
 onMounted(() => {
-    if (props.showCloseButton || props.trapFocus) trigger = document.activeElement;
     if (!document.body.classList.contains('no-scroll')) {
         scrollPosition = window.scrollY;
         document.body.classList.add('no-scroll');
         document.body.style.top = `-${scrollPosition}px`;
     }
-    if (props.fullscreen) el.value.showModal();
-    showWindow({ targets: [el.value, overlay.value] }).eventCallback('onComplete', () => {
-        if (!isClosing) (closeButton.value || el.value).focus({ preventScroll: true });
-    });
+    el.value.showModal();
+    showWindow({ targets: [el.value, overlay.value] });
 });
 
 function restoreScroll() {
@@ -115,51 +109,33 @@ function close() {
     hideWindow({
         targets: [el.value, overlay.value],
         onComplete: () => {
-            if (props.fullscreen) el.value.close();
-            else el.value.blur();
+            el.value.close();
             emit('close');
-            if (trigger?.isConnected) trigger.focus({ preventScroll: true });
         },
     });
 }
 
-function keepFocusInside(event) {
-    if (props.fullscreen) return;
-    if (!props.showCloseButton && !props.trapFocus) return;
-
-    const controls = [
-        ...el.value.querySelectorAll('a[href], button, input, select, textarea, iframe, [tabindex]'),
-    ].filter((control) => control.tabIndex >= 0 && !control.disabled && control.getClientRects().length);
-    const first = controls[0];
-    const last = controls.at(-1);
-
-    if (document.activeElement === el.value || document.activeElement === (event.shiftKey ? first : last)) {
-        event.preventDefault();
-        (event.shiftKey ? last : first)?.focus();
-    }
-}
-
-onBeforeUnmount(restoreScroll);
+onBeforeUnmount(() => {
+    el.value.close();
+    restoreScroll();
+});
 defineExpose({ close });
 </script>
 
 <template>
-    <component
-        :is="fullscreen ? 'dialog' : 'div'"
+    <dialog
         ref="el"
         class="selected-container"
         :class="{ 'fullscreen-mobile': fullscreenOnMobile, fullscreen }"
-        :tabindex="fullscreen ? -1 : 0"
-        role="dialog"
-        aria-modal="true"
         :aria-label="label"
-        @keydown.esc.stop.prevent="close"
         @cancel.prevent="close"
-        @keydown.tab="keepFocusInside"
     >
+        <!-- Start keyboard navigation before the controls without highlighting a button. -->
         <div
             ref="windowContent"
             class="selected-window"
+            tabindex="-1"
+            autofocus
             :class="{ 'is-dragging': isDragging }"
             :style="swipeOffset ? { translate: `0 ${swipeOffset}px` } : undefined"
             v-on="
@@ -171,7 +147,6 @@ defineExpose({ close });
         >
             <button
                 v-if="showCloseButton"
-                ref="closeButton"
                 class="window-close-btn"
                 type="button"
                 aria-label="Close window"
@@ -183,7 +158,7 @@ defineExpose({ close });
         </div>
 
         <div ref="overlay" class="overlay" @click="close"></div>
-    </component>
+    </dialog>
 </template>
 
 <style lang="scss" scoped>
@@ -197,15 +172,28 @@ defineExpose({ close });
 }
 
 .selected-container {
-    @include flex-center-all;
-
     position: fixed;
-    top: 0;
+    inset: 0;
     z-index: 2;
     width: 100vw;
+    max-width: none;
     height: 100vh;
+    max-height: none;
+    padding: 0;
+    margin: 0;
     font-size: 1.1em;
+    color: inherit;
+    background-color: transparent;
+    border: 0;
     backdrop-filter: blur(5px);
+
+    &[open] {
+        @include flex-center-all;
+    }
+
+    &::backdrop {
+        background: transparent;
+    }
 
     @include theme-dark {
         background-color: rgb(0 0 0 / 40%);
@@ -229,6 +217,7 @@ defineExpose({ close });
     padding: $size-9 $size-10;
     margin: $space-8 0;
     overflow-y: auto;
+    outline: none;
     border: 1px solid rgb(255 255 255 / 12%);
     border-radius: $radius-xl;
     box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
@@ -310,19 +299,9 @@ defineExpose({ close });
 }
 
 .fullscreen {
-    inset: 0;
     width: 100%;
-    max-width: none;
     height: 100dvh;
-    max-height: none;
-    padding: 0;
-    margin: 0;
     background-color: transparent;
-    border: 0;
-
-    &::backdrop {
-        background: transparent;
-    }
 
     .selected-window {
         display: grid;

@@ -36,7 +36,6 @@ const slides = computed(() => {
 
 const activeIndex = defineModel('activeIndex', { default: 0, type: Number });
 const isExpanded = ref(false);
-const expandButton = ref(null);
 const imageRatio = ref(props.project.portrait ? 9 / 16 : 16 / 9);
 const activeSlide = computed(() => slides.value[activeIndex.value]);
 const mediaRatio = computed(() =>
@@ -111,7 +110,6 @@ function showVideo() {
 }
 
 function enlarge() {
-    expandButton.value.focus({ preventScroll: true });
     isExpanded.value = true;
 }
 
@@ -222,7 +220,6 @@ function onKeydown(event) {
             </div>
             <button
                 v-if="!expanded"
-                ref="expandButton"
                 class="gallery-expand"
                 type="button"
                 aria-label="Enlarge media"

@@ -29,7 +29,6 @@ defineExpose({ close });
         ref="selectedWindow"
         :label="activeProject.title"
         :fullscreen-on-mobile="fullscreenOnMobile"
-        :trap-focus="fullscreenOnMobile"
         @close="emit('close-project')"
     >
         <div
