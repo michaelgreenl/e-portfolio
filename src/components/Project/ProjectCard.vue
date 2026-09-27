@@ -593,11 +593,7 @@ p {
 .card-footer {
     justify-content: space-between;
     margin-top: $space-1;
-    font-size: 1.3em;
-
-    @include bp-sm-phone {
-        font-size: 1.4em;
-    }
+    font-size: 1.4em;
 
     @include bp-md-tablet {
         flex-wrap: nowrap;
@@ -608,22 +604,20 @@ p {
 
     :deep(.see-more) {
         .icon {
-            height: 1.2em !important;
+            width: 0.8em;
 
             @include bp-md-tablet {
+                width: auto;
                 height: 1.1em !important;
                 margin-bottom: 0.1rem;
             }
         }
 
         @include theme-light {
-            gap: 0.4rem;
+            gap: 0.6rem;
 
             .icon {
-                height: 1.4em !important;
-
                 @include bp-md-tablet {
-                    height: 1.1em !important;
                     margin: 0 0 0.1rem 0.1rem;
                 }
             }
