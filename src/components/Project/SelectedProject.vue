@@ -296,7 +296,10 @@ p {
         }
 
         .project-gallery {
-            width: min(100cqw, calc((100cqh - var(--gallery-controls-height)) * 9 / 16));
+            width: min(
+                100cqw,
+                calc((100cqh - var(--gallery-controls-height)) * 9 / 16 + var(--gallery-controls-width, 0px))
+            );
         }
 
         .tool-container {
@@ -533,7 +536,7 @@ p {
                     'heading heading' auto
                     'separator separator' auto
                     'stack media' auto
-                    'description media' 1fr / minmax(0, 1fr) minmax(0, min(13rem, 32vw, 42dvh));
+                    'description media' 1fr / minmax(0, 1fr) minmax(0, min(16rem, 39vw, 42dvh));
                 gap: $space-4 clamp($space-3, 3vw, $space-6);
                 align-items: start;
                 width: 100%;

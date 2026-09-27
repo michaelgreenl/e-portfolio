@@ -387,8 +387,8 @@ function onKeydown(event) {
         background-color 0.15s ease;
 
     svg {
-        width: 1rem;
-        height: 1rem;
+        width: 1.2rem;
+        height: 1.2rem;
         fill: currentcolor;
     }
 
@@ -513,12 +513,26 @@ function onKeydown(event) {
     }
 }
 
-// Keep portrait controls inside the narrow media column used on tablets.
+// Keep portrait indicators beside the media and navigation below it.
 @include bp-custom-min(550) {
-    .is-portrait:not(.is-expanded) {
+    .is-portrait.has-navigation:not(.is-expanded) {
+        --gallery-controls-height: 2.25rem;
+        --gallery-controls-width: 2rem;
+
+        display: grid;
+        grid-template:
+            'media indicators' auto
+            'controls .' auto / minmax(0, 1fr) 1.75rem;
+        gap: $space-2 $space-1;
+
+        .gallery-stage {
+            grid-area: media;
+        }
+
         .gallery-arrow {
             top: calc(100% + $space-2);
             width: 1.75rem;
+            height: 1.75rem;
             background: transparent;
             box-shadow: none;
             transform: none;
@@ -532,10 +546,28 @@ function onKeydown(event) {
                 right: auto;
                 left: 2rem;
             }
+
+            svg {
+                width: 1rem;
+                height: 1rem;
+            }
+        }
+
+        .gallery-controls {
+            display: contents;
         }
 
         .gallery-indicators {
-            padding-inline: 4rem 2rem;
+            flex-flow: column nowrap;
+            grid-area: indicators;
+            align-self: center;
+            padding-inline: 0;
+        }
+
+        .gallery-expand {
+            position: relative;
+            grid-area: controls;
+            justify-self: end;
         }
     }
 }

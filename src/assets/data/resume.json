@@ -46,8 +46,20 @@
                     "portrait": true,
                     "gallery": [
                         {
-                            "src": "oakley-preview.jpg",
-                            "alt": "Oakley kiosk showing four athletes to choose from before taking a photo."
+                            "src": "oakley/welcome.png",
+                            "alt": "Oakley welcome screen with an athlete video and a Tap to Start button."
+                        },
+                        {
+                            "src": "oakley/participants.png",
+                            "alt": "Oakley participant selection with a preview of the athlete's position beside one or more visitors."
+                        },
+                        {
+                            "src": "oakley/athletes.png",
+                            "alt": "Oakley athlete selection with Francisco Lindor, Patrick Rodgers, Patrick Mahomes, and Mikaela Shiffrin."
+                        },
+                        {
+                            "src": "oakley/photo-download.png",
+                            "alt": "Oakley completed photo preview with a sample portrait and a QR code for downloading the image."
                         }
                     ],
                     "video": "1220947923",
@@ -68,8 +80,8 @@
                     },
                     "gallery": [
                         {
-                            "src": "jsf_blurred.webp",
-                            "alt": "Campaign Manager gallery placeholder."
+                            "src": "campaign-manager/phone-layouts.svg",
+                            "alt": "Campaign Manager mobile layouts showing the welcome screen, event and activation filters, and a report with download and pagination controls."
                         }
                     ],
                     "video": "1220947923",
