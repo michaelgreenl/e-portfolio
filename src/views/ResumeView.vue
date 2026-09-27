@@ -622,6 +622,7 @@ li {
         gap: 0.2em;
         align-items: center;
         transition: color 0.15s ease;
+        margin-right: $space-4;
 
         @include interactive {
             color: $color-primary-light;
@@ -639,7 +640,7 @@ li {
             overflow: visible;
             fill: currentcolor;
             stroke: currentcolor;
-            stroke-width: 24;
+            stroke-width: 48;
         }
     }
 }
