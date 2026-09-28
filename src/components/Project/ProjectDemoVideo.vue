@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } f
 const props = defineProps({
     project: { required: true, type: Object },
     autoplay: { default: false, type: Boolean },
+    active: { default: true, type: Boolean },
 });
 
 const projectImages = import.meta.glob('../../assets/images/*_blurred.webp', {
@@ -58,7 +59,19 @@ function onPlayerMessage(event) {
     if (data?.event !== 'ready' && data?.method !== 'ping') return;
 
     videoFrame.value.contentWindow?.postMessage({ method: 'addEventListener', value: 'timeupdate' }, vimeoOrigin);
+    if (!props.active) pause();
 }
+
+function pause() {
+    videoFrame.value?.contentWindow?.postMessage({ method: 'pause' }, vimeoOrigin);
+}
+
+watch(
+    () => props.active,
+    (active) => {
+        if (!active) pause();
+    },
+);
 
 function onFrameLoad() {
     videoFrame.value.contentWindow?.postMessage({ method: 'ping' }, vimeoOrigin);

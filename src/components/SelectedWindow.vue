@@ -1,18 +1,21 @@
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { nextTick, ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { gsap } from 'gsap';
 import { useMediaQuery } from '@vueuse/core';
 import { useGsap } from '@/composables/useGsap.js';
 import { selectedWindowAnimations } from '@/animations/component/selectedWindow.js';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
-defineProps({
+const props = defineProps({
     label: { required: true, type: String },
     fullscreenOnMobile: { type: Boolean, default: false },
     fullscreen: { type: Boolean, default: false },
     showCloseButton: { type: Boolean, default: false },
+    inline: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['open', 'close']);
+const isOpen = ref(false);
 const el = ref(null);
 const overlay = ref(null);
 const windowContent = ref(null);
@@ -83,6 +86,16 @@ function endSwipe() {
 watch(isMobile, cancelSwipe);
 
 onMounted(() => {
+    if (!props.inline) open();
+});
+
+async function open() {
+    if (isOpen.value) return;
+    isOpen.value = true;
+    emit('open');
+    await nextTick();
+    if (!el.value) return;
+
     if (!document.body.classList.contains('no-scroll')) {
         scrollPosition = window.scrollY;
         document.body.classList.add('no-scroll');
@@ -90,7 +103,7 @@ onMounted(() => {
     }
     el.value.showModal();
     showWindow({ targets: [el.value, overlay.value] });
-});
+}
 
 function restoreScroll() {
     if (scrollPosition === undefined) return;
@@ -102,7 +115,7 @@ function restoreScroll() {
 }
 
 function close() {
-    if (isClosing) return;
+    if (isClosing || !isOpen.value) return;
     isClosing = true;
     restoreScroll();
 
@@ -110,6 +123,9 @@ function close() {
         targets: [el.value, overlay.value],
         onComplete: () => {
             el.value.close();
+            gsap.set([el.value, overlay.value], { clearProps: 'opacity,visibility,transform' });
+            isOpen.value = false;
+            isClosing = false;
             emit('close');
         },
     });
@@ -119,23 +135,23 @@ onBeforeUnmount(() => {
     el.value.close();
     restoreScroll();
 });
-defineExpose({ close });
+defineExpose({ open, close });
 </script>
 
 <template>
     <dialog
         ref="el"
         class="selected-container"
-        :class="{ 'fullscreen-mobile': fullscreenOnMobile, fullscreen }"
+        :class="{ 'fullscreen-mobile': fullscreenOnMobile, fullscreen, 'is-inline': inline && !isOpen }"
         :aria-label="label"
-        @cancel.prevent="close"
+        @cancel.stop.prevent="close"
     >
         <!-- Start keyboard navigation before the controls without highlighting a button. -->
         <div
             ref="windowContent"
             class="selected-window"
-            tabindex="-1"
-            autofocus
+            :tabindex="isOpen ? -1 : undefined"
+            :autofocus="isOpen"
             :class="{ 'is-dragging': isDragging }"
             :style="swipeOffset ? { translate: `0 ${swipeOffset}px` } : undefined"
             v-on="
@@ -146,7 +162,7 @@ defineExpose({ close });
             @click.self="fullscreen && close()"
         >
             <button
-                v-if="showCloseButton"
+                v-if="showCloseButton && isOpen"
                 class="window-close-btn"
                 type="button"
                 aria-label="Close window"
@@ -157,7 +173,7 @@ defineExpose({ close });
             <slot />
         </div>
 
-        <div ref="overlay" class="overlay" @click="close"></div>
+        <div v-show="isOpen" ref="overlay" class="overlay" @click="close"></div>
     </dialog>
 </template>
 
@@ -272,7 +288,7 @@ defineExpose({ close });
         z-index: 10;
         height: 100dvh;
 
-        .selected-window {
+        > .selected-window {
             width: 100%;
             max-width: none;
             height: 100%;
@@ -303,7 +319,7 @@ defineExpose({ close });
     height: 100dvh;
     background-color: transparent;
 
-    .selected-window {
+    > .selected-window {
         display: grid;
         place-items: center;
         width: 100%;
@@ -329,6 +345,16 @@ defineExpose({ close });
         right: max($space-3, env(safe-area-inset-right));
         width: 2.5rem;
         height: 2.5rem;
+    }
+}
+
+// Keep inline media in the same DOM position when the dialog enters the top layer.
+.selected-container.is-inline {
+    display: contents;
+    font-size: inherit;
+
+    > .selected-window {
+        display: contents;
     }
 }
 </style>

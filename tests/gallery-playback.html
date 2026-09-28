@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gallery playback regression</title>
+    </head>
+    <body>
+        <!-- Open /tests/gallery-playback.html through npm run dev in a real browser. -->
+        <button id="run">Check gallery player persistence</button>
+        <pre id="result" role="status">Ready</pre>
+        <div id="mount"></div>
+        <script type="module">
+            import { createApp, h } from 'vue';
+            import Gallery from '/src/components/Project/ProjectMediaGallery.vue';
+            import SelectedWindow from '/src/components/SelectedWindow.vue';
+            import resume from '/src/assets/data/resume.json';
+
+            const mount = document.querySelector('#mount');
+            const result = document.querySelector('#result');
+            const button = document.querySelector('#run');
+            const assert = (condition, message) => {
+                if (!condition) throw new Error(message);
+            };
+            async function until(condition) {
+                const deadline = performance.now() + 30000;
+                while (!condition()) {
+                    assert(performance.now() < deadline, 'Timed out waiting for the player or dialog');
+                    await new Promise((resolve) => setTimeout(resolve, 50));
+                }
+            }
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                result.textContent = 'Running with the real Vimeo iframe…';
+                let loads = 0;
+                const onLoad = (event) => {
+                    if (event.target.tagName === 'IFRAME') loads++;
+                };
+                mount.addEventListener('load', onLoad, true);
+                const app = createApp({
+                    render: () =>
+                        h(SelectedWindow, { label: 'Gallery test project' }, () =>
+                            h(Gallery, { project: resume.experience['24g'].projects[0] }),
+                        ),
+                });
+                try {
+                    app.mount(mount);
+                    await until(() => loads === 1);
+                    const frame = mount.querySelector('iframe');
+                    const playerWindow = frame.contentWindow;
+                    const checkPlayer = () => {
+                        assert(frame.isConnected && mount.querySelector('iframe') === frame, 'Player was replaced');
+                        assert(frame.contentWindow === playerWindow, 'Player browsing context was replaced');
+                        assert(loads === 1, `Player loaded ${loads} times instead of once`);
+                    };
+                    for (let cycle = 0; cycle < 2; cycle++) {
+                        mount.querySelector('[data-testid="enlarge-media"]').click();
+                        await until(() => mount.querySelector('[data-testid="media-viewer"]').matches(':modal'));
+                        checkPlayer();
+                        mount.querySelector('[data-testid="media-viewer"] [aria-label="Close window"]').click();
+                        await until(() => !mount.querySelector('[data-testid="media-viewer"]').matches(':modal'));
+                        checkPlayer();
+                        assert(mount.querySelector('dialog').matches(':modal'), 'Closing media closed the project');
+                    }
+                    mount.querySelector('[aria-label="Show image 2"]').click();
+                    await until(() => mount.querySelector('[data-testid="enlarge-image"]'));
+                    checkPlayer();
+                    mount.querySelector('[aria-label="Show demo video"]').click();
+                    await until(() => !mount.querySelector('[data-testid="enlarge-image"]'));
+                    checkPlayer();
+                    result.textContent = 'PASS: One iframe load through two expand/close cycles and image navigation.';
+                } catch (error) {
+                    result.textContent = `FAIL: ${error.message}`;
+                    console.error(error);
+                } finally {
+                    app.unmount();
+                    mount.removeEventListener('load', onLoad, true);
+                    button.disabled = false;
+                }
+            });
+        </script>
+    </body>
+</html>
