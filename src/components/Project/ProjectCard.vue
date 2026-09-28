@@ -66,6 +66,7 @@ const toolChipList = useTemplateRef('toolChipList');
 const toolOverflow = useTemplateRef('toolOverflow');
 const toolOverflowMeasure = useTemplateRef('toolOverflowMeasure');
 const projectSelected = ref(false);
+const detailsMounted = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
 const toolsRevealed = shallowRef(false);
@@ -359,6 +360,7 @@ async function openProject(autoplay = false) {
         emit('open-project', props.project, autoplay);
         projectSelected.value = true;
     } else {
+        detailsMounted.value = true;
         projectSelected.value = true;
         autoplayVideo.value = autoplay;
         await nextTick();
@@ -514,8 +516,13 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
             </div>
 
             <Transition :css="false" @enter="onSelectedDetailsEnter" @leave="onSelectedDetailsLeave">
-                <div v-if="projectSelected && !bp.isLaptop.value" class="selected-details">
-                    <ProjectMediaGallery ref="mediaGallery" :project="project" :autoplay="autoplayVideo" />
+                <div v-if="detailsMounted" v-show="projectSelected && !bp.isLaptop.value" class="selected-details">
+                    <ProjectMediaGallery
+                        ref="mediaGallery"
+                        :project="project"
+                        :autoplay="autoplayVideo"
+                        :active="projectSelected && !bp.isLaptop.value"
+                    />
 
                     <ul class="selected-description">
                         <li v-for="detail in project.description?.long" :key="detail">

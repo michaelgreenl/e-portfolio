@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import SelectedWindow from '@/components/SelectedWindow.vue';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
@@ -8,8 +8,8 @@ import ProjectMediaGallery from '@/components/Project/ProjectMediaGallery.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
-defineProps({
-    activeProject: { required: true, type: Object },
+const props = defineProps({
+    activeProject: { default: null, type: Object },
     autoplayVideo: { default: false, type: Boolean },
     projectLogos: { default: () => ({}), type: Object },
     externalIcons: { default: () => ({}), type: Object },
@@ -18,8 +18,24 @@ defineProps({
 
 const emit = defineEmits(['close-project']);
 
+const openedProjects = ref([]);
 const selectedWindow = ref(null);
-const close = () => selectedWindow.value.close();
+const close = () => selectedWindow.value?.close();
+
+watch(
+    () => props.activeProject,
+    async (project) => {
+        if (!project) {
+            close();
+            return;
+        }
+
+        if (!openedProjects.value.some(({ slug }) => slug === project.slug)) openedProjects.value.push(project);
+        await nextTick();
+        selectedWindow.value?.open();
+    },
+    { immediate: true },
+);
 
 defineExpose({ close });
 </script>
@@ -27,53 +43,57 @@ defineExpose({ close });
 <template>
     <SelectedWindow
         ref="selectedWindow"
-        :label="activeProject.title"
+        :label="activeProject?.title ?? 'Project details'"
+        :auto-open="false"
         :fullscreen-on-mobile="fullscreenOnMobile"
         @close="emit('close-project')"
     >
         <div
+            v-for="project in openedProjects"
+            v-show="activeProject?.slug === project.slug"
+            :key="project.slug"
             class="selected-project"
             :class="{
-                portrait: activeProject.portrait,
-                oakley: activeProject.slug === 'oakley',
-                'campaign-manager': activeProject.slug === 'campaign-manager',
+                portrait: project.portrait,
+                oakley: project.slug === 'oakley',
+                'campaign-manager': project.slug === 'campaign-manager',
             }"
         >
             <div class="project-overview">
-                <div v-if="activeProject.longDate" class="date">
+                <div v-if="project.longDate" class="date">
                     <CalendarIcon aria-hidden="true" />
-                    <p>{{ activeProject.longDate }}</p>
+                    <p>{{ project.longDate }}</p>
                 </div>
 
                 <div class="project-header-info">
                     <div class="project-title">
-                        <component :is="projectLogos[activeProject.slug]" />
+                        <component :is="projectLogos[project.slug]" />
 
                         <h2
                             :style="{
-                                fontFamily: activeProject.fontFamily,
-                                fontWeight: activeProject.slug === 'tally' ? '500' : '400',
+                                fontFamily: project.fontFamily,
+                                fontWeight: project.slug === 'tally' ? '500' : '400',
                             }"
                         >
-                            {{
-                                activeProject.slug === 'oakley'
-                                    ? activeProject.title.replace(' / ', ' /\n')
-                                    : activeProject.title
-                            }}
+                            {{ project.slug === 'oakley' ? project.title.replace(' / ', ' /\n') : project.title }}
                         </h2>
                     </div>
 
-                    <p class="description description-short">{{ activeProject.description.short }}</p>
+                    <p class="description description-short">{{ project.description.short }}</p>
                 </div>
 
                 <hr v-if="fullscreenOnMobile" class="project-separator" />
 
                 <div class="project-media">
-                    <ProjectMediaGallery :project="activeProject" :autoplay="autoplayVideo" />
+                    <ProjectMediaGallery
+                        :project="project"
+                        :autoplay="autoplayVideo"
+                        :active="activeProject?.slug === project.slug"
+                    />
 
-                    <div v-if="activeProject.externalLinks" class="external-links">
+                    <div v-if="project.externalLinks" class="external-links">
                         <a
-                            v-for="[key, link] in Object.entries(activeProject.externalLinks).filter(
+                            v-for="[key, link] in Object.entries(project.externalLinks).filter(
                                 ([key]) => key !== 'demoVideo' && key !== 'porfolioLink',
                             )"
                             :key="key"
@@ -97,9 +117,9 @@ defineExpose({ close });
                 <hr v-if="fullscreenOnMobile" class="project-separator" />
 
                 <div class="tool-container">
-                    <div class="tool-chips" :class="{ 'large-stack': activeProject.stack.length > 5 }">
+                    <div class="tool-chips" :class="{ 'large-stack': project.stack.length > 5 }">
                         <ToolChip
-                            v-for="tool in activeProject.stack"
+                            v-for="tool in project.stack"
                             :key="tool"
                             :tool="tool"
                             class="chip"
@@ -111,10 +131,10 @@ defineExpose({ close });
                 <ul
                     class="description description-long"
                     :class="{
-                        'contains-video': activeProject.video || activeProject.preview || activeProject.gallery?.length,
+                        'contains-video': project.video || project.preview || project.gallery?.length,
                     }"
                 >
-                    <li v-for="detail in activeProject.description?.long" :key="detail">
+                    <li v-for="detail in project.description?.long" :key="detail">
                         {{ detail }}
                     </li>
                 </ul>

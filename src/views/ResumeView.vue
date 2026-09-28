@@ -47,10 +47,9 @@ onMounted(() => {
 <template>
     <div class="resume-container page" :class="{ 'window-open': showInternship }">
         <SelectedProject
-            v-if="showInternship && activeInternshipProject"
             ref="internshipWindow"
             class="experience-project-window"
-            :active-project="activeInternshipProject"
+            :active-project="showInternship ? activeInternshipProject : null"
             fullscreen-on-mobile
             @close-project="showInternship = false"
         />

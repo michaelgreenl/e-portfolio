@@ -7,6 +7,7 @@ import ChevronIcon from '@/components/SVGs/ChevronIcon.vue';
 const props = defineProps({
     project: { required: true, type: Object },
     autoplay: { default: false, type: Boolean },
+    active: { default: true, type: Boolean },
 });
 
 const images = import.meta.glob('../../assets/images/**/*.{png,jpg,jpeg,webp,avif,svg}', {
@@ -95,7 +96,7 @@ function ignoreSwipeClick(event) {
 }
 
 watch(
-    [() => props.project, () => props.autoplay],
+    [() => props.project, () => props.autoplay, () => props.active],
     () => {
         activeIndex.value = 0;
     },
@@ -178,7 +179,7 @@ function onKeydown(event) {
                         <ProjectDemoVideo
                             v-if="project.video"
                             v-show="activeSlide.type === 'video'"
-                            :active="activeSlide.type === 'video'"
+                            :active="active && activeSlide.type === 'video'"
                             :project="project"
                             :autoplay="autoplay"
                         />

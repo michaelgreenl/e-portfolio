@@ -101,10 +101,9 @@ async function openProject(project, autoplay = false) {
 <template>
     <div class="projects-container page page-shell">
         <SelectedProject
-            v-if="activeProject"
             ref="selectedProject"
             class="portfolio-project-window"
-            :class="{ 'tally-project-window': activeProject.slug === 'tally' }"
+            :class="{ 'tally-project-window': activeProject?.slug === 'tally' }"
             :active-project="activeProject"
             :autoplay-video="autoplayVideo"
             :project-logos="projectLogos"

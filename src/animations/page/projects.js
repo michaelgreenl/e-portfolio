@@ -86,11 +86,11 @@ export const projectAnimations = {
         const detailTargets = getSelectedProjectDetailTargets(target);
 
         gsap.killTweensOf([target, ...detailTargets]);
-        gsap.set(target, { height: 0, overflow: 'hidden' });
+        gsap.set(target, { height: 0, clipPath: 'inset(0 -2rem)' });
         gsap.set(detailTargets, { autoAlpha: 0, y: 8 });
 
         tl.eventCallback('onComplete', () => {
-            gsap.set(target, { clearProps: 'height,overflow' });
+            gsap.set(target, { clearProps: 'height,clipPath' });
             onComplete();
         });
 
@@ -119,7 +119,7 @@ export const projectAnimations = {
         const detailTargets = getSelectedProjectDetailTargets(target);
 
         gsap.killTweensOf([target, ...detailTargets]);
-        gsap.set(target, { height: target.offsetHeight, overflow: 'hidden' });
+        gsap.set(target, { height: target.offsetHeight, clipPath: 'inset(0 -2rem)' });
         tl.eventCallback('onComplete', onComplete);
 
         if (detailTargets.length) {

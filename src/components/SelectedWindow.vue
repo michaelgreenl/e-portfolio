@@ -12,6 +12,7 @@ const props = defineProps({
     fullscreen: { type: Boolean, default: false },
     showCloseButton: { type: Boolean, default: false },
     inline: { type: Boolean, default: false },
+    autoOpen: { type: Boolean, default: true },
 });
 
 const emit = defineEmits(['open', 'close']);
@@ -86,11 +87,12 @@ function endSwipe() {
 watch(isMobile, cancelSwipe);
 
 onMounted(() => {
-    if (!props.inline) open();
+    if (!props.inline && props.autoOpen) open();
 });
 
 async function open() {
     if (isOpen.value) return;
+    cancelSwipe();
     isOpen.value = true;
     emit('open');
     await nextTick();
