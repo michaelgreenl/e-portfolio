@@ -29,15 +29,19 @@ const bp = useBreakpoints();
 const externalLinkRespText = (projectSlug, externalLinks) => {
     const className = 'responsive-link-text';
 
+    const TWO_COLUMN_CARD = 'jsf';
+
     if (bp.isXlLaptop.value) {
         return 'undefined';
     }
 
     if (bp.isLgLaptop.value) {
+        if (projectSlug === TWO_COLUMN_CARD) return 'undefined';
         return `${Object.keys(externalLinks).length <= 3 ? undefined : className}`;
     }
 
     if (bp.isLaptop.value) {
+        if (projectSlug === TWO_COLUMN_CARD) return 'undefined';
         return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
     }
 

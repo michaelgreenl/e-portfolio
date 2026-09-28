@@ -9,7 +9,6 @@ import ProjectCard from '@/components/Project/ProjectCard.vue';
 
 import ReactionLogo from '@/components/SVGs/ProjectLogos/ReactionLogo.vue';
 import AlgoVisualizerLogo from '@/components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
-import GameLobbyLogo from '@/components/SVGs/ProjectLogos/GameLobbyLogo.vue';
 import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
 
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
@@ -30,7 +29,6 @@ const projectCardRefs = ref({});
 
 const projectLogos = {
     reaction: ReactionLogo,
-    'game-lobby': GameLobbyLogo,
     'algo-visualizer': AlgoVisualizerLogo,
     tally: TallyLogo,
 };
@@ -275,6 +273,11 @@ async function openProject(project, autoplay = false) {
         width: 100%;
         max-width: 92em;
         margin-inline: auto;
+
+        :deep(.project-card:nth-child(1)) {
+            grid-row: 1;
+            grid-column: 1 / span 2;
+        }
     }
 
     @include bp-xl-desktop {

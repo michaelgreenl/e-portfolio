@@ -179,39 +179,5 @@
                 "alt": "Two tablet views of Reaction: a round result with recent scores, and game history with saved settings and filters."
             }
         ]
-    },
-    {
-        "title": "GameLobby",
-        "slug": "game-lobby",
-        "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Express", "Sass"],
-        "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "express", "sass"],
-        "shortDate": "June 2025 - July 2025",
-        "longDate": "June 2025 - July 2025",
-        "description": {
-            "short": "A real-time tic-tac-toe lobby with JWT-authenticated Socket.IO sessions, server-side move validation, rematches, forfeits, and disconnect recovery.",
-            "long": [
-                "The server validates each move before either client receives the updated board. I kept turn order and match outcomes there as well, giving both players a single source of game state.",
-                "Disconnects have a 30-second grace period before a match is forfeited. Returning players reconnect to their existing game, and session tracking accounts for multiple tabs so closing one does not remove a player who is still connected.",
-                "Full-match tests run two connected clients through moves, rematches, and forfeits. They check both players’ events and final state, covering the exchanges between clients as well as the rules on the server."
-            ]
-        },
-        "fontFamily": "BitCount",
-        "img": "game-lobby_blurred.webp",
-        "video": "1119895851",
-        "externalLinks": {
-            "github": {
-                "href": "https://github.com/michaelgreenl/game-lobby",
-                "text": "Repository"
-            },
-            "demoVideo": {
-                "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=true",
-                "text": "Demo Video"
-            },
-            "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" },
-            "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=false"
-            }
-        },
-        "gallery": false
     }
 ]
