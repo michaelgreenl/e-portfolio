@@ -544,6 +544,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                         ]"
                         :key="link"
                         :href="key === 'demoVideo' ? null : link.href"
+                        :aria-label="link.text"
                         target="_blank"
                     >
                         <Button
@@ -552,9 +553,16 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                             :text="link.text"
                             :iconLeft="externalIcons[key]"
                             preset="secondary"
+                            tooltip-when-text-hidden
                         />
 
-                        <Button v-else :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                        <Button
+                            v-else
+                            :text="link.text"
+                            :iconLeft="externalIcons[key]"
+                            preset="secondary"
+                            tooltip-when-text-hidden
+                        />
                     </a>
                 </div>
 
@@ -983,7 +991,7 @@ p {
 .external-links {
     a {
         &.responsive-link-text {
-            &:deep(button) span {
+            &:deep(button) .button-text {
                 display: none;
             }
         }

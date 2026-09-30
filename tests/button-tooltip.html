@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>External link tooltip check</title>
+        <style>
+            body {
+                margin: 5rem 1rem;
+                font-family: sans-serif;
+                color: #ced4da;
+                background: #212529;
+            }
+
+            .test-link {
+                position: fixed;
+                top: 3rem;
+            }
+
+            .test-link:first-child {
+                left: 1px;
+            }
+
+            .test-link:last-child {
+                right: 1px;
+            }
+
+            .hide-label .button-text {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Start Vite, then open /tests/button-tooltip.html. Add ?dialog to check modal links. -->
+        <div id="links" class="hide-label"></div>
+        <button id="run" type="button">Run tooltip checks</button>
+        <p id="result" role="status">Ready</p>
+        <script type="module">
+            import { createApp, h, nextTick } from 'vue';
+            import Button from '/src/components/Button.vue';
+            import GithubIcon from '/src/components/SVGs/GithubIcon.vue';
+
+            if (new URLSearchParams(location.search).has('dialog')) {
+                const dialog = document.createElement('dialog');
+                document.body.append(dialog);
+                dialog.append(...document.querySelectorAll('#links, #run, #result'));
+                dialog.showModal();
+            }
+
+            createApp({
+                render: () =>
+                    ['left', 'right'].map((side) =>
+                        h(Button, {
+                            class: 'test-link',
+                            'data-testid': `${side}-link`,
+                            text: 'External repository',
+                            iconLeft: GithubIcon,
+                            preset: 'secondary',
+                            tooltipWhenTextHidden: true,
+                        }),
+                    ),
+            }).mount('#links');
+
+            function check(condition, message) {
+                if (!condition) throw new Error(message);
+            }
+
+            document.querySelector('#run').onclick = async () => {
+                const links = document.querySelector('#links');
+                const result = document.querySelector('#result');
+
+                try {
+                    await nextTick();
+                    for (const side of ['left', 'right']) {
+                        const button = document.querySelector(`[data-testid="${side}-link"]`);
+                        const tooltip = document.getElementById(button.getAttribute('aria-describedby'));
+                        const enter = () =>
+                            button.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+                        const leave = (target = button, relatedTarget = null) =>
+                            target.dispatchEvent(
+                                new PointerEvent('pointerleave', { pointerType: 'mouse', relatedTarget }),
+                            );
+
+                        links.classList.add('hide-label');
+                        enter();
+                        check(tooltip.matches(':popover-open'), `${side}: hidden label must show a tooltip`);
+                        const bounds = tooltip.getBoundingClientRect();
+                        check(
+                            bounds.left >= 8 && bounds.right <= document.documentElement.clientWidth - 8,
+                            `${side}: tooltip crosses the viewport edge`,
+                        );
+                        check(
+                            tooltip.contains(
+                                document.elementFromPoint(
+                                    bounds.left + bounds.width / 2,
+                                    bounds.top + bounds.height / 2,
+                                ),
+                            ),
+                            `${side}: tooltip must remain hoverable`,
+                        );
+                        const trigger = button.getBoundingClientRect();
+                        for (let y = trigger.top + 1; y < trigger.bottom; y += 2) {
+                            for (let x = trigger.left + 1; x < trigger.right; x += 2) {
+                                check(
+                                    button.contains(document.elementFromPoint(x, y)),
+                                    `${side}: tooltip intercepts the button`,
+                                );
+                            }
+                        }
+                        leave(button, tooltip);
+                        check(tooltip.matches(':popover-open'), `${side}: moving onto the tooltip must keep it open`);
+                        leave(tooltip, button);
+                        check(
+                            tooltip.matches(':popover-open'),
+                            `${side}: returning to the button must keep the tooltip open`,
+                        );
+                        leave(tooltip);
+                        check(
+                            !tooltip.matches(':popover-open'),
+                            `${side}: tooltip must close after leaving both targets`,
+                        );
+
+                        links.classList.remove('hide-label');
+                        enter();
+                        check(!tooltip.matches(':popover-open'), `${side}: visible label must suppress the tooltip`);
+                    }
+                    result.textContent =
+                        'PASS: button hit targets, tooltip hover transfer, both viewport edges, pointer exit, and visible-label suppression.';
+                } catch (error) {
+                    result.textContent = `FAIL: ${error.message}`;
+                } finally {
+                    links.classList.add('hide-label');
+                }
+            };
+        </script>
+    </body>
+</html>

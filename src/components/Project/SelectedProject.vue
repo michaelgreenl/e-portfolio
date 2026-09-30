@@ -100,10 +100,14 @@ defineExpose({ close });
                             :class="{ 'no-fill': key === 'liveSite' }"
                             :href="link.href"
                             :aria-label="link.text"
-                            :title="link.text"
                             target="_blank"
                         >
-                            <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                            <Button
+                                :text="link.text"
+                                :iconLeft="externalIcons[key]"
+                                preset="secondary"
+                                tooltip-when-text-hidden
+                            />
                         </a>
                     </div>
                 </div>
@@ -637,7 +641,7 @@ p {
                 gap: $space-2;
             }
 
-            span {
+            .button-text {
                 display: none;
 
                 @include bp-md-tablet {
