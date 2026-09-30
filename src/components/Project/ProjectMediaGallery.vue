@@ -326,6 +326,10 @@ function onKeydown(event) {
     }
 }
 
+button.gallery-image-button > .gallery-image {
+    pointer-events: none;
+}
+
 .gallery-content.is-expanded {
     --gallery-controls-height: 0px;
 
