@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Contact form contract check</title>
+    </head>
+    <body>
+        <!-- Run Vite with test EmailJS variables, then open /tests/contact-form.html.
+             Keyboard checks: Enter sends; Shift+Enter adds a newline; links have one tab stop.
+             EmailJS uses its real SDK. This fixture intercepts its network request. -->
+        <div id="app"></div>
+        <aside
+            style="
+                position: fixed;
+                right: 1rem;
+                bottom: 1rem;
+                z-index: 1000;
+                padding: 1rem;
+                background: white;
+                color: black;
+            "
+        >
+            <p data-testid="contract-status">Preparing contact form</p>
+            <p data-testid="request-count">Requests: 0</p>
+            <pre data-testid="request-fields"></pre>
+            <button id="respond-success" type="button">Respond successfully</button>
+            <button id="respond-failure" type="button">Respond with failure</button>
+        </aside>
+        <script type="module">
+            import { createApp, nextTick } from 'vue';
+            import { createPinia } from 'pinia';
+            import App from '/src/App.vue';
+            import { router } from '/src/router/index.js';
+
+            const status = document.querySelector('[data-testid="contract-status"]');
+            const requestCount = document.querySelector('[data-testid="request-count"]');
+            const requestFields = document.querySelector('[data-testid="request-fields"]');
+            const fieldNames = ['email', 'subject', 'message'];
+            const originalFetch = window.fetch.bind(window);
+            let requests = 0;
+            let respond;
+
+            function assert(condition, message) {
+                if (!condition) {
+                    status.textContent = `FAIL: ${message}`;
+                    throw new Error(message);
+                }
+            }
+
+            window.fetch = async (url, options) => {
+                if (!String(url).startsWith('https://api.emailjs.com/')) return originalFetch(url, options);
+
+                requests += 1;
+                requestCount.textContent = `Requests: ${requests}`;
+                const fields = Object.fromEntries(fieldNames.map((name) => [name, options.body.get(name)]));
+                requestFields.textContent = JSON.stringify(fields, null, 2);
+                for (const name of fieldNames) {
+                    assert(fields[name] === document.getElementById(name).value, `${name} was not serialized`);
+                }
+                status.textContent = 'PASS: EmailJS received all three field values';
+                return new Promise((resolve) => {
+                    respond = (success) =>
+                        resolve(new Response(success ? 'OK' : 'Test failure', { status: success ? 200 : 500 }));
+                });
+            };
+
+            document.getElementById('respond-success').addEventListener('click', () => respond?.(true));
+            document.getElementById('respond-failure').addEventListener('click', () => respond?.(false));
+
+            createApp(App).use(createPinia()).use(router).mount('#app');
+            await router.replace('/contact');
+            await nextTick();
+
+            const form = document.getElementById('contact-form');
+            const submit = document.querySelector('button[type="submit"]');
+            assert(submit?.form === form, 'Send is not associated with the form');
+            const links = [...document.querySelectorAll('.contact-links a')];
+            assert(links.length === 3, 'Expected three contact links');
+            assert(
+                links.every((link) => link.tabIndex === 0 && !link.querySelector('button')),
+                'Contact links have nested tab stops',
+            );
+            assert(
+                fieldNames.every((name) => new FormData(form).has(name)),
+                'FormData does not contain all fields',
+            );
+            status.textContent = 'PASS: native form and contact link contracts';
+        </script>
+    </body>
+</html>

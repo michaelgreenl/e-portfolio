@@ -1,5 +1,8 @@
 <script setup>
 defineProps({
+    href: {
+        type: String,
+    },
     preset: {
         type: String, // primary, primary-accent, secondary, contact-link
     },
@@ -19,17 +22,24 @@ defineProps({
 </script>
 
 <template>
-    <button :class="preset" :style="{ ...styles }" @click="$event.currentTarget.classList.add('is-clicked')">
+    <component
+        :is="href ? 'a' : 'button'"
+        :href="href"
+        :class="preset"
+        :style="{ ...styles }"
+        @click="$event.currentTarget.classList.add('is-clicked')"
+    >
         <component :is="iconLeft" class="icon" />
         <span>
             {{ text }}
         </span>
         <component :is="iconRight" class="icon" />
-    </button>
+    </component>
 </template>
 
 <style lang="scss" scoped>
-button {
+button,
+a {
     @include flex-center-all;
 
     font-family: $primary-font-stack;
