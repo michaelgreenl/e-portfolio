@@ -6,11 +6,9 @@ import { useThemeStore } from '@/stores/themeStore.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { homeAnimations } from '@/animations/page/home.js';
 import Button from '@/components/Button.vue';
+import ContactLinks from '@/components/ContactLinks.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
-import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
-import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
-import MailSquareIcon from '@/components/SVGs/MailSquareIcon.vue';
 
 const { isLaptop } = useBreakpoints();
 
@@ -80,30 +78,10 @@ onMounted(() => {
                 />
             </div>
 
-            <div v-show="isLaptop" class="contact-links contact-links-desktop">
-                <a href="https://github.com/michaelgreenl" target="_blank">
-                    <Button :iconLeft="GithubFillIcon" preset="secondary contact-link" />
-                </a>
-                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                    <Button :iconLeft="LinkedInIcon" preset="secondary contact-link" />
-                </a>
-                <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-                    <Button :iconLeft="MailSquareIcon" preset="secondary contact-link" />
-                </a>
-            </div>
+            <ContactLinks v-show="isLaptop" class="contact-links-desktop" />
         </div>
     </div>
-    <div v-show="!isLaptop" class="contact-links contact-links-mobile">
-        <a href="https://github.com/michaelgreenl" target="_blank">
-            <Button :iconLeft="GithubFillIcon" preset="secondary contact-link" />
-        </a>
-        <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-            <Button :iconLeft="LinkedInIcon" preset="secondary contact-link" />
-        </a>
-        <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-            <Button :iconLeft="MailSquareIcon" preset="secondary contact-link" />
-        </a>
-    </div>
+    <ContactLinks v-show="!isLaptop" class="contact-links-mobile" />
 </template>
 
 <style lang="scss" scoped>
@@ -238,7 +216,8 @@ p {
         display: flex;
     }
 
-    :deep(button) {
+    :deep(button),
+    :deep(.contact-link) {
         padding: 0 $space-1;
         font-size: 1.3em;
 
@@ -278,7 +257,7 @@ p {
         }
     }
 
-    a :deep(button) {
+    :deep(.contact-link) {
         gap: 0;
 
         &::after {

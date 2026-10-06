@@ -4,10 +4,8 @@ import { useRouteStore } from '@/stores/routeStore.js';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import emailjs from '@emailjs/browser';
 import Button from '@/components/Button.vue';
+import ContactLinks from '@/components/ContactLinks.vue';
 import MailIcon from '@/components/SVGs/MailIcon.vue';
-import MailSquareIcon from '@/components/SVGs/MailSquareIcon.vue';
-import GithubFillIcon from '@/components/SVGs/GithubFillIcon.vue';
-import LinkedInIcon from '@/components/SVGs/LinkedInIcon.vue';
 
 const SERVICE_ID = import.meta.env.VITE_SERVICE_ID;
 const TEMPLATE_ID = import.meta.env.VITE_TEMPLATE_ID;
@@ -233,28 +231,7 @@ const clearStatus = () => {
         </form>
 
         <div class="form-actions">
-            <div class="contact-links">
-                <Button
-                    href="https://github.com/michaelgreenl"
-                    target="_blank"
-                    aria-label="GitHub"
-                    :iconLeft="GithubFillIcon"
-                    preset="secondary contact-link"
-                />
-                <Button
-                    href="https://www.linkedin.com/in/michaelgreen5/"
-                    target="_blank"
-                    aria-label="LinkedIn"
-                    :iconLeft="LinkedInIcon"
-                    preset="secondary contact-link"
-                />
-                <Button
-                    href="mailto:greenmichael5000@gmail.com"
-                    aria-label="Email Michael Green"
-                    :iconLeft="MailSquareIcon"
-                    preset="secondary contact-link"
-                />
-            </div>
+            <ContactLinks />
 
             <Button
                 type="submit"
