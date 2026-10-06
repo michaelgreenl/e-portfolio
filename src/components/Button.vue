@@ -3,6 +3,9 @@ import { useId, useTemplateRef } from 'vue';
 import { useEventListener, useResizeObserver } from '@vueuse/core';
 
 const props = defineProps({
+    href: {
+        type: String,
+    },
     preset: {
         type: String, // primary, primary-accent, secondary, contact-link
     },
@@ -82,7 +85,9 @@ if (props.tooltipWhenTextHidden) {
 </script>
 
 <template>
-    <button
+    <component
+        :is="href ? 'a' : 'button'"
+        :href="href"
         ref="button"
         :class="preset"
         :style="{ ...styles }"
@@ -116,7 +121,7 @@ if (props.tooltipWhenTextHidden) {
                 {{ text }}
             </span>
         </Teleport>
-    </button>
+    </component>
 </template>
 
 <style lang="scss" scoped>
@@ -168,7 +173,8 @@ if (props.tooltipWhenTextHidden) {
     }
 }
 
-button {
+button,
+a {
     @include flex-center-all;
 
     font-family: $primary-font-stack;

@@ -133,33 +133,34 @@ const validateForm = () => {
 };
 
 const handleSubmit = async () => {
-    if (!validateForm()) {
+    if (isSubmitting.value || !validateForm()) {
         return;
     }
 
     isSubmitting.value = true;
     submitStatus.value = '';
 
-    emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formElement.value, PUBLIC_KEY).then(
-        (res) => {
-            if (res.text === 'OK') {
-                submitStatus.value = 'success';
-                isSubmitting.value = false;
+    try {
+        await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formElement.value, PUBLIC_KEY);
+        submitStatus.value = 'success';
+        form.email = '';
+        form.subject = '';
+        form.message = '';
+        touched.email = false;
+        touched.subject = false;
+        touched.message = false;
+    } catch (error) {
+        console.error(error);
+        submitStatus.value = 'error';
+    } finally {
+        isSubmitting.value = false;
+    }
+};
 
-                form.email = '';
-                form.subject = '';
-                form.message = '';
-                touched.email = false;
-                touched.subject = false;
-                touched.message = false;
-            }
-        },
-        (error) => {
-            console.error(error);
-            submitStatus.value = 'error';
-            isSubmitting.value = false;
-        },
-    );
+const submitMessageOnEnter = (event) => {
+    if (event.isComposing) return;
+    event.preventDefault();
+    formElement.value.requestSubmit();
 };
 
 const clearStatus = () => {
@@ -176,11 +177,12 @@ const clearStatus = () => {
             <hr />
         </div>
 
-        <form ref="formElement" @submit.prevent="handleSubmit" class="contact-form">
+        <form id="contact-form" ref="formElement" @submit.prevent="handleSubmit" class="contact-form" novalidate>
             <div class="form-group">
                 <label for="email" class="form-label">Email Address</label>
                 <input
                     id="email"
+                    name="email"
                     v-model="form.email"
                     type="email"
                     class="form-input"
@@ -197,6 +199,7 @@ const clearStatus = () => {
                 <label for="subject" class="form-label">Subject</label>
                 <input
                     id="subject"
+                    name="subject"
                     v-model="form.subject"
                     type="text"
                     class="form-input"
@@ -213,6 +216,7 @@ const clearStatus = () => {
                 <label for="message" class="form-label">Message</label>
                 <textarea
                     id="message"
+                    name="message"
                     v-model="form.message"
                     class="form-textarea"
                     :class="{ error: errors.message }"
@@ -221,6 +225,7 @@ const clearStatus = () => {
                     @input="handleFieldInput('message')"
                     @blur="handleFieldBlur('message')"
                     @focus="handleFieldFocus('message')"
+                    @keydown.enter.exact="submitMessageOnEnter"
                 ></textarea>
 
                 <span v-if="errors.message" class="status-message error-message">{{ errors.message }}</span>
@@ -229,23 +234,35 @@ const clearStatus = () => {
 
         <div class="form-actions">
             <div class="contact-links">
-                <a href="https://github.com/michaelgreenl" target="_blank">
-                    <Button :iconLeft="GithubFillIcon" preset="secondary contact-link" />
-                </a>
-                <a href="https://www.linkedin.com/in/michaelgreen5/" target="_blank">
-                    <Button :iconLeft="LinkedInIcon" preset="secondary contact-link" />
-                </a>
-                <a href="mailto:greenmichael5000@gmail.com" aria-label="Email Michael Green">
-                    <Button :iconLeft="MailSquareIcon" preset="secondary contact-link" />
-                </a>
+                <Button
+                    href="https://github.com/michaelgreenl"
+                    target="_blank"
+                    aria-label="GitHub"
+                    :iconLeft="GithubFillIcon"
+                    preset="secondary contact-link"
+                />
+                <Button
+                    href="https://www.linkedin.com/in/michaelgreen5/"
+                    target="_blank"
+                    aria-label="LinkedIn"
+                    :iconLeft="LinkedInIcon"
+                    preset="secondary contact-link"
+                />
+                <Button
+                    href="mailto:greenmichael5000@gmail.com"
+                    aria-label="Email Michael Green"
+                    :iconLeft="MailSquareIcon"
+                    preset="secondary contact-link"
+                />
             </div>
 
             <Button
                 type="submit"
+                form="contact-form"
                 class="contact-link"
                 preset="primary"
                 :text="isSubmitting ? 'Sending...' : 'Send'"
-                @click="handleSubmit"
+                :disabled="isSubmitting"
                 :styles="{
                     opacity: isSubmitting ? 0.7 : 1,
                     pointerEvents: isSubmitting ? 'none' : 'auto',
@@ -489,7 +506,7 @@ const clearStatus = () => {
         gap: $space-2;
         font-size: 1.8em;
 
-        a :deep(button) {
+        :deep(.contact-link) {
             &::after {
                 display: none;
             }
