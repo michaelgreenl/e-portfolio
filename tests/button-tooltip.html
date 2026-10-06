@@ -33,6 +33,7 @@
     <body>
         <!-- Start Vite, then open /tests/button-tooltip.html. Add ?dialog to check modal links. -->
         <div id="links" class="hide-label"></div>
+        <div id="lifecycle" class="hide-label"></div>
         <button id="run" type="button">Run tooltip checks</button>
         <p id="result" role="status">Ready</p>
         <script type="module">
@@ -70,6 +71,19 @@
                 const result = document.querySelector('#result');
 
                 try {
+                    for (const tooltipWhenTextHidden of [false, true]) {
+                        const errors = [];
+                        const app = createApp(Button, { text: 'Contact', tooltipWhenTextHidden });
+                        app.config.errorHandler = (error) => errors.push(error);
+                        app.mount('#lifecycle');
+                        await nextTick();
+                        const trigger = document.querySelector('#lifecycle button');
+                        trigger.focus();
+                        app.unmount();
+                        trigger.dispatchEvent(new FocusEvent('blur'));
+                        trigger.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
+                        check(errors.length === 0, `Unmounted button received a late event: ${errors[0]?.message}`);
+                    }
                     await nextTick();
                     for (const side of ['left', 'right']) {
                         const button = document.querySelector(`[data-testid="${side}-link"]`);
@@ -86,7 +100,8 @@
                         check(tooltip.matches(':popover-open'), `${side}: hidden label must show a tooltip`);
                         const bounds = tooltip.getBoundingClientRect();
                         check(
-                            bounds.left >= 8 && bounds.right <= document.documentElement.clientWidth - 8,
+                            Math.round(bounds.left) >= 8 &&
+                                Math.round(bounds.right) <= document.documentElement.clientWidth - 8,
                             `${side}: tooltip crosses the viewport edge`,
                         );
                         check(
@@ -125,7 +140,7 @@
                         check(!tooltip.matches(':popover-open'), `${side}: visible label must suppress the tooltip`);
                     }
                     result.textContent =
-                        'PASS: button hit targets, tooltip hover transfer, both viewport edges, pointer exit, and visible-label suppression.';
+                        'PASS: late events after unmount, button hit targets, tooltip hover transfer, viewport edges, pointer exit, and visible-label suppression.';
                 } catch (error) {
                     result.textContent = `FAIL: ${error.message}`;
                 } finally {

@@ -33,7 +33,14 @@ const tooltip = useTemplateRef('tooltip');
 const tooltipId = useId();
 
 function showTooltip(event) {
-    if (!props.tooltipWhenTextHidden || !props.text || label.value.getClientRects().length) return;
+    if (
+        !props.tooltipWhenTextHidden ||
+        !props.text ||
+        !label.value ||
+        !tooltip.value ||
+        label.value.getClientRects().length
+    )
+        return;
     if (event.pointerType === 'touch') return;
     if (event.type === 'focus' && !event.target.matches(':focus-visible')) return;
 
@@ -42,7 +49,7 @@ function showTooltip(event) {
 }
 
 function positionTooltip() {
-    if (!tooltip.value?.matches(':popover-open')) return;
+    if (!button.value || !label.value || !tooltip.value?.matches(':popover-open')) return;
 
     const trigger = button.value.getBoundingClientRect();
     if (label.value.getClientRects().length || trigger.bottom <= 0 || trigger.top >= window.innerHeight) {
@@ -65,6 +72,7 @@ function positionTooltip() {
 }
 
 function hideTooltip(event) {
+    if (!button.value) return;
     if (
         event?.type === 'pointerleave' &&
         (button.value.closest(':focus-visible') ||
