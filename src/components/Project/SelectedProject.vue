@@ -741,6 +741,10 @@ p {
             font-family: $secondary-font-stack;
             font-weight: 700;
         }
+
+        @include bp-sm-phone {
+            text-wrap: pretty;
+        }
     }
 }
 </style>

@@ -38,8 +38,8 @@
                     "description": {
                         "short": "An interactive photo experience with athlete selection, custom animated transitions, coordinated video and camera sequences, and QR codes for downloading the finished image.",
                         "long": [
-                            "As the sole frontend developer, I built the kiosk from supplied visual mockups and owned the interaction design and API integration.",
-                            "I requested separate text assets from the design team to animate elements embedded in the mockup’s background. I used them in staggered transitions and coordinated the video cuts, countdown, and photo capture as one sequence.",
+                            "As the sole frontend developer, I constructed the interface from supplied visual mockups and owned its interactive design and API integration.",
+                            "I requested separate assets from the design team in order to animate elements embedded in the supplied assets. I used them in staggered animations during transitions and interactions, making the background artwork part of how the interface responded to user actions.",
                             "Essilor Luxottica named Oakley its favorite of the four experiences at the event and expressed interest in using it again with more prominent placement."
                         ]
                     },
