@@ -29,7 +29,7 @@ const bp = useBreakpoints();
 const externalLinkRespText = (projectSlug, externalLinks) => {
     const className = 'responsive-link-text';
 
-    const TWO_COLUMN_CARD = 'jsf';
+    const TWO_COLUMN_CARD = 'reaction';
 
     if (bp.isXlLaptop.value) {
         return 'undefined';

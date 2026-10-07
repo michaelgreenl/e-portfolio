@@ -273,8 +273,8 @@ async function openProject(project, autoplay = false) {
         max-width: 92em;
         margin-inline: auto;
 
-        :deep(.project-card:nth-child(1)) {
-            grid-row: 1;
+        :deep(.project-card:nth-child(3)) {
+            grid-row: 2;
             grid-column: 1 / span 2;
         }
     }
