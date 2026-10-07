@@ -132,8 +132,8 @@
         },
         "gallery": [
             {
-                "src": "tally_blurred.webp",
-                "alt": "Tally preview placeholder."
+                "src": "tally/phone-layouts.svg",
+                "alt": "Three views of Tally: personal and shared counters, counter participants, and Home Screen and Lock Screen widgets."
             }
         ]
     },
