@@ -24,7 +24,7 @@
             "dates": "January 2022 - August 2022",
             "info": [
                 "Delivered four Vue.js expo interfaces as the sole frontend developer for Salesforce, Waymo, and Essilor Luxottica, coordinating with the Experiential Team Lead to take each interface from mockup to production.",
-                "Designed and implemented custom page transitions beyond the supplied mockups for Oakley’s Vue.js interface, coordinating with the design team to adapt supporting assets.",
+                "Designed and implemented custom page transitions and UI animations beyond the supplied static mockups for Oakley’s Vue.js interface, coordinating with the design team to adapt supporting assets.",
                 "Delivered the frontend for an Oakley expo activation that Essilor Luxottica named its favorite of four event experiences and expressed intent to reuse with better placement to increase visibility and participation.",
                 "Owned Campaign Manager’s reporting interface and contributed to its API integration. The internal event-reporting tool remained in active company use after the internship."
             ],
@@ -36,11 +36,11 @@
                     "shortDate": "March 2022 - April 2022",
                     "longDate": "March 2022 - April 2022",
                     "description": {
-                        "short": "An interactive photo experience with athlete selection, custom animated transitions, coordinated video and camera sequences, and QR codes for downloading the finished image.",
+                        "short": "An expo photo kiosk where visitors pick an athlete, pose for a photo with them, and download the finished image by QR code, with custom animated transitions between each step.",
                         "long": [
-                            "As the sole frontend developer, I constructed the interface from supplied visual mockups and owned its interactive design and API integration.",
-                            "I requested separate assets from the design team in order to animate elements embedded in the supplied assets. I used them in staggered animations during transitions and interactions, making the background artwork part of how the interface responded to user actions.",
-                            "Essilor Luxottica named Oakley its favorite of the four experiences at the event and expressed interest in using it again with more prominent placement."
+                            "As the sole frontend developer, I built the interface from supplied visual mockups and owned its interactive design and API integration.",
+                            "I requested separate assets from the design team so I could animate elements embedded in the supplied artwork. I used them in staggered animations during transitions, making the background artwork part of how the interface responded to user actions.",
+                            "Essilor Luxottica named Oakley its favorite of the four experiences at the event and expressed intent to use it again with more prominent placement."
                         ]
                     },
                     "portrait": true,
