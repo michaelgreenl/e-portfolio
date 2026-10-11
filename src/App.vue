@@ -4,6 +4,7 @@ import { useRouteStore } from '@/stores/routeStore.js';
 import Navbar from '@/components/Navbar/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import BgSVG from '@/components/SVGs/BgSVG.vue';
+import AsciiField from '@/components/AsciiField.vue';
 import StatusLine from '@/components/StatusLine.vue';
 
 const routeStore = useRouteStore();
@@ -11,6 +12,7 @@ const routeStore = useRouteStore();
 
 <template>
     <BgSVG class="bg-svg" />
+    <AsciiField />
 
     <Navbar />
     <RouterView v-slot="{ Component }">

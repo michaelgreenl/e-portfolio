@@ -1,7 +1,6 @@
 <script setup>
 import { nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue';
 import { useEventListener, useResizeObserver } from '@vueuse/core';
-import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 
 const RAMP = ' .·:-=+*%';
@@ -16,22 +15,25 @@ const RIPPLE_LIFE = 1.4;
 const MAX_RIPPLES = 5;
 const FIELD_THRESHOLD = 0.46;
 const FIELD_PEAK = 0.9;
-const INTERACTIVE = 'a, button, input, textarea, select, label';
+const INTERACTIVE = 'a, button, input, textarea, select, label, [role="button"]';
 
-// Page content is drawn into a low-resolution mask: glyphs and icons by their shape,
-// controls with a visible surface by their rounded box. The blurred mask fades the field.
-const SURFACES = 'button, .theme-toggle, .nav-mobile, .status-line';
-const MASK_SCALE = 4;
+// Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
+// shape and smaller text by line box. Elements matching SURFACES clear their whole rounded box while they
+// show a background, border, or backdrop blur. The blurred mask fades and bends the field around content.
+const SURFACES =
+    'button, input, textarea, select, .theme-toggle, .nav-mobile, .status-line, .project-card, .section-content, .status-message';
+const GLYPH_MIN_FONT_SIZE = 24;
+const MASK_SCALE = 6;
 const MASK_INTERVAL = 150;
 const CLEAR_PADDING = 12;
-const BLUR_RADIUS = 4;
-const BLUR_PASSES = 3;
+const BLUR_RADIUS = 3;
+const BLUR_PASSES = 2;
 const FADE_START = 0.08;
 const FADE_END = 0.5;
 const WARP_STRENGTH = 4;
+const VISIBILITY_EASE = 0.3;
 const LAYER_ALPHAS = [0.3, 0.6, 1];
 
-const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
 const canvas = useTemplateRef('canvas');
@@ -51,12 +53,16 @@ let rows = 0;
 let cellWidth = 0;
 let viewWidth = 0;
 let viewHeight = 0;
+let maskA = new Float32Array(0);
+let maskB = new Float32Array(0);
+let targetVisibility = new Float32Array(0);
 let visibility = new Float32Array(0);
 let warpX = new Float32Array(0);
 let warpY = new Float32Array(0);
 let frameId = 0;
 let lastFrame = 0;
 let lastMask = 0;
+let lastScrollY = 0;
 const startTime = performance.now();
 
 function readColors() {
@@ -85,7 +91,14 @@ function resize() {
     maskCanvas.width = Math.ceil(width / MASK_SCALE);
     maskCanvas.height = Math.ceil(height / MASK_SCALE);
 
-    rebuildMask();
+    maskA = new Float32Array(maskCanvas.width * maskCanvas.height);
+    maskB = new Float32Array(maskA.length);
+    targetVisibility = new Float32Array(cols * rows);
+    visibility = new Float32Array(cols * rows);
+    warpX = new Float32Array(cols * rows);
+    warpY = new Float32Array(cols * rows);
+
+    rebuildMask(true);
     if (reducedMotion) draw(0);
 }
 
@@ -102,19 +115,21 @@ function field(x, y, t) {
     return Math.min(1, Math.max(0, (n - FIELD_THRESHOLD) / (1 - FIELD_THRESHOLD))) * FIELD_PEAK;
 }
 
-function hasSurface(el) {
-    const style = getComputedStyle(el);
-    const isVisible = (color) => !/^rgba\(.*,\s*0\)$|^transparent$/.test(color);
+const isVisibleColor = (color) => color !== 'transparent' && !/[,/]\s*0\)$/.test(color);
+const SIDES = ['Top', 'Right', 'Bottom', 'Left'];
 
+function hasSurface(style) {
     return (
-        isVisible(style.backgroundColor) ||
-        (parseFloat(style.borderTopWidth) > 0 && isVisible(style.borderTopColor)) ||
-        style.backdropFilter !== 'none'
+        isVisibleColor(style.backgroundColor) ||
+        style.backgroundImage !== 'none' ||
+        style.backdropFilter !== 'none' ||
+        SIDES.some((side) => parseFloat(style[`border${side}Width`]) > 0 && isVisibleColor(style[`border${side}Color`]))
     );
 }
 
 function drawBox(rect, radius) {
     if (!rect.width && !rect.height) return;
+    if (rect.bottom < -CLEAR_PADDING * 3 || rect.top > viewHeight + CLEAR_PADDING * 3) return;
 
     const r = Math.min(radius, rect.width / 2, rect.height / 2) + CLEAR_PADDING;
     maskCtx.beginPath();
@@ -129,7 +144,11 @@ function drawBox(rect, radius) {
 }
 
 // Draws each character at its rendered position; the round stroke adds even padding around the glyph.
-function drawText(node, style) {
+function drawGlyphs(node, style) {
+    range.selectNodeContents(node);
+    const box = range.getBoundingClientRect();
+    if (box.bottom < -CLEAR_PADDING || box.top > viewHeight + CLEAR_PADDING) return;
+
     maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
     const ascent = maskCtx.measureText('M').fontBoundingBoxAscent;
     let offset = 0;
@@ -142,7 +161,7 @@ function drawText(node, style) {
             range.setEnd(node, end);
             const rect = range.getBoundingClientRect();
 
-            if (rect.width && rect.bottom > 0 && rect.top < viewHeight) {
+            if (rect.width) {
                 maskCtx.strokeText(char, rect.left, rect.top + ascent);
                 maskCtx.fillText(char, rect.left, rect.top + ascent);
             }
@@ -150,6 +169,11 @@ function drawText(node, style) {
 
         offset = end;
     }
+}
+
+function drawLines(node) {
+    range.selectNodeContents(node);
+    for (const rect of range.getClientRects()) drawBox(rect, rect.height / 2);
 }
 
 function boxBlur(src, dst, w, h, r) {
@@ -165,7 +189,7 @@ function boxBlur(src, dst, w, h, r) {
     }
 }
 
-function rebuildMask() {
+function rebuildMask(snap) {
     const root = document.getElementById('app');
     const w = maskCanvas.width;
     const h = maskCanvas.height;
@@ -178,46 +202,68 @@ function rebuildMask() {
     maskCtx.lineJoin = 'round';
     maskCtx.textBaseline = 'alphabetic';
 
-    const surfaces = [...root.querySelectorAll(SURFACES)].filter(hasSurface);
-    const isCovered = (el) => surfaces.some((surface) => surface.contains(el));
+    // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
+    const styles = new Map();
+    const opacities = new Map();
+    const covered = new Map();
+    const styleOf = (el) => {
+        if (!styles.has(el)) styles.set(el, getComputedStyle(el));
+        return styles.get(el);
+    };
+    const opacityOf = (el) => {
+        if (!el || el === root) return 1;
+        if (!opacities.has(el)) opacities.set(el, parseFloat(styleOf(el).opacity) * opacityOf(el.parentElement));
+        return opacities.get(el);
+    };
+    const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
+
+    const surfaces = new Set([...root.querySelectorAll(SURFACES)].filter((el) => hasSurface(styleOf(el))));
+    const isCovered = (el) => {
+        if (!el || el === root) return false;
+        if (!covered.has(el)) covered.set(el, surfaces.has(el.parentElement) || isCovered(el.parentElement));
+        return covered.get(el);
+    };
 
     for (const surface of surfaces) {
-        drawBox(surface.getBoundingClientRect(), parseFloat(getComputedStyle(surface).borderTopLeftRadius) || 0);
+        if (isCovered(surface)) continue;
+        maskCtx.globalAlpha = alphaOf(surface);
+        drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
     }
 
-    for (const el of root.querySelectorAll('svg, hr')) {
-        if (!isCovered(el)) drawBox(el.getBoundingClientRect(), 4);
+    for (const el of root.querySelectorAll('svg, hr, img, video')) {
+        if (surfaces.has(el) || isCovered(el)) continue;
+        maskCtx.globalAlpha = alphaOf(el);
+        drawBox(el.getBoundingClientRect(), 4);
     }
 
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const styles = new Map();
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
         const el = node.parentElement;
-        if (!node.data.trim() || !el || isCovered(el)) continue;
+        if (!el || !node.data.trim() || surfaces.has(el) || isCovered(el)) continue;
 
-        if (!styles.has(el)) styles.set(el, getComputedStyle(el));
-        drawText(node, styles.get(el));
+        const alpha = alphaOf(el);
+        if (alpha < 0.02) continue;
+
+        maskCtx.globalAlpha = alpha;
+        const style = styleOf(el);
+        if (parseFloat(style.fontSize) >= GLYPH_MIN_FONT_SIZE) drawGlyphs(node, style);
+        else drawLines(node);
     }
+    maskCtx.globalAlpha = 1;
 
-    // Three box-blur passes approximate a Gaussian, which gives a soft, even falloff.
+    // Two box-blur passes give a soft, even falloff around content.
     const { data } = maskCtx.getImageData(0, 0, w, h);
-    let a = new Float32Array(w * h);
-    let b = new Float32Array(w * h);
-    for (let i = 0; i < a.length; i++) a[i] = data[i * 4 + 3] / 255;
+    for (let i = 0; i < maskA.length; i++) maskA[i] = data[i * 4 + 3] / 255;
     for (let pass = 0; pass < BLUR_PASSES; pass++) {
-        boxBlur(a, b, w, h, BLUR_RADIUS);
-        boxBlur(b, a, h, w, BLUR_RADIUS);
+        boxBlur(maskA, maskB, w, h, BLUR_RADIUS);
+        boxBlur(maskB, maskA, h, w, BLUR_RADIUS);
     }
 
     const at = (px, py) => {
         const mx = Math.min(w - 1, Math.max(0, Math.floor(px / MASK_SCALE)));
         const my = Math.min(h - 1, Math.max(0, Math.floor(py / MASK_SCALE)));
-        return a[my * w + mx];
+        return maskA[my * w + mx];
     };
-
-    visibility = new Float32Array(cols * rows);
-    warpX = new Float32Array(cols * rows);
-    warpY = new Float32Array(cols * rows);
 
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
@@ -226,12 +272,15 @@ function rebuildMask() {
             const py = (y + 0.5) * LINE_HEIGHT;
             const fade = Math.min(1, Math.max(0, (at(px, py) - FADE_START) / (FADE_END - FADE_START)));
 
-            visibility[i] = 1 - fade * fade * (3 - 2 * fade);
+            targetVisibility[i] = 1 - fade * fade * (3 - 2 * fade);
             // The mask gradient points toward content, so the pattern bends around it.
             warpX[i] = (at(px + cellWidth, py) - at(px - cellWidth, py)) * WARP_STRENGTH;
             warpY[i] = (at(px, py + LINE_HEIGHT) - at(px, py - LINE_HEIGHT)) * WARP_STRENGTH;
         }
     }
+
+    // Scrolling moves content a lot between frames, so the field jumps to the new mask instead of easing.
+    if (snap) visibility.set(targetVisibility);
 }
 
 function heat(px, py, t) {
@@ -252,6 +301,7 @@ function heat(px, py, t) {
 function draw(t) {
     const hotCells = [];
     const last = RAMP.length - 1;
+    const ease = reducedMotion ? 1 : VISIBILITY_EASE;
 
     while (ripples.length && t - ripples[0].start > RIPPLE_LIFE) ripples.shift();
     pointer.strength += (pointer.target - pointer.strength) * 0.12;
@@ -265,7 +315,7 @@ function draw(t) {
 
         for (let x = 0; x < cols; x++) {
             const i = y * cols + x;
-            const v = visibility[i];
+            const v = (visibility[i] += (targetVisibility[i] - visibility[i]) * ease);
             const layer = v > 0.66 ? 2 : v > 0.33 ? 1 : 0;
             let char = ' ';
 
@@ -299,19 +349,24 @@ function draw(t) {
 function frame(now) {
     frameId = requestAnimationFrame(frame);
     if (now - lastFrame < FRAME_MS) return;
+    lastFrame = now;
 
-    // Rebuilt on an interval so the mask follows enter animations, scrolling, and layout changes.
-    if (now - lastMask > MASK_INTERVAL) {
+    // The mask follows layout on an interval, and on every frame while the page scrolls.
+    const scrolled = window.scrollY !== lastScrollY;
+    const maskDue = scrolled || now - lastMask > MASK_INTERVAL;
+    if (maskDue) {
         lastMask = now;
-        rebuildMask();
+        lastScrollY = window.scrollY;
+        rebuildMask(scrolled);
     }
 
-    lastFrame = now;
-    draw((now - startTime) / 1000);
+    // With reduced motion the field holds still, so it only redraws when content moves.
+    if (reducedMotion && !maskDue) return;
+    draw(reducedMotion ? 0 : (now - startTime) / 1000);
 }
 
 function start() {
-    if (reducedMotion || frameId) return;
+    if (frameId) return;
     frameId = requestAnimationFrame(frame);
 }
 
@@ -362,12 +417,7 @@ onUnmounted(stop);
 </script>
 
 <template>
-    <canvas
-        ref="canvas"
-        class="ascii-field"
-        :class="{ 'is-ready': isReady, 'is-leaving': routeStore.isLeaving }"
-        aria-hidden="true"
-    ></canvas>
+    <canvas ref="canvas" class="ascii-field" :class="{ 'is-ready': isReady }" aria-hidden="true"></canvas>
 </template>
 
 <style lang="scss" scoped>
@@ -394,11 +444,6 @@ onUnmounted(stop);
 
     &.is-ready {
         opacity: 1;
-    }
-
-    &.is-leaving {
-        opacity: 0;
-        transition-duration: 0.3s;
     }
 
     @media (prefers-reduced-motion: reduce) {
