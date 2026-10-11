@@ -383,8 +383,13 @@ useEventListener(window, 'pointermove', (e) => {
     pointer.target = 1;
 });
 
-useEventListener(document, 'pointerleave', () => {
-    pointer.target = 0;
+// Fade the lens when the mouse leaves the window or a touch ends.
+useEventListener(window, 'pointerout', (e) => {
+    if (!e.relatedTarget) pointer.target = 0;
+});
+
+useEventListener(window, ['pointerup', 'pointercancel'], (e) => {
+    if (e.pointerType !== 'mouse') pointer.target = 0;
 });
 
 useEventListener(window, 'pointerdown', (e) => {
