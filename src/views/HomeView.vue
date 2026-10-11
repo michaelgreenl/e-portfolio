@@ -5,6 +5,7 @@ import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import { homeAnimations } from '@/animations/page/home.js';
+import AsciiField from '@/components/AsciiField.vue';
 import Button from '@/components/Button.vue';
 import ContactLinks from '@/components/ContactLinks.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
@@ -37,6 +38,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <AsciiField />
     <div class="home-container page page-shell">
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
