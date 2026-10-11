@@ -15,25 +15,25 @@ export const navigationRoutes = {
         path: '/',
         name: 'Home',
         component: () => import('@/views/HomeView.vue'),
-        meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
+        meta: { title: 'Portfolio', file: 'README.md', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
     },
     projects: {
         path: '/projects',
         name: 'Projects',
         component: () => import('@/views/ProjectsView.vue'),
-        meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
+        meta: { title: 'Projects', file: 'projects/', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },
     },
     resume: {
         path: '/resume',
         name: 'Resume',
         component: markRaw(ResumeView),
-        meta: { title: 'Resume', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
+        meta: { title: 'Resume', file: 'resume.pdf', icon: markRaw(ResumeIcon), iconFill: markRaw(ResumeIconFill) },
     },
     contact: {
         path: '/contact',
         name: 'Contact',
         component: () => import('@/views/ContactView.vue'),
-        meta: { title: 'Contact', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
+        meta: { title: 'Contact', file: 'contact.md', icon: markRaw(ContactIcon), iconFill: markRaw(ContactIconFill) },
     },
 };
 
