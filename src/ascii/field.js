@@ -86,9 +86,10 @@ function boxBlur(src, dst, w, h, r) {
  * @param {object} options
  * @param {HTMLElement} options.root Element whose content the art keeps clear of.
  * @param {string} options.surfaces Selector for panels and controls that clear their whole box.
+ * @param {string} [options.ceiling] Selector for an element; nothing is drawn above its bottom edge.
  * @param {Record<string, object>} options.scenes Scene for each page name, see scenes/earth.js.
  */
-export function createAsciiField(canvas, { root, surfaces, scenes }) {
+export function createAsciiField(canvas, { root, surfaces, scenes, ceiling }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
     const grid = createGrid();
@@ -109,6 +110,7 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     );
 
     let ink = '';
+    let ceilingEl = null;
     let viewW = 1;
     let viewH = 1;
     let maskA = new Float32Array(0);
@@ -437,13 +439,25 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
 
     /* ---------- Characters ---------- */
 
+    // Bottom edge of the ceiling element on screen, in px.
+    function ceilingY() {
+        if (!ceiling) return 0;
+        if (!ceilingEl?.isConnected) ceilingEl = document.querySelector(ceiling);
+        return ceilingEl ? Math.max(0, ceilingEl.getBoundingClientRect().bottom) : 0;
+    }
+
     function draw() {
         const { cols, rows, lum, lines, lineCode, lineFamily, cover, shade, opacity, edge } = grid;
         const ease = reducedMotion ? 1 : VISIBILITY_EASE;
+        const top = ceilingY();
 
         ctx.clearRect(0, 0, viewW, viewH);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, top, viewW, viewH - top);
+        ctx.clip();
         ctx.fillStyle = ink;
-        for (let y = 0; y < rows; y++) {
+        for (let y = Math.floor(top / LINE_HEIGHT); y < rows; y++) {
             // One string per opacity layer keeps this to a few fillText calls per row.
             for (const layer of rowLayers) layer.fill(' ');
             let used = 0;
@@ -484,7 +498,7 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
                 ctx.fillText(rowLayers[l].join(''), 0, y * LINE_HEIGHT);
             }
         }
-        ctx.globalAlpha = 1;
+        ctx.restore();
     }
 
     /* ---------- Loop ---------- */
