@@ -49,7 +49,6 @@ onMounted(() => {
     field = createAsciiField(canvas.value, {
         root: document.getElementById('app'),
         surfaces: SURFACES,
-        ceiling: '.nav-line',
         scenes: { home: createSaturn(), projects: createEarth(), resume: createRocket(), contact: createSatellite() },
     });
     field.setScene(routeStore.currentRoute.base);
