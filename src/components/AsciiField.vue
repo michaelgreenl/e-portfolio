@@ -10,7 +10,7 @@ import { createSatellite } from '@/ascii/scenes/satellite.js';
 
 // Panels and controls that clear their whole rounded box while they show a background, border, or blur.
 const SURFACES =
-    'button, input, textarea, select, .theme-toggle, .nav-mobile, .status-line, .project-card, .section-content, .status-message';
+    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();

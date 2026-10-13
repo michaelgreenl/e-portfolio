@@ -5,7 +5,6 @@ import Navbar from '@/components/Navbar/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import BgSVG from '@/components/SVGs/BgSVG.vue';
 import AsciiField from '@/components/AsciiField.vue';
-import StatusLine from '@/components/StatusLine.vue';
 
 const routeStore = useRouteStore();
 </script>
@@ -19,7 +18,6 @@ const routeStore = useRouteStore();
         <component :is="Component" :key="routeStore.activePath" />
     </RouterView>
     <Footer />
-    <StatusLine />
 </template>
 
 <style lang="scss">
@@ -55,11 +53,6 @@ body,
 
     @include bp-sm-phone {
         font-size: 17px;
-    }
-
-    @include bp-md-tablet {
-        // Keeps the footer clear of the fixed status line.
-        padding-bottom: 1.75rem;
     }
 
     @include bp-xl-desktop {
