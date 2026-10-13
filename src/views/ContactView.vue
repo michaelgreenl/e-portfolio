@@ -372,6 +372,7 @@ const clearStatus = () => {
     font-size: 1em;
     background-color: transparent;
     border: 2px solid transparent;
+    backdrop-filter: blur(2px);
 
     &:focus {
         outline: none;

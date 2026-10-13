@@ -650,6 +650,7 @@ p {
     padding: $space-4 $size-4;
     cursor: pointer;
     border-bottom: solid 1px $color-text-muted;
+    backdrop-filter: blur(2px);
 
     &.is-page-transitioning {
         pointer-events: none;
@@ -664,7 +665,6 @@ p {
         &:not(.is-page-transitioning):active {
             border-radius: $radius-md;
             box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
-            backdrop-filter: blur(2px);
             transform: scale(1.01) !important;
 
             .card-footer {
