@@ -54,6 +54,8 @@ onMounted(() => {
             @close-project="showInternship = false"
         />
 
+        <div class="art-slot" aria-hidden="true"></div>
+
         <div class="page-header">
             <div class="page-title">
                 <span class="page-eyebrow">Michael L. Green</span>
@@ -234,6 +236,7 @@ onMounted(() => {
     --resume-light-heading: #2f4858;
     --resume-light-accent: #315f72;
     --resume-light-muted: #52646e;
+    --column: 33em;
 
     position: relative;
     display: flex;
@@ -241,7 +244,7 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 33em;
+    max-width: var(--column);
     padding: $space-4;
     margin: 0 auto;
     font-size: 0.9em;
@@ -258,11 +261,11 @@ onMounted(() => {
     }
 
     @include bp-custom-min(730) {
-        max-width: 48em;
+        --column: 48em;
     }
 
     @include bp-xl-desktop {
-        max-width: 58em;
+        --column: 58em;
     }
 
     @include bp-xsm-phone {
@@ -353,6 +356,22 @@ li {
 
     @include theme-light {
         color: #45545c;
+    }
+}
+
+// Where the ASCII rocket goes, fixed behind the page so it keeps flying while the resume scrolls: large and
+// partly past the right edge on phones, and beside the column on wider screens, over the column's edge.
+.art-slot {
+    position: fixed;
+    inset: 15vh auto auto 62.5vw;
+    width: 67.5vw;
+    height: 100vh;
+    pointer-events: none;
+
+    @include bp-md-tablet {
+        inset: 10vh 0 6vh calc(50% + var(--column) / 2 - 10em);
+        width: auto;
+        height: auto;
     }
 }
 

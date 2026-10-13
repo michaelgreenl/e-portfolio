@@ -111,6 +111,8 @@ async function openProject(project, autoplay = false) {
             @close-project="activeProject = null"
         />
 
+        <div class="art-slot" aria-hidden="true"></div>
+
         <div ref="pageHeader" class="page-header">
             <h1>Projects</h1>
             <hr />
@@ -174,6 +176,9 @@ async function openProject(project, autoplay = false) {
 .projects-container {
     position: relative;
     padding: $space-10 0 $space-3;
+
+    // On phones the Jupiter slot runs past both sides of the screen; this keeps it from widening the page.
+    overflow-x: clip;
     font-size: 0.6em;
 
     @include bp-md-tablet {
@@ -221,12 +226,42 @@ async function openProject(project, autoplay = false) {
     }
 }
 
+// Where the ASCII Jupiter goes: at the top of the page, so it scrolls away with the header and does not stay
+// behind the cards. On phones it is a planet behind the header, about as wide as the screen or wider; on wider
+// screens it takes the right side. Its moons reach far past the slot.
+.art-slot {
+    position: absolute;
+    inset: calc(-7px - 14.2vw) -12.5vw auto;
+    height: calc(5.4vw + 531px);
+    pointer-events: none;
+
+    @include bp-md-tablet {
+        inset: -2vh auto auto 50%;
+        width: 47vw;
+        height: 64vh;
+    }
+}
+
+// On wider screens the header keeps to the left side, beside Jupiter, set in from the edge of the cards.
 .page-header {
     @include flex-center-all;
 
     flex-direction: column;
     padding: 0 $space-3;
-    margin: $space-10 0 $space-20;
+    margin: ($space-24 + $space-4) 0 $space-20;
+
+    @include bp-md-tablet {
+        align-items: flex-start;
+        width: 100%;
+        max-width: 92em;
+        padding-right: 45%;
+        padding-left: 3em;
+        margin-top: $space-10;
+    }
+
+    @include bp-xl-desktop {
+        max-width: 116em;
+    }
 
     h1 {
         @include bp-lg-laptop {
@@ -239,6 +274,10 @@ async function openProject(project, autoplay = false) {
         font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
+
+        @include bp-md-tablet {
+            text-align: left;
+        }
 
         @include bp-lg-laptop {
             max-width: 65ch;

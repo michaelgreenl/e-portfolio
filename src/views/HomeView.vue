@@ -38,6 +38,7 @@ onMounted(() => {
 
 <template>
     <div class="home-container page page-shell">
+        <div class="art-slot" aria-hidden="true"></div>
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
             <h1>
@@ -85,13 +86,20 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+$hero-tablet-bp: 525;
+
+// On narrow phones the name takes two lines, so the hero starts lower, below the top of the globe.
 .home-container {
     z-index: 5;
     gap: $space-page-section;
-    padding: $space-8 $space-4 0;
+    padding: ($space-32 + $space-8) $space-4 0;
 
     @include bp-xsm-phone {
         font-size: 1em;
+    }
+
+    @include bp-custom-min($hero-tablet-bp) {
+        padding-top: $space-10;
     }
 
     @include bp-md-tablet {
@@ -108,7 +116,22 @@ onMounted(() => {
     }
 }
 
-$hero-tablet-bp: 525;
+// Where the ASCII Earth goes, behind the page. On phones it is a globe around the hero that grows with the
+// screen width, up to about 80% of the screen height; on wider screens it takes the right half.
+.art-slot {
+    --size: min(80.5vw + 160px, 79.5vh);
+
+    position: fixed;
+    inset: calc(min(49vh + 16.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
+    height: var(--size);
+    pointer-events: none;
+
+    @include bp-md-tablet {
+        position: absolute;
+        inset: 0 0 0 50%;
+        height: auto;
+    }
+}
 
 h1 {
     padding-bottom: $size-1;
