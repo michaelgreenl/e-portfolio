@@ -1,4 +1,5 @@
-// Resume: a rocket in flight. Its flame grows and the dust streams past faster while the page scrolls.
+// Resume: a rocket in flight. Its flame grows and the dust streams past faster while the page scrolls, and it
+// burns at full thrust while it lifts off or lands.
 
 import {
     castRegion,
@@ -26,7 +27,8 @@ const BOUND = { y: 3.4, radius: 4.8 }; // a sphere around the whole rocket
 const LIGHT = normalize([0.6, 0.5, 0.65]);
 const SPIN_SECONDS = 24;
 const FLAME = { count: 240, idle: 1.4, boost: 5 }; // flame length in units, at rest and at full thrust
-const DUST = { count: 80, inner: 2.6, outer: 6.5, low: -8, high: 11 };
+// All the dust shows when the rocket's bound is fullRadius px or more on screen.
+const DUST = { count: 80, inner: 2.6, outer: 6.5, low: -8, high: 11, fullRadius: 200 };
 const FULL_THRUST_SPEED = 1400; // px of scrolling per second that gives full thrust
 
 const NOSE = { apex: [0, NOSE_TIP, 0], axis: [0, -1, 0], k: BODY_RADIUS / (NOSE_TIP - BODY_TOP) };
@@ -124,7 +126,8 @@ export function createRocket() {
         const p = [0, 0, 0];
         for (let i = 0; i < FLAME.count; i++) {
             const f = flame[i];
-            const phase = (f.seed + t * rate * f.pace) % 1;
+            const cycle = f.seed + t * rate * f.pace;
+            const phase = cycle - Math.floor(cycle);
             const r = 0.7 * (1 - phase) ** 0.6 * f.radius;
             transform(frame, Math.cos(f.angle) * r, -0.05 - phase * length * f.pace, Math.sin(f.angle) * r, p);
             flamePoints[i * 4] = p[0];
@@ -136,12 +139,16 @@ export function createRocket() {
     }
 
     // Dust in a column around the rocket, sliding down as the rocket climbs; fast enough, it draws streaks.
-    function drawDust(grid, cam, step, gain) {
+    // Only a share of the dust shows; the last point shown fades in, so the share can change smoothly.
+    function drawDust(grid, cam, step, gain, share) {
         const span = DUST.high - DUST.low;
         const streak = step * 2.5;
+        const shown = share * DUST.count;
         const at = [0, 0, 0];
-        for (let i = 0; i < DUST.count; i++) {
+        let used = 0;
+        for (let i = 0; i < shown; i++) {
             const g = dust[i];
+            const weight = Math.min(1, shown - i);
             const y = DUST.low + ((((g.y - altitude) % span) + span) % span);
             if (streak > 0.4) {
                 const point = (k) => {
@@ -150,29 +157,28 @@ export function createRocket() {
                     at[2] = g.z;
                     return at;
                 };
-                polyline(grid, cam, 1, point, () => 0.45 * gain, 4);
+                polyline(grid, cam, 1, point, () => 0.45 * weight * gain);
             } else {
-                dustPoints[i * 4] = g.x;
-                dustPoints[i * 4 + 1] = y;
-                dustPoints[i * 4 + 2] = g.z;
-                dustPoints[i * 4 + 3] = 0.5;
+                dustPoints[used * 4] = g.x;
+                dustPoints[used * 4 + 1] = y;
+                dustPoints[used * 4 + 2] = g.z;
+                dustPoints[used * 4 + 3] = 0.5 * weight;
+                used++;
             }
         }
-        if (streak <= 0.4) splatPoints(grid, cam, dustPoints, DUST.count, gain);
+        splatPoints(grid, cam, dustPoints, used, gain);
     }
 
     return {
-        extent: [2.4, (NOSE_TIP + FLAME.idle + FLAME.boost) / 2],
-        center: [0, (NOSE_TIP - FLAME.idle - FLAME.boost) / 2, 0],
+        // The frame holds the rocket and its flame at rest; at full thrust the flame reaches past it.
+        extent: [2.4, (NOSE_TIP + FLAME.idle + 1) / 2],
+        center: [0, (NOSE_TIP - FLAME.idle - 1) / 2, 0],
         view: [0.25, 0.12, 1],
-        fit: { max: [0.16, 0.42], min: 120 },
-        prefer: (u, v) => 1 + 0.15 * u - 0.3 * Math.abs(v - 0.5),
-        planeSize: 9,
-        render(grid, cam, { t, gain, speed }) {
+        render(grid, cam, { t, gain, speed, burn }) {
             const dt = clamp01(t - lastT);
             lastT = t;
             // Thrust rises quickly with scrolling and settles slowly.
-            const want = clamp01(speed / FULL_THRUST_SPEED);
+            const want = Math.max(burn, clamp01(speed / FULL_THRUST_SPEED));
             thrust += (want - thrust) * (1 - Math.exp(-dt / (want > thrust ? 0.15 : 0.8)));
             const climb = 0.6 + 14 * thrust;
             altitude += climb * dt;
@@ -183,9 +189,11 @@ export function createRocket() {
                 eulerMatrix(0, (t * Math.PI * 2) / SPIN_SECONDS, 0),
             );
             lift = 0.12 * Math.sin(t * 1.3);
-            drawDust(grid, cam, climb * 0.05, gain);
-            drawFlame(grid, cam, t, gain);
             const c = screenCircle(cam, 0, BOUND.y + lift, 0, BOUND.radius);
+            // A rocket that is small on screen gets less dust, so its dust is as sparse as a large rocket's.
+            const share = c ? Math.min(1, (c.r / DUST.fullRadius) ** 2) : 1;
+            drawDust(grid, cam, climb * 0.05, gain, share);
+            drawFlame(grid, cam, t, gain);
             if (!c) return;
             castRegion(
                 grid,

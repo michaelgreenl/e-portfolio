@@ -83,20 +83,26 @@ export function createGrid() {
         lineH: 16,
         width: 1,
         height: 1,
+        // Set before each object draws: its scene units per world unit, for depth across objects, and the
+        // first id of its parts, so parts of different objects never share an id.
+        depthScale: 1,
+        idBase: 0,
         resize(width, height, cellW, lineH) {
             Object.assign(grid, { width, height, cellW, lineH });
             grid.cols = Math.ceil(width / cellW);
             grid.rows = Math.ceil(height / lineH);
             const n = grid.cols * grid.rows;
-            grid.lum = new Float32Array(n); // brightness from points, stars and glows
+            grid.lum = new Float32Array(n); // brightness from points and glows
             grid.dens = new Float32Array(n); // point density before tone mapping
-            grid.lines = new Float32Array(n); // grid line strength
+            grid.lines = new Float32Array(n); // line strength
             grid.lineCode = new Uint8Array(n);
-            grid.lineFamily = new Uint8Array(n);
+            grid.star = new Uint8Array(n); // star character, see STAR_CHARS
+            grid.starAlpha = new Float32Array(n);
+            grid.front = new Uint8Array(n); // 1 where the speck in a cell is in front of everything else
             grid.cover = new Float32Array(n); // share of a cell covered by a solid object
             grid.shade = new Float32Array(n); // lighting of the solid object in a cell
             grid.opacity = new Float32Array(n); // how far the solid object has faded in
-            grid.depth = new Float32Array(n); // distance from the camera to the solid object
+            grid.depth = new Float32Array(n); // distance from the camera to the solid object, in world units
             grid.ident = new Uint8Array(n); // which solid object covers a cell
             grid.round = new Uint8Array(n); // 1 when that object's outline is drawn with ( and )
             grid.edge = new Uint8Array(n); // outline character, see EDGE_CHARS
@@ -108,7 +114,9 @@ export function createGrid() {
                 'dens',
                 'lines',
                 'lineCode',
-                'lineFamily',
+                'star',
+                'starAlpha',
+                'front',
                 'cover',
                 'shade',
                 'opacity',
@@ -178,6 +186,12 @@ function rayDir(cam, sx, sy, out) {
     out[2] = z / l;
 }
 
+// Half width and half height of points around the origin, as seen along z.
+export const extentOf = (points) => [
+    Math.max(...points.map((p) => Math.abs(p[0]))),
+    Math.max(...points.map((p) => Math.abs(p[1]))),
+];
+
 // Screen position (px) and depth of a point, written into out; false when it is behind the camera.
 export function project(cam, x, y, z, out) {
     const dx = x - cam.px;
@@ -245,22 +259,19 @@ export function toneDensity(grid) {
 
 /* ---------- Lines ---------- */
 
-// Marks the cells along a screen segment (px) with a slope character. Cells crossed by both line families
-// of a plane become '+'.
-function rasterSegment(grid, x0, y0, x1, y1, strength, family) {
-    const { width, height, cols, rows, cellW, lineH, lines, lineCode, lineFamily } = grid;
+// Line character for a direction on screen (radians, y down), indexed into LINE_CHARS: - \ | or /.
+function slopeCode(angle) {
+    let a = angle % Math.PI;
+    if (a < 0) a += Math.PI;
+    return a < Math.PI / 8 || a >= (7 * Math.PI) / 8 ? 1 : a < (3 * Math.PI) / 8 ? 2 : a < (5 * Math.PI) / 8 ? 3 : 4;
+}
+
+// Marks the cells along a screen segment (px) with a slope character.
+function rasterSegment(grid, x0, y0, x1, y1, strength) {
+    const { width, height, cols, rows, cellW, lineH, lines, lineCode } = grid;
     if ((x0 < -width && x1 < -width) || (x0 > width * 2 && x1 > width * 2)) return;
     if ((y0 < -height && y1 < -height) || (y0 > height * 2 && y1 > height * 2)) return;
-    let ang = Math.atan2(y1 - y0, x1 - x0);
-    if (ang < 0) ang += Math.PI;
-    const code =
-        ang < Math.PI / 8 || ang >= (7 * Math.PI) / 8
-            ? 1
-            : ang < (3 * Math.PI) / 8
-              ? 2
-              : ang < (5 * Math.PI) / 8
-                ? 3
-                : 4;
+    const code = slopeCode(Math.atan2(y1 - y0, x1 - x0));
     const gx0 = x0 / cellW;
     const gy0 = y0 / lineH;
     const gx1 = x1 / cellW;
@@ -272,7 +283,6 @@ function rasterSegment(grid, x0, y0, x1, y1, strength, family) {
         const cy = Math.floor(gy0 + (gy1 - gy0) * f);
         if (cx < 0 || cy < 0 || cx >= cols || cy >= rows) continue;
         const i = cy * cols + cx;
-        lineFamily[i] |= family;
         if (strength > lines[i]) {
             lines[i] = strength;
             lineCode[i] = code;
@@ -281,7 +291,7 @@ function rasterSegment(grid, x0, y0, x1, y1, strength, family) {
 }
 
 // Draws a polyline through scene points point(k) for k = 0..n, with strength strengthAt(k).
-export function polyline(grid, cam, n, point, strengthAt, family) {
+export function polyline(grid, cam, n, point, strengthAt) {
     const at = {};
     let hasPrev = false;
     let px = 0;
@@ -294,7 +304,7 @@ export function polyline(grid, cam, n, point, strengthAt, family) {
             continue;
         }
         const s = strengthAt(k);
-        if (hasPrev && (s > 0.02 || ps > 0.02)) rasterSegment(grid, px, py, at.x, at.y, (s + ps) / 2, family);
+        if (hasPrev && (s > 0.02 || ps > 0.02)) rasterSegment(grid, px, py, at.x, at.y, (s + ps) / 2);
         hasPrev = true;
         px = at.x;
         py = at.y;
@@ -302,66 +312,33 @@ export function polyline(grid, cam, n, point, strengthAt, family) {
     }
 }
 
-// The x, y and z planes through a scene's center. They show only while the page changes: boost runs
-// from 0 to 1 and back, and swing turns them about their vertical axis.
-const PLANE_AXES = [
-    [0, 2], // floor: x and z
-    [0, 1], // wall: x and y
-    [2, 1], // wall: z and y
-];
-export function drawPlanes(grid, cam, size, gain, swing, boost) {
-    const LINES = 8;
-    const SEGMENTS = 24;
-    const strength = boost * gain * 0.5;
-    if (strength < 0.01) return;
-    const cs = Math.cos(swing);
-    const sn = Math.sin(swing);
-    const local = [0, 0, 0];
-    const world = [0, 0, 0];
-    const fadeAt = (u, v) => 1 - smoothstep(size * 0.25, size, Math.hypot(u, v));
-    for (const [ia, ib] of PLANE_AXES) {
-        for (let i = 0; i <= LINES; i++) {
-            const fixed = -size + (i * size * 2) / LINES;
-            for (let dir = 0; dir < 2; dir++) {
-                const uv = (k) => {
-                    const run = -size + (k * size * 2) / SEGMENTS;
-                    return dir ? [fixed, run] : [run, fixed];
-                };
-                const point = (k) => {
-                    const [u, v] = uv(k);
-                    local[0] = local[1] = local[2] = 0;
-                    local[ia] = u;
-                    local[ib] = v;
-                    world[0] = local[0] * cs + local[2] * sn;
-                    world[1] = local[1];
-                    world[2] = -local[0] * sn + local[2] * cs;
-                    return world;
-                };
-                polyline(grid, cam, SEGMENTS, point, (k) => strength * fadeAt(...uv(k)), dir ? 2 : 1);
-            }
-        }
-    }
-}
-
-// Draws a wave front on screen: part of a circle around (cx, cy) in px, moving right (side 1) or left
-// (side -1), with spread radians above and below. One character per row: ( or ) where it runs upright,
-// / and \ toward its ends, fading at the tips.
-export function wave(grid, cx, cy, radius, side, spread, strength) {
+// Draws a wave front on screen: an arc of the circle around (cx, cy) in px that travels toward angle
+// (radians, y down), spread radians to each side, fading toward its tips. Where it runs upright it uses
+// ( or ), so it bulges the way it travels.
+// `seed` gives each wave its own uneven brightness along the arc, which moves with the wave.
+export function wave(grid, cx, cy, radius, angle, spread, strength, seed) {
     const { cols, rows, cellW, lineH, lines, lineCode } = grid;
-    const reach = radius * Math.sin(spread);
-    const y0 = Math.max(0, Math.floor((cy - reach) / lineH));
-    const y1 = Math.min(rows - 1, Math.floor((cy + reach) / lineH));
-    for (let y = y0; y <= y1; y++) {
-        const dy = (y + 0.5) * lineH - cy;
-        if (Math.abs(dy) > reach) continue;
-        const x = Math.floor((cx + side * Math.sqrt(radius * radius - dy * dy)) / cellW);
-        if (x < 0 || x >= cols) continue;
-        const slant = Math.abs(dy) > radius * 0.42;
-        const code = slant ? (dy < 0 === side < 0 ? 4 : 2) : side < 0 ? 5 : 6;
-        const s = strength * (1 - 0.5 * (dy / reach) ** 2);
+    // Steps of about half a cell along the arc.
+    const step = Math.min(cellW, lineH) / 2;
+    const steps = Math.ceil((radius * spread * 2) / step) + 1;
+    for (let s = 0; s <= steps; s++) {
+        const off = spread * ((2 * s) / steps - 1);
+        const a = angle + off;
+        const px = cx + radius * Math.cos(a);
+        const py = cy + radius * Math.sin(a);
+        // Where the front runs steeply, only the steps near the middle of a row draw, so it stays one
+        // character wide.
+        if (Math.abs(Math.cos(a)) > 0.5 && Math.abs(py - (Math.floor(py / lineH) + 0.5) * lineH) > step / 2) continue;
+        const x = Math.floor(px / cellW);
+        const y = Math.floor(py / lineH);
+        if (x < 0 || y < 0 || x >= cols || y >= rows) continue;
+        // The front runs across its direction of travel.
+        let code = slopeCode(a + Math.PI / 2);
+        if (code === 3) code = Math.cos(a) < 0 ? 5 : 6;
+        const v = strength * (1 - 0.5 * (off / spread) ** 2) * (0.7 + 0.3 * Math.sin(off * 11 + seed * 2.4));
         const i = y * cols + x;
-        if (s > lines[i]) {
-            lines[i] = s;
+        if (v > lines[i]) {
+            lines[i] = v;
             lineCode[i] = code;
         }
     }
@@ -369,7 +346,11 @@ export function wave(grid, cx, cy, radius, side, spread, strength) {
 
 /* ---------- Stars ---------- */
 
-const STAR_COUNT = 2400;
+// Star characters, faint to bright, then the speck for a small moon, indexed by grid.star.
+export const STAR_CHARS = ' .·+*°';
+const SPECK = 5;
+const STAR_COUNT = 16000;
+const STAR_DENSITY = 1.2e-4; // stars per square px, on every screen size
 const stars = (() => {
     const rand = mulberry32(42);
     const data = new Float32Array(STAR_COUNT * 5);
@@ -382,10 +363,12 @@ const stars = (() => {
     return data;
 })();
 
-// Faint stars, infinitely far away: only the camera's direction moves them.
+// Faint stars, infinitely far away: only the camera's direction moves them. Brighter stars get larger
+// characters. One square px shows 1 / focal² steradians of sky, so this many stars over the whole sky keep
+// the same density on every screen.
 export function drawStars(grid, cam, t, gain) {
-    const { cols, rows, cellW, lineH, lum } = grid;
-    const used = Math.min(STAR_COUNT, Math.round(cols * rows * 0.25));
+    const { cols, rows, cellW, lineH, star, starAlpha } = grid;
+    const used = Math.min(STAR_COUNT, Math.round(STAR_DENSITY * 4 * Math.PI * cam.focal * cam.focal));
     for (let p = 0; p < used; p++) {
         const o = p * 5;
         const zc = stars[o] * cam.fx + stars[o + 1] * cam.fy + stars[o + 2] * cam.fz;
@@ -396,9 +379,32 @@ export function drawStars(grid, cam, t, gain) {
             (cam.cy - (stars[o] * cam.ux + stars[o + 1] * cam.uy + stars[o + 2] * cam.uz) * inv) / lineH,
         );
         if (x < 0 || y < 0 || x >= cols || y >= rows) continue;
-        const b = stars[o + 3] * (0.8 + 0.2 * Math.sin(t * 0.9 + stars[o + 4])) * gain;
+        const bright = stars[o + 3];
+        const alpha = (0.2 + 0.8 * bright ** 0.8) * (0.8 + 0.2 * Math.sin(t * 0.9 + stars[o + 4])) * gain;
         const i = y * cols + x;
-        if (b > lum[i]) lum[i] = b;
+        if (alpha > starAlpha[i]) {
+            starAlpha[i] = alpha;
+            star[i] = bright < 0.2 ? 1 : bright < 0.3 ? 2 : bright < 0.42 ? 3 : 4;
+        }
+    }
+}
+
+// Small moons, too small to cast: points [x, y, z, ...], each one ° character. They show behind any solid
+// object, or in front of everything when front is true.
+export function drawSpecks(grid, cam, points, count, alpha, front = false) {
+    const { cols, rows, cellW, lineH, star, starAlpha } = grid;
+    const at = {};
+    for (let p = 0; p < count; p++) {
+        if (!project(cam, points[p * 3], points[p * 3 + 1], points[p * 3 + 2], at)) continue;
+        const x = Math.floor(at.x / cellW);
+        const y = Math.floor(at.y / lineH);
+        if (x < 0 || y < 0 || x >= cols || y >= rows) continue;
+        const i = y * cols + x;
+        if (front || alpha > starAlpha[i]) {
+            starAlpha[i] = alpha;
+            star[i] = SPECK;
+            if (front) grid.front[i] = 1;
+        }
     }
 }
 
@@ -408,7 +414,7 @@ export function drawStars(grid, cam, t, gain) {
 // out.id (0 when the ray misses), out.shade (lighting, 0 to 1), out.depth (distance to the hit) and
 // out.glow (light outside the object). rounded(id) says whether an object's outline uses ( and ).
 export function castRegion(grid, cam, box, sample, gain, rounded) {
-    const { cols, rows, cellW, lineH, cover, shade, opacity, depth, ident, round, lum } = grid;
+    const { cols, rows, cellW, lineH, cover, shade, opacity, depth, ident, round, lum, depthScale, idBase } = grid;
     const x0 = Math.max(0, Math.floor(box.x0 / cellW));
     const x1 = Math.min(cols - 1, Math.ceil(box.x1 / cellW));
     const y0 = Math.max(0, Math.floor(box.y0 / lineH));
@@ -458,11 +464,14 @@ export function castRegion(grid, cam, box, sample, gain, rounded) {
                 sumLit += lit[s];
                 sumDepth += far[s];
             }
+            // A nearer object drawn earlier keeps the cell.
+            const near = (sumDepth / bestCount) * depthScale;
+            if (cover[i] >= 0.5 && depth[i] < near) continue;
             cover[i] = hits / 4;
             shade[i] = sumLit / bestCount;
-            depth[i] = sumDepth / bestCount;
+            depth[i] = near;
             opacity[i] = gain;
-            ident[i] = best;
+            ident[i] = idBase + best;
             round[i] = rounded(best) ? 1 : 0;
         }
     }
@@ -483,11 +492,24 @@ const OUTWARD = [
     [-1, 1],
 ];
 
+// The 8 cells around a cell, the 4 straight ones first.
+const NEIGHBORS = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [-1, 1],
+    [1, -1],
+    [-1, -1],
+];
+
 export function traceOutlines(grid) {
     const { cols, rows, cellW, lineH, cover, depth, ident, round, edge, octant } = grid;
-    // 1 where a cell holds the same object, or an object in front of it.
+    // 1 where a cell holds the same object, or an object in front of it. Past the screen edge the object
+    // goes on, so it gets no outline there.
     const same = (x, y, id, near) => {
-        if (x < 0 || y < 0 || x >= cols || y >= rows) return 0;
+        if (x < 0 || y < 0 || x >= cols || y >= rows) return 1;
         const j = y * cols + x;
         return cover[j] >= 0.5 && (ident[j] === id || depth[j] < near) ? 1 : 0;
     };
@@ -524,6 +546,22 @@ export function traceOutlines(grid) {
             octant[i] = ((Math.round(a / (Math.PI / 4)) % 8) + 8) % 8;
         }
     }
+    // The cells past the screen edge are unknown, so an outline cell on the edge takes the direction of the
+    // outline next to it, inside the screen. The outline then runs on past the edge with the same character.
+    const inside = (x, y) => x > 0 && y > 0 && x < cols - 1 && y < rows - 1;
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            const i = y * cols + x;
+            if (octant[i] < 0 || inside(x, y)) continue;
+            for (const [dx, dy] of NEIGHBORS) {
+                const j = (y + dy) * cols + x + dx;
+                if (inside(x + dx, y + dy) && octant[j] >= 0 && ident[j] === ident[i]) {
+                    octant[i] = octant[j];
+                    break;
+                }
+            }
+        }
+    }
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
             const i = y * cols + x;
@@ -547,37 +585,4 @@ export function traceOutlines(grid) {
             edge[i] = [side, EDGE.slash, EDGE.top, EDGE.backslash, side, EDGE.slash, EDGE.bottom, EDGE.backslash][o];
         }
     }
-}
-
-/* ---------- Free space ---------- */
-
-// For every cell, the half width (in cells) of the largest box centered on it that holds no occupied cell,
-// for boxes aspect times taller than wide (in cells). Found per row first, then per column.
-export function freeDistance(occupied, w, h, aspect, out) {
-    const rise = 1 / aspect;
-    const across = new Float32Array(w * h); // distance to the nearest occupied cell in the same row
-    for (let y = 0; y < h; y++) {
-        let last = -Infinity;
-        for (let x = 0; x < w; x++) {
-            if (occupied[y * w + x]) last = x;
-            across[y * w + x] = x - last;
-        }
-        last = Infinity;
-        for (let x = w - 1; x >= 0; x--) {
-            if (occupied[y * w + x]) last = x;
-            across[y * w + x] = Math.min(across[y * w + x], last - x);
-        }
-    }
-    for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-            // A row k rows away limits the box once the box is tall enough to reach it.
-            let best = across[y * w + x];
-            for (let k = 1; k < h && k * rise < best; k++) {
-                if (y - k >= 0) best = Math.min(best, Math.max(across[(y - k) * w + x], k * rise));
-                if (y + k < h) best = Math.min(best, Math.max(across[(y + k) * w + x], k * rise));
-            }
-            out[y * w + x] = best;
-        }
-    }
-    return out;
 }

@@ -3,14 +3,14 @@ import { nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } f
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { createAsciiField } from '@/ascii/field.js';
-import { createSaturn } from '@/ascii/scenes/saturn.js';
-import { createEarth } from '@/ascii/scenes/earth.js';
-import { createRocket } from '@/ascii/scenes/rocket.js';
-import { createSatellite } from '@/ascii/scenes/satellite.js';
+import { createWorld } from '@/ascii/world.js';
 
-// Panels and controls that clear their whole rounded box while they show a background, border, or blur.
+// Panels and controls that clear their whole rounded box while they show a background or border.
 const SURFACES =
     'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message';
+
+// Which object each page shows, in the box its .art-slot element marks.
+const PAGE_OBJECTS = { home: 'earth', projects: 'jupiter', resume: 'rocket', contact: 'satellite' };
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
@@ -19,19 +19,19 @@ const canvas = useTemplateRef('canvas');
 const isReady = shallowRef(false);
 let field;
 
-// The old page's object leaves as soon as the page starts to leave.
+// The camera starts toward the next page's object as soon as the page starts to leave.
 watch(
     () => routeStore.isLeaving && routeStore.toPath,
     (page) => {
-        if (page) field?.setScene(page);
+        if (page) field?.setScene(PAGE_OBJECTS[page]);
     },
 );
 
-// Once the new page is on screen, its object finds a place beside the content.
+// Once the new page is on screen, its object settles into the page's slot.
 watch(
     () => routeStore.activePath,
     () => {
-        field?.setScene(routeStore.currentRoute.base);
+        field?.setScene(PAGE_OBJECTS[routeStore.currentRoute.base]);
         field?.relayout();
     },
     { flush: 'post' },
@@ -49,9 +49,10 @@ onMounted(() => {
     field = createAsciiField(canvas.value, {
         root: document.getElementById('app'),
         surfaces: SURFACES,
-        scenes: { home: createSaturn(), projects: createEarth(), resume: createRocket(), contact: createSatellite() },
+        slot: '.art-slot',
+        world: createWorld(),
     });
-    field.setScene(routeStore.currentRoute.base);
+    field.setScene(PAGE_OBJECTS[routeStore.currentRoute.base]);
     field.relayout();
     isReady.value = true;
 });

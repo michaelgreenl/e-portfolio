@@ -1,22 +1,21 @@
-// The ASCII art behind the pages: one large object per page, placed in the open space beside the content,
-// with faint stars that shift as the pointer moves. While the page changes, the old object rushes past the
-// camera, the new one flies in from far away, and the x, y and z planes of each scene swing into view.
+// The ASCII art behind the pages. Each page shows one object from a small shared world (see world.js), framed
+// in the box its slot element marks. When the page changes, the camera flies from the old object to the new
+// one: straight in or out when the two are close, and out, across and back in when they are far apart. Faint
+// stars shift as the pointer moves, a finger taps, or the page scrolls.
 
 import {
     EDGE_CHARS,
     LAST,
     LINE_CHARS,
     RAMP,
+    STAR_CHARS,
     aim,
     clamp01,
     createCamera,
     createGrid,
-    drawPlanes,
     drawStars,
-    easeIn,
-    easeOut,
-    freeDistance,
     normalize,
+    project,
     smoothstep,
     toneDensity,
     traceOutlines,
@@ -27,24 +26,31 @@ const LINE_HEIGHT = 16;
 const FRAME_MS = 1000 / 30;
 const LAYER_ALPHAS = [0.16, 0.3, 0.48, 0.7, 0.95];
 const FOV = 30;
+const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 
-// Page changes, in seconds.
-const INTRO_SECONDS = 1.8;
-const ARRIVE_SECONDS = 1.1;
-const LEAVE_SECONDS = 0.7;
-// The new object waits this long for the new page before it finds a place anyway.
-const ARRIVE_TIMEOUT = 0.8;
-// After a page change or resize, the object follows the layout for this long, then holds still.
-const PLACE_SECONDS = 1.5;
-const PLACE_EASE = 0.2;
-const SHOW_EASE = 0.08;
-// Open space kept between page content and the object, and between the screen edge and the object, in px.
-const KEEP_OUT = 36;
-const EDGE_MARGIN = 24;
+// The first object flies in from this many times its resting distance.
+const INTRO = { seconds: 1.8, distance: 6 };
+// A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
+const TRAVEL = { base: 1.2, perStep: 0.22, min: 1.2, max: 2.6 };
+// On a trip the camera's target may sweep this many radians across the view. When the objects are farther
+// apart, the camera backs off in the middle of the trip until the sweep fits.
+const MAX_SWEEP = 1.25;
+const PATH_SAMPLES = 48;
+// Objects that are neither leaving nor arriving show this much in the middle of a page change.
+const PASSING_GAIN = 0.8;
+// During a page change, objects too small on screen to make out do not show. The arriving and leaving objects
+// show from the first radius, in px, and fully from the second; other objects need PASSING_RADIUS. So the
+// small rocket and satellite show only on trips to or from their own pages, once the camera is near them.
+const SEEN_RADIUS = [16, 48];
+const PASSING_RADIUS = [48, 96];
+// Until the new page is on screen, its object aims for this part of the screen.
+const GUESS_SLOT = { left: 0.55, top: 0.15, width: 0.4, height: 0.6 };
+const SHOW_EASE = 0.15;
 
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
 // shape and smaller text by line box. Elements matching the surfaces selector clear their whole rounded box
-// while they show a background, border, or backdrop blur. The blurred mask fades characters near content.
+// while they show a background or border. Elements with a backdrop blur clear nothing: the art shows through
+// them, blurred. The blurred mask fades characters near content.
 const GLYPH_MIN_FONT_SIZE = 24;
 const MASK_SCALE = 6;
 const MASK_INTERVAL = 150;
@@ -65,8 +71,18 @@ const SIDES = ['Top', 'Right', 'Bottom', 'Left'];
 const hasSurface = (style) =>
     isVisibleColor(style.backgroundColor) ||
     style.backgroundImage !== 'none' ||
-    style.backdropFilter !== 'none' ||
     SIDES.some((side) => parseFloat(style[`border${side}Width`]) > 0 && isVisibleColor(style[`border${side}Color`]));
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+// Turns a vector about the vertical axis.
+function turnY(v, turn) {
+    const c = Math.cos(turn);
+    const s = Math.sin(turn);
+    return [c * v[0] + s * v[2], v[1], -s * v[0] + c * v[2]];
+}
 
 function boxBlur(src, dst, w, h, r) {
     const size = r * 2 + 1;
@@ -86,27 +102,32 @@ function boxBlur(src, dst, w, h, r) {
  * @param {object} options
  * @param {HTMLElement} options.root Element whose content the art keeps clear of.
  * @param {string} options.surfaces Selector for panels and controls that clear their whole box.
- * @param {Record<string, object>} options.scenes Scene for each page name, see scenes/earth.js.
+ * @param {string} options.slot Selector for the element that marks where the page's object goes.
+ * @param {Record<string, object>} options.world Objects by name, see world.js.
  */
-export function createAsciiField(canvas, { root, surfaces, scenes }) {
+export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
     const grid = createGrid();
-    const leaveCam = createCamera();
-    const arriveCam = createCamera();
+    const cam = createCamera();
+    const local = createCamera();
+    const probe = createCamera();
     const range = document.createRange();
     const maskCanvas = document.createElement('canvas');
     const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
     const listeners = new AbortController();
-    const pointer = { x: 0, y: 0, sx: 0, sy: 0, inside: 0 };
+    const pointer = { x: 0, y: 0, sx: 0, sy: 0, inside: 0, until: 0 };
     const startTime = performance.now();
-    // Where each page's object sits: screen center (px), size (px per scene unit) and how visible it is.
-    const places = Object.fromEntries(
-        Object.keys(scenes).map((name) => [
-            name,
-            { x: 0, y: 0, scale: 1, show: 0, target: { x: 0, y: 0, scale: 1, show: 0 } },
-        ]),
-    );
+    const names = Object.keys(world);
+    // Parts of different objects get different ids, so their outlines meet cleanly.
+    const idBase = Object.fromEntries(names.map((name, k) => [name, k * 8]));
+    const show = Object.fromEntries(names.map((name) => [name, 0]));
+    // Each object's scene time is zero when the camera arrives at it from out of sight, so it arrives
+    // showing what its scene sets up for time zero, such as the Earth's land and Jupiter's moons.
+    const epoch = Object.fromEntries(names.map((name) => [name, 0]));
+    const drawn = Object.fromEntries(names.map((name) => [name, 0])); // gain in the last frame
+    // Where the camera last rested for each object; a first guess at its framing on the next visit.
+    const lastFraming = {};
 
     let ink = '';
     let viewW = 1;
@@ -115,25 +136,21 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     let maskB = new Float32Array(0);
     let targetVisibility = new Float32Array(0);
     let visibility = new Float32Array(0);
-    let occupied = new Uint8Array(0);
-    let free = new Float32Array(0);
     let rowLayers = [];
 
-    let page = null;
-    let leaving = null; // { name, start, gain }
-    let pageStart = 0;
-    let arriveStart = -1;
-    let arriveSeconds = INTRO_SECONDS;
-    let hasArrived = false;
-    let placeUntil = 0;
-    let snapPlace = true;
+    let page = null; // name of the object the current page shows
+    let current = null; // where the camera is now: { target, view, distance, shift }
+    let travel = null; // the page change in progress: { from, to, start, duration, a }
+    let oldSlot = null; // the leaving page's slot, which the new page's object must not use
+    let slotReady = true; // false while the new page is not on screen yet
 
     let clock = 0;
     let frameId = 0;
     let lastFrame = 0;
     let lastMask = 0;
     let lastScrollY = window.scrollY;
-    let speed = 0; // how fast the page scrolls, in px per second
+    let velocity = 0; // how fast the page scrolls, in px per second, down positive
+    let tilt = 0;
 
     /* ---------- Size and colors ---------- */
 
@@ -156,11 +173,8 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
         maskB = new Float32Array(maskA.length);
         targetVisibility = new Float32Array(n);
         visibility = new Float32Array(n);
-        occupied = new Uint8Array(n);
-        free = new Float32Array(n);
         rowLayers = LAYER_ALPHAS.map(() => new Array(grid.cols));
 
-        relayout();
         rebuildMask(true);
         if (reducedMotion) redraw();
     }
@@ -171,7 +185,7 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
         if (reducedMotion) redraw();
     }
 
-    /* ---------- Content mask and open space ---------- */
+    /* ---------- Content mask ---------- */
 
     function drawBox(rect, radius) {
         if (!rect.width && !rect.height) return;
@@ -186,18 +200,6 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
             r,
         );
         maskCtx.fill();
-    }
-
-    // Marks the cells near a box as taken, so objects are placed away from it.
-    function occupy(rect) {
-        if (!rect.width && !rect.height) return;
-        const { cols, rows, cellW } = grid;
-        const x0 = Math.max(0, Math.floor((rect.left - KEEP_OUT) / cellW));
-        const x1 = Math.min(cols - 1, Math.floor((rect.right + KEEP_OUT) / cellW));
-        const y0 = Math.max(0, Math.floor((rect.top - KEEP_OUT) / LINE_HEIGHT));
-        const y1 = Math.min(rows - 1, Math.floor((rect.bottom + KEEP_OUT) / LINE_HEIGHT));
-        if (x0 > x1) return;
-        for (let y = y0; y <= y1; y++) occupied.fill(1, y * cols + x0, y * cols + x1 + 1);
     }
 
     // Draws each character at its rendered position; the round stroke adds even padding around the glyph.
@@ -234,7 +236,6 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
         maskCtx.lineWidth = CLEAR_PADDING * 2;
         maskCtx.lineJoin = 'round';
         maskCtx.textBaseline = 'alphabetic';
-        occupied.fill(0);
 
         // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
         const styles = new Map();
@@ -250,42 +251,46 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
             return opacities.get(el);
         };
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
-        const surfaceSet = new Set([...root.querySelectorAll(surfaces)].filter((el) => hasSurface(styleOf(el))));
+        const shields = new Set();
+        const frosted = new Set();
+        for (const el of root.querySelectorAll(surfaces)) {
+            const style = styleOf(el);
+            if (style.backdropFilter !== 'none') frosted.add(el);
+            else if (hasSurface(style)) shields.add(el);
+        }
         const isCovered = (el) => {
             if (!el || el === root) return false;
-            if (!covered.has(el)) covered.set(el, surfaceSet.has(el.parentElement) || isCovered(el.parentElement));
+            if (!covered.has(el)) {
+                const parent = el.parentElement;
+                covered.set(el, shields.has(parent) || frosted.has(parent) || isCovered(parent));
+            }
             return covered.get(el);
         };
 
-        // Content still fading in counts as taken, so objects are placed for the page as it will look.
-        for (const surface of surfaceSet) {
+        for (const surface of shields) {
             if (isCovered(surface)) continue;
-            const rect = surface.getBoundingClientRect();
-            occupy(rect);
             maskCtx.globalAlpha = alphaOf(surface);
-            drawBox(rect, parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
+            drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
         }
         for (const el of root.querySelectorAll('svg, hr, img, video')) {
-            if (surfaceSet.has(el) || isCovered(el)) continue;
-            const rect = el.getBoundingClientRect();
-            occupy(rect);
+            if (shields.has(el) || frosted.has(el) || isCovered(el)) continue;
             maskCtx.globalAlpha = alphaOf(el);
-            drawBox(rect, 4);
+            drawBox(el.getBoundingClientRect(), 4);
         }
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
             const el = node.parentElement;
-            if (!el || !node.data.trim() || surfaceSet.has(el) || isCovered(el)) continue;
-            range.selectNodeContents(node);
-            const lines = range.getClientRects();
-            for (const rect of lines) occupy(rect);
-
+            if (!el || !node.data.trim() || shields.has(el) || frosted.has(el) || isCovered(el)) continue;
             const alpha = alphaOf(el);
             if (alpha < 0.02) continue;
             maskCtx.globalAlpha = alpha;
             const style = styleOf(el);
-            if (parseFloat(style.fontSize) >= GLYPH_MIN_FONT_SIZE) drawGlyphs(node, style);
-            else for (const rect of lines) drawBox(rect, rect.height / 2);
+            if (parseFloat(style.fontSize) >= GLYPH_MIN_FONT_SIZE) {
+                drawGlyphs(node, style);
+            } else {
+                range.selectNodeContents(node);
+                for (const rect of range.getClientRects()) drawBox(rect, rect.height / 2);
+            }
         }
         maskCtx.globalAlpha = 1;
 
@@ -310,126 +315,240 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
         if (snap) visibility.set(targetVisibility);
     }
 
-    /* ---------- Placement ---------- */
+    /* ---------- Framing ---------- */
 
-    // Finds the largest open spot for the page's object, leaning toward where the scene prefers to sit.
-    function place() {
-        const scene = scenes[page];
-        if (!scene) return;
-        const { cols, rows, cellW } = grid;
-        const [halfW, halfH] = scene.extent;
-
-        // A band along the screen edge counts as taken too, so objects stay whole.
-        const bandX = Math.ceil(EDGE_MARGIN / cellW);
-        const bandY = Math.ceil(EDGE_MARGIN / LINE_HEIGHT);
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                if (x < bandX || y < bandY || x >= cols - bandX || y >= rows - bandY) occupied[y * cols + x] = 1;
-            }
+    // The first slot element that shows on screen, with its box.
+    function findSlot() {
+        for (const el of root.querySelectorAll(slot)) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) return { el, rect };
         }
-        freeDistance(occupied, cols, rows, ((halfH / halfW) * cellW) / LINE_HEIGHT, free);
-
-        const maxScale = Math.min((scene.fit.max[0] * viewW) / halfW, (scene.fit.max[1] * viewH) / halfH);
-        const cap = (maxScale * halfW) / cellW;
-        let best = 0;
-        let bestIndex = -1;
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                const i = y * cols + x;
-                // Room up to the largest size counts fully; beyond it, extra room only centers the object.
-                const score =
-                    (Math.min(free[i], cap) + 0.3 * free[i]) * scene.prefer((x + 0.5) / cols, (y + 0.5) / rows);
-                if (score > best) {
-                    best = score;
-                    bestIndex = i;
-                }
-            }
-        }
-
-        const target = places[page].target;
-        if (bestIndex < 0) {
-            target.show = 0;
-        } else {
-            target.x = ((bestIndex % cols) + 0.5) * cellW;
-            target.y = (Math.floor(bestIndex / cols) + 0.5) * LINE_HEIGHT;
-            target.scale = Math.min((free[bestIndex] * cellW) / halfW, maxScale);
-            // Without room for a readable size, the object stays hidden.
-            target.show = target.scale * halfH >= scene.fit.min ? 1 : 0;
-        }
-        if (snapPlace) {
-            Object.assign(places[page], target, { show: reducedMotion ? target.show : places[page].show });
-            snapPlace = false;
-        }
-        if (arriveStart < 0) {
-            arriveStart = clock;
-            arriveSeconds = hasArrived ? ARRIVE_SECONDS : INTRO_SECONDS;
-            hasArrived = true;
-        }
+        return null;
     }
 
-    function easePlace(p) {
-        const ease = reducedMotion ? 1 : PLACE_EASE;
-        p.x += (p.target.x - p.x) * ease;
-        p.y += (p.target.y - p.y) * ease;
-        p.scale += (p.target.scale - p.scale) * ease;
-        p.show += (p.target.show - p.show) * (reducedMotion ? 1 : SHOW_EASE);
+    // The current page's slot box on screen, or null while the new page is not on screen or has no slot.
+    function slotRect() {
+        const found = findSlot();
+        return found && (slotReady || found.el !== oldSlot) ? found.rect : null;
+    }
+
+    // Where an object's scene origin is in the world now. A rocket lifts off or lands on its way to or from
+    // its launch object, keeping pace with the camera.
+    function positionOf(name) {
+        const { position, launch } = world[name];
+        if (!launch || !travel) return position;
+        const along =
+            travel.to === name && travel.from === launch.from
+                ? travel.across
+                : travel.from === name && travel.to === launch.from
+                  ? 1 - travel.across
+                  : 1;
+        return lerp3(launch.pad, position, along);
+    }
+
+    function burnOf(name) {
+        const { launch } = world[name];
+        if (!launch || !travel) return 0;
+        const pair = [travel.from, travel.to];
+        return pair.includes(name) && pair.includes(launch.from) ? 1 : 0;
+    }
+
+    // Camera framing that fits an object into a box on screen, by its extent. Perspective makes the near parts
+    // of a large object look bigger than that, so two passes then fit its outline, if it has one, as the
+    // camera sees it.
+    function framingIn(name, box) {
+        const { scene, scale, turn, position } = world[name];
+        const [halfW, halfH] = scene.extent;
+        const pxPerUnit = Math.min(box.width / (2 * halfW * scale), box.height / (2 * halfH * scale));
+        const offset = turnY(scene.center, turn);
+        const framing = {
+            target: [0, 1, 2].map((k) => position[k] + offset[k] * scale),
+            view: turnY(normalize(scene.view), turn),
+            distance: viewH / 2 / TAN_HALF_FOV / pxPerUnit,
+            shift: [(box.left + box.width / 2) / viewW - 0.5, (box.top + box.height / 2) / viewH - 0.5],
+        };
+        for (let pass = 0; scene.outline && pass < 2; pass++) fitOutline(framing, world[name], box);
+        return framing;
+    }
+
+    // Moves and scales a framing so the object's outline, as the camera sees it, fills the box.
+    function fitOutline(framing, { scene, scale, turn, position }, box) {
+        const { target, view, distance, shift } = framing;
+        const eye = [0, 1, 2].map((k) => target[k] + view[k] * distance);
+        aim(probe, grid, eye, target, FOV, shift);
+        const at = {};
+        const xs = [];
+        const ys = [];
+        for (const point of scene.outline) {
+            const [x, y, z] = turnY(point, turn).map((v, k) => position[k] + v * scale);
+            if (project(probe, x, y, z, at)) {
+                xs.push(at.x);
+                ys.push(at.y);
+            }
+        }
+        const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+        if (!(x1 > x0 && y1 > y0)) return;
+        framing.distance *= Math.max((x1 - x0) / box.width, (y1 - y0) / box.height);
+        framing.shift = [
+            shift[0] + (box.left + box.width / 2 - (x0 + x1) / 2) / viewW,
+            shift[1] + (box.top + box.height / 2 - (y0 + y1) / 2) / viewH,
+        ];
+    }
+
+    // Where the camera wants to be for an object: its page's slot, or a guess until the page is on screen.
+    function restingFraming(name) {
+        const box = slotRect();
+        if (box) return (lastFraming[name] = framingIn(name, box));
+        if (lastFraming[name]) return lastFraming[name];
+        return framingIn(name, {
+            left: GUESS_SLOT.left * viewW,
+            top: GUESS_SLOT.top * viewH,
+            width: GUESS_SLOT.width * viewW,
+            height: GUESS_SLOT.height * viewH,
+        });
+    }
+
+    // The camera's distance at eased progress e from framing a to framing b: even steps in log scale, plus a
+    // hump that backs the camera off in the middle of the trip.
+    const distanceAt = (a, b, hump, e) =>
+        Math.exp(lerp(Math.log(a.distance), Math.log(b.distance), e) + hump * Math.sin(Math.PI * e));
+
+    // The camera's distance summed over the trip up to e (and over the whole trip). The target moves in step
+    // with this sum: fast while the camera is far and slow while it is close. So it sweeps the same angle of
+    // view on every part of the trip, and a small object next to a large one stays in view.
+    function pathLength(a, b, hump, e = 1) {
+        let sum = 0;
+        let total = 0;
+        let prev = distanceAt(a, b, hump, 0);
+        for (let s = 1; s <= PATH_SAMPLES; s++) {
+            const d = distanceAt(a, b, hump, s / PATH_SAMPLES);
+            const step = (prev + d) / 2 / PATH_SAMPLES;
+            sum += step * clamp01(e * PATH_SAMPLES - (s - 1));
+            total += step;
+            prev = d;
+        }
+        return { sum, total };
+    }
+
+    // The smallest hump that keeps the target's sweep, its travel over the summed distance, within MAX_SWEEP.
+    function humpFor(a, b) {
+        const gap = Math.hypot(b.target[0] - a.target[0], b.target[1] - a.target[1], b.target[2] - a.target[2]);
+        const sweep = (hump) => gap / pathLength(a, b, hump).total;
+        if (sweep(0) <= MAX_SWEEP) return 0;
+        let low = 0;
+        let high = 12;
+        for (let i = 0; i < 20; i++) {
+            const mid = (low + high) / 2;
+            if (sweep(mid) > MAX_SWEEP) low = mid;
+            else high = mid;
+        }
+        return high;
+    }
+
+    function progress() {
+        return travel ? clamp01((clock - travel.start) / travel.duration) : 1;
+    }
+
+    function updateCamera() {
+        const rest = restingFraming(page);
+        if (!travel) {
+            current = rest;
+            return;
+        }
+        // The first page flies in from far away along its own line of sight.
+        const a = (travel.a ??= { ...rest, distance: rest.distance * INTRO.distance });
+        const k = progress();
+        const e = easeInOut(k);
+        const hump = humpFor(a, rest);
+        const { sum, total } = pathLength(a, rest, hump, e);
+        travel.across = sum / total;
+        current = {
+            target: lerp3(a.target, rest.target, travel.across),
+            view: normalize(lerp3(a.view, rest.view, travel.across)),
+            distance: distanceAt(a, rest, hump, e),
+            shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
+        };
+        if (k >= 1) travel = null;
     }
 
     /* ---------- Scenes ---------- */
 
-    // Places a scene's camera so its object sits at p, then draws the scene. leave runs from 0 to 1 while
-    // the scene rushes past; arrive runs from 0 to 1 while it flies in.
-    function drawScene(name, p, cam, t, { leave = 0, arrive = 1, gain, swing, boost }) {
-        const scene = scenes[name];
-        const focal = viewH / 2 / Math.tan((FOV * Math.PI) / 360);
-        const distance = (focal / p.scale) * (1 + 3.2 * (1 - arrive) ** 2 - 0.85 * leave);
-        const view = normalize(scene.view);
-        const target = scene.center;
-        const pos = [0, 1, 2].map((k) => target[k] + view[k] * distance);
-        const fov = FOV + leave * 22;
-        const shift = [p.x / viewW - 0.5, p.y / viewH - 0.5];
-        aim(cam, grid, pos, target, fov, shift);
-        if (!reducedMotion) {
-            // The pointer turns the camera a little, for depth.
-            const ox = pointer.sx * distance * 0.06;
-            const oy = -pointer.sy * distance * 0.04;
-            pos[0] += cam.rx * ox + cam.ux * oy;
-            pos[1] += cam.uy * oy;
-            pos[2] += cam.rz * ox + cam.uz * oy;
-            aim(cam, grid, pos, target, fov, shift);
-        }
-        drawStars(grid, cam, t, gain);
-        drawPlanes(grid, cam, scene.planeSize, gain, swing, boost);
-        scene.render(grid, cam, { t, gain, speed, facing: p.x > viewW / 2 ? -1 : 1 });
+    // An object's radius on screen, in px.
+    function screenRadius(name) {
+        const { scene, scale } = world[name];
+        const [x, y, z] = positionOf(name);
+        return (Math.max(...scene.extent) * scale * cam.focal) / Math.hypot(cam.px - x, cam.py - y, cam.pz - z);
+    }
+
+    // How strongly each object draws. On a trip between nearby objects, as from the Earth to the rocket, both
+    // show for nearly all of it. On a long trip the arriving object fades in, the leaving one fades out near
+    // the end, and others show only in the middle of the trip. Objects too small on screen do not show.
+    function gainOf(name) {
+        if (!travel) return name === page ? show[name] : 0;
+        const k = progress();
+        const { near } = travel;
+        const r = screenRadius(name);
+        const seen = smoothstep(SEEN_RADIUS[0], SEEN_RADIUS[1], r);
+        if (name === travel.to) return seen * show[name] * smoothstep(0, near ? 0.12 : travel.from ? 0.45 : 0.6, k);
+        if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(near ? 0.85 : 0.55, 1, k));
+        const passing = PASSING_GAIN * smoothstep(0.1, 0.35, k) * (1 - smoothstep(0.65, 0.9, k));
+        return passing * smoothstep(PASSING_RADIUS[0], PASSING_RADIUS[1], r);
+    }
+
+    // The world camera, expressed in an object's own scene units.
+    function toLocal(name, position) {
+        const { scale, turn } = world[name];
+        const c = Math.cos(turn);
+        const s = Math.sin(turn);
+        const dx = cam.px - position[0];
+        const dy = cam.py - position[1];
+        const dz = cam.pz - position[2];
+        Object.assign(local, {
+            px: (c * dx - s * dz) / scale,
+            py: dy / scale,
+            pz: (s * dx + c * dz) / scale,
+            fx: c * cam.fx - s * cam.fz,
+            fy: cam.fy,
+            fz: s * cam.fx + c * cam.fz,
+            rx: c * cam.rx - s * cam.rz,
+            rz: s * cam.rx + c * cam.rz,
+            ux: c * cam.ux - s * cam.uz,
+            uy: cam.uy,
+            uz: s * cam.ux + c * cam.uz,
+            focal: cam.focal,
+            cx: cam.cx,
+            cy: cam.cy,
+        });
+    }
+
+    function placeCamera(f) {
+        const pos = [0, 1, 2].map((k) => f.target[k] + f.view[k] * f.distance);
+        aim(cam, grid, pos, f.target, FOV, f.shift);
+        if (reducedMotion) return;
+        // The pointer, a tap, or scrolling turns the camera a little, for depth.
+        const ox = pointer.sx * f.distance * 0.06;
+        const oy = (-pointer.sy * 0.04 - tilt * 0.04) * f.distance;
+        pos[0] += cam.rx * ox + cam.ux * oy;
+        pos[1] += cam.uy * oy;
+        pos[2] += cam.rz * ox + cam.uz * oy;
+        aim(cam, grid, pos, f.target, FOV, f.shift);
     }
 
     function renderFrame(t) {
         grid.clear();
-        if (leaving) {
-            const k = (clock - leaving.start) / LEAVE_SECONDS;
-            if (k >= 1) {
-                leaving = null;
-            } else {
-                const leave = easeIn(k);
-                drawScene(leaving.name, places[leaving.name], leaveCam, t, {
-                    leave,
-                    gain: leaving.gain * (1 - k) ** 1.6,
-                    swing: leave * 1.4,
-                    boost: Math.sin(Math.PI * Math.min(1, k * 2)),
-                });
-            }
-        }
-        if (page && arriveStart >= 0) {
-            const p = places[page];
-            easePlace(p);
-            const k = reducedMotion ? 1 : clamp01((clock - arriveStart) / arriveSeconds);
-            const arrive = easeOut(k);
-            drawScene(page, p, arriveCam, t, {
-                arrive,
-                gain: smoothstep(0, 1, k) * p.show,
-                swing: (1 - arrive) * -1.2,
-                boost: k < 1 ? Math.sin(Math.PI * k) : 0,
-            });
+        if (!page) return;
+        updateCamera();
+        placeCamera(current);
+        drawStars(grid, cam, t, 1);
+        for (const name of names) {
+            const gain = gainOf(name);
+            drawn[name] = gain;
+            if (gain < 0.01) continue;
+            const { scene, scale } = world[name];
+            toLocal(name, positionOf(name));
+            grid.depthScale = scale;
+            grid.idBase = idBase[name];
+            scene.render(grid, local, { t: t - epoch[name], gain, speed: Math.abs(velocity), burn: burnOf(name) });
         }
         toneDensity(grid);
         traceOutlines(grid);
@@ -438,7 +557,7 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     /* ---------- Characters ---------- */
 
     function draw() {
-        const { cols, rows, lum, lines, lineCode, lineFamily, cover, shade, opacity, edge } = grid;
+        const { cols, rows, lum, lines, lineCode, star, starAlpha, front, cover, shade, opacity, edge } = grid;
         const ease = reducedMotion ? 1 : VISIBILITY_EASE;
 
         ctx.clearRect(0, 0, viewW, viewH);
@@ -453,7 +572,10 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
                 if (v <= 0.02) continue;
                 let char = ' ';
                 let alpha = 0;
-                if (edge[i]) {
+                if (front[i]) {
+                    char = STAR_CHARS[star[i]];
+                    alpha = starAlpha[i];
+                } else if (edge[i]) {
                     char = EDGE_CHARS[edge[i]];
                     alpha = (0.62 + 0.33 * shade[i]) * opacity[i];
                 } else if (cover[i] >= 0.5) {
@@ -469,8 +591,11 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
                         char = RAMP[step];
                         alpha = 0.2 + 0.8 * level ** 0.8;
                     } else if (lines[i] > 0.04) {
-                        char = (lineFamily[i] & 3) === 3 ? '+' : LINE_CHARS[lineCode[i]];
+                        char = LINE_CHARS[lineCode[i]];
                         alpha = lines[i] * 0.55;
+                    } else if (star[i]) {
+                        char = STAR_CHARS[star[i]];
+                        alpha = starAlpha[i];
                     }
                 }
                 const layer = char === ' ' ? -1 : layerFor(alpha * v);
@@ -491,16 +616,25 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
 
     function measureScroll(dt) {
         const y = window.scrollY;
-        const rate = dt > 0 ? Math.abs(y - lastScrollY) / dt : 0;
-        speed += (rate - speed) * (1 - Math.exp(-dt / 0.2));
+        const rate = dt > 0 ? (y - lastScrollY) / dt : 0;
+        const settle = 1 - Math.exp(-dt / 0.2);
+        velocity += (rate - velocity) * settle;
+        tilt += (Math.max(-1, Math.min(1, velocity / 3000)) - tilt) * settle;
         const moved = y !== lastScrollY;
         lastScrollY = y;
         return moved;
     }
 
+    function updateShow() {
+        // A page without a slot on screen hides its object.
+        const target = slotRect() ? 1 : slotReady ? 0 : show[page];
+        show[page] += (target - show[page]) * (reducedMotion ? 1 : SHOW_EASE);
+    }
+
     // With reduced motion the scene holds still and only redraws when content, size or colors change.
     function redraw() {
         if (!ink || !page) return;
+        updateShow();
         renderFrame(0);
         draw();
     }
@@ -518,15 +652,17 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
         if (maskDue) {
             lastMask = now;
             rebuildMask(scrolled);
-            if (page && (clock < placeUntil || (arriveStart < 0 && clock - pageStart > ARRIVE_TIMEOUT))) place();
         }
-        if (reducedMotion && !maskDue) return;
+        if (reducedMotion) {
+            if (maskDue) redraw();
+            return;
+        }
 
-        if (!reducedMotion) {
-            pointer.sx += ((pointer.x / viewW - 0.5) * pointer.inside - pointer.sx) * 0.05;
-            pointer.sy += ((pointer.y / viewH - 0.5) * pointer.inside - pointer.sy) * 0.05;
-        }
-        renderFrame(reducedMotion ? 0 : clock);
+        const inside = pointer.inside || clock < pointer.until ? 1 : 0;
+        pointer.sx += ((pointer.x / viewW - 0.5) * inside - pointer.sx) * 0.05;
+        pointer.sy += ((pointer.y / viewH - 0.5) * inside - pointer.sy) * 0.05;
+        if (page) updateShow();
+        renderFrame(clock);
         draw();
     }
 
@@ -542,25 +678,41 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
 
     /* ---------- Public ---------- */
 
-    // Starts the change to a page's scene. The old object leaves at once; the new one arrives after
-    // relayout(), once the new page is on screen.
+    // Starts the trip to a page's object. The camera leaves at once; it finds the new page's slot once
+    // relayout() says the new page is on screen.
     function setScene(name) {
-        if (name === page || !scenes[name]) return;
-        if (page && arriveStart >= 0 && !reducedMotion) {
-            const k = clamp01((clock - arriveStart) / arriveSeconds);
-            leaving = { name: page, start: clock, gain: smoothstep(0, 1, k) * places[page].show };
+        if (name === page || !world[name]) return;
+        oldSlot = findSlot()?.el;
+        slotReady = false;
+        if (reducedMotion) {
+            travel = null;
+        } else if (page && current) {
+            const rest = restingFraming(name);
+            const a = { ...current };
+            const hump = humpFor(a, rest);
+            const zoom = Math.abs(Math.log(rest.distance / a.distance)) + 2 * hump;
+            travel = {
+                from: page,
+                to: name,
+                start: clock,
+                a,
+                fromShow: show[page],
+                // The camera needs no hump between nearby objects, so both can show for the whole trip.
+                near: hump === 0,
+                duration: Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
+            };
+        } else {
+            travel = { from: null, to: name, start: clock, a: null, near: false, duration: INTRO.seconds };
         }
+        if (travel && drawn[name] < 0.01) epoch[name] = travel.start + travel.duration;
         page = name;
-        pageStart = clock;
-        arriveStart = -1;
-        snapPlace = true;
-        // The layout on screen still belongs to the old page.
-        placeUntil = 0;
+        // Assume the new page has a slot until it is on screen without one.
+        show[name] = 1;
     }
 
-    // The page's layout changed, so the object finds its place again.
+    // The new page is on screen, so its slot can be used.
     function relayout() {
-        placeUntil = clock + PLACE_SECONDS;
+        slotReady = true;
         lastMask = 0;
     }
 
@@ -578,17 +730,19 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     on(window, 'pointermove', (e) => {
         pointer.x = e.clientX;
         pointer.y = e.clientY;
-        pointer.inside = 1;
+        if (e.pointerType === 'mouse') pointer.inside = 1;
     });
-    // The camera eases back when the mouse leaves the window or a touch ends.
+    // A tap pulls the camera toward it for a moment.
+    on(window, 'pointerdown', (e) => {
+        if (e.pointerType === 'mouse') return;
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        pointer.until = clock + 0.8;
+    });
+    // The camera eases back when the mouse leaves the window.
     on(window, 'pointerout', (e) => {
         if (!e.relatedTarget) pointer.inside = 0;
     });
-    for (const type of ['pointerup', 'pointercancel']) {
-        on(window, type, (e) => {
-            if (e.pointerType !== 'mouse') pointer.inside = 0;
-        });
-    }
     on(document, 'visibilitychange', () => (document.hidden ? stop() : start()));
 
     refreshColors();

@@ -1,4 +1,4 @@
-// Projects: the Earth, turning slowly.
+// Home: the Earth, turning slowly.
 
 import { castRegion, eulerMatrix, multiply, normalize, screenCircle, smoothstep, transformBack } from '../render.js';
 import { sphere } from '../shapes.js';
@@ -52,21 +52,16 @@ export function createEarth() {
         extent: [RADIUS * HALO, RADIUS * HALO],
         center: [0, 0, 0],
         view: [0, 0, 1],
-        fit: { max: [0.3, 0.38], min: 70 },
-        prefer: (u, v) => 1 + 0.25 * u - 0.4 * v,
-        planeSize: RADIUS * 3,
         render(grid, cam, { t, gain }) {
             frame = multiply(TILT, eulerMatrix(0, START + (t * Math.PI * 2) / DAY_SECONDS, 0));
             const c = screenCircle(cam, 0, 0, 0, RADIUS * HALO);
-            if (!c) return;
-            castRegion(
-                grid,
-                cam,
-                { x0: c.x - c.r, y0: c.y - c.r, x1: c.x + c.r, y1: c.y + c.r },
-                sample,
-                gain,
-                () => true,
-            );
+            // Close to the Earth, as next to the rocket or the satellite, its disk has no circle on screen,
+            // so the whole screen is cast.
+            if (!c && Math.hypot(cam.px, cam.py, cam.pz) <= RADIUS * HALO) return;
+            const box = c
+                ? { x0: c.x - c.r, y0: c.y - c.r, x1: c.x + c.r, y1: c.y + c.r }
+                : { x0: 0, y0: 0, x1: grid.width, y1: grid.height };
+            castRegion(grid, cam, box, sample, gain, () => true);
         },
     };
 }
