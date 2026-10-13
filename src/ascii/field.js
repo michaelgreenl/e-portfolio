@@ -1,7 +1,6 @@
 // The ASCII art behind the pages: one large object per page, placed in the open space beside the content,
-// with faint stars, a lens under the pointer, and ripples where the page is clicked. While the page changes,
-// the old object rushes past the camera, the new one flies in from far away, and the x, y and z planes of
-// each scene swing into view.
+// with faint stars that shift as the pointer moves. While the page changes, the old object rushes past the
+// camera, the new one flies in from far away, and the x, y and z planes of each scene swing into view.
 
 import {
     EDGE_CHARS,
@@ -42,13 +41,6 @@ const SHOW_EASE = 0.08;
 // Open space kept between page content and the object, and between the screen edge and the object, in px.
 const KEEP_OUT = 36;
 const EDGE_MARGIN = 24;
-
-const LENS_RADIUS = 110;
-const RIPPLE_SPEED = 420;
-const RIPPLE_WIDTH = 18;
-const RIPPLE_LIFE = 1.4;
-const MAX_RIPPLES = 5;
-const INTERACTIVE = 'a, button, input, textarea, select, label, [role="button"]';
 
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
 // shape and smaller text by line box. Elements matching the surfaces selector clear their whole rounded box
@@ -106,8 +98,7 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     const maskCanvas = document.createElement('canvas');
     const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
     const listeners = new AbortController();
-    const pointer = { x: 0, y: 0, sx: 0, sy: 0, strength: 0, target: 0 };
-    const ripples = [];
+    const pointer = { x: 0, y: 0, sx: 0, sy: 0, inside: 0 };
     const startTime = performance.now();
     // Where each page's object sits: screen center (px), size (px per scene unit) and how visible it is.
     const places = Object.fromEntries(
@@ -446,35 +437,9 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
 
     /* ---------- Characters ---------- */
 
-    // Overlapping sine waves read as slow-moving weather on a terminal map; they show only under the lens.
-    function weather(x, y, t) {
-        const { cols, rows } = grid;
-        const v =
-            Math.sin(x * 0.07 + t * 0.6) +
-            Math.sin(y * 0.11 - t * 0.4) +
-            Math.sin((x * 0.6 + y) * 0.045 + t * 0.3) +
-            Math.sin(Math.hypot(x - cols * 0.7, y - rows * 0.45) * 0.12 - t * 0.8);
-        return clamp01(((v + 4) / 8 - 0.4) / 0.6);
-    }
-
-    function heat(px, py, t) {
-        const dx = px - pointer.x;
-        const dy = py - pointer.y;
-        let h = pointer.strength * Math.exp(-(dx * dx + dy * dy) / (LENS_RADIUS * LENS_RADIUS));
-        for (const ripple of ripples) {
-            const age = t - ripple.start;
-            const ring = (Math.hypot(px - ripple.x, py - ripple.y) - age * RIPPLE_SPEED) / RIPPLE_WIDTH;
-            h += Math.exp(-ring * ring) * (1 - age / RIPPLE_LIFE);
-        }
-        return Math.min(1, h);
-    }
-
-    function draw(t) {
-        const { cols, rows, cellW, lum, lines, lineCode, lineFamily, cover, shade, opacity, edge } = grid;
+    function draw() {
+        const { cols, rows, lum, lines, lineCode, lineFamily, cover, shade, opacity, edge } = grid;
         const ease = reducedMotion ? 1 : VISIBILITY_EASE;
-        while (ripples.length && t - ripples[0].start > RIPPLE_LIFE) ripples.shift();
-        pointer.strength += (pointer.target - pointer.strength) * 0.12;
-        const lens = !reducedMotion && (pointer.strength > 0.01 || ripples.length > 0);
 
         ctx.clearRect(0, 0, viewW, viewH);
         ctx.fillStyle = ink;
@@ -498,10 +463,6 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
                     alpha = (0.2 + 0.8 * level ** 0.8) * opacity[i];
                 } else {
                     let level = lum[i];
-                    if (lens) {
-                        const h = heat((x + 0.5) * cellW, (y + 0.5) * LINE_HEIGHT, t);
-                        if (h > 0.01) level += h * (0.18 + 0.5 * weather(x, y, t));
-                    }
                     if (level > 0.04) level = clamp01(level + DITHER[(y & 3) * 4 + (x & 3)]);
                     const step = Math.round(Math.min(1, level) * LAST);
                     if (step >= 1) {
@@ -541,7 +502,7 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     function redraw() {
         if (!ink || !page) return;
         renderFrame(0);
-        draw(0);
+        draw();
     }
 
     function frame(now) {
@@ -562,12 +523,11 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
         if (reducedMotion && !maskDue) return;
 
         if (!reducedMotion) {
-            pointer.sx += ((pointer.x / viewW - 0.5) * pointer.strength - pointer.sx) * 0.05;
-            pointer.sy += ((pointer.y / viewH - 0.5) * pointer.strength - pointer.sy) * 0.05;
+            pointer.sx += ((pointer.x / viewW - 0.5) * pointer.inside - pointer.sx) * 0.05;
+            pointer.sy += ((pointer.y / viewH - 0.5) * pointer.inside - pointer.sy) * 0.05;
         }
-        const t = reducedMotion ? 0 : clock;
-        renderFrame(t);
-        draw(t);
+        renderFrame(reducedMotion ? 0 : clock);
+        draw();
     }
 
     function start() {
@@ -618,22 +578,17 @@ export function createAsciiField(canvas, { root, surfaces, scenes }) {
     on(window, 'pointermove', (e) => {
         pointer.x = e.clientX;
         pointer.y = e.clientY;
-        pointer.target = 1;
+        pointer.inside = 1;
     });
-    // Fade the lens when the mouse leaves the window or a touch ends.
+    // The camera eases back when the mouse leaves the window or a touch ends.
     on(window, 'pointerout', (e) => {
-        if (!e.relatedTarget) pointer.target = 0;
+        if (!e.relatedTarget) pointer.inside = 0;
     });
     for (const type of ['pointerup', 'pointercancel']) {
         on(window, type, (e) => {
-            if (e.pointerType !== 'mouse') pointer.target = 0;
+            if (e.pointerType !== 'mouse') pointer.inside = 0;
         });
     }
-    on(window, 'pointerdown', (e) => {
-        if (reducedMotion || e.target.closest?.(INTERACTIVE)) return;
-        ripples.push({ x: e.clientX, y: e.clientY, start: clock });
-        if (ripples.length > MAX_RIPPLES) ripples.shift();
-    });
     on(document, 'visibilitychange', () => (document.hidden ? stop() : start()));
 
     refreshColors();
