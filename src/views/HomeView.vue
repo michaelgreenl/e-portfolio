@@ -92,7 +92,7 @@ $hero-tablet-bp: 525;
 .home-container {
     z-index: 5;
     gap: $space-page-section;
-    padding: $space-16 $space-4 0;
+    padding: $space-20 $space-4 0;
 
     @include bp-xsm-phone {
         font-size: 1em;
@@ -122,9 +122,13 @@ $hero-tablet-bp: 525;
     --size: min(80.5vw + 160px, 79.5vh);
 
     position: fixed;
-    inset: calc(min(49vh + 12.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
+    inset: calc(min(49vh + 16.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
     height: var(--size);
     pointer-events: none;
+
+    @include bp-sm-phone {
+        inset: calc(min(49vh + 12.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
+    }
 
     @include bp-md-tablet {
         position: absolute;
