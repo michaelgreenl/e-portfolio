@@ -92,7 +92,7 @@ $hero-tablet-bp: 525;
 .home-container {
     z-index: 5;
     gap: $space-page-section;
-    padding: ($space-32 + $space-8) $space-4 0;
+    padding: $space-16 $space-4 0;
 
     @include bp-xsm-phone {
         font-size: 1em;
@@ -122,7 +122,7 @@ $hero-tablet-bp: 525;
     --size: min(80.5vw + 160px, 79.5vh);
 
     position: fixed;
-    inset: calc(min(49vh + 16.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
+    inset: calc(min(49vh + 12.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
     height: var(--size);
     pointer-events: none;
 
@@ -134,7 +134,7 @@ $hero-tablet-bp: 525;
 }
 
 h1 {
-    padding-bottom: $size-1;
+    padding-bottom: $space-3;
     margin: 0;
     font-size: clamp(4.5em, 21vw, 5.2em);
     line-height: 0.8ch;
@@ -143,7 +143,7 @@ h1 {
         display: flex;
         gap: $space-3;
         max-width: 100vw;
-        padding-bottom: $size-1;
+        padding-bottom: $space-2;
         margin: 0 auto;
         font-size: clamp(4.2em, 13.2vw, 5.2em);
         line-height: 1ch;
@@ -258,7 +258,7 @@ p {
 
     &-mobile {
         position: absolute;
-        top: 5.5rem;
+        top: 5rem;
         right: $space-3;
         z-index: 5;
         width: 100vw;
@@ -299,7 +299,7 @@ p {
     }
 
     @include bp-sm-phone {
-        top: 6.25rem;
+        top: 5.5rem;
         right: 0.85em;
     }
 }
