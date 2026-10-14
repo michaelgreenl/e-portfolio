@@ -102,8 +102,6 @@ watch(
         </label>
     </header>
 
-    <hr class="nav-line" />
-
     <MobileNavbar />
 </template>
 
@@ -112,24 +110,6 @@ watch(
 .logo,
 .theme-toggle {
     opacity: 0;
-}
-
-.nav-line {
-    position: relative;
-    z-index: 3;
-    width: 100%;
-    min-height: 1px;
-    margin: 0;
-    border: 0;
-    transform: scaleX(0);
-
-    @include theme-dark {
-        background-color: #575e6455;
-    }
-
-    @include theme-light {
-        background-color: #3d505c33;
-    }
 }
 
 .navbar-header {

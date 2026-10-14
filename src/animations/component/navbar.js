@@ -54,15 +54,6 @@ export const navbarAnimations = {
                 opacity: 1,
             },
             0,
-        ).to(
-            '.nav-line',
-            {
-                duration: TIMING.duration.verySlow,
-                ease: TIMING.easing.bounce,
-                opacity: 1,
-                scaleX: 1,
-            },
-            0,
         );
     },
 
