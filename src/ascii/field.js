@@ -9,6 +9,7 @@ import {
     LINE_CHARS,
     RAMP,
     STAR_CHARS,
+    TINTS,
     aim,
     clamp01,
     createCamera,
@@ -65,6 +66,34 @@ const VISIBILITY_EASE = 0.3;
 const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => ((v / 16 - 0.47) / LAST) * 0.5);
 const layerFor = (alpha) =>
     alpha < 0.08 ? -1 : alpha < 0.23 ? 0 : alpha < 0.39 ? 1 : alpha < 0.59 ? 2 : alpha < 0.82 ? 3 : 4;
+
+// Material colors, see TINTS: soft on the dark theme, deeper on the light one so they hold up on a pale
+// background. Ink takes the page's text color.
+const PALETTE = {
+    sea: ['#7fb2e5', '#2f6a9e'],
+    forest: ['#6fa86a', '#2f6a34'],
+    grass: ['#9fcf86', '#4f8a3d'],
+    olive: ['#c2c487', '#76782f'],
+    tan: ['#d4b487', '#8f6d3b'],
+    sand: ['#ead6a4', '#a88a48'],
+    ice: ['#e3eef7', '#5f7a8f'],
+    air: ['#a9cfff', '#4a80bb'],
+    hull: ['#dfe3e8', '#59616a'],
+    red: ['#ec837a', '#b23c33'],
+    metal: ['#a3a9b0', '#4a4f55'],
+    glass: ['#8ed3ef', '#2a7fa6'],
+    flame: ['#ffb877', '#d0661c'],
+    zone: ['#f1e2c4', '#9a7e4e'],
+    belt: ['#cf9f74', '#85552f'],
+    pole: ['#b9b3aa', '#6b655d'],
+    spot: ['#e2825f', '#a8462a'],
+    io: ['#ead37f', '#97831f'],
+    europa: ['#e9e1d2', '#83786a'],
+    ganymede: ['#b8aa98', '#6c5f50'],
+    callisto: ['#9d9184', '#5a5047'],
+    // The site's --color-primary-light on the dark theme and --color-primary on the light one.
+    accent: ['#b2cfd7', '#6b8f9e'],
+};
 
 const isVisibleColor = (color) => color !== 'transparent' && !/[,/]\s*0\)$/.test(color);
 const SIDES = ['Top', 'Right', 'Bottom', 'Left'];
@@ -130,6 +159,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     const lastFraming = {};
 
     let ink = '';
+    let colors = []; // by material, see TINTS
     let viewW = 1;
     let viewH = 1;
     let maskA = new Float32Array(0);
@@ -173,7 +203,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         maskB = new Float32Array(maskA.length);
         targetVisibility = new Float32Array(n);
         visibility = new Float32Array(n);
-        rowLayers = LAYER_ALPHAS.map(() => new Array(grid.cols));
+        // One row of characters for each material and opacity layer.
+        rowLayers = TINTS.map((_, material) =>
+            LAYER_ALPHAS.map((alpha) => ({ material, alpha, chars: new Array(grid.cols).fill(' ') })),
+        );
 
         rebuildMask(true);
         if (reducedMotion) redraw();
@@ -182,6 +215,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     function refreshColors() {
         // The computed color resolves the theme's CSS variables to a plain rgb() string the canvas accepts.
         ink = getComputedStyle(canvas).color;
+        // Light ink means the dark theme.
+        const [r, g, b] = ink.match(/\d+/g).map(Number);
+        const shade = r + g + b > 382 ? 0 : 1;
+        colors = TINTS.map((name) => (name === 'ink' ? ink : PALETTE[name][shade]));
         if (reducedMotion) redraw();
     }
 
@@ -548,6 +585,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             toLocal(name, positionOf(name));
             grid.depthScale = scale;
             grid.idBase = idBase[name];
+            grid.paint = 0;
             scene.render(grid, local, { t: t - epoch[name], gain, speed: Math.abs(velocity), burn: burnOf(name) });
         }
         toneDensity(grid);
@@ -557,32 +595,48 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     /* ---------- Characters ---------- */
 
     function draw() {
-        const { cols, rows, lum, lines, lineCode, star, starAlpha, front, cover, shade, opacity, edge } = grid;
+        const {
+            cols,
+            rows,
+            lum,
+            lines,
+            lineCode,
+            star,
+            starAlpha,
+            front,
+            cover,
+            shade,
+            opacity,
+            edge,
+            tint,
+            glowTint,
+        } = grid;
         const ease = reducedMotion ? 1 : VISIBILITY_EASE;
+        const used = [];
 
         ctx.clearRect(0, 0, viewW, viewH);
-        ctx.fillStyle = ink;
         for (let y = 0; y < rows; y++) {
-            // One string per opacity layer keeps this to a few fillText calls per row.
-            for (const layer of rowLayers) layer.fill(' ');
-            let used = 0;
+            // One string per material and opacity layer keeps this to a few fillText calls per row.
             for (let x = 0; x < cols; x++) {
                 const i = y * cols + x;
                 const v = (visibility[i] += (targetVisibility[i] - visibility[i]) * ease);
                 if (v <= 0.02) continue;
                 let char = ' ';
                 let alpha = 0;
+                let material = 0;
                 if (front[i]) {
                     char = STAR_CHARS[star[i]];
                     alpha = starAlpha[i];
                 } else if (edge[i]) {
                     char = EDGE_CHARS[edge[i]];
                     alpha = (0.62 + 0.33 * shade[i]) * opacity[i];
+                    material = tint[i];
                 } else if (cover[i] >= 0.5) {
                     // Solid faces keep one character per brightness step, without dither, so flat parts stay even.
                     const level = clamp01(shade[i]);
                     char = RAMP[Math.round(level * LAST)];
                     alpha = (0.2 + 0.8 * level ** 0.8) * opacity[i];
+                    material = tint[i];
                 } else {
                     let level = lum[i];
                     if (level > 0.04) level = clamp01(level + DITHER[(y & 3) * 4 + (x & 3)]);
@@ -590,9 +644,11 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                     if (step >= 1) {
                         char = RAMP[step];
                         alpha = 0.2 + 0.8 * level ** 0.8;
+                        material = glowTint[i];
                     } else if (lines[i] > 0.04) {
                         char = LINE_CHARS[lineCode[i]];
                         alpha = lines[i] * 0.55;
+                        material = glowTint[i];
                     } else if (star[i]) {
                         char = STAR_CHARS[star[i]];
                         alpha = starAlpha[i];
@@ -600,14 +656,17 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                 }
                 const layer = char === ' ' ? -1 : layerFor(alpha * v);
                 if (layer < 0) continue;
-                rowLayers[layer][x] = char;
-                used |= 1 << layer;
+                const row = rowLayers[material][layer];
+                if (!used.includes(row)) used.push(row);
+                row.chars[x] = char;
             }
-            for (let l = 0; l < rowLayers.length; l++) {
-                if (!(used & (1 << l))) continue;
-                ctx.globalAlpha = LAYER_ALPHAS[l];
-                ctx.fillText(rowLayers[l].join(''), 0, y * LINE_HEIGHT);
+            for (const row of used) {
+                ctx.fillStyle = colors[row.material];
+                ctx.globalAlpha = row.alpha;
+                ctx.fillText(row.chars.join(''), 0, y * LINE_HEIGHT);
+                row.chars.fill(' ');
             }
+            used.length = 0;
         }
         ctx.globalAlpha = 1;
     }

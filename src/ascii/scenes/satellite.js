@@ -1,6 +1,7 @@
 // Contact: a satellite in orbit around the Earth, sending signal waves home.
 
 import {
+    TINT,
     castRegion,
     eulerMatrix,
     extentOf,
@@ -106,6 +107,7 @@ export function createSatellite() {
         const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
         const albedo = id === 1 ? 0.8 : id === 6 ? 0.95 : 0.7;
         out.id = id;
+        out.tint = id === 1 ? TINT.metal : id === 6 ? TINT.hull : TINT.accent;
         out.depth = best;
         out.shade = albedo * (0.1 + 0.9 * lit ** 0.8);
     }
@@ -141,6 +143,7 @@ export function createSatellite() {
             frame = frameAt(YAW.base + YAW.sway * Math.sin((t * Math.PI * 2) / YAW.seconds));
             const c = screenCircle(cam, 0, 0, 0, BOUND);
             const near = c ? smoothstep(WAVES.near[0], WAVES.near[1], c.r) : 1;
+            grid.paint = TINT.accent;
             if (near > 0) drawWaves(grid, cam, t, gain * near);
             if (!c) return;
             castRegion(

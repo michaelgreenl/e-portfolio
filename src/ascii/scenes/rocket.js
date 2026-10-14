@@ -2,6 +2,7 @@
 // burns at full thrust while it lifts off or lands.
 
 import {
+    TINT,
     castRegion,
     clamp01,
     eulerMatrix,
@@ -87,17 +88,19 @@ export function createRocket() {
         let best = Infinity;
         let id = 0;
         let albedo = 1;
-        const take = (t, part, color) => {
+        let tint = 0;
+        const take = (t, part, color, material) => {
             if (t >= best) return false;
             best = t;
             id = part;
             albedo = color;
+            tint = material;
             hit[0] = n[0];
             hit[1] = n[1];
             hit[2] = n[2];
             return true;
         };
-        if (take(tube(o, d, BODY_RADIUS, BODY_BOTTOM, BODY_TOP, n), 1, 0.7)) {
+        if (take(tube(o, d, BODY_RADIUS, BODY_BOTTOM, BODY_TOP, n), 1, 0.7, TINT.hull)) {
             // A round window on the body, outlined as its own part.
             const y = o[1] + d[1] * best;
             let da = Math.atan2(n[2], n[0]) - WINDOW.angle;
@@ -105,16 +108,18 @@ export function createRocket() {
             if (Math.hypot(da * BODY_RADIUS, y - WINDOW.y) < WINDOW.radius) {
                 id = 4;
                 albedo = 0.1;
+                tint = TINT.glass;
             }
         }
-        take(cone(o, d, NOSE.apex, NOSE.axis, NOSE.k, 0, NOSE_TIP - BODY_TOP, n), 1, 0.45);
-        take(cone(o, d, NOZZLE.apex, NOZZLE.axis, NOZZLE.k, 1.6, 2.4, n), 3, 0.35);
-        for (const planes of fins) take(convex(o, d, planes, n), 2, 0.55);
+        take(cone(o, d, NOSE.apex, NOSE.axis, NOSE.k, 0, NOSE_TIP - BODY_TOP, n), 1, 0.45, TINT.red);
+        take(cone(o, d, NOZZLE.apex, NOZZLE.axis, NOZZLE.k, 1.6, 2.4, n), 3, 0.35, TINT.metal);
+        for (const planes of fins) take(convex(o, d, planes, n), 2, 0.55, TINT.red);
         if (!id) return;
 
         transform(frame, hit[0], hit[1], hit[2], n);
         const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
         out.id = id;
+        out.tint = tint;
         out.depth = best;
         out.shade = albedo * (0.08 + 0.92 * lit ** 0.8);
     }
@@ -192,7 +197,9 @@ export function createRocket() {
             const c = screenCircle(cam, 0, BOUND.y + lift, 0, BOUND.radius);
             // A rocket that is small on screen gets less dust, so its dust is as sparse as a large rocket's.
             const share = c ? Math.min(1, (c.r / DUST.fullRadius) ** 2) : 1;
+            grid.paint = TINT.ink;
             drawDust(grid, cam, climb * 0.05, gain, share);
+            grid.paint = TINT.flame;
             drawFlame(grid, cam, t, gain);
             if (!c) return;
             castRegion(

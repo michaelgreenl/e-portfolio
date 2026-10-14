@@ -4,6 +4,7 @@
 // view sways slowly, so the orbits open and close.
 
 import {
+    TINT,
     castRegion,
     drawSpecks,
     eulerMatrix,
@@ -32,15 +33,15 @@ const SPOT = { lat: -0.375, width: 0.34, height: 0.085 }; // the Great Red Spot,
 const DEPTH = 0.15;
 const TAU = Math.PI * 2;
 
-// The large moons: orbit radius and size in Jupiter radii, orbit time relative to Io, surface brightness, and
-// where each is on its orbit when the camera arrives. Then Io is beside the planet, up and to the right, and
-// Callisto is far to the left, which wide screens show. Europa and Ganymede cross low in front of the planet,
-// which phones show below the header.
+// The large moons: orbit radius and size in Jupiter radii, orbit time relative to Io, surface brightness,
+// material, and where each is on its orbit when the camera arrives. Then Io is beside the planet, up and to the
+// right, and Callisto is far to the left, which wide screens show. Europa and Ganymede cross low in front of the
+// planet, which phones show below the header.
 const MOONS = [
-    { orbit: 2.4, size: 0.17, period: 1, albedo: 0.85, start: 5.26 }, // Io
-    { orbit: 3.2, size: 0.15, period: 2.007, albedo: 0.95, start: 1.66 }, // Europa
-    { orbit: 4.3, size: 0.22, period: 4.044, albedo: 0.7, start: 1.48 }, // Ganymede
-    { orbit: 6, size: 0.2, period: 9.433, albedo: 0.5, start: 4.01 }, // Callisto
+    { orbit: 2.4, size: 0.17, period: 1, albedo: 0.85, start: 5.26, tint: TINT.io }, // Io
+    { orbit: 3.2, size: 0.15, period: 2.007, albedo: 0.95, start: 1.66, tint: TINT.europa }, // Europa
+    { orbit: 4.3, size: 0.22, period: 4.044, albedo: 0.7, start: 1.48, tint: TINT.ganymede }, // Ganymede
+    { orbit: 6, size: 0.2, period: 9.433, albedo: 0.5, start: 4.01, tint: TINT.callisto }, // Callisto
 ];
 // The small inner moons, Metis, Adrastea, Amalthea and Thebe: orbit radius in Jupiter radii and orbit time in
 // seconds, slower than real.
@@ -56,11 +57,12 @@ const OUTER = { count: 107, near: 3.2, far: 11, seconds: [200, 520], backward: 0
 const SPECK_ALPHA = 0.3;
 
 // Cloud brightness by latitude (v, about its sine) and longitude: bright zones and dark belts with wavy edges,
-// and darker poles.
-function cloudsAt(v, lon) {
+// and darker poles. The material goes in out.tint.
+function cloudsAt(v, lon, out) {
     const u = v + 0.025 * Math.sin(lon * 6 + v * 11) + 0.015 * Math.sin(lon * 13 - v * 31);
     const a = Math.abs(u);
     const band = a < 0.11 ? 0.92 : a < 0.3 ? 0.53 : a < 0.42 ? 0.88 : a < 0.53 ? 0.66 : a < 0.63 ? 0.82 : 0.62;
+    out.tint = a > 0.7 ? TINT.pole : band > 0.8 ? TINT.zone : TINT.belt;
     return band * (1 - 0.25 * smoothstep(0.65, 0.95, a));
 }
 
@@ -130,7 +132,8 @@ export function createJupiter() {
         out.id = spot < 1 ? 2 : 1;
         out.depth = t;
         // The spot is darker than the zone around it, with a paler middle.
-        const albedo = spot < 1 ? 0.34 + 0.3 * (1 - spot) ** 2 : cloudsAt(v, lon);
+        out.tint = TINT.spot;
+        const albedo = spot < 1 ? 0.34 + 0.3 * (1 - spot) ** 2 : cloudsAt(v, lon, out);
         out.shade = albedo * (0.05 + 0.95 * lit ** 0.7) * shadow;
     }
 
@@ -147,6 +150,7 @@ export function createJupiter() {
         const mottle = 0.82 + 0.18 * Math.sin(5 * x + 3 * Math.sin(4 * p[1])) * Math.sin(4 * z + 2 * p[1]);
         const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
         out.id = m.id;
+        out.tint = m.tint;
         // Nearer than the planet by its radius, so it is in front of every part of the planet.
         out.depth = m.front ? t - RADIUS : t;
         out.shade = m.albedo * mottle * (0.06 + 0.94 * lit ** 0.7);

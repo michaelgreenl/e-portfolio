@@ -1,6 +1,15 @@
 // Home: the Earth, turning slowly.
 
-import { castRegion, eulerMatrix, multiply, normalize, screenCircle, smoothstep, transformBack } from '../render.js';
+import {
+    TINT,
+    castRegion,
+    eulerMatrix,
+    multiply,
+    normalize,
+    screenCircle,
+    smoothstep,
+    transformBack,
+} from '../render.js';
 import { sphere } from '../shapes.js';
 import { landAt } from '../worldMap.js';
 
@@ -14,6 +23,88 @@ const LAND = 1;
 const SEA = 0.24;
 const ICE = 0.9;
 const DEGREES = 180 / Math.PI;
+const POLAR = 64; // land past this latitude, north or south, reads as ice
+// The land's materials come from a map on a grid of this many degrees, made once.
+const MAP_STEP = 2;
+const MAP_COLS = 360 / MAP_STEP;
+const MAP_ROWS = 180 / MAP_STEP;
+
+// Smooth value noise in 3D, 0 to 1.
+function hash(x, y, z) {
+    let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1440662683);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+function noise(x, y, z) {
+    const xi = Math.floor(x);
+    const yi = Math.floor(y);
+    const zi = Math.floor(z);
+    const u = smoothstep(0, 1, x - xi);
+    const v = smoothstep(0, 1, y - yi);
+    const w = smoothstep(0, 1, z - zi);
+    const lerp = (a, b, f) => a + (b - a) * f;
+    const edge = (dy, dz) => lerp(hash(xi, yi + dy, zi + dz), hash(xi + 1, yi + dy, zi + dz), u);
+    return lerp(lerp(edge(0, 0), edge(1, 0), v), lerp(edge(0, 1), edge(1, 1), v), w);
+}
+
+// Noise with finer detail added in `octaves` steps, about 0.5 on average.
+function fbm(x, y, z, octaves) {
+    let sum = 0;
+    let amp = 0.5;
+    for (let k = 0; k < octaves; k++) {
+        sum += amp * noise(x, y, z);
+        x *= 2;
+        y *= 2;
+        z *= 2;
+        amp /= 2;
+    }
+    return sum / (1 - amp * 2);
+}
+
+// Calls fn(q, lat, index) for the middle of each map cell, with q the point on the unit sphere.
+function eachCell(fn) {
+    const q = [0, 0, 0];
+    for (let row = 0; row < MAP_ROWS; row++) {
+        const lat = 90 - (row + 0.5) * MAP_STEP;
+        for (let col = 0; col < MAP_COLS; col++) {
+            const lon = -180 + (col + 0.5) * MAP_STEP;
+            const c = Math.cos(lat / DEGREES);
+            q[0] = c * Math.sin(lon / DEGREES);
+            q[1] = Math.sin(lat / DEGREES);
+            q[2] = c * Math.cos(lon / DEGREES);
+            fn(q, lat, row * MAP_COLS + col);
+        }
+    }
+}
+
+// Land material by climate: rainforest near the equator, savanna, desert in the subtropics, steppe, green
+// temperate land and dark boreal forest. Noise moves the bands about and mixes wetter and drier land in.
+function landMap() {
+    const map = new Uint8Array(MAP_COLS * MAP_ROWS);
+    eachCell((q, lat, i) => {
+        const band = Math.abs(lat) + 30 * (fbm(q[0] * 2 + 7, q[1] * 2, q[2] * 2, 2) - 0.5);
+        const wet = fbm(q[0] * 4, q[1] * 4 + 3, q[2] * 4, 3);
+        let tint;
+        if (band < 10) tint = wet > 0.42 ? TINT.forest : TINT.grass;
+        else if (band < 18) tint = wet > 0.55 ? TINT.grass : TINT.olive;
+        else if (band < 32) tint = wet > 0.62 ? TINT.olive : wet > 0.48 ? TINT.tan : TINT.sand;
+        else if (band < 40) tint = wet > 0.5 ? TINT.olive : TINT.tan;
+        else if (band < 54) tint = wet > 0.42 ? TINT.grass : TINT.olive;
+        else tint = wet > 0.38 ? TINT.forest : TINT.grass;
+        map[i] = tint;
+    });
+    return map;
+}
+
+const LAND_MAP = landMap();
+
+// The land map's material at a latitude and longitude in degrees.
+function landTintAt(lat, lon) {
+    const row = Math.min(MAP_ROWS - 1, Math.floor((90 - lat) / MAP_STEP));
+    const col = Math.floor((lon + 180) / MAP_STEP) % MAP_COLS;
+    return LAND_MAP[row * MAP_COLS + col];
+}
 
 export function createEarth() {
     const n = [0, 0, 0];
@@ -33,6 +124,7 @@ export function createEarth() {
                 const fall = 1 - (dist - RADIUS) / (RADIUS * (HALO - 1));
                 const lit = Math.max(0, (px * LIGHT[0] + py * LIGHT[1] + pz * LIGHT[2]) / dist);
                 out.glow = 0.3 * fall * fall * lit;
+                out.tint = TINT.air;
             }
             return;
         }
@@ -40,8 +132,12 @@ export function createEarth() {
         transformBack(frame, n[0], n[1], n[2], q);
         const lat = Math.asin(q[1]) * DEGREES;
         const lon = Math.atan2(q[0], q[2]) * DEGREES;
-        const ground = SEA + (LAND - SEA) * landAt(lat, lon);
-        const albedo = Math.max(ground, ICE * smoothstep(72, 80, lat));
+        const land = landAt(lat, lon);
+        const ground = SEA + (LAND - SEA) * land;
+        const seaIce = ICE * smoothstep(72, 80, lat);
+        const albedo = Math.max(ground, seaIce);
+        if (seaIce > ground || (land > 0.5 && Math.abs(lat) > POLAR)) out.tint = TINT.ice;
+        else out.tint = land > 0.5 ? landTintAt(lat, lon) : TINT.sea;
         const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
         out.id = 1;
         out.depth = t;

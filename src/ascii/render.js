@@ -12,6 +12,34 @@ const EDGE = { top: 1, bottom: 2, slash: 3, backslash: 4, bar: 5, open: 6, close
 // Line characters, indexed by grid.lineCode. Arcs use ( and ) where they run upright.
 export const LINE_CHARS = ' -\\|/()';
 
+// Materials, so each part of an object can draw in its own color. Index 0 draws in the page's ink.
+export const TINTS = [
+    'ink',
+    'sea',
+    'forest',
+    'grass',
+    'olive',
+    'tan',
+    'sand',
+    'ice',
+    'air',
+    'hull',
+    'red',
+    'metal',
+    'glass',
+    'flame',
+    'zone',
+    'belt',
+    'pole',
+    'spot',
+    'io',
+    'europa',
+    'ganymede',
+    'callisto',
+    'accent',
+];
+export const TINT = Object.fromEntries(TINTS.map((name, k) => [name, k]));
+
 /* ---------- Math ---------- */
 
 export const clamp01 = (x) => Math.min(1, Math.max(0, x));
@@ -87,6 +115,8 @@ export function createGrid() {
         // first id of its parts, so parts of different objects never share an id.
         depthScale: 1,
         idBase: 0,
+        // Material of the points and lines drawn next, see TINTS.
+        paint: 0,
         resize(width, height, cellW, lineH) {
             Object.assign(grid, { width, height, cellW, lineH });
             grid.cols = Math.ceil(width / cellW);
@@ -106,6 +136,8 @@ export function createGrid() {
             grid.ident = new Uint8Array(n); // which solid object covers a cell
             grid.round = new Uint8Array(n); // 1 when that object's outline is drawn with ( and )
             grid.edge = new Uint8Array(n); // outline character, see EDGE_CHARS
+            grid.tint = new Uint8Array(n); // material of the solid object in a cell, see TINTS
+            grid.glowTint = new Uint8Array(n); // material of the points, glow or line in a cell
             grid.octant = new Int8Array(n); // direction of an outline, for traceOutlines
         },
         clear() {
@@ -124,6 +156,8 @@ export function createGrid() {
                 'ident',
                 'round',
                 'edge',
+                'tint',
+                'glowTint',
             ]) {
                 grid[key].fill(0);
             }
@@ -217,7 +251,7 @@ export function screenCircle(cam, cx, cy, cz, radius) {
 
 // Adds points [x, y, z, weight, ...] to the density buffer, spread over the cells around each point.
 export function splatPoints(grid, cam, points, count, gain) {
-    const { cols, rows, cellW, lineH, dens } = grid;
+    const { cols, rows, cellW, lineH, dens, glowTint, paint } = grid;
     for (let p = 0; p < count; p++) {
         const o = p * 4;
         const dx = points[o] - cam.px;
@@ -236,12 +270,24 @@ export function splatPoints(grid, cam, points, count, gain) {
         const w = points[o + 3] * gain;
         const i = y0 * cols + x0;
         if (y0 >= 0) {
-            if (x0 >= 0) dens[i] += w * (1 - ax) * (1 - ay);
-            if (x0 + 1 < cols) dens[i + 1] += w * ax * (1 - ay);
+            if (x0 >= 0) {
+                dens[i] += w * (1 - ax) * (1 - ay);
+                glowTint[i] = paint;
+            }
+            if (x0 + 1 < cols) {
+                dens[i + 1] += w * ax * (1 - ay);
+                glowTint[i + 1] = paint;
+            }
         }
         if (y0 + 1 < rows) {
-            if (x0 >= 0) dens[i + cols] += w * (1 - ax) * ay;
-            if (x0 + 1 < cols) dens[i + cols + 1] += w * ax * ay;
+            if (x0 >= 0) {
+                dens[i + cols] += w * (1 - ax) * ay;
+                glowTint[i + cols] = paint;
+            }
+            if (x0 + 1 < cols) {
+                dens[i + cols + 1] += w * ax * ay;
+                glowTint[i + cols + 1] = paint;
+            }
         }
     }
 }
@@ -268,7 +314,7 @@ function slopeCode(angle) {
 
 // Marks the cells along a screen segment (px) with a slope character.
 function rasterSegment(grid, x0, y0, x1, y1, strength) {
-    const { width, height, cols, rows, cellW, lineH, lines, lineCode } = grid;
+    const { width, height, cols, rows, cellW, lineH, lines, lineCode, glowTint, paint } = grid;
     if ((x0 < -width && x1 < -width) || (x0 > width * 2 && x1 > width * 2)) return;
     if ((y0 < -height && y1 < -height) || (y0 > height * 2 && y1 > height * 2)) return;
     const code = slopeCode(Math.atan2(y1 - y0, x1 - x0));
@@ -286,6 +332,7 @@ function rasterSegment(grid, x0, y0, x1, y1, strength) {
         if (strength > lines[i]) {
             lines[i] = strength;
             lineCode[i] = code;
+            glowTint[i] = paint;
         }
     }
 }
@@ -317,7 +364,7 @@ export function polyline(grid, cam, n, point, strengthAt) {
 // ( or ), so it bulges the way it travels.
 // `seed` gives each wave its own uneven brightness along the arc, which moves with the wave.
 export function wave(grid, cx, cy, radius, angle, spread, strength, seed) {
-    const { cols, rows, cellW, lineH, lines, lineCode } = grid;
+    const { cols, rows, cellW, lineH, lines, lineCode, glowTint, paint } = grid;
     // Steps of about half a cell along the arc.
     const step = Math.min(cellW, lineH) / 2;
     const steps = Math.ceil((radius * spread * 2) / step) + 1;
@@ -340,6 +387,7 @@ export function wave(grid, cx, cy, radius, angle, spread, strength, seed) {
         if (v > lines[i]) {
             lines[i] = v;
             lineCode[i] = code;
+            glowTint[i] = paint;
         }
     }
 }
@@ -412,38 +460,65 @@ export function drawSpecks(grid, cam, points, count, alpha, front = false) {
 
 // Casts rays through every cell of a screen box, 2 x 2 samples per cell. sample(origin, dir, out) sets
 // out.id (0 when the ray misses), out.shade (lighting, 0 to 1), out.depth (distance to the hit) and
-// out.glow (light outside the object). rounded(id) says whether an object's outline uses ( and ).
+// out.glow (light outside the object), and may set out.tint (its material, see TINTS). rounded(id) says
+// whether an object's outline uses ( and ).
 export function castRegion(grid, cam, box, sample, gain, rounded) {
-    const { cols, rows, cellW, lineH, cover, shade, opacity, depth, ident, round, lum, depthScale, idBase } = grid;
+    const {
+        cols,
+        rows,
+        cellW,
+        lineH,
+        cover,
+        shade,
+        opacity,
+        depth,
+        ident,
+        round,
+        tint,
+        glowTint,
+        lum,
+        depthScale,
+        idBase,
+    } = grid;
     const x0 = Math.max(0, Math.floor(box.x0 / cellW));
     const x1 = Math.min(cols - 1, Math.ceil(box.x1 / cellW));
     const y0 = Math.max(0, Math.floor(box.y0 / lineH));
     const y1 = Math.min(rows - 1, Math.ceil(box.y1 / lineH));
     const origin = [cam.px, cam.py, cam.pz];
     const dir = [0, 0, 0];
-    const out = { id: 0, shade: 0, depth: 0, glow: 0 };
+    const out = { id: 0, shade: 0, depth: 0, glow: 0, tint: 0 };
     const ids = [0, 0, 0, 0];
+    const tints = [0, 0, 0, 0];
     const lit = [0, 0, 0, 0];
     const far = [0, 0, 0, 0];
     for (let y = y0; y <= y1; y++) {
         for (let x = x0; x <= x1; x++) {
             let hits = 0;
             let glow = 0;
+            let glowPaint = 0;
             for (let s = 0; s < 4; s++) {
                 rayDir(cam, (x + 0.25 + (s & 1) * 0.5) * cellW, (y + 0.25 + (s >> 1) * 0.5) * lineH, dir);
                 out.id = 0;
                 out.shade = 0;
                 out.depth = 0;
                 out.glow = 0;
+                out.tint = 0;
                 sample(origin, dir, out);
                 ids[s] = out.id;
+                tints[s] = out.tint;
                 lit[s] = out.shade;
                 far[s] = out.depth;
                 if (out.id) hits++;
-                glow += out.glow;
+                if (out.glow) {
+                    glow += out.glow;
+                    glowPaint = out.tint;
+                }
             }
             const i = y * cols + x;
-            if (glow) lum[i] += (glow / 4) * gain;
+            if (glow) {
+                lum[i] += (glow / 4) * gain;
+                glowTint[i] = glowPaint;
+            }
             if (!hits) continue;
             // The cell belongs to the object hit by most samples.
             let best = 0;
@@ -459,10 +534,12 @@ export function castRegion(grid, cam, box, sample, gain, rounded) {
             }
             let sumLit = 0;
             let sumDepth = 0;
+            let bestTint = 0;
             for (let s = 0; s < 4; s++) {
                 if (ids[s] !== best) continue;
                 sumLit += lit[s];
                 sumDepth += far[s];
+                bestTint = tints[s];
             }
             // A nearer object drawn earlier keeps the cell.
             const near = (sumDepth / bestCount) * depthScale;
@@ -472,6 +549,7 @@ export function castRegion(grid, cam, box, sample, gain, rounded) {
             depth[i] = near;
             opacity[i] = gain;
             ident[i] = idBase + best;
+            tint[i] = bestTint;
             round[i] = rounded(best) ? 1 : 0;
         }
     }
