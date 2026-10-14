@@ -53,6 +53,14 @@ body,
 
     @include bp-sm-phone {
         font-size: 17px;
+
+        @media (height >= 900px) {
+            font-size: 19px;
+        }
+
+        @media (height >= 1000px) {
+            font-size: 21px;
+        }
     }
 
     @include bp-xl-desktop {

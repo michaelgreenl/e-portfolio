@@ -90,16 +90,20 @@ $hero-tablet-bp: 525;
 
 // On narrow phones the name takes two lines, so the hero starts lower, below the top of the globe.
 .home-container {
+    --hero-padding-top: #{$space-20};
+
     z-index: 5;
     gap: $space-page-section;
-    padding: $space-20 $space-4 0;
+    padding: var(--hero-padding-top) $space-4 0;
 
     @include bp-xsm-phone {
         font-size: 1em;
     }
 
     @include bp-custom-min($hero-tablet-bp) {
-        padding-top: $space-10;
+        --hero-padding-top: #{$space-10};
+
+        overflow-x: clip;
     }
 
     @include bp-md-tablet {
@@ -116,8 +120,7 @@ $hero-tablet-bp: 525;
     }
 }
 
-// Where the ASCII Earth goes, behind the page. On phones it is a globe around the hero that grows with the
-// screen width, up to about 80% of the screen height; on wider screens it takes the right half.
+// On phones and tablets the globe sits behind the hero. Its size follows the viewport; wider screens use the right half.
 .art-slot {
     --size: min(80.5vw + 160px, 79.5vh);
 
@@ -126,12 +129,12 @@ $hero-tablet-bp: 525;
     height: var(--size);
     pointer-events: none;
 
-    @include bp-sm-phone {
-        inset: calc(min(49vh + 12.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
+    @include bp-custom-min($hero-tablet-bp) {
+        position: absolute;
+        inset: calc(50% + var(--hero-padding-top) / 2 - var(--size) / 2) -10vw auto;
     }
 
     @include bp-md-tablet {
-        position: absolute;
         inset: 0 0 0 50%;
         height: auto;
     }
