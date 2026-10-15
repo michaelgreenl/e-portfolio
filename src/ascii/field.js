@@ -57,10 +57,10 @@ const SHOW_EASE = 0.15;
 // while they show a background or border. Elements with a backdrop blur clear nothing: the art shows through
 // them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell shows art
 // only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of all content,
-// even a thin line, and the edge around content is a clean cut along the rows and columns. Strips of art
-// narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too, so no slivers
-// squeeze between them. The padding and the narrowest strip kept grow from the first value at phone width to
-// the second at desktop width.
+// even a thin line, and the edge around content is a clean cut along the rows and columns, with no fade.
+// Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too,
+// so no slivers squeeze between them. The padding and the narrowest strip kept grow from the first value at
+// phone width to the second at desktop width.
 const GLYPH_MIN_FONT_SIZE = 24;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
@@ -68,7 +68,6 @@ const MASK_WIDTHS = [390, 1280];
 const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
-const VISIBILITY_EASE = 0.3;
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
 const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => ((v / 16 - 0.47) / LAST) * 0.5);
@@ -178,8 +177,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     let alphaScale = 1;
     let viewW = 1;
     let viewH = 1;
-    let targetVisibility = new Float32Array(0);
-    let visibility = new Float32Array(0);
+    let visible = new Uint8Array(0); // 1 where a cell shows art
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
     let minStripCols = MIN_STRIP.cols[1];
@@ -221,15 +219,14 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         const n = grid.cols * grid.rows;
         maskCanvas.width = grid.cols * MASK_CELL[0];
         maskCanvas.height = grid.rows * MASK_CELL[1];
-        targetVisibility = new Float32Array(n);
-        visibility = new Float32Array(n);
+        visible = new Uint8Array(n);
         glass = new Uint8Array(n);
         // One row of characters for each material and opacity layer.
         rowLayers = TINTS.map((_, material) =>
             LAYER_ALPHAS.map((alpha) => ({ material, alpha, chars: new Array(grid.cols).fill(' ') })),
         );
 
-        rebuildMask(true);
+        rebuildMask();
         if (reducedMotion) redraw();
     }
 
@@ -284,7 +281,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         }
     }
 
-    function rebuildMask(snap) {
+    function rebuildMask() {
         const w = maskCanvas.width;
         const h = maskCanvas.height;
         if (!w || !h) return;
@@ -364,7 +361,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                         if (data[(my * w + mx) * 4 + 3] >= CLEAR_AT * 255) open = 0;
                     }
                 }
-                targetVisibility[y * cols + x] = open;
+                visible[y * cols + x] = open;
             }
         }
         glass.fill(0);
@@ -377,10 +374,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                 for (let x = Math.max(0, Math.round(rect.left / cellW)); x < x1; x++) glass[y * cols + x] = 1;
             }
         }
-        clearStrips(targetVisibility, glass, rows, cols, cols, 1, minStripCols);
-        clearStrips(targetVisibility, glass, cols, rows, 1, cols, MIN_STRIP.rows);
-        // Scrolling moves content a lot between frames, so the field jumps to the new mask instead of easing.
-        if (snap) visibility.set(targetVisibility);
+        clearStrips(visible, glass, rows, cols, cols, 1, minStripCols);
+        clearStrips(visible, glass, cols, rows, 1, cols, MIN_STRIP.rows);
     }
 
     /* ---------- Framing ---------- */
@@ -664,7 +659,6 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             tint,
             glowTint,
         } = grid;
-        const ease = reducedMotion ? 1 : VISIBILITY_EASE;
         const used = [];
 
         ctx.clearRect(0, 0, viewW, viewH);
@@ -672,8 +666,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             // One string per material and opacity layer keeps this to a few fillText calls per row.
             for (let x = 0; x < cols; x++) {
                 const i = y * cols + x;
-                const v = (visibility[i] += (targetVisibility[i] - visibility[i]) * ease);
-                if (v <= 0.02) continue;
+                if (!visible[i]) continue;
                 let char = ' ';
                 let alpha = 0;
                 let material = 0;
@@ -707,7 +700,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                         alpha = starAlpha[i];
                     }
                 }
-                const layer = char === ' ' ? -1 : layerFor(alpha * v);
+                const layer = char === ' ' ? -1 : layerFor(alpha);
                 if (layer < 0) continue;
                 const row = rowLayers[material][layer];
                 if (!used.includes(row)) used.push(row);
@@ -763,7 +756,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         const maskDue = scrolled || now - lastMask > MASK_INTERVAL;
         if (maskDue) {
             lastMask = now;
-            rebuildMask(scrolled);
+            rebuildMask();
         }
         if (reducedMotion) {
             if (maskDue) redraw();
