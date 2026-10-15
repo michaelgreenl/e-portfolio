@@ -518,15 +518,18 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     }
 
     // The smallest hump that keeps the target's sweep, its travel over the summed distance, within MAX_SWEEP.
+    // A screen narrower than it is tall shows less of the world from side to side, so there the limit shrinks
+    // with the screen's width, and objects cross a phone screen about as fast as a wide one.
     function humpFor(a, b) {
         const gap = Math.hypot(b.target[0] - a.target[0], b.target[1] - a.target[1], b.target[2] - a.target[2]);
+        const limit = MAX_SWEEP * Math.min(1, viewW / viewH);
         const sweep = (hump) => gap / pathLength(a, b, hump).total;
-        if (sweep(0) <= MAX_SWEEP) return 0;
+        if (sweep(0) <= limit) return 0;
         let low = 0;
         let high = 12;
         for (let i = 0; i < 20; i++) {
             const mid = (low + high) / 2;
-            if (sweep(mid) > MAX_SWEEP) low = mid;
+            if (sweep(mid) > limit) low = mid;
             else high = mid;
         }
         return high;
