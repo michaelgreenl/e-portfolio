@@ -53,18 +53,19 @@ const SHOW_EASE = 0.15;
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
 // shape and smaller text by line box. Elements matching the surfaces selector clear their whole rounded box
 // while they show a background or border. Elements with a backdrop blur clear nothing: the art shows through
-// them, blurred. A cell shows art only where the mask at its middle is below CLEAR_AT, so the edge around
-// content is a clean cut along the rows and columns. Strips of art narrower than MIN_STRIP between content,
-// frosted panels and the screen edge are cleared too, so no slivers squeeze between them. The padding around
-// content and the narrowest strip kept grow from the first value at phone width to the second at desktop
-// width, so a small screen keeps more of its art.
+// them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell shows art
+// only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of all content,
+// even a thin line, and the edge around content is a clean cut along the rows and columns. Strips of art
+// narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too, so no slivers
+// squeeze between them. The padding and the narrowest strip kept grow from the first value at phone width to
+// the second at desktop width.
 const GLYPH_MIN_FONT_SIZE = 24;
-const MASK_SCALE = 6;
+const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
 const MASK_WIDTHS = [390, 1280];
-const CLEAR_PADDING = [12, 16];
+const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.25;
-const MIN_STRIP = { cols: [4, 8], rows: 2 };
+const MIN_STRIP = { cols: [2, 3], rows: 2 };
 const VISIBILITY_EASE = 0.3;
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
@@ -211,8 +212,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         viewH = height;
         grid.resize(width, height, ctx.measureText('M').width, LINE_HEIGHT);
         const n = grid.cols * grid.rows;
-        maskCanvas.width = Math.ceil(width / MASK_SCALE);
-        maskCanvas.height = Math.ceil(height / MASK_SCALE);
+        maskCanvas.width = grid.cols * MASK_CELL[0];
+        maskCanvas.height = grid.rows * MASK_CELL[1];
         targetVisibility = new Float32Array(n);
         visibility = new Float32Array(n);
         glass = new Uint8Array(n);
@@ -283,7 +284,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
 
         maskCtx.setTransform(1, 0, 0, 1, 0, 0);
         maskCtx.clearRect(0, 0, w, h);
-        maskCtx.setTransform(1 / MASK_SCALE, 0, 0, 1 / MASK_SCALE, 0, 0);
+        maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, MASK_CELL[1] / LINE_HEIGHT, 0, 0);
         maskCtx.lineWidth = clearPadding * 2;
         maskCtx.lineJoin = 'round';
         maskCtx.textBaseline = 'alphabetic';
@@ -347,11 +348,16 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
 
         const { data } = maskCtx.getImageData(0, 0, w, h);
         const { cols, rows, cellW } = grid;
+        const [across, down] = MASK_CELL;
         for (let y = 0; y < rows; y++) {
-            const my = Math.min(h - 1, Math.floor(((y + 0.5) * LINE_HEIGHT) / MASK_SCALE));
             for (let x = 0; x < cols; x++) {
-                const mx = Math.min(w - 1, Math.floor(((x + 0.5) * cellW) / MASK_SCALE));
-                targetVisibility[y * cols + x] = data[(my * w + mx) * 4 + 3] < CLEAR_AT * 255 ? 1 : 0;
+                let open = 1;
+                for (let my = y * down; my < (y + 1) * down; my++) {
+                    for (let mx = x * across; mx < (x + 1) * across; mx++) {
+                        if (data[(my * w + mx) * 4 + 3] >= CLEAR_AT * 255) open = 0;
+                    }
+                }
+                targetVisibility[y * cols + x] = open;
             }
         }
         glass.fill(0);
