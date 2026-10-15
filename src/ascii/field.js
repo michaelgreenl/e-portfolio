@@ -54,7 +54,8 @@ const SHOW_EASE = 0.15;
 
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
 // shape and smaller text by line box. Elements matching the surfaces selector clear their whole rounded box
-// while they show a background or border, and otherwise the band where their ::after underline draws, so the
+// while they show a background or a border all around. One bordered on only some sides, such as a divider,
+// clears just those lines, and one with neither clears the band where its ::after underline draws, so the
 // art holds still while an underline grows in on hover. Elements with a backdrop blur clear nothing: the art
 // shows through them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a
 // cell shows art only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of
@@ -105,10 +106,9 @@ const PALETTE = {
 
 const isVisibleColor = (color) => color !== 'transparent' && !/[,/]\s*0\)$/.test(color);
 const SIDES = ['Top', 'Right', 'Bottom', 'Left'];
-const hasSurface = (style) =>
-    isVisibleColor(style.backgroundColor) ||
-    style.backgroundImage !== 'none' ||
-    SIDES.some((side) => parseFloat(style[`border${side}Width`]) > 0 && isVisibleColor(style[`border${side}Color`]));
+const hasFill = (style) => isVisibleColor(style.backgroundColor) || style.backgroundImage !== 'none';
+const bordersOf = (style) =>
+    SIDES.filter((side) => parseFloat(style[`border${side}Width`]) > 0 && isVisibleColor(style[`border${side}Color`]));
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
@@ -135,6 +135,18 @@ function clearStrips(open, glass, lines, length, across, along, min) {
             start = -1;
         }
     }
+}
+
+// A box's border on one side, as a thin box.
+function borderLine(box, style, side) {
+    const size = parseFloat(style[`border${side}Width`]);
+    const across = side === 'Top' || side === 'Bottom';
+    return new DOMRect(
+        side === 'Right' ? box.right - size : box.left,
+        side === 'Bottom' ? box.bottom - size : box.top,
+        across ? box.width : size,
+        across ? size : box.height,
+    );
 }
 
 // The band under an element where its ::after underline draws, across the element's full width, or null.
@@ -321,11 +333,14 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
         const shields = new Set();
         const frosted = new Set();
+        const dividers = [];
         const controls = [];
         for (const el of root.querySelectorAll(surfaces)) {
             const style = styleOf(el);
+            const borders = bordersOf(style).length;
             if (style.backdropFilter !== 'none') frosted.add(el);
-            else if (hasSurface(style)) shields.add(el);
+            else if (hasFill(style) || borders === SIDES.length) shields.add(el);
+            else if (borders) dividers.push(el);
             else controls.push(el);
         }
         const isCovered = (el) => {
@@ -341,6 +356,13 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             if (isCovered(surface)) continue;
             maskCtx.globalAlpha = alphaOf(surface);
             drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
+        }
+        for (const el of dividers) {
+            if (isCovered(el)) continue;
+            const style = styleOf(el);
+            const box = el.getBoundingClientRect();
+            maskCtx.globalAlpha = alphaOf(el);
+            for (const side of bordersOf(style)) drawBox(borderLine(box, style, side), 0);
         }
         for (const el of controls) {
             const band = !isCovered(el) && underlineOf(el);
