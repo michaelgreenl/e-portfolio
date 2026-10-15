@@ -54,13 +54,14 @@ const SHOW_EASE = 0.15;
 
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
 // shape and smaller text by line box. Elements matching the surfaces selector clear their whole rounded box
-// while they show a background or border. Elements with a backdrop blur clear nothing: the art shows through
-// them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell shows art
-// only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of all content,
-// even a thin line, and the edge around content is a clean cut along the rows and columns, with no fade.
-// Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too,
-// so no slivers squeeze between them. The padding and the narrowest strip kept grow from the first value at
-// phone width to the second at desktop width.
+// while they show a background or border, and otherwise the band where their ::after underline draws, so the
+// art holds still while an underline grows in on hover. Elements with a backdrop blur clear nothing: the art
+// shows through them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a
+// cell shows art only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of
+// all content, even a thin line, and the edge around content is a clean cut along the rows and columns, with
+// no fade. Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge are
+// cleared too, so no slivers squeeze between them. The padding and the narrowest strip kept grow from the
+// first value at phone width to the second at desktop width.
 const GLYPH_MIN_FONT_SIZE = 24;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
@@ -134,6 +135,17 @@ function clearStrips(open, glass, lines, length, across, along, min) {
             start = -1;
         }
     }
+}
+
+// The band under an element where its ::after underline draws, across the element's full width, or null.
+function underlineOf(el) {
+    const style = getComputedStyle(el, '::after');
+    const draws = style.position === 'absolute' && style.display !== 'none' && isVisibleColor(style.backgroundColor);
+    if (!draws) return null;
+    const box = el.getBoundingClientRect();
+    const bottom = box.bottom - parseFloat(style.bottom);
+    const height = parseFloat(style.height);
+    return height > 0 && Number.isFinite(bottom) ? new DOMRect(box.left, bottom - height, box.width, height) : null;
 }
 
 /**
@@ -309,10 +321,12 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
         const shields = new Set();
         const frosted = new Set();
+        const controls = [];
         for (const el of root.querySelectorAll(surfaces)) {
             const style = styleOf(el);
             if (style.backdropFilter !== 'none') frosted.add(el);
             else if (hasSurface(style)) shields.add(el);
+            else controls.push(el);
         }
         const isCovered = (el) => {
             if (!el || el === root) return false;
@@ -327,6 +341,12 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             if (isCovered(surface)) continue;
             maskCtx.globalAlpha = alphaOf(surface);
             drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
+        }
+        for (const el of controls) {
+            const band = !isCovered(el) && underlineOf(el);
+            if (!band) continue;
+            maskCtx.globalAlpha = alphaOf(el);
+            drawBox(band, 0);
         }
         for (const el of root.querySelectorAll('svg, hr, img, video')) {
             if (shields.has(el) || frosted.has(el) || isCovered(el)) continue;
