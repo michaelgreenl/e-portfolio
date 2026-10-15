@@ -73,6 +73,7 @@
     },
     {
         "title": "Tally",
+        "_note": "App Store link hidden until Tally passes App Store review. To restore it, add externalLinks.apple with the App Store URL and the text \"App Store\".",
         "slug": "tally",
         "stackText": [
             "TypeScript",
@@ -117,10 +118,6 @@
             "github": {
                 "href": "https://github.com/michaelgreenl/tally-tracker",
                 "text": "Repository"
-            },
-            "apple": {
-                "href": "https://github.com/michaelgreenl/tally-tracker",
-                "text": "App Store"
             },
             "demoVideo": {
                 "href": "https://michaelgreenl.net/projects?slug=tally&autoplay=true",
