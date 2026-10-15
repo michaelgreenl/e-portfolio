@@ -1,30 +1,41 @@
 <script setup>
-import { onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import projectsData from '@/assets/data/projects.json';
 import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useGsap } from '@/composables/useGsap.js';
+import { PAGE_TIME_SCALE } from '@/animations/constants/timing.js';
 import { resumeAnimations } from '@/animations/page/resume.js';
+import { useMediaQuery } from '@vueuse/core';
 import Button from '@/components/Button.vue';
+import SelectedProject from '@/components/Project/SelectedProject.vue';
 import DownloadIcon from '@/components/SVGs/DownloadIcon.vue';
 import DownloadThickIcon from '@/components/SVGs/DownloadThickIcon.vue';
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
+import ChevronIcon from '@/components/SVGs/ChevronIcon.vue';
 
 const routeStore = useRouteStore();
 const themeStore = useThemeStore();
+const activeInternshipProject = ref(null);
+const showInternship = ref(false);
+const internshipWindow = ref(null);
 
 const { registerAnim } = useGsap();
+const page = { timeScale: PAGE_TIME_SCALE };
+
+const uniLocationWrapping = useMediaQuery('(min-width: 477px)');
 
 const anims = {
-    enterPage: registerAnim(resumeAnimations.enterPage),
-    exitPage: registerAnim(resumeAnimations.exitPage),
+    enterPage: registerAnim(resumeAnimations.enterPage, page),
+    exitPage: registerAnim(resumeAnimations.exitPage, page),
 };
 
 watch(
     () => routeStore.isLeaving,
     (newVal) => {
         if (newVal) {
+            internshipWindow.value?.close();
             anims.exitPage();
         }
     },
@@ -36,7 +47,17 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="resume-container page">
+    <div class="resume-container page" :class="{ 'window-open': showInternship }">
+        <SelectedProject
+            ref="internshipWindow"
+            class="experience-project-window"
+            :active-project="showInternship ? activeInternshipProject : null"
+            fullscreen-on-mobile
+            @close-project="showInternship = false"
+        />
+
+        <div class="art-slot" aria-hidden="true"></div>
+
         <div class="page-header">
             <div class="page-title">
                 <span class="page-eyebrow">Michael L. Green</span>
@@ -57,7 +78,7 @@ onMounted(() => {
                 <h2 class="section-header">Experience</h2>
 
                 <div class="section-content">
-                    <div v-for="experience in resumeData.experience" :key="experience.title" class="section-segment">
+                    <div v-for="(experience, key) in resumeData.experience" :key="key" class="section-segment">
                         <div class="segment-header">
                             <h3 class="segment-title">{{ experience.title }}</h3>
 
@@ -78,6 +99,40 @@ onMounted(() => {
                                 {{ info }}
                             </li>
                         </ul>
+
+                        <div v-if="key === '24g'" class="segment-footer">
+                            <h4 class="experience-projects-heading">Featured Work</h4>
+                        </div>
+
+                        <div v-if="experience.projects" class="experience-projects">
+                            <div v-for="project in experience.projects" :key="project.title" class="section-segment">
+                                <div class="segment-header segment-header-projects">
+                                    <h4 class="segment-title segment-title-projects">
+                                        <button
+                                            class="project-link"
+                                            type="button"
+                                            aria-haspopup="dialog"
+                                            @click="
+                                                activeInternshipProject = project;
+                                                showInternship = true;
+                                            "
+                                        >
+                                            <span>{{ project.title }}</span>
+                                            <ChevronIcon aria-hidden="true" />
+                                        </button>
+                                    </h4>
+
+                                    <div class="segment-dates">
+                                        <CalendarIcon />
+                                        <h3>{{ project.longDate }}</h3>
+                                    </div>
+                                </div>
+
+                                <ul class="segment-info">
+                                    <li>{{ project.description.short }}</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,7 +144,10 @@ onMounted(() => {
                     <div v-for="education in resumeData.education" :key="education.title" class="section-segment">
                         <div class="segment-header">
                             <h3 class="segment-title">
-                                {{ education.title }} <span v-if="education.location"> {{ education.location }}</span>
+                                {{ education.title }}
+                                <span v-if="education.location">
+                                    <span v-if="uniLocationWrapping">,</span> {{ education.location }}</span
+                                >
                             </h3>
 
                             <div class="segment-dates">
@@ -167,11 +225,20 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.experience-project-window {
+    font-size: 0.75em;
+
+    @include bp-md-tablet {
+        font-size: 0.66em;
+    }
+}
+
 .resume-container {
     --resume-light-ink: #2f3940;
     --resume-light-heading: #2f4858;
     --resume-light-accent: #315f72;
     --resume-light-muted: #52646e;
+    --column: 33em;
 
     position: relative;
     display: flex;
@@ -179,22 +246,28 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 33em;
+    max-width: var(--column);
     padding: $space-4;
     margin: 0 auto;
     font-size: 0.9em;
     color: $color-text-primary;
+
+    &.window-open {
+        @include bp-custom-max(847) {
+            z-index: 10;
+        }
+    }
 
     @include theme-light {
         color: var(--resume-light-ink);
     }
 
     @include bp-custom-min(730) {
-        max-width: 48em;
+        --column: 48em;
     }
 
     @include bp-xl-desktop {
-        max-width: 58em;
+        --column: 58em;
     }
 
     @include bp-xsm-phone {
@@ -245,6 +318,7 @@ h2 {
 }
 
 h3,
+h4,
 p span {
     font-family: $ternary-font-stack;
 }
@@ -284,6 +358,22 @@ li {
 
     @include theme-light {
         color: #45545c;
+    }
+}
+
+// Where the ASCII rocket goes, fixed behind the page so it keeps flying while the resume scrolls: large and
+// partly past the right edge on phones, and beside the column on wider screens, over the column's edge.
+.art-slot {
+    position: fixed;
+    inset: 15vh auto auto 62.5vw;
+    width: 67.5vw;
+    height: 100vh;
+    pointer-events: none;
+
+    @include bp-md-tablet {
+        inset: 10vh 0 6vh calc(50% + var(--column) / 2 - 10em);
+        width: auto;
+        height: auto;
     }
 }
 
@@ -457,8 +547,12 @@ li {
 .segment-header {
     display: flex;
     flex-wrap: wrap-reverse;
-    gap: $space-2;
+    column-gap: $space-2;
     justify-content: space-between;
+
+    &:not(.segment-header-projects) {
+        row-gap: $space-2;
+    }
 }
 
 .segment-title {
@@ -470,14 +564,15 @@ li {
     font-weight: 600;
     line-height: 1.25;
 
-    @include bp-custom-min(489) {
-        gap: $space-1;
-    }
-
     &-projects {
         .project-link {
+            padding: 0;
+            font: inherit;
             font-size: 1.1em;
             color: inherit;
+            text-align: left;
+            background: transparent;
+            border: 0;
 
             &:focus-visible {
                 outline: 2px solid $color-primary;
@@ -515,10 +610,78 @@ li {
     }
 }
 
+.experience-projects {
+    margin: 0.25rem 0 0;
+    border-top: solid 1px transparent;
+
+    @include theme-dark {
+        border-color: #adb5bd22;
+    }
+
+    @include theme-light {
+        border-color: #3d505c22;
+    }
+
+    > .section-segment {
+        gap: 0;
+        padding: 1rem 0.5rem 0;
+    }
+
+    .segment-header-projects {
+        row-gap: $space-1;
+    }
+
+    .segment-title {
+        min-width: 0;
+        margin-right: 0;
+        line-height: 1;
+    }
+
+    .project-link {
+        display: inline-flex;
+        gap: 0.2em;
+        align-items: center;
+        transition: color 0.15s ease;
+        margin-right: $space-4;
+
+        @include interactive {
+            color: $color-primary-light;
+            text-decoration: none;
+
+            @include theme-light {
+                color: var(--resume-light-accent);
+            }
+        }
+
+        :deep(svg) {
+            flex-shrink: 0;
+            width: 0.4em;
+            height: 0.4em;
+            overflow: visible;
+            fill: currentcolor;
+            stroke: currentcolor;
+            stroke-width: 48;
+        }
+    }
+}
+
 .segment-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
+    margin-top: $space-2;
+}
+
+.experience-projects-heading {
+    align-self: flex-end;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: $color-primary-light;
+
+    @include theme-light {
+        color: var(--resume-light-heading);
+    }
 }
 
 .segment-info {

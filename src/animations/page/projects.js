@@ -5,7 +5,7 @@ import { TIMING } from '@/animations/constants/timing.js';
 gsap.registerPlugin(Flip);
 
 const getSelectedProjectDetailTargets = (target) => [
-    ...target.querySelectorAll('.demo-video, .selected-description li'),
+    ...target.querySelectorAll('.project-gallery, .selected-description li'),
 ];
 
 export const captureProjectToolChipState = (targets) => Flip.getState(targets);
@@ -82,39 +82,15 @@ export const projectAnimations = {
         }
     },
 
-    showSelectedProject: ({ tl, targets, reducedMotion }) => {
-        gsap.set(targets, {
-            autoAlpha: 0,
-            scale: reducedMotion ? 1 : 0.98,
-        });
-
-        tl.to(targets, {
-            autoAlpha: 1,
-            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-            ease: TIMING.easing.smooth,
-            scale: 1,
-        });
-    },
-
-    hideSelectedProject: ({ tl, targets, onComplete, reducedMotion }) => {
-        tl.to(targets, {
-            autoAlpha: 0,
-            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-            ease: TIMING.easing.smooth,
-            scale: reducedMotion ? 1 : 0.98,
-            onComplete,
-        });
-    },
-
     showSelectedProjectDetails: ({ tl, target, onComplete }) => {
         const detailTargets = getSelectedProjectDetailTargets(target);
 
         gsap.killTweensOf([target, ...detailTargets]);
-        gsap.set(target, { height: 0, overflow: 'hidden' });
+        gsap.set(target, { height: 0, clipPath: 'inset(0 -2rem)' });
         gsap.set(detailTargets, { autoAlpha: 0, y: 8 });
 
         tl.eventCallback('onComplete', () => {
-            gsap.set(target, { clearProps: 'height,overflow' });
+            gsap.set(target, { clearProps: 'height,clipPath' });
             onComplete();
         });
 
@@ -143,7 +119,7 @@ export const projectAnimations = {
         const detailTargets = getSelectedProjectDetailTargets(target);
 
         gsap.killTweensOf([target, ...detailTargets]);
-        gsap.set(target, { height: target.offsetHeight, overflow: 'hidden' });
+        gsap.set(target, { height: target.offsetHeight, clipPath: 'inset(0 -2rem)' });
         tl.eventCallback('onComplete', onComplete);
 
         if (detailTargets.length) {

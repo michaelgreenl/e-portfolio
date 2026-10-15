@@ -10,7 +10,7 @@ import {
 } from '@/animations/page/projects.js';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
-import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
+import ProjectMediaGallery from '@/components/Project/ProjectMediaGallery.vue';
 
 import BoxArrowIcon from '@/components/SVGs/BoxArrowIcon.vue';
 import ArrowIcon from '@/components/SVGs/ArrowIcon.vue';
@@ -29,15 +29,19 @@ const bp = useBreakpoints();
 const externalLinkRespText = (projectSlug, externalLinks) => {
     const className = 'responsive-link-text';
 
+    const TWO_COLUMN_CARD = 'reaction';
+
     if (bp.isXlLaptop.value) {
         return 'undefined';
     }
 
     if (bp.isLgLaptop.value) {
+        if (projectSlug === TWO_COLUMN_CARD) return 'undefined';
         return `${Object.keys(externalLinks).length <= 3 ? undefined : className}`;
     }
 
     if (bp.isLaptop.value) {
+        if (projectSlug === TWO_COLUMN_CARD) return 'undefined';
         return `${Object.keys(externalLinks).length < 3 ? undefined : className}`;
     }
 
@@ -56,11 +60,13 @@ const externalLinkRespText = (projectSlug, externalLinks) => {
 };
 
 const cardEl = ref(null);
+const mediaGallery = useTemplateRef('mediaGallery');
 const { registerAnim } = useGsap(cardEl);
 const toolChipList = useTemplateRef('toolChipList');
 const toolOverflow = useTemplateRef('toolOverflow');
 const toolOverflowMeasure = useTemplateRef('toolOverflowMeasure');
 const projectSelected = ref(false);
+const detailsMounted = ref(false);
 const autoplayVideo = ref(false);
 const visibleToolCount = shallowRef(props.project.stack.length);
 const toolsRevealed = shallowRef(false);
@@ -354,9 +360,12 @@ async function openProject(autoplay = false) {
         emit('open-project', props.project, autoplay);
         projectSelected.value = true;
     } else {
+        detailsMounted.value = true;
         projectSelected.value = true;
         autoplayVideo.value = autoplay;
         await nextTick();
+
+        if (autoplay) mediaGallery.value?.showVideo();
 
         // Handling race condition with scrollTo getting viewportHeight and project-card grow animation completing
         if (props.project.slug === 'algo-visualizer' || props.project.slug === 'mawm') {
@@ -419,7 +428,12 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                 <div class="card-title">
                     <component :is="projectLogos[project.slug]" class="project-logo" />
 
-                    <h2 :style="{ fontFamily: project.fontFamily }">
+                    <h2
+                        :style="{
+                            fontFamily: project.fontFamily,
+                            fontWeight: project.slug === 'tally' ? '500' : '400',
+                        }"
+                    >
                         {{ project.title }}
                     </h2>
                 </div>
@@ -502,12 +516,17 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
             </div>
 
             <Transition :css="false" @enter="onSelectedDetailsEnter" @leave="onSelectedDetailsLeave">
-                <div v-if="projectSelected && !bp.isLaptop.value" class="selected-details">
-                    <ProjectDemoVideo v-if="project.video" :project="project" :autoplay="autoplayVideo" />
+                <div v-if="detailsMounted" v-show="projectSelected && !bp.isLaptop.value" class="selected-details">
+                    <ProjectMediaGallery
+                        ref="mediaGallery"
+                        :project="project"
+                        :autoplay="autoplayVideo"
+                        :active="projectSelected && !bp.isLaptop.value"
+                    />
 
                     <ul class="selected-description">
-                        <li v-for="detail in project.description?.long" :key="detail.label">
-                            <strong>{{ detail.label }}:</strong> {{ detail.text }}
+                        <li v-for="detail in project.description?.long" :key="detail">
+                            {{ detail }}
                         </li>
                     </ul>
                 </div>
@@ -519,9 +538,13 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                         v-for="[key, link] in Object.entries(project.externalLinks).filter(
                             ([key]) => key !== 'porfolioLink',
                         )"
-                        :class="externalLinkRespText(project.slug, project.externalLinks)"
+                        :class="[
+                            externalLinkRespText(project.slug, project.externalLinks),
+                            { 'no-fill': key === 'liveSite' },
+                        ]"
                         :key="link"
                         :href="key === 'demoVideo' ? null : link.href"
+                        :aria-label="link.text"
                         target="_blank"
                     >
                         <Button
@@ -530,9 +553,16 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                             :text="link.text"
                             :iconLeft="externalIcons[key]"
                             preset="secondary"
+                            tooltip-when-text-hidden
                         />
 
-                        <Button v-else :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                        <Button
+                            v-else
+                            :text="link.text"
+                            :iconLeft="externalIcons[key]"
+                            preset="secondary"
+                            tooltip-when-text-hidden
+                        />
                     </a>
                 </div>
 
@@ -582,11 +612,7 @@ p {
 .card-footer {
     justify-content: space-between;
     margin-top: $space-1;
-    font-size: 1.3em;
-
-    @include bp-sm-phone {
-        font-size: 1.4em;
-    }
+    font-size: 1.4em;
 
     @include bp-md-tablet {
         flex-wrap: nowrap;
@@ -597,22 +623,20 @@ p {
 
     :deep(.see-more) {
         .icon {
-            height: 1.2em !important;
+            width: 0.8em;
 
             @include bp-md-tablet {
+                width: auto;
                 height: 1.1em !important;
                 margin-bottom: 0.1rem;
             }
         }
 
         @include theme-light {
-            gap: 0.4rem;
+            gap: 0.6rem;
 
             .icon {
-                height: 1.4em !important;
-
                 @include bp-md-tablet {
-                    height: 1.1em !important;
                     margin: 0 0 0.1rem 0.1rem;
                 }
             }
@@ -626,6 +650,7 @@ p {
     padding: $space-4 $size-4;
     cursor: pointer;
     border-bottom: solid 1px $color-text-muted;
+    backdrop-filter: blur(2px);
 
     &.is-page-transitioning {
         pointer-events: none;
@@ -640,7 +665,6 @@ p {
         &:not(.is-page-transitioning):active {
             border-radius: $radius-md;
             box-shadow: 0 8px 16px 0 rgb(0 0 0 / 37%);
-            backdrop-filter: blur(2px);
             transform: scale(1.01) !important;
 
             .card-footer {
@@ -711,8 +735,9 @@ p {
     justify-content: space-between;
 
     .card-title {
-        gap: $space-2;
+        gap: 0.45em;
         margin-right: $space-8;
+        margin-bottom: -$space-2;
         font-size: 1.2em;
 
         @include bp-xsm-phone {
@@ -722,7 +747,7 @@ p {
         .project-logo {
             display: flex;
             align-items: center;
-            height: 2.6em;
+            height: 2.2em;
 
             @include theme-dark {
                 fill: $color-gray3;
@@ -904,12 +929,10 @@ p {
     pointer-events: none;
 }
 
-.demo-video {
+.project-gallery {
     width: 100%;
     max-width: 60em;
-    aspect-ratio: 16 / 9;
-    margin: $space-3 auto;
-    border-radius: $radius-md;
+    margin: $space-3 auto 0;
 
     @include bp-xsm-phone {
         width: 95%;
@@ -968,7 +991,7 @@ p {
 .external-links {
     a {
         &.responsive-link-text {
-            &:deep(button) span {
+            &:deep(button) .button-text {
                 display: none;
             }
         }
@@ -1013,7 +1036,7 @@ p {
         }
     }
 
-    a:nth-child(3):hover :deep(button) svg {
+    a.no-fill:hover :deep(button) svg {
         fill: transparent !important;
     }
 }

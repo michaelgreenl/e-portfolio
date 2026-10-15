@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } f
 const props = defineProps({
     project: { required: true, type: Object },
     autoplay: { default: false, type: Boolean },
+    active: { default: true, type: Boolean },
 });
 
 const projectImages = import.meta.glob('../../assets/images/*_blurred.webp', {
@@ -15,12 +16,11 @@ const projectImages = import.meta.glob('../../assets/images/*_blurred.webp', {
 const isLoaded = shallowRef(false);
 const videoFrame = useTemplateRef('videoFrame');
 const vimeoOrigin = 'https://player.vimeo.com';
-let loadTimer;
 
 const videoSrc = computed(() => {
     if (!props.project.video) return undefined;
 
-    return `https://player.vimeo.com/video/${props.project.video}?badge=0&autopause=0&player_id=0&app_id=58479&texttrack=en-US&autoplay=${props.autoplay ? '1' : '0'}&muted=1`;
+    return `https://player.vimeo.com/video/${props.project.video}?badge=0&autopause=0&player_id=0&app_id=58479&texttrack=en-US&autoplay=0&muted=1`;
 });
 
 const posterSrc = computed(() => {
@@ -30,13 +30,6 @@ const posterSrc = computed(() => {
 });
 
 const videoTitle = computed(() => `${props.project.slug}-demo-vid`);
-
-function clearLoadTimer() {
-    if (!loadTimer) return;
-
-    window.clearTimeout(loadTimer);
-    loadTimer = undefined;
-}
 
 function onPlayerMessage(event) {
     if (event.origin !== vimeoOrigin || event.source !== videoFrame.value?.contentWindow) return;
@@ -57,18 +50,25 @@ function onPlayerMessage(event) {
 
     if (data?.event !== 'ready' && data?.method !== 'ping') return;
 
+    if (isLoaded.value) return;
+
+    isLoaded.value = true;
     videoFrame.value.contentWindow?.postMessage({ method: 'addEventListener', value: 'timeupdate' }, vimeoOrigin);
+    updatePlayback();
 }
+
+function updatePlayback() {
+    if (!isLoaded.value) return;
+
+    if (!props.active || props.autoplay) {
+        videoFrame.value?.contentWindow?.postMessage({ method: props.active ? 'play' : 'pause' }, vimeoOrigin);
+    }
+}
+
+watch([() => props.active, () => props.autoplay], updatePlayback);
 
 function onFrameLoad() {
     videoFrame.value.contentWindow?.postMessage({ method: 'ping' }, vimeoOrigin);
-
-    clearLoadTimer();
-
-    loadTimer = window.setTimeout(() => {
-        isLoaded.value = true;
-        loadTimer = undefined;
-    }, 160);
 }
 
 onMounted(() => window.addEventListener('message', onPlayerMessage));
@@ -76,14 +76,12 @@ onMounted(() => window.addEventListener('message', onPlayerMessage));
 watch(
     videoSrc,
     () => {
-        clearLoadTimer();
         isLoaded.value = false;
     },
     { immediate: true },
 );
 
 onUnmounted(() => {
-    clearLoadTimer();
     window.removeEventListener('message', onPlayerMessage);
 });
 </script>

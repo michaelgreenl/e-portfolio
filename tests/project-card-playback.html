@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Project card playback regression</title>
+    </head>
+    <body>
+        <!-- Open /tests/project-card-playback.html through npm run dev in a real browser. -->
+        <button id="run">Check card reveal and playback</button>
+        <pre id="result" role="status">Ready</pre>
+        <iframe id="portfolio" title="Mobile portfolio" style="width: 379px; height: 756px; border: 0"></iframe>
+        <script type="module">
+            const result = document.querySelector('#result');
+            const button = document.querySelector('#run');
+            const portfolio = document.querySelector('#portfolio');
+            const assert = (condition, message) => {
+                if (!condition) throw new Error(message);
+            };
+            async function until(condition) {
+                const deadline = performance.now() + 30000;
+                while (!condition()) {
+                    assert(performance.now() < deadline, 'Timed out waiting for the card or player');
+                    await new Promise((resolve) => setTimeout(resolve, 25));
+                }
+            }
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                result.textContent = 'Running against the mobile Projects page and real Vimeo player…';
+                portfolio.src = '/projects';
+                let loads = 0;
+                let sampleFrame;
+                let doc;
+                const onLoad = (event) => {
+                    if (event.target.tagName === 'IFRAME') loads++;
+                };
+                try {
+                    await until(() => portfolio.contentDocument?.querySelector('[data-project-slug="jsf"]'));
+                    doc = portfolio.contentDocument;
+                    const win = portfolio.contentWindow;
+                    const card = doc.querySelector('[data-project-slug="jsf"]');
+                    const disclosure = () =>
+                        [...card.querySelectorAll('button')].find((el) => /See (More|Less)/.test(el.textContent));
+                    await until(() => !card.classList.contains('is-page-transitioning'));
+                    card.addEventListener('load', onLoad, true);
+                    const clipped = new Set();
+                    let fadeFrames = 0;
+                    const sample = () => {
+                        const gallery = card.querySelector('[data-testid="project-gallery"]');
+                        const frame = card.querySelector('iframe');
+                        if (frame) {
+                            const opacity = Number(win.getComputedStyle(frame).opacity);
+                            if (opacity > 0 && opacity < 1) fadeFrames++;
+                        }
+                        if (gallery && Number(win.getComputedStyle(gallery).opacity) > 0.1) {
+                            for (const label of ['Previous media', 'Next media']) {
+                                const arrow = gallery.querySelector(`[aria-label="${label}"]`);
+                                const box = arrow.getBoundingClientRect();
+                                const x = label === 'Previous media' ? box.left + 4 : box.right - 4;
+                                const y = box.top + box.height / 2;
+                                if (y > 0 && y < win.innerHeight && !arrow.contains(doc.elementFromPoint(x, y)))
+                                    clipped.add(label);
+                            }
+                        }
+                        sampleFrame = win.requestAnimationFrame(sample);
+                    };
+                    sample();
+                    disclosure().click();
+                    await until(
+                        () => loads === 1 && card.querySelector('.demo-video')?.getAttribute('aria-busy') === 'false',
+                    );
+                    await until(() => win.getComputedStyle(card.querySelector('iframe')).opacity === '1');
+                    win.cancelAnimationFrame(sampleFrame);
+                    assert(clipped.size === 0, `Arrows were clipped during reveal: ${[...clipped].join(', ')}`);
+                    assert(fadeFrames > 1, 'The player appeared without an opacity transition');
+                    const frame = card.querySelector('iframe');
+                    const playerWindow = frame.contentWindow;
+                    const source = frame.src;
+                    const checkPlayer = () => {
+                        assert(
+                            frame.isConnected && card.querySelector('iframe') === frame,
+                            'Collapsing the card destroyed its player',
+                        );
+                        assert(
+                            frame.contentWindow === playerWindow && frame.src === source && loads === 1,
+                            'The player reloaded',
+                        );
+                    };
+                    for (let cycle = 0; cycle < 2; cycle++) {
+                        disclosure().click();
+                        await until(() => !card.querySelector('[data-testid="project-gallery"]').checkVisibility());
+                        checkPlayer();
+                        const demo = [...card.querySelectorAll('button')].find(
+                            (el) => el.textContent.trim() === 'Demo Video',
+                        );
+                        demo.click();
+                        await until(() => card.querySelector('[data-testid="project-gallery"]').checkVisibility());
+                        checkPlayer();
+                    }
+                    result.textContent =
+                        'PASS: Reveal keeps arrows visible and fades the player. One iframe survives collapse, reopen, and autoplay changes.';
+                } catch (error) {
+                    result.textContent = `FAIL: ${error.message}`;
+                    console.error(error);
+                } finally {
+                    portfolio.contentWindow?.cancelAnimationFrame(sampleFrame);
+                    doc?.querySelector('[data-project-slug="jsf"]')?.removeEventListener('load', onLoad, true);
+                    button.disabled = false;
+                }
+            });
+        </script>
+    </body>
+</html>

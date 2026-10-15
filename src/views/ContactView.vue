@@ -170,6 +170,8 @@ const clearStatus = () => {
 
 <template>
     <div ref="pageElement" class="contact-container page page-shell">
+        <div class="art-slot" aria-hidden="true"></div>
+
         <div ref="pageHeader" class="contact-header">
             <h1>Get in Touch!</h1>
             <hr />
@@ -259,16 +261,47 @@ const clearStatus = () => {
 </template>
 
 <style lang="scss" scoped>
+// The header and form share one centered column, with the header text at the column's left edge. On wider
+// screens the ASCII satellite sits at the column's top right; on phones it sits in a band above the header.
 .contact-container {
     position: relative;
     padding: $space-2 $space-4;
+
+    // The satellite's slot runs past the right edge; this keeps it from widening the page.
+    overflow-x: clip;
 }
 
+// Where the ASCII satellite goes: up and to the right of the form, so its signal crosses the form. It runs past
+// the right edge of the screen. On phones it is fixed behind the page at the top right, across the header.
+.art-slot {
+    position: fixed;
+    inset: 2.5vh -27vw auto auto;
+    width: 93vw;
+    height: 51vh;
+    pointer-events: none;
+
+    @include bp-md-tablet {
+        position: absolute;
+        inset: -2em -18em auto calc(50% + 2em);
+        width: auto;
+        height: 32em;
+    }
+}
+
+// On phones the line under the header is hidden, so the form sits closer.
 .contact-header {
-    width: 90%;
-    max-width: 27em;
-    margin: $space-6 0;
-    text-align: center;
+    width: 100%;
+    max-width: 33em;
+    margin: $space-6 0 $space-2;
+
+    @include bp-md-tablet {
+        max-width: 36em;
+        margin-bottom: $space-6;
+    }
+
+    @include bp-lg-laptop {
+        max-width: 40em;
+    }
 
     h1,
     p {
@@ -288,9 +321,15 @@ const clearStatus = () => {
         }
     }
 
+    // On phones the satellite sits right over the line, so the line shows only on wider screens.
     hr {
+        display: none;
         width: 100%;
         margin: $space-3 auto $space-2;
+
+        @include bp-md-tablet {
+            display: block;
+        }
     }
 
     p {
@@ -372,6 +411,7 @@ const clearStatus = () => {
     font-size: 1em;
     background-color: transparent;
     border: 2px solid transparent;
+    backdrop-filter: blur(2px);
 
     &:focus {
         outline: none;

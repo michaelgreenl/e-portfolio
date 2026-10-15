@@ -2,7 +2,7 @@
     "education": {
         "cmu": {
             "title": "Central Michigan University",
-            "location": "Mount Pleasant MI",
+            "location": "Mount Pleasant, MI",
             "dates": "Graduation: August 2023",
             "major": "Bachelor of Science in Computer Science",
             "minor": "Minor in Mathematics"
@@ -19,14 +19,74 @@
     "experience": {
         "24g": {
             "title": "Software Development Intern",
-            "company": "24g",
+            "company": "24G",
             "location": "Troy MI",
             "dates": "January 2022 - August 2022",
             "info": [
-                "Delivered four Vue.js expo interfaces as the sole frontend developer for Salesforce, Waymo, and Essilor Luxottica, coordinating with the Experiential Team Lead to take each interface from mockup to production in 4–8 weeks.",
-                "Designed and implemented custom page transitions beyond the supplied mockups for Oakley’s Vue.js interface, coordinating with the design team to adapt supporting assets.",
+                "Delivered four Vue.js expo interfaces as the sole frontend developer for Salesforce, Waymo, and Essilor Luxottica, coordinating with the Experiential Team Lead to take each interface from mockup to production.",
+                "Designed and implemented custom page transitions and UI animations beyond the supplied static mockups for Oakley’s Vue.js interface, coordinating with the design team to adapt supporting assets.",
                 "Delivered the frontend for an Oakley expo activation that Essilor Luxottica named its favorite of four event experiences and expressed intent to reuse with better placement to increase visibility and participation.",
-                "Built an analytics dashboard for an internal expo reporting tool, including data display and CSV export, that remained in active company use following the internship."
+                "Owned Campaign Manager’s reporting interface and contributed to its API integration. The internal event-reporting tool remained in active company use after the internship."
+            ],
+            "projects": [
+                {
+                    "title": "Oakley / Essilor Luxottica",
+                    "slug": "oakley",
+                    "stack": ["vue", "sass", "javascript"],
+                    "shortDate": "March 2022 - April 2022",
+                    "longDate": "March 2022 - April 2022",
+                    "description": {
+                        "short": "An expo photo kiosk where visitors pick an athlete, pose for a photo with them, and download the finished image by QR code, with custom animated transitions between each step.",
+                        "long": [
+                            "As the sole frontend developer, I built the interface from supplied visual mockups and owned its interactive design and API integration.",
+                            "I requested separate assets from the design team so I could animate elements embedded in the supplied artwork. I used them in staggered animations during transitions, making the background artwork part of how the interface responded to user actions.",
+                            "Essilor Luxottica named Oakley its favorite of the four experiences at the event and expressed intent to use it again with more prominent placement."
+                        ]
+                    },
+                    "portrait": true,
+                    "gallery": [
+                        {
+                            "src": "oakley/welcome.png",
+                            "alt": "Oakley welcome screen with an athlete video and a Tap to Start button."
+                        },
+                        {
+                            "src": "oakley/participants.png",
+                            "alt": "Oakley participant selection with a preview of the athlete's position beside one or more visitors."
+                        },
+                        {
+                            "src": "oakley/athletes.png",
+                            "alt": "Oakley athlete selection with Francisco Lindor, Patrick Rodgers, Patrick Mahomes, and Mikaela Shiffrin."
+                        },
+                        {
+                            "src": "oakley/photo-download.png",
+                            "alt": "Oakley completed photo preview with a sample portrait and a QR code for downloading the image."
+                        }
+                    ],
+                    "video": "1230759398",
+                    "img": "oakley_blurred.webp"
+                },
+                {
+                    "title": "Campaign Manager",
+                    "slug": "campaign-manager",
+                    "stack": ["vue", "sass", "node", "express", "sequelize", "mysql", "javascript"],
+                    "shortDate": "January 2022 - March 2022",
+                    "longDate": "January 2022 - March 2022",
+                    "description": {
+                        "short": "An internal dashboard for reviewing event and activation data through social, lead, and interaction reports, with filters, pagination, and CSV exports.",
+                        "long": [
+                            "I took ownership of most of Campaign Manager’s frontend while working with the other interns at 24G. I built the reporting interface and integrated the team’s APIs, contributing to a tool that remained in active company use after my internship.",
+                            "The download flow gave me room to shape an interaction within an otherwise established interface. I used sliding file entries and an animated completion checkmark to show when the application was preparing a report and when the file was ready."
+                        ]
+                    },
+                    "gallery": [
+                        {
+                            "src": "campaign-manager/phone-layouts.svg",
+                            "alt": "Campaign Manager mobile layouts showing the welcome screen, event and activation filters, and a report with download and pagination controls."
+                        }
+                    ],
+                    "video": "1231795711",
+                    "img": "campaign-manager_blurred.webp"
+                }
             ]
         }
     },

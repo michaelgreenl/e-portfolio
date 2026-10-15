@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
-import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
-import { projectAnimations } from '@/animations/page/projects.js';
 import { useUtilAnimations } from '@/composables/useUtilAnimations.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
 import projectsData from '@/assets/data/projects.json';
@@ -11,12 +9,12 @@ import ProjectCard from '@/components/Project/ProjectCard.vue';
 
 import ReactionLogo from '@/components/SVGs/ProjectLogos/ReactionLogo.vue';
 import AlgoVisualizerLogo from '@/components/SVGs/ProjectLogos/AlgoVisualizerLogo.vue';
-import GameLobbyLogo from '@/components/SVGs/ProjectLogos/GameLobbyLogo.vue';
 import TallyLogo from '@/components/SVGs/ProjectLogos/TallyLogo.vue';
 
 import GithubIcon from '@/components/SVGs/GithubIcon.vue';
 import VideoIcon from '@/components/SVGs/VideoIcon.vue';
 import WebsiteIcon from '@/components/SVGs/WebsiteIcon.vue';
+import AppleIcon from '@/components/SVGs/AppleIcon.vue';
 import NPMIcon from '@/components/SVGs/NPMIcon.vue';
 import { TIMING } from '@/animations/constants/timing';
 
@@ -24,12 +22,6 @@ const routeStore = useRouteStore();
 const { revealIn, headerReveal, headerDismiss } = useUtilAnimations();
 
 const { isLaptop } = useBreakpoints();
-const { registerAnim } = useGsap();
-
-const anims = {
-    showSelectedProject: registerAnim(projectAnimations.showSelectedProject),
-    hideSelectedProject: registerAnim(projectAnimations.hideSelectedProject),
-};
 
 const pageHeader = ref(null);
 const selectedProject = ref(null);
@@ -37,7 +29,6 @@ const projectCardRefs = ref({});
 
 const projectLogos = {
     reaction: ReactionLogo,
-    'game-lobby': GameLobbyLogo,
     'algo-visualizer': AlgoVisualizerLogo,
     tally: TallyLogo,
 };
@@ -46,11 +37,11 @@ const externalIcons = {
     github: GithubIcon,
     demoVideo: VideoIcon,
     liveSite: WebsiteIcon,
+    apple: AppleIcon,
     npm: NPMIcon,
 };
 
 const activeProject = ref();
-const scrollPosition = ref();
 const autoplayVideo = ref(false);
 const enteringProjectSlugs = ref(new Set(projectsData.map(({ slug }) => slug)));
 
@@ -59,7 +50,7 @@ watch(
     (newVal) => {
         if (newVal) {
             if (activeProject.value) {
-                closeProject();
+                selectedProject.value?.close();
             }
 
             headerDismiss({ headerEl: pageHeader.value, extraTargets: ['.project-card'] });
@@ -72,7 +63,7 @@ onMounted(() => {
     revealIn({
         selector: '.project-card',
         opts: {
-            delay: 0.2,
+            delay: 0.3,
             duration: TIMING.duration.moderate,
             stagger: {
                 each: TIMING.stagger.loose,
@@ -99,34 +90,10 @@ async function openProject(project, autoplay = false) {
 
     if (isLaptop.value) {
         activeProject.value = project;
-
-        scrollPosition.value = window.scrollY;
-        document.body.classList.add('no-scroll');
-        document.body.style.top = `-${scrollPosition.value}px`;
-
-        await nextTick();
-        selectedProject.value.el.focus();
-        anims.showSelectedProject({ targets: [selectedProject.value.el, selectedProject.value.overlay] });
     } else {
         queriedProjectRef.openProject(autoplay);
         await nextTick();
         queriedProjectRef.scrollToSelectedCard();
-    }
-}
-
-function closeProject() {
-    document.body.classList.remove('no-scroll');
-    document.body.style.top = '';
-    window.scrollTo(0, scrollPosition.value);
-
-    if (selectedProject.value) {
-        anims.hideSelectedProject({
-            targets: [selectedProject.value.el, selectedProject.value.overlay],
-            onComplete: () => {
-                selectedProject.value.el.blur();
-                activeProject.value = null;
-            },
-        });
     }
 }
 </script>
@@ -134,14 +101,17 @@ function closeProject() {
 <template>
     <div class="projects-container page page-shell">
         <SelectedProject
-            v-if="activeProject"
             ref="selectedProject"
+            class="portfolio-project-window"
+            :class="{ 'tally-project-window': activeProject?.slug === 'tally' }"
             :active-project="activeProject"
             :autoplay-video="autoplayVideo"
             :project-logos="projectLogos"
             :external-icons="externalIcons"
-            @close-project="closeProject()"
+            @close-project="activeProject = null"
         />
+
+        <div class="art-slot" aria-hidden="true"></div>
 
         <div ref="pageHeader" class="page-header">
             <h1>Projects</h1>
@@ -163,16 +133,52 @@ function closeProject() {
                 :data-project-slug="project.slug"
                 :class="{ 'is-page-transitioning': enteringProjectSlugs.has(project.slug) || routeStore.isLeaving }"
                 @open-project="openProject"
-                @close-selected="closeProject"
+                @close-selected="selectedProject?.close()"
             />
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
+.portfolio-project-window {
+    :deep(.selected-project) {
+        column-gap: $space-12;
+    }
+
+    :deep(.project-details) {
+        gap: $space-4;
+        justify-content: space-between;
+    }
+
+    :deep(.tool-chips) {
+        row-gap: $space-3;
+    }
+
+    &.tally-project-window :deep(.tool-chips) {
+        @include bp-custom-max(991) {
+            column-gap: $space-3;
+
+            .chip {
+                padding-inline: $space-3;
+            }
+        }
+    }
+
+    :deep(.project-details .description-long) {
+        gap: $space-3;
+        padding-left: $space-4;
+        margin-top: 0;
+        font-size: clamp(1.35em, 1.7vw, 1.45em);
+        line-height: 1.3;
+    }
+}
+
 .projects-container {
     position: relative;
     padding: $space-10 0 $space-3;
+
+    // On phones the Jupiter slot runs past both sides of the screen; this keeps it from widening the page.
+    overflow-x: clip;
     font-size: 0.6em;
 
     @include bp-md-tablet {
@@ -220,12 +226,51 @@ function closeProject() {
     }
 }
 
+// Where the ASCII Jupiter goes: at the top of the page, so it scrolls away with the header and does not stay
+// behind the cards. On phones it is a planet behind the header, about as wide as the screen or wider; on wider
+// screens it takes the right side. Its moons reach far past the slot.
+.art-slot {
+    position: absolute;
+    inset: calc(-7px - 16.2vw) -12.5vw auto;
+    height: calc(5.4vw + 531px);
+    pointer-events: none;
+
+    @include bp-sm-phone {
+        inset: calc(-7px - 11.2vw) -12.5vw auto;
+    }
+
+    @include bp-md-tablet {
+        inset: -2vh auto auto 50%;
+        width: 47vw;
+        height: 64vh;
+    }
+}
+
+// On wider screens the header keeps to the left side, beside Jupiter, set in from the edge of the cards.
 .page-header {
     @include flex-center-all;
 
     flex-direction: column;
     padding: 0 $space-3;
-    margin: $space-10 0 $space-20;
+    margin: $space-20 0;
+
+    @include bp-sm-phone {
+        margin: $space-24 0 $space-20;
+    }
+
+    @include bp-md-tablet {
+        align-items: flex-start;
+        width: 100%;
+        max-width: 92em;
+        padding-right: 45%;
+        padding-left: 3em;
+    }
+
+    @include bp-xl-desktop {
+        max-width: 116em;
+        padding-left: 0;
+        width: 81%;
+    }
 
     h1 {
         @include bp-lg-laptop {
@@ -235,9 +280,14 @@ function closeProject() {
 
     p {
         max-width: 48ch;
+        min-width: 48ch;
         font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
+
+        @include bp-md-tablet {
+            text-align: left;
+        }
 
         @include bp-lg-laptop {
             max-width: 65ch;
@@ -271,6 +321,11 @@ function closeProject() {
         width: 100%;
         max-width: 92em;
         margin-inline: auto;
+
+        :deep(.project-card:nth-child(3)) {
+            grid-row: 2;
+            grid-column: 1 / span 2;
+        }
     }
 
     @include bp-xl-desktop {

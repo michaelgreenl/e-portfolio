@@ -4,12 +4,14 @@ import { useRouteStore } from '@/stores/routeStore.js';
 import Navbar from '@/components/Navbar/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import BgSVG from '@/components/SVGs/BgSVG.vue';
+import AsciiField from '@/components/AsciiField.vue';
 
 const routeStore = useRouteStore();
 </script>
 
 <template>
     <BgSVG class="bg-svg" />
+    <AsciiField />
 
     <Navbar />
     <RouterView v-slot="{ Component }">
@@ -51,20 +53,19 @@ body,
 
     @include bp-sm-phone {
         font-size: 17px;
+
+        @media (height >= 900px) {
+            font-size: 19px;
+        }
+
+        @media (height >= 1000px) {
+            font-size: 21px;
+        }
     }
 
     @include bp-xl-desktop {
         font-size: 18px;
     }
-}
-
-.no-scroll {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
 }
 
 .page {

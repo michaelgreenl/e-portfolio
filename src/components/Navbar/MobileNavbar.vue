@@ -261,6 +261,10 @@ const navMobileRouteTo = (key) => {
 
     @include bp-sm-phone {
         max-width: 374px;
+
+        @media (height >= 900px) {
+            max-width: 435px;
+        }
     }
 
     @include bp-md-tablet {

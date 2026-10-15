@@ -4,6 +4,7 @@ import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
+import { PAGE_TIME_SCALE } from '@/animations/constants/timing.js';
 import { homeAnimations } from '@/animations/page/home.js';
 import Button from '@/components/Button.vue';
 import ContactLinks from '@/components/ContactLinks.vue';
@@ -16,10 +17,11 @@ const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
 const { registerAnim } = useGsap();
+const page = { timeScale: PAGE_TIME_SCALE };
 
 const anims = {
-    enterPage: registerAnim(homeAnimations.enterPage),
-    exitPage: registerAnim(homeAnimations.exitPage),
+    enterPage: registerAnim(homeAnimations.enterPage, page),
+    exitPage: registerAnim(homeAnimations.exitPage, page),
 };
 
 watch(
@@ -38,6 +40,7 @@ onMounted(() => {
 
 <template>
     <div class="home-container page page-shell">
+        <div class="art-slot" aria-hidden="true"></div>
         <div class="hero-content">
             <h3>Hi 👋, my name is</h3>
             <h1>
@@ -85,13 +88,24 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+$hero-tablet-bp: 525;
+
+// On narrow phones the name takes two lines, so the hero starts lower, below the top of the globe.
 .home-container {
+    --hero-padding-top: #{$space-20};
+
     z-index: 5;
     gap: $space-page-section;
-    padding: $space-8 $space-4 0;
+    padding: var(--hero-padding-top) $space-4 0;
 
     @include bp-xsm-phone {
         font-size: 1em;
+    }
+
+    @include bp-custom-min($hero-tablet-bp) {
+        --hero-padding-top: #{$space-10};
+
+        overflow-x: clip;
     }
 
     @include bp-md-tablet {
@@ -108,10 +122,28 @@ onMounted(() => {
     }
 }
 
-$hero-tablet-bp: 525;
+// On phones and tablets the globe sits behind the hero. Its size follows the viewport; wider screens use the right half.
+.art-slot {
+    --size: min(80.5vw + 160px, 79.5vh);
+
+    position: fixed;
+    inset: calc(min(49vh + 16.7vw - 92px, 51vh) - var(--size) / 2) -10vw auto;
+    height: var(--size);
+    pointer-events: none;
+
+    @include bp-custom-min($hero-tablet-bp) {
+        position: absolute;
+        inset: calc(50% + var(--hero-padding-top) / 2 - var(--size) / 2) -10vw auto;
+    }
+
+    @include bp-md-tablet {
+        inset: 0 0 0 50%;
+        height: auto;
+    }
+}
 
 h1 {
-    padding-bottom: $size-1;
+    padding-bottom: $space-3;
     margin: 0;
     font-size: clamp(4.5em, 21vw, 5.2em);
     line-height: 0.8ch;
@@ -120,7 +152,7 @@ h1 {
         display: flex;
         gap: $space-3;
         max-width: 100vw;
-        padding-bottom: $size-1;
+        padding-bottom: $space-2;
         margin: 0 auto;
         font-size: clamp(4.2em, 13.2vw, 5.2em);
         line-height: 1ch;
@@ -235,7 +267,7 @@ p {
 
     &-mobile {
         position: absolute;
-        top: 5.5rem;
+        top: 5rem;
         right: $space-3;
         z-index: 5;
         width: 100vw;
@@ -276,7 +308,7 @@ p {
     }
 
     @include bp-sm-phone {
-        top: 6.25rem;
+        top: 5.5rem;
         right: 0.85em;
     }
 }

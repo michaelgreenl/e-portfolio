@@ -35,18 +35,9 @@
         "description": {
             "short": "A local full-stack web app that turns AI-sourced job leads into a focused pipeline for reviewing roles, managing applications, and tracking outreach.",
             "long": [
-                {
-                    "label": "Project and Experience",
-                    "text": "Job Search Facilitator turns job discovery into one review, application, outreach, and tracking workflow. Users can review ranked roles, set priorities, manage application files, find contacts, draft messages, and track follow-ups."
-                },
-                {
-                    "label": "System Design",
-                    "text": "A Vue and Pinia client uses an Express, Prisma, and PostgreSQL API for durable workflow data. A host-side bridge streams structured Codex tasks, while isolated agents discover jobs and judge candidates through validated artifacts."
-                },
-                {
-                    "label": "Controlled Agent Workflows",
-                    "text": "The bridge turns Codex activity into visible, recoverable application state, including reasoning, failures, and browser permission requests. Read-only execution and schema-validated artifacts keep job imports and outreach results inside explicit access and data boundaries."
-                }
+                "Agent tasks run research in the background, with progress, failures, and browser-access requests shown in the interface. Active tasks remain available across navigation and reloads, so reviewing a role or preparing an application doesn’t interrupt the research.",
+                "Job discovery and evaluation use separate agents, so the researcher gathering leads doesn’t also decide which ones qualify. Their handoffs preserve supporting evidence, with schema checks validating the results before they become saved job records.",
+                "Codex needs local access to Chrome, so I separated agent execution from the application’s data service. A Node bridge manages research tasks and browser permissions, while the API preserves job records and application history in PostgreSQL."
             ]
         },
         "fontFamily": "ClashDisplay",
@@ -64,10 +55,25 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=jsf&autoplay=false"
             }
-        }
+        },
+        "gallery": [
+            {
+                "src": "jsf/phone-layouts.svg",
+                "alt": "Three phone views of Job Search Facilitator: the application queue, outreach research progress, and a saved outreach message."
+            },
+            {
+                "src": "jsf/tablet-applications.svg",
+                "alt": "Two tablet views of Job Search Facilitator: the job review list and application details with role evaluation and document uploads."
+            },
+            {
+                "src": "jsf/tablet-outreach.svg",
+                "alt": "Two tablet views of Job Search Facilitator: saved outreach contacts and application activity, alongside outreach research progress."
+            }
+        ]
     },
     {
-        "title": "Tally Tracker",
+        "title": "Tally",
+        "_note": "App Store link hidden until Tally passes App Store review. To restore it, add externalLinks.apple with the App Store URL and the text \"App Store\".",
         "slug": "tally",
         "stackText": [
             "TypeScript",
@@ -98,20 +104,11 @@
         "shortDate": "January 2026 - Present",
         "longDate": "January 2026 - Present",
         "description": {
-            "short": "Tally Tracker is a cross-platform app for personal and shared counters on iOS, Android, and web, with real-time collaboration and offline synchronization.",
+            "short": "Tally is a cross-platform app for managing personal and shared counters across devices, with real-time collaboration and offline synchronization.",
             "long": [
-                {
-                    "label": "Project and Experience",
-                    "text": "Tally Tracker is a cross-platform counter app for personal and shared tracking. Users can track counters, invite participants through deep links, and continue working through disconnects."
-                },
-                {
-                    "label": "System Design",
-                    "text": "Actions update local state first and enter a durable command queue. The API, database, and real-time layer coordinate replay and synchronization across reconnects, restarts, and concurrent devices."
-                },
-                {
-                    "label": "Decisions and Tradeoffs",
-                    "text": "Offline support shaped authentication, idempotency, state reconciliation, and web/native token delivery. I accepted added synchronization complexity so the app could stay responsive and recover cleanly after connection loss."
-                }
+                "Counting works offline as well as online, so updates happen locally before reaching the API. I used a persistent queue to retain pending changes through lost connections and app restarts.",
+                "A lost response can leave the client unsure whether an update was saved. Stable operation IDs let the server recognize retries and avoid applying the same increment twice.",
+                "Web and native clients share an authentication API, with HTTP-only cookies in the browser and secure device storage on native. When access tokens expire, concurrent requests share a single refresh request before retrying, with refresh-token rotation handled by the API."
             ]
         },
         "fontFamily": "ClashDisplay",
@@ -129,7 +126,13 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=tally&autoplay=false"
             }
-        }
+        },
+        "gallery": [
+            {
+                "src": "tally/phone-layouts.svg",
+                "alt": "Three views of Tally: personal and shared counters, counter participants, and Home Screen and Lock Screen widgets."
+            }
+        ]
     },
     {
         "title": "Reaction",
@@ -141,18 +144,9 @@
         "description": {
             "short": "A reaction-time training app with timed drills, animated feedback, user accounts, and performance history, backed by a secure Express/PostgreSQL API.",
             "long": [
-                {
-                    "label": "Project and Experience",
-                    "text": "Reaction is a training app built around configurable reaction-time drills. Players can adjust settings for each drill, receive animated feedback, and review results across recent sessions and their full profile history."
-                },
-                {
-                    "label": "System Design",
-                    "text": "Vue and Pinia manage the game flow while GSAP coordinates feedback and transitions between game states. An Express and PostgreSQL API stores accounts, results, statistics, and the settings used for each attempt."
-                },
-                {
-                    "label": "Interaction Design",
-                    "text": "GSAP timelines coordinate countdowns, target feedback, score changes, settings, and end screens without mixing animation into gameplay logic. Flip transitions reorganize profile filters and history columns while preserving continuity across responsive layouts."
-                }
+                "Animation carries the interface from setup through the countdown and into each round. GSAP timelines coordinate screen transitions with target and score feedback, including the shift from active play to the final result.",
+                "Each result keeps a snapshot of the settings used for that attempt. I carried that context into the profile’s filters, so results can be compared by their original target size and timing even after account preferences change.",
+                "The profile combines filtering and pagination with optional columns for saved settings. Its layout changes as those controls expand, so I used GSAP Flip to animate the reflow and adapted the controls for smaller screens."
             ]
         },
         "fontFamily": "AudioWide",
@@ -171,48 +165,16 @@
             "porfolioLink": {
                 "href": "https://michaelgreenl.net/projects?slug=reaction&autoplay=false"
             }
-        }
-    },
-    {
-        "title": "GameLobby",
-        "slug": "game-lobby",
-        "stackText": ["Vue", "Socket.IO", "Pinia", "Prisma", "Postgres", "Node", "Express", "Sass"],
-        "stack": ["vue", "socket", "pinia", "prisma", "postgres", "node", "express", "sass"],
-        "shortDate": "June 2025 - July 2025",
-        "longDate": "June 2025 - July 2025",
-        "description": {
-            "short": "A real-time tic-tac-toe lobby with JWT-authenticated Socket.IO sessions, server-side move validation, rematches, forfeits, and disconnect recovery.",
-            "long": [
-                {
-                    "label": "Project and Experience",
-                    "text": "GameLobby turns tic-tac-toe into a complete multiplayer flow with authenticated lobbies, live matches, rematches, forfeits, and recovery from temporary disconnects."
-                },
-                {
-                    "label": "System Design",
-                    "text": "Socket.IO connects each player to a server-authoritative game session that validates moves, turns, and match outcomes. User-to-socket tracking supports reconnects and multiple tabs, while Prisma and PostgreSQL persist users and games."
-                },
-                {
-                    "label": "Verified Multiplayer Flow",
-                    "text": "Socket-level tests connect real clients through authentication, game creation, joining, wins, draws, forfeits, rematches, and disconnects. They exercise the same event handlers that coordinate live matches, not only isolated board rules."
-                }
-            ]
         },
-        "fontFamily": "BitCount",
-        "img": "game-lobby_blurred.webp",
-        "video": "1119895851",
-        "externalLinks": {
-            "github": {
-                "href": "https://github.com/michaelgreenl/game-lobby",
-                "text": "Repository"
+        "gallery": [
+            {
+                "src": "reaction/phone-layouts.svg",
+                "alt": "Three phone views of Reaction: a round result, target and timing settings, and game history with filters."
             },
-            "demoVideo": {
-                "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=true",
-                "text": "Demo Video"
-            },
-            "liveSite": { "href": "https://gamelobby.io", "text": "Live Site" },
-            "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=game-lobby&autoplay=false"
+            {
+                "src": "reaction/tablet-layouts.svg",
+                "alt": "Two tablet views of Reaction: a round result with recent scores, and game history with saved settings and filters."
             }
-        }
+        ]
     }
 ]

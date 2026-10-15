@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gallery playback regression</title>
+    </head>
+    <body>
+        <!-- Open /tests/gallery-playback.html through npm run dev in a real browser. -->
+        <button id="run">Check gallery player persistence</button>
+        <pre id="result" role="status">Ready</pre>
+        <div id="mount"></div>
+        <script type="module">
+            import { createApp, h, ref } from 'vue';
+            import { createPinia } from 'pinia';
+            import SelectedProject from '/src/components/Project/SelectedProject.vue';
+            import resume from '/src/assets/data/resume.json';
+
+            const mount = document.querySelector('#mount');
+            const result = document.querySelector('#result');
+            const button = document.querySelector('#run');
+            const assert = (condition, message) => {
+                if (!condition) throw new Error(message);
+            };
+            async function until(condition) {
+                const deadline = performance.now() + 30000;
+                while (!(await condition())) {
+                    assert(performance.now() < deadline, 'Timed out waiting for the player or dialog');
+                    await new Promise((resolve) => setTimeout(resolve, 50));
+                }
+            }
+            async function playerPaused(frame) {
+                let paused;
+                const onMessage = (event) => {
+                    if (event.origin !== 'https://player.vimeo.com' || event.source !== frame.contentWindow) return;
+                    const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                    if (data.method === 'getPaused') paused = data.value;
+                };
+                window.addEventListener('message', onMessage);
+                try {
+                    frame.contentWindow.postMessage({ method: 'getPaused' }, 'https://player.vimeo.com');
+                    await until(() => paused !== undefined);
+                    return paused;
+                } finally {
+                    window.removeEventListener('message', onMessage);
+                }
+            }
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                result.textContent = 'Running with the real Vimeo iframe…';
+                let loads = 0;
+                const onLoad = (event) => {
+                    if (event.target.tagName === 'IFRAME') loads++;
+                };
+                mount.addEventListener('load', onLoad, true);
+                const project = resume.experience['24g'].projects[0];
+                const activeProject = ref(project);
+                const app = createApp({
+                    render: () =>
+                        h(SelectedProject, {
+                            activeProject: activeProject.value,
+                            autoplayVideo: true,
+                            onCloseProject: () => (activeProject.value = null),
+                        }),
+                });
+                try {
+                    app.use(createPinia());
+                    app.mount(mount);
+                    await until(() => loads === 1);
+                    const frame = mount.querySelector('iframe');
+                    const playerWindow = frame.contentWindow;
+                    await until(() => mount.querySelector('.demo-video').getAttribute('aria-busy') === 'false');
+                    await until(async () => !(await playerPaused(frame)));
+                    const checkPlayer = () => {
+                        assert(frame.isConnected && mount.querySelector('iframe') === frame, 'Player was replaced');
+                        assert(frame.contentWindow === playerWindow, 'Player browsing context was replaced');
+                        assert(loads === 1, `Player loaded ${loads} times instead of once`);
+                    };
+                    for (let cycle = 0; cycle < 2; cycle++) {
+                        mount.querySelector('[data-testid="enlarge-media"]').click();
+                        await until(() => mount.querySelector('[data-testid="media-viewer"]').matches(':modal'));
+                        checkPlayer();
+                        mount.querySelector('[data-testid="media-viewer"] [aria-label="Close window"]').click();
+                        await until(() => !mount.querySelector('[data-testid="media-viewer"]').matches(':modal'));
+                        checkPlayer();
+                        assert(mount.querySelector('dialog').matches(':modal'), 'Closing media closed the project');
+                    }
+                    mount.querySelector('[aria-label="Show image 2"]').click();
+                    await until(() => mount.querySelector('[data-testid="enlarge-image"]'));
+                    checkPlayer();
+                    mount.querySelector('[aria-label="Show demo video"]').click();
+                    await until(() => !mount.querySelector('[data-testid="enlarge-image"]'));
+                    checkPlayer();
+                    for (let cycle = 0; cycle < 2; cycle++) {
+                        mount.querySelector('[aria-label="Show image 2"]').click();
+                        await until(() => mount.querySelector('[data-testid="enlarge-image"]'));
+                        mount.querySelector('[aria-label="Close project"]').click();
+                        await until(() => !mount.querySelector('dialog').matches(':modal'));
+                        checkPlayer();
+                        assert(await playerPaused(frame), 'The hidden project kept playing');
+                        activeProject.value = project;
+                        await until(() => mount.querySelector('dialog').matches(':modal'));
+                        assert(
+                            !mount.querySelector('[data-testid="enlarge-image"]'),
+                            'Reopening left the video hidden',
+                        );
+                        await until(async () => !(await playerPaused(frame)));
+                        checkPlayer();
+                    }
+                    result.textContent =
+                        'PASS: One iframe load through gallery expansion, image navigation, and closing/reopening the project. Hidden playback pauses.';
+                } catch (error) {
+                    result.textContent = `FAIL: ${error.message}`;
+                    console.error(error);
+                } finally {
+                    app.unmount();
+                    mount.removeEventListener('load', onLoad, true);
+                    button.disabled = false;
+                }
+            });
+        </script>
+    </body>
+</html>

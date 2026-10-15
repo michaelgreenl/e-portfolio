@@ -1,5 +1,8 @@
 <script setup>
-defineProps({
+import { useId, useTemplateRef } from 'vue';
+import { useEventListener, useResizeObserver } from '@vueuse/core';
+
+const props = defineProps({
     href: {
         type: String,
     },
@@ -18,26 +21,166 @@ defineProps({
     styles: {
         type: Object,
     },
+    tooltipWhenTextHidden: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const button = useTemplateRef('button');
+const label = useTemplateRef('label');
+const tooltip = useTemplateRef('tooltip');
+const tooltipId = useId();
+
+function showTooltip(event) {
+    if (
+        !props.tooltipWhenTextHidden ||
+        !props.text ||
+        !label.value ||
+        !tooltip.value ||
+        label.value.getClientRects().length
+    )
+        return;
+    if (event.pointerType === 'touch') return;
+    if (event.type === 'focus' && !event.target.matches(':focus-visible')) return;
+
+    tooltip.value.showPopover();
+    positionTooltip();
+}
+
+function positionTooltip() {
+    if (!button.value || !label.value || !tooltip.value?.matches(':popover-open')) return;
+
+    const trigger = button.value.getBoundingClientRect();
+    if (label.value.getClientRects().length || trigger.bottom <= 0 || trigger.top >= window.innerHeight) {
+        hideTooltip();
+        return;
+    }
+
+    const { width, height } = tooltip.value.getBoundingClientRect();
+    const gutter = 8;
+    const below = trigger.top - height - gutter < gutter;
+    const left = Math.max(
+        gutter,
+        Math.min(trigger.left + (trigger.width - width) / 2, document.documentElement.clientWidth - width - gutter),
+    );
+    const top = below ? trigger.bottom + gutter : trigger.top - height - gutter;
+
+    tooltip.value.classList.toggle('is-below', below);
+    tooltip.value.style.left = `${left}px`;
+    tooltip.value.style.top = `${Math.min(top, window.innerHeight - height - gutter)}px`;
+}
+
+function hideTooltip(event) {
+    if (!button.value) return;
+    if (
+        event?.type === 'pointerleave' &&
+        (button.value.closest(':focus-visible') ||
+            button.value.contains(event.relatedTarget) ||
+            tooltip.value?.contains(event.relatedTarget))
+    )
+        return;
+    if (event?.type === 'blur' && (button.value.matches(':hover') || tooltip.value?.matches(':hover'))) return;
+    tooltip.value?.hidePopover();
+}
+
+if (props.tooltipWhenTextHidden) {
+    useEventListener(() => button.value?.closest('a'), 'focus', showTooltip);
+    useEventListener(() => button.value?.closest('a'), 'blur', hideTooltip);
+    useEventListener(window, ['resize', 'scroll'], positionTooltip, { capture: true });
+    useResizeObserver(label, positionTooltip);
+}
 </script>
 
 <template>
     <component
         :is="href ? 'a' : 'button'"
         :href="href"
+        ref="button"
         :class="preset"
         :style="{ ...styles }"
-        @click="$event.currentTarget.classList.add('is-clicked')"
+        :aria-label="tooltipWhenTextHidden ? text : undefined"
+        :aria-describedby="tooltipWhenTextHidden ? tooltipId : undefined"
+        @pointerenter="showTooltip"
+        @pointerleave="hideTooltip"
+        @focus="showTooltip"
+        @blur="hideTooltip"
+        @click="
+            hideTooltip();
+            $event.currentTarget.classList.add('is-clicked');
+        "
     >
         <component :is="iconLeft" class="icon" />
-        <span>
+        <span ref="label" class="button-text">
             {{ text }}
         </span>
         <component :is="iconRight" class="icon" />
+        <Teleport v-if="tooltipWhenTextHidden" :to="button?.closest('dialog') ?? 'body'">
+            <span
+                :id="tooltipId"
+                ref="tooltip"
+                class="button-tooltip"
+                role="tooltip"
+                popover="auto"
+                data-testid="external-link-tooltip"
+                @pointerleave="hideTooltip"
+                @click.stop.prevent
+            >
+                {{ text }}
+            </span>
+        </Teleport>
     </component>
 </template>
 
 <style lang="scss" scoped>
+.button-tooltip {
+    position: fixed;
+    inset: auto;
+    width: max-content;
+    max-width: calc(100vw - 1rem);
+    padding: $space-2 $space-3;
+    margin: 0;
+    overflow: visible;
+    font-family: $secondary-font-stack;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: $color-text-primary;
+    text-align: center;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    cursor: default;
+    background: $color-bg-primary;
+    border: 1px solid $color-text-muted;
+    border-radius: $radius-sm;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+
+    // Keep the tooltip open while the pointer crosses the gap above the button.
+    &::after {
+        position: absolute;
+        right: 0;
+        bottom: -9px;
+        left: 0;
+        height: 9px;
+        content: '';
+    }
+
+    &.is-below::after {
+        top: -9px;
+        bottom: auto;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        transition: opacity 0.12s ease;
+
+        @starting-style {
+            &:popover-open {
+                opacity: 0;
+            }
+        }
+    }
+}
+
 button,
 a {
     @include flex-center-all;

@@ -83,6 +83,7 @@ export const homeAnimations = {
                 '.cta > button, .cta > a',
                 {
                     autoAlpha: 1,
+                    clearProps: 'transform',
                     duration,
                     ease: TIMING.easing.smooth,
                     scale: 1,

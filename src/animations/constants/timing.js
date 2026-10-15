@@ -1,4 +1,9 @@
-export const LEAVE_DURATION = 350;
+// Page enter and exit animations run at this speed, so the page content keeps pace with the ASCII camera's
+// trip between pages.
+export const PAGE_TIME_SCALE = 0.75;
+
+// How long the old page has to leave before the route changes, in ms.
+export const LEAVE_DURATION = 350 / PAGE_TIME_SCALE;
 
 export const TIMING = {
     duration: {

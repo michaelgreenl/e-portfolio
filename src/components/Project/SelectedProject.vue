@@ -1,107 +1,155 @@
 <script setup>
-import { ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
+import SelectedWindow from '@/components/SelectedWindow.vue';
 import Button from '@/components/Button.vue';
 import ToolChip from '@/components/ToolChip.vue';
-import ProjectDemoVideo from '@/components/Project/ProjectDemoVideo.vue';
+import ProjectMediaGallery from '@/components/Project/ProjectMediaGallery.vue';
 
 import CalendarIcon from '@/components/SVGs/CalendarIcon.vue';
 import CloseIcon from '@/components/SVGs/CloseIcon.vue';
 
-defineProps({
-    activeProject: { required: true, type: Object },
-    autoplayVideo: { required: true, type: Boolean },
-    projectLogos: { required: true, type: Object },
-    externalIcons: { required: true, type: Object },
+const props = defineProps({
+    activeProject: { default: null, type: Object },
+    autoplayVideo: { default: false, type: Boolean },
+    projectLogos: { default: () => ({}), type: Object },
+    externalIcons: { default: () => ({}), type: Object },
+    fullscreenOnMobile: { default: false, type: Boolean },
 });
 
 const emit = defineEmits(['close-project']);
 
-const el = ref(null);
-const overlay = ref(null);
+const openedProjects = ref([]);
+const selectedWindow = ref(null);
+const close = () => selectedWindow.value?.close();
 
-defineExpose({ el, overlay });
+watch(
+    () => props.activeProject,
+    async (project) => {
+        if (!project) {
+            close();
+            return;
+        }
+
+        if (!openedProjects.value.some(({ slug }) => slug === project.slug)) openedProjects.value.push(project);
+        await nextTick();
+        selectedWindow.value?.open();
+    },
+    { immediate: true },
+);
+
+defineExpose({ close });
 </script>
 
 <template>
-    <div
-        ref="el"
-        class="selected-container"
-        tabindex="0"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="activeProject.title"
-        @keydown.esc="emit('close-project')"
+    <SelectedWindow
+        ref="selectedWindow"
+        :label="activeProject?.title ?? 'Project details'"
+        :auto-open="false"
+        :fullscreen-on-mobile="fullscreenOnMobile"
+        @close="emit('close-project')"
     >
-        <div class="selected-project">
+        <div
+            v-for="project in openedProjects"
+            v-show="activeProject?.slug === project.slug"
+            :key="project.slug"
+            class="selected-project"
+            :class="{
+                portrait: project.portrait,
+                oakley: project.slug === 'oakley',
+                'campaign-manager': project.slug === 'campaign-manager',
+            }"
+        >
             <div class="project-overview">
-                <div class="date">
+                <div v-if="project.longDate" class="date">
                     <CalendarIcon aria-hidden="true" />
-                    <p>{{ activeProject.longDate }}</p>
+                    <p>{{ project.longDate }}</p>
                 </div>
 
                 <div class="project-header-info">
                     <div class="project-title">
-                        <component :is="projectLogos[activeProject.slug]" />
+                        <component :is="projectLogos[project.slug]" />
 
-                        <h2 :style="{ fontFamily: activeProject.fontFamily }">
-                            {{ activeProject.title }}
+                        <h2
+                            :style="{
+                                fontFamily: project.fontFamily,
+                                fontWeight: project.slug === 'tally' ? '500' : '400',
+                            }"
+                        >
+                            {{ project.slug === 'oakley' ? project.title.replace(' / ', ' /\n') : project.title }}
                         </h2>
                     </div>
 
-                    <p class="description description-short">{{ activeProject.description.short }}</p>
+                    <p class="description description-short">{{ project.description.short }}</p>
                 </div>
 
-                <div class="project-media">
-                    <ProjectDemoVideo v-if="activeProject.video" :project="activeProject" :autoplay="autoplayVideo" />
+                <hr v-if="fullscreenOnMobile" class="project-separator" />
 
-                    <div class="external-links">
+                <div class="project-media">
+                    <ProjectMediaGallery
+                        :project="project"
+                        :autoplay="autoplayVideo"
+                        :active="activeProject?.slug === project.slug"
+                    />
+
+                    <div v-if="project.externalLinks" class="external-links">
                         <a
-                            v-for="[key, link] in Object.entries(activeProject.externalLinks).filter(
+                            v-for="[key, link] in Object.entries(project.externalLinks).filter(
                                 ([key]) => key !== 'demoVideo' && key !== 'porfolioLink',
                             )"
                             :key="key"
                             :class="{ 'no-fill': key === 'liveSite' }"
                             :href="link.href"
                             :aria-label="link.text"
-                            :title="link.text"
                             target="_blank"
                         >
-                            <Button :text="link.text" :iconLeft="externalIcons[key]" preset="secondary" />
+                            <Button
+                                :text="link.text"
+                                :iconLeft="externalIcons[key]"
+                                preset="secondary"
+                                tooltip-when-text-hidden
+                            />
                         </a>
                     </div>
                 </div>
             </div>
 
             <div class="project-details">
-                <button class="close-btn" type="button" aria-label="Close project" @click="emit('close-project')">
+                <button class="close-btn" type="button" aria-label="Close project" @click="close">
                     <CloseIcon />
                 </button>
 
+                <hr v-if="fullscreenOnMobile" class="project-separator" />
+
                 <div class="tool-container">
-                    <div class="tool-chips" :class="{ 'large-stack': activeProject.stack.length > 5 }">
-                        <ToolChip v-for="tool in activeProject.stack" :key="tool" :tool="tool" class="chip" />
+                    <div class="tool-chips" :class="{ 'large-stack': project.stack.length > 5 }">
+                        <ToolChip
+                            v-for="tool in project.stack"
+                            :key="tool"
+                            :tool="tool"
+                            class="chip"
+                            :class="`chip-${tool}`"
+                        />
                     </div>
                 </div>
 
-                <ul class="description description-long" :class="{ 'contains-video': activeProject.video }">
-                    <li v-for="detail in activeProject.description?.long" :key="detail.label">
-                        <strong>{{ detail.label }}:</strong> {{ detail.text }}
+                <ul
+                    class="description description-long"
+                    :class="{
+                        'contains-video': project.video || project.preview || project.gallery?.length,
+                    }"
+                >
+                    <li v-for="detail in project.description?.long" :key="detail">
+                        {{ detail }}
                     </li>
                 </ul>
             </div>
         </div>
-
-        <div ref="overlay" class="overlay" @click="emit('close-project')"></div>
-    </div>
+    </SelectedWindow>
 </template>
 
 <style lang="scss" scoped>
 p {
     margin: 0;
-}
-
-.selected-container {
-    @include flex-center-all;
 }
 
 .project-title,
@@ -110,55 +158,13 @@ p {
     align-items: center;
 }
 
-.overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    width: 100vw;
-    height: 100vh;
-}
-
-.selected-container {
-    position: fixed;
-    top: 0;
-    z-index: 2;
-    width: 100vw;
-    height: 100vh;
-    font-size: 1.1em;
-    backdrop-filter: blur(5px);
-
-    @include theme-dark {
-        background-color: rgb(0 0 0 / 40%);
-    }
-}
-
 .selected-project {
-    position: relative;
-    z-index: 2;
     display: grid;
     grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
     gap: $space-3 $space-6;
-    width: 98vw;
-    max-width: 90em;
-    max-height: 95dvh;
-    padding: $size-9 $size-10;
-    margin: $space-8 0;
-    overflow-y: auto;
-    border: 1px solid rgb(255 255 255 / 12%);
-    border-radius: $radius-xl;
-    box-shadow: 0 8px 32px 0 rgb(0 0 0 / 37%);
-
-    @include theme-dark {
-        background: linear-gradient(0deg, #212529ea 30%, #212529aa 60%, #212529ea 90%);
-    }
-
-    @include theme-light {
-        background: linear-gradient(0deg, #dee2e6ea 40%, #dee2e6aa 60%, #dee2e6ea 90%);
-    }
 
     @include bp-lg-laptop {
         column-gap: $space-10;
-        padding: $size-9 $size-12;
     }
 }
 
@@ -254,9 +260,369 @@ p {
     gap: $space-8;
 }
 
-.demo-video {
+.project-gallery {
     width: 100%;
-    border-radius: $radius-md;
+}
+
+.portrait .project-gallery {
+    align-self: center;
+    width: min(100%, calc(60dvh * 9 / 16));
+}
+
+.selected-project.oakley {
+    .project-title h2 {
+        white-space: pre-line;
+    }
+
+    .project-media {
+        padding-top: $space-2;
+    }
+
+    .project-gallery {
+        width: min(100%, 34.75dvh);
+    }
+
+    .description-long {
+        padding-left: $space-3;
+    }
+
+    @include bp-custom-min(848) {
+        position: relative;
+        grid-template:
+            'date .' auto
+            'heading media' auto
+            'stack media' auto
+            'description media' 1fr / minmax(0, 1.2fr) minmax(0, 0.8fr);
+        align-items: start;
+
+        .project-overview,
+        .project-details {
+            display: contents;
+        }
+
+        .date {
+            grid-area: date;
+            margin-bottom: 0;
+        }
+
+        .project-header-info {
+            grid-area: heading;
+        }
+
+        .project-media {
+            display: grid;
+            grid-area: media;
+            place-items: center;
+            align-self: stretch;
+            min-height: 0;
+            margin-top: 0;
+            container-type: size;
+        }
+
+        .project-gallery {
+            width: min(
+                100cqw,
+                calc((100cqh - var(--gallery-controls-height)) * 9 / 16 + var(--gallery-controls-width, 0px))
+            );
+        }
+
+        .tool-container {
+            grid-area: stack;
+            margin-top: $space-1;
+        }
+
+        .description-long {
+            grid-area: description;
+            margin-top: $space-2;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}
+
+.fullscreen-mobile {
+    .project-separator {
+        display: none;
+    }
+
+    .date {
+        gap: 0.3rem;
+        align-items: flex-end;
+
+        p {
+            line-height: 1;
+        }
+    }
+
+    .project-title h2 {
+        font-size: clamp(2rem, 9vw, 2.8rem) !important;
+    }
+
+    .project-details {
+        gap: $space-6;
+        justify-content: flex-start;
+    }
+
+    .selected-project.oakley .chip {
+        flex-basis: auto;
+    }
+
+    @include bp-md-tablet {
+        .selected-project.oakley {
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+
+            .description-long {
+                gap: $space-2;
+            }
+        }
+
+        .selected-project.campaign-manager {
+            column-gap: clamp($space-4, 2.5vw, $space-10);
+
+            .project-title h2 {
+                font-size: clamp(2.25rem, 4vw, 2.8rem) !important;
+            }
+        }
+
+        .selected-project.campaign-manager .project-details {
+            gap: 0;
+        }
+
+        .selected-project.campaign-manager .tool-chips {
+            margin: $space-2 0 $space-4;
+        }
+
+        @include bp-custom-max(1099) {
+            .selected-project.campaign-manager {
+                .tool-chips {
+                    gap: $space-3 $space-2;
+
+                    .chip {
+                        padding-inline: $space-2;
+                    }
+
+                    .chip-vue {
+                        flex-grow: 0.85;
+                    }
+
+                    .chip-express {
+                        flex-grow: 1.15;
+                    }
+                }
+            }
+        }
+    }
+
+    .description {
+        line-height: 1.5;
+    }
+
+    .description-long {
+        margin-top: 0;
+
+        &.contains-video {
+            gap: $space-3;
+            font-size: clamp(1rem, 1.8vw, 1.125rem);
+        }
+    }
+
+    @include bp-custom-max(847) {
+        .selected-project {
+            grid-template-columns: minmax(0, 1fr);
+            gap: $space-2;
+        }
+
+        .project-overview {
+            grid-area: 1 / 1;
+        }
+
+        .project-overview .project-media {
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        @include bp-custom-min(450) {
+            .selected-project:not(.portrait) .project-media {
+                padding-inline: $space-8;
+            }
+        }
+
+        .project-overview .project-separator {
+            margin: $space-4 auto $space-6;
+        }
+
+        .date {
+            min-height: 2.75rem;
+            padding-right: calc(2.75rem + $space-2);
+            font-size: 1.2em;
+            white-space: normal;
+        }
+
+        .description {
+            font-size: 1rem;
+        }
+
+        .tool-chips {
+            font-size: 1rem;
+
+            &.large-stack {
+                max-width: 33rem;
+                margin: 0 auto;
+                font-size: 1.2em;
+            }
+
+            .chip {
+                font-size: 1em;
+            }
+        }
+
+        .project-details {
+            display: contents;
+        }
+
+        .close-btn {
+            position: sticky;
+            top: env(safe-area-inset-top, 0);
+            z-index: 3;
+            grid-area: 1 / 1;
+            place-self: start end;
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: $space-3;
+            background-color: $color-bg-primary;
+            transform: none;
+        }
+
+        .tool-container {
+            grid-row: 3;
+        }
+
+        .project-separator {
+            display: block;
+            width: 98%;
+            margin: $space-4 auto $space-3;
+            border: 0;
+            border-top: solid 1px transparent;
+
+            @include theme-dark {
+                border-color: #adb5bd22;
+            }
+
+            @include theme-light {
+                border-color: #3d505c22;
+            }
+        }
+
+        .description-long {
+            grid-row: 5;
+        }
+
+        .selected-project.oakley {
+            .project-title h2 {
+                white-space: normal;
+            }
+        }
+
+        @include bp-custom-min(550) {
+            .description {
+                font-size: clamp(1rem, 2.5vw, 1.0625rem);
+            }
+
+            .selected-project.campaign-manager {
+                .project-overview,
+                .tool-container,
+                .description-long {
+                    justify-self: center;
+                    width: 100%;
+                    max-width: 40rem;
+                }
+
+                .project-details .project-separator {
+                    max-width: calc(40rem * 0.98);
+                }
+
+                .project-media {
+                    align-items: center;
+                }
+
+                .project-gallery {
+                    max-width: 35rem;
+                }
+            }
+
+            .selected-project.oakley {
+                grid-template:
+                    'date date' auto
+                    'heading heading' auto
+                    'separator separator' auto
+                    'stack media' auto
+                    'description media' 1fr / minmax(0, 1fr) minmax(0, min(16rem, 39vw, 42dvh));
+                gap: $space-4 clamp($space-3, 3vw, $space-6);
+                align-items: start;
+                width: 100%;
+                max-width: 42rem;
+                margin-inline: auto;
+
+                .project-overview {
+                    display: contents;
+                }
+
+                .date,
+                .close-btn {
+                    grid-area: date;
+                }
+
+                .date {
+                    margin-bottom: 0;
+                }
+
+                .project-header-info {
+                    grid-area: heading;
+                    margin-top: -$space-2;
+                }
+
+                .project-media {
+                    position: sticky;
+                    top: calc(2.75rem + $space-4);
+                    grid-area: media;
+                    align-self: start;
+                }
+
+                .project-gallery {
+                    width: 100%;
+                }
+
+                .project-overview .project-separator {
+                    grid-area: separator;
+                    margin: $space-2 auto;
+                }
+
+                .project-details .project-separator {
+                    display: none;
+                }
+
+                .tool-container {
+                    grid-area: stack;
+                }
+
+                .tool-chips {
+                    gap: $space-2;
+
+                    .chip {
+                        padding-inline: $space-2;
+                    }
+                }
+
+                .description-long {
+                    grid-area: description;
+                }
+            }
+        }
+    }
 }
 
 .external-links {
@@ -275,7 +641,7 @@ p {
                 gap: $space-2;
             }
 
-            span {
+            .button-text {
                 display: none;
 
                 @include bp-md-tablet {
@@ -374,6 +740,10 @@ p {
         strong {
             font-family: $secondary-font-stack;
             font-weight: 700;
+        }
+
+        @include bp-sm-phone {
+            text-wrap: pretty;
         }
     }
 }
