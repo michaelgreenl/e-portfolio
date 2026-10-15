@@ -279,7 +279,7 @@ async function openProject(project, autoplay = false) {
     }
 
     p {
-        max-width: 48ch;
+        max-width: 42ch;
         font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
