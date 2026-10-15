@@ -26,6 +26,8 @@ const FONT_SIZE = 14;
 const LINE_HEIGHT = 16;
 const FRAME_MS = 1000 / 30;
 const LAYER_ALPHAS = [0.16, 0.3, 0.48, 0.7, 0.95];
+// Faint characters wash out on the light theme's pale background, so they draw this much stronger there.
+const LIGHT_THEME_ALPHA = 1.4;
 const FOV = 30;
 const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 
@@ -70,7 +72,7 @@ const layerFor = (alpha) =>
 // Material colors, see TINTS: soft on the dark theme, deeper on the light one so they hold up on a pale
 // background. Ink takes the page's text color.
 const PALETTE = {
-    sea: ['#7fb2e5', '#2f6a9e'],
+    sea: ['#7fb2e5', '#174a80'],
     forest: ['#6fa86a', '#2f6a34'],
     grass: ['#9fcf86', '#4f8a3d'],
     olive: ['#c2c487', '#76782f'],
@@ -83,10 +85,10 @@ const PALETTE = {
     metal: ['#a3a9b0', '#4a4f55'],
     glass: ['#8ed3ef', '#2a7fa6'],
     flame: ['#ffb877', '#d0661c'],
-    zone: ['#f1e2c4', '#9a7e4e'],
-    belt: ['#cf9f74', '#85552f'],
-    pole: ['#b9b3aa', '#6b655d'],
-    spot: ['#e2825f', '#a8462a'],
+    zone: ['#f1e2c4', '#6e5426'],
+    belt: ['#cf9f74', '#5e3414'],
+    pole: ['#b9b3aa', '#45403a'],
+    spot: ['#e2825f', '#8c2f14'],
     io: ['#ead37f', '#97831f'],
     europa: ['#e9e1d2', '#83786a'],
     ganymede: ['#b8aa98', '#6c5f50'],
@@ -160,6 +162,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
 
     let ink = '';
     let colors = []; // by material, see TINTS
+    let alphaScale = 1;
     let viewW = 1;
     let viewH = 1;
     let maskA = new Float32Array(0);
@@ -219,6 +222,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         const [r, g, b] = ink.match(/\d+/g).map(Number);
         const shade = r + g + b > 382 ? 0 : 1;
         colors = TINTS.map((name) => (name === 'ink' ? ink : PALETTE[name][shade]));
+        alphaScale = shade ? LIGHT_THEME_ALPHA : 1;
         if (reducedMotion) redraw();
     }
 
@@ -662,7 +666,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             }
             for (const row of used) {
                 ctx.fillStyle = colors[row.material];
-                ctx.globalAlpha = row.alpha;
+                ctx.globalAlpha = Math.min(1, row.alpha * alphaScale);
                 ctx.fillText(row.chars.join(''), 0, y * LINE_HEIGHT);
                 row.chars.fill(' ');
             }
