@@ -268,6 +268,8 @@ async function openProject(project, autoplay = false) {
 
     @include bp-xl-desktop {
         max-width: 116em;
+        padding-left: 0;
+        width: 81%;
     }
 
     h1 {
@@ -278,6 +280,7 @@ async function openProject(project, autoplay = false) {
 
     p {
         max-width: 48ch;
+        min-width: 48ch;
         font-size: 1.6em;
         color: $color-text-secondary;
         text-align: center;
