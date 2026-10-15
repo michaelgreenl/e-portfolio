@@ -48,6 +48,8 @@ const SEEN_RADIUS = [16, 48];
 const PASSING_RADIUS = [48, 96];
 // Until the new page is on screen, its object aims for this part of the screen.
 const GUESS_SLOT = { left: 0.55, top: 0.15, width: 0.4, height: 0.6 };
+// Once the new page is on screen, the camera eases from its guess to the page's slot over this many seconds.
+const SETTLE_SECONDS = 0.3;
 const SHOW_EASE = 0.15;
 
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
@@ -165,8 +167,11 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     // showing what its scene sets up for time zero, such as the Earth's land and Jupiter's moons.
     const epoch = Object.fromEntries(names.map((name) => [name, 0]));
     const drawn = Object.fromEntries(names.map((name) => [name, 0])); // gain in the last frame
-    // Where the camera last rested for each object; a first guess at its framing on the next visit.
-    const lastFraming = {};
+    // Where the camera last rested for each object at the top of its page; a first guess at its framing on the
+    // next visit.
+    let lastFraming = {};
+    let guess = null; // where the camera headed while the new page was not on screen
+    let guessedAt = 0; // the last time it did
 
     let ink = '';
     let colors = []; // by material, see TINTS
@@ -205,6 +210,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         ctx.font = `${FONT_SIZE}px ${getComputedStyle(canvas).fontFamily}`;
         ctx.textBaseline = 'top';
 
+        // A new screen width moves every slot, so the remembered framings no longer fit.
+        if (width !== viewW) lastFraming = {};
         viewW = width;
         const fit = clamp01((width - MASK_WIDTHS[0]) / (MASK_WIDTHS[1] - MASK_WIDTHS[0]));
         clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
@@ -456,17 +463,36 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         ];
     }
 
-    // Where the camera wants to be for an object: its page's slot, or a guess until the page is on screen.
+    // Where the camera wants to be for an object: its page's slot. Until the page is on screen, it heads for
+    // where the object last rested, or a guess, and then eases from there to the slot, so the trip bends
+    // instead of jumping.
     function restingFraming(name) {
         const box = slotRect();
-        if (box) return (lastFraming[name] = framingIn(name, box));
-        if (lastFraming[name]) return lastFraming[name];
-        return framingIn(name, {
-            left: GUESS_SLOT.left * viewW,
-            top: GUESS_SLOT.top * viewH,
-            width: GUESS_SLOT.width * viewW,
-            height: GUESS_SLOT.height * viewH,
-        });
+        if (!box) {
+            guess =
+                lastFraming[name] ??
+                framingIn(name, {
+                    left: GUESS_SLOT.left * viewW,
+                    top: GUESS_SLOT.top * viewH,
+                    width: GUESS_SLOT.width * viewW,
+                    height: GUESS_SLOT.height * viewH,
+                });
+            guessedAt = clock;
+            return guess;
+        }
+        const framing = framingIn(name, box);
+        // Each visit starts at the top of the page.
+        if (!window.scrollY) lastFraming[name] = framing;
+        const settle = guess && !reducedMotion ? smoothstep(0, SETTLE_SECONDS, clock - guessedAt) : 1;
+        if (settle >= 1) {
+            guess = null;
+            return framing;
+        }
+        return {
+            ...framing,
+            distance: Math.exp(lerp(Math.log(guess.distance), Math.log(framing.distance), settle)),
+            shift: [lerp(guess.shift[0], framing.shift[0], settle), lerp(guess.shift[1], framing.shift[1], settle)],
+        };
     }
 
     // The camera's distance at eased progress e from framing a to framing b: even steps in log scale, plus a
