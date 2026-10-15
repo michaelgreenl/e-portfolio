@@ -34,7 +34,7 @@ const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 // The first object flies in from this many times its resting distance.
 const INTRO = { seconds: 1.8, distance: 6 };
 // A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
-const TRAVEL = { base: 1.2, perStep: 0.22, min: 1.2, max: 2.6 };
+const TRAVEL = { base: 1, perStep: 0.15, min: 1, max: 2 };
 // On a trip the camera's target may sweep this many radians across the view. When the objects are farther
 // apart, the camera backs off in the middle of the trip until the sweep fits.
 const MAX_SWEEP = 1.25;

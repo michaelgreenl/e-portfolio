@@ -5,6 +5,7 @@ import resumeData from '@/assets/data/resume.json';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useGsap } from '@/composables/useGsap.js';
+import { PAGE_TIME_SCALE } from '@/animations/constants/timing.js';
 import { resumeAnimations } from '@/animations/page/resume.js';
 import { useMediaQuery } from '@vueuse/core';
 import Button from '@/components/Button.vue';
@@ -21,12 +22,13 @@ const showInternship = ref(false);
 const internshipWindow = ref(null);
 
 const { registerAnim } = useGsap();
+const page = { timeScale: PAGE_TIME_SCALE };
 
 const uniLocationWrapping = useMediaQuery('(min-width: 477px)');
 
 const anims = {
-    enterPage: registerAnim(resumeAnimations.enterPage),
-    exitPage: registerAnim(resumeAnimations.exitPage),
+    enterPage: registerAnim(resumeAnimations.enterPage, page),
+    exitPage: registerAnim(resumeAnimations.exitPage, page),
 };
 
 watch(

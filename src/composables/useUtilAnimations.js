@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 import Flip from 'gsap/Flip';
 import { useGsap } from '@/composables/useGsap.js';
-import { TIMING } from '@/animations/constants/timing.js';
+import { PAGE_TIME_SCALE, TIMING } from '@/animations/constants/timing.js';
 
 gsap.registerPlugin(Flip);
 
@@ -39,13 +39,15 @@ export function useUtilAnimations() {
         });
     });
 
-    const revealIn = registerAnim(({ selector, opts, onComplete, reducedMotion }) => {
+    const page = { timeScale: PAGE_TIME_SCALE };
+
+    const revealIn = registerAnim(({ tl, selector, opts, onComplete, reducedMotion }) => {
         gsap.set(selector, {
             autoAlpha: 0,
             scale: reducedMotion ? 1 : 0.98,
             y: reducedMotion ? 0 : 24,
         });
-        gsap.to(selector, {
+        tl.to(selector, {
             autoAlpha: 1,
             clearProps: 'transform,visibility',
             duration: reducedMotion ? 0.01 : TIMING.duration.moderate,
@@ -55,7 +57,7 @@ export function useUtilAnimations() {
             ...opts,
             onComplete,
         });
-    });
+    }, page);
 
     const headerReveal = registerAnim(({ tl, headerEl, extraTargets = [], reducedMotion }) => {
         const copy = headerEl.querySelectorAll('h1, p');
@@ -102,7 +104,7 @@ export function useUtilAnimations() {
                 reducedMotion ? 0 : 0.12,
             );
         }
-    });
+    }, page);
 
     const headerDismiss = registerAnim(({ tl, headerEl, extraTargets = [], reducedMotion }) => {
         const copy = headerEl.querySelectorAll('h1, p');
@@ -131,7 +133,7 @@ export function useUtilAnimations() {
                 0,
             )
             .set(targets, { clearProps: 'transition' });
-    });
+    }, page);
 
     return {
         flipFrom,

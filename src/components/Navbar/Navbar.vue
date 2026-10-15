@@ -5,6 +5,7 @@ import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { navbarAnimations } from '@/animations/component/navbar.js';
+import { PAGE_TIME_SCALE } from '@/animations/constants/timing.js';
 import DesktopNavbar from '@/components/Navbar/DesktopNavbar.vue';
 import Logo from '@/components/Logo.vue';
 import MobileNavbar from '@/components/Navbar/MobileNavbar.vue';
@@ -13,12 +14,13 @@ const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
 const { registerAnim } = useGsap();
+const page = { timeScale: PAGE_TIME_SCALE };
 
 const anims = {
     enterMobileNavbar: registerAnim(navbarAnimations.enterMobileNavbar),
     enterLogoTheme: registerAnim(navbarAnimations.enterLogoTheme),
-    enterNavItem: registerAnim(navbarAnimations.enterNavItem),
-    exitNavItem: registerAnim(navbarAnimations.exitNavItem),
+    enterNavItem: registerAnim(navbarAnimations.enterNavItem, page),
+    exitNavItem: registerAnim(navbarAnimations.exitNavItem, page),
     enterPage: registerAnim(navbarAnimations.enterPage),
 };
 

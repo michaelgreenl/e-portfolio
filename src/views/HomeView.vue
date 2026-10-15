@@ -4,6 +4,7 @@ import { useGsap } from '@/composables/useGsap.js';
 import { useRouteStore } from '@/stores/routeStore.js';
 import { useThemeStore } from '@/stores/themeStore.js';
 import { useBreakpoints } from '@/composables/useBreakpoints.js';
+import { PAGE_TIME_SCALE } from '@/animations/constants/timing.js';
 import { homeAnimations } from '@/animations/page/home.js';
 import Button from '@/components/Button.vue';
 import ContactLinks from '@/components/ContactLinks.vue';
@@ -16,10 +17,11 @@ const routeStore = useRouteStore();
 const themeStore = useThemeStore();
 
 const { registerAnim } = useGsap();
+const page = { timeScale: PAGE_TIME_SCALE };
 
 const anims = {
-    enterPage: registerAnim(homeAnimations.enterPage),
-    exitPage: registerAnim(homeAnimations.exitPage),
+    enterPage: registerAnim(homeAnimations.enterPage, page),
+    exitPage: registerAnim(homeAnimations.exitPage, page),
 };
 
 watch(

@@ -10,12 +10,13 @@ export function useGsap(scope) {
         }
     };
 
-    const registerAnim = (animationLogic) => {
+    // timeScale sets the speed of the timeline the animation builds, unless the caller passes its own.
+    const registerAnim = (animationLogic, { timeScale = 1 } = {}) => {
         return (userOptions = {}) => {
             init();
 
             const defaults = {
-                tl: gsap.timeline(),
+                tl: gsap.timeline().timeScale(timeScale),
                 delay: 0,
                 onComplete: () => {},
                 onStart: () => {},
