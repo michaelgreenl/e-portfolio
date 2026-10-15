@@ -5,9 +5,9 @@ import { useThemeStore } from '@/stores/themeStore.js';
 import { createAsciiField } from '@/ascii/field.js';
 import { createWorld } from '@/ascii/world.js';
 
-// Panels and controls that clear their whole rounded box while they show a background or border.
+// Panels, controls and dividers that clear their whole rounded box while they show a background or border.
 const SURFACES =
-    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message';
+    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message, .contact-links-desktop';
 
 // Which object each page shows, in the box its .art-slot element marks.
 const PAGE_OBJECTS = { home: 'earth', projects: 'jupiter', resume: 'rocket', contact: 'satellite' };

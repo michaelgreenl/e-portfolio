@@ -53,15 +53,15 @@ const SHOW_EASE = 0.15;
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
 // shape and smaller text by line box. Elements matching the surfaces selector clear their whole rounded box
 // while they show a background or border. Elements with a backdrop blur clear nothing: the art shows through
-// them, blurred. The blurred mask fades characters near content.
+// them, blurred. A cell shows art only where the mask at its middle is below CLEAR_AT, so the edge around
+// content is a clean cut along the rows and columns. Strips of art narrower than MIN_STRIP between content,
+// frosted panels and the screen edge are cleared too, so no slivers squeeze between them.
 const GLYPH_MIN_FONT_SIZE = 24;
 const MASK_SCALE = 6;
 const MASK_INTERVAL = 150;
-const CLEAR_PADDING = 12;
-const BLUR_RADIUS = 3;
-const BLUR_PASSES = 2;
-const FADE_START = 0.08;
-const FADE_END = 0.5;
+const CLEAR_PADDING = 16;
+const CLEAR_AT = 0.25;
+const MIN_STRIP = { cols: 8, rows: 2 };
 const VISIBILITY_EASE = 0.3;
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
@@ -115,14 +115,18 @@ function turnY(v, turn) {
     return [c * v[0] + s * v[2], v[1], -s * v[0] + c * v[2]];
 }
 
-function boxBlur(src, dst, w, h, r) {
-    const size = r * 2 + 1;
-    for (let y = 0; y < h; y++) {
-        let sum = 0;
-        for (let x = -r; x <= r; x++) sum += src[y * w + Math.min(w - 1, Math.max(0, x))];
-        for (let x = 0; x < w; x++) {
-            dst[x * h + y] = sum / size;
-            sum += src[y * w + Math.min(w - 1, x + r + 1)] - src[y * w + Math.max(0, x - r)];
+// Clears each run of open cells shorter than min along a line. Cells under glass show art but end a run.
+// There are `lines` lines of `length` cells; a line starts at line * across and its cells are along apart.
+function clearStrips(open, glass, lines, length, across, along, min) {
+    for (let line = 0; line < lines; line++) {
+        let start = -1;
+        for (let k = 0; k <= length; k++) {
+            const i = line * across + k * along;
+            const isOpen = k < length && open[i] && !glass[i];
+            if (isOpen && start < 0) start = k;
+            if (isOpen || start < 0) continue;
+            if (k - start < min) for (let j = start; j < k; j++) open[line * across + j * along] = 0;
+            start = -1;
         }
     }
 }
@@ -165,10 +169,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     let alphaScale = 1;
     let viewW = 1;
     let viewH = 1;
-    let maskA = new Float32Array(0);
-    let maskB = new Float32Array(0);
     let targetVisibility = new Float32Array(0);
     let visibility = new Float32Array(0);
+    let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let rowLayers = [];
 
     let page = null; // name of the object the current page shows
@@ -202,10 +205,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         const n = grid.cols * grid.rows;
         maskCanvas.width = Math.ceil(width / MASK_SCALE);
         maskCanvas.height = Math.ceil(height / MASK_SCALE);
-        maskA = new Float32Array(maskCanvas.width * maskCanvas.height);
-        maskB = new Float32Array(maskA.length);
         targetVisibility = new Float32Array(n);
         visibility = new Float32Array(n);
+        glass = new Uint8Array(n);
         // One row of characters for each material and opacity layer.
         rowLayers = TINTS.map((_, material) =>
             LAYER_ALPHAS.map((alpha) => ({ material, alpha, chars: new Array(grid.cols).fill(' ') })),
@@ -335,23 +337,27 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         }
         maskCtx.globalAlpha = 1;
 
-        // Two box-blur passes give a soft, even falloff around content.
         const { data } = maskCtx.getImageData(0, 0, w, h);
-        for (let i = 0; i < maskA.length; i++) maskA[i] = data[i * 4 + 3] / 255;
-        for (let pass = 0; pass < BLUR_PASSES; pass++) {
-            boxBlur(maskA, maskB, w, h, BLUR_RADIUS);
-            boxBlur(maskB, maskA, h, w, BLUR_RADIUS);
-        }
-
         const { cols, rows, cellW } = grid;
         for (let y = 0; y < rows; y++) {
             const my = Math.min(h - 1, Math.floor(((y + 0.5) * LINE_HEIGHT) / MASK_SCALE));
             for (let x = 0; x < cols; x++) {
                 const mx = Math.min(w - 1, Math.floor(((x + 0.5) * cellW) / MASK_SCALE));
-                const fade = clamp01((maskA[my * w + mx] - FADE_START) / (FADE_END - FADE_START));
-                targetVisibility[y * cols + x] = 1 - fade * fade * (3 - 2 * fade);
+                targetVisibility[y * cols + x] = data[(my * w + mx) * 4 + 3] < CLEAR_AT * 255 ? 1 : 0;
             }
         }
+        glass.fill(0);
+        for (const panel of frosted) {
+            if (isCovered(panel)) continue;
+            const rect = panel.getBoundingClientRect();
+            const y1 = Math.min(rows, Math.round(rect.bottom / LINE_HEIGHT));
+            const x1 = Math.min(cols, Math.round(rect.right / cellW));
+            for (let y = Math.max(0, Math.round(rect.top / LINE_HEIGHT)); y < y1; y++) {
+                for (let x = Math.max(0, Math.round(rect.left / cellW)); x < x1; x++) glass[y * cols + x] = 1;
+            }
+        }
+        clearStrips(targetVisibility, glass, rows, cols, cols, 1, MIN_STRIP.cols);
+        clearStrips(targetVisibility, glass, cols, rows, 1, cols, MIN_STRIP.rows);
         // Scrolling moves content a lot between frames, so the field jumps to the new mask instead of easing.
         if (snap) visibility.set(targetVisibility);
     }
