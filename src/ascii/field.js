@@ -55,13 +55,16 @@ const SHOW_EASE = 0.15;
 // while they show a background or border. Elements with a backdrop blur clear nothing: the art shows through
 // them, blurred. A cell shows art only where the mask at its middle is below CLEAR_AT, so the edge around
 // content is a clean cut along the rows and columns. Strips of art narrower than MIN_STRIP between content,
-// frosted panels and the screen edge are cleared too, so no slivers squeeze between them.
+// frosted panels and the screen edge are cleared too, so no slivers squeeze between them. The padding around
+// content and the narrowest strip kept grow from the first value at phone width to the second at desktop
+// width, so a small screen keeps more of its art.
 const GLYPH_MIN_FONT_SIZE = 24;
 const MASK_SCALE = 6;
 const MASK_INTERVAL = 150;
-const CLEAR_PADDING = 16;
+const MASK_WIDTHS = [390, 1280];
+const CLEAR_PADDING = [12, 16];
 const CLEAR_AT = 0.25;
-const MIN_STRIP = { cols: 8, rows: 2 };
+const MIN_STRIP = { cols: [4, 8], rows: 2 };
 const VISIBILITY_EASE = 0.3;
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
@@ -172,6 +175,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     let targetVisibility = new Float32Array(0);
     let visibility = new Float32Array(0);
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
+    let clearPadding = CLEAR_PADDING[1];
+    let minStripCols = MIN_STRIP.cols[1];
     let rowLayers = [];
 
     let page = null; // name of the object the current page shows
@@ -200,6 +205,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         ctx.textBaseline = 'top';
 
         viewW = width;
+        const fit = clamp01((width - MASK_WIDTHS[0]) / (MASK_WIDTHS[1] - MASK_WIDTHS[0]));
+        clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
+        minStripCols = Math.round(lerp(MIN_STRIP.cols[0], MIN_STRIP.cols[1], fit));
         viewH = height;
         grid.resize(width, height, ctx.measureText('M').width, LINE_HEIGHT);
         const n = grid.cols * grid.rows;
@@ -232,14 +240,14 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
 
     function drawBox(rect, radius) {
         if (!rect.width && !rect.height) return;
-        if (rect.bottom < -CLEAR_PADDING * 3 || rect.top > viewH + CLEAR_PADDING * 3) return;
-        const r = Math.min(radius, rect.width / 2, rect.height / 2) + CLEAR_PADDING;
+        if (rect.bottom < -clearPadding * 3 || rect.top > viewH + clearPadding * 3) return;
+        const r = Math.min(radius, rect.width / 2, rect.height / 2) + clearPadding;
         maskCtx.beginPath();
         maskCtx.roundRect(
-            rect.left - CLEAR_PADDING,
-            rect.top - CLEAR_PADDING,
-            rect.width + CLEAR_PADDING * 2,
-            rect.height + CLEAR_PADDING * 2,
+            rect.left - clearPadding,
+            rect.top - clearPadding,
+            rect.width + clearPadding * 2,
+            rect.height + clearPadding * 2,
             r,
         );
         maskCtx.fill();
@@ -249,7 +257,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     function drawGlyphs(node, style) {
         range.selectNodeContents(node);
         const box = range.getBoundingClientRect();
-        if (box.bottom < -CLEAR_PADDING || box.top > viewH + CLEAR_PADDING) return;
+        if (box.bottom < -clearPadding || box.top > viewH + clearPadding) return;
         maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
         const ascent = maskCtx.measureText('M').fontBoundingBoxAscent;
         let offset = 0;
@@ -276,7 +284,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         maskCtx.setTransform(1, 0, 0, 1, 0, 0);
         maskCtx.clearRect(0, 0, w, h);
         maskCtx.setTransform(1 / MASK_SCALE, 0, 0, 1 / MASK_SCALE, 0, 0);
-        maskCtx.lineWidth = CLEAR_PADDING * 2;
+        maskCtx.lineWidth = clearPadding * 2;
         maskCtx.lineJoin = 'round';
         maskCtx.textBaseline = 'alphabetic';
 
@@ -356,7 +364,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                 for (let x = Math.max(0, Math.round(rect.left / cellW)); x < x1; x++) glass[y * cols + x] = 1;
             }
         }
-        clearStrips(targetVisibility, glass, rows, cols, cols, 1, MIN_STRIP.cols);
+        clearStrips(targetVisibility, glass, rows, cols, cols, 1, minStripCols);
         clearStrips(targetVisibility, glass, cols, rows, 1, cols, MIN_STRIP.rows);
         // Scrolling moves content a lot between frames, so the field jumps to the new mask instead of easing.
         if (snap) visibility.set(targetVisibility);
