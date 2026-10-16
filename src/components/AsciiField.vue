@@ -50,6 +50,7 @@ onMounted(() => {
         root: document.getElementById('app'),
         surfaces: SURFACES,
         slot: '.art-slot',
+        anchor: '.art-anchor',
         world: createWorld(),
     });
     field.setScene(PAGE_OBJECTS[routeStore.currentRoute.base]);

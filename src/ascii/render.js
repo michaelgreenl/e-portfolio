@@ -117,10 +117,9 @@ export function createGrid() {
         idBase: 0,
         // Material of the points and lines drawn next, see TINTS.
         paint: 0,
-        resize(width, height, cellW, lineH) {
-            Object.assign(grid, { width, height, cellW, lineH });
+        resize(width, height, cellW, lineH, rows = Math.ceil(height / lineH)) {
+            Object.assign(grid, { width, height, cellW, lineH, rows });
             grid.cols = Math.ceil(width / cellW);
-            grid.rows = Math.ceil(height / lineH);
             const n = grid.cols * grid.rows;
             grid.lum = new Float32Array(n); // brightness from points and glows
             grid.dens = new Float32Array(n); // point density before tone mapping

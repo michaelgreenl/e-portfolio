@@ -69,6 +69,10 @@ const SHOW_EASE = 0.15;
 // both ends and right below, such as art that hangs into the gap between two nav links. The padding and the
 // narrowest strip kept grow from the first value at phone width to the second at desktop width.
 const TEXT_TOP_INSET = 2;
+// With an anchor on the page, the rows of art shift down by less than one row, so the anchor line's tallest
+// character starts ANCHOR_OFFSET px into a row, just below that row's characters. With the page at the top,
+// the row above that line then shows in full, at every screen size.
+const ANCHOR_OFFSET = 15;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
 const MASK_WIDTHS = [390, 1280];
@@ -192,9 +196,10 @@ function underlineOf(el) {
  * @param {HTMLElement} options.root Element whose content the art keeps clear of.
  * @param {string} options.surfaces Selector for panels and controls that clear their whole box.
  * @param {string} options.slot Selector for the element that marks where the page's object goes.
+ * @param {string} options.anchor Selector for the line of text that the rows of art line up with.
  * @param {Record<string, object>} options.world Objects by name, see world.js.
  */
-export function createAsciiField(canvas, { root, surfaces, slot, world }) {
+export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
     const grid = createGrid();
@@ -226,6 +231,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
     let alphaScale = 1;
     let viewW = 1;
     let viewH = 1;
+    let gridTop = 0; // where the first row of art starts, at or above the top of the screen
     let visible = new Uint8Array(0); // 1 where a cell shows art
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
@@ -264,7 +270,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
         minStripCols = Math.round(lerp(MIN_STRIP.cols[0], MIN_STRIP.cols[1], fit));
         viewH = height;
-        grid.resize(width, height, ctx.measureText('M').width, LINE_HEIGHT);
+        // One row more than the screen needs, for when the rows shift to line up with the anchor.
+        grid.resize(width, height, ctx.measureText('M').width, LINE_HEIGHT, Math.ceil(height / LINE_HEIGHT) + 1);
         const n = grid.cols * grid.rows;
         maskCanvas.width = grid.cols * MASK_CELL[0];
         maskCanvas.height = grid.rows * MASK_CELL[1];
@@ -327,14 +334,34 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         maskCtx.fill();
     }
 
+    // Where the first row of art starts so that the anchor line's tallest character starts ANCHOR_OFFSET into a
+    // row, or 0 without an anchor. It uses the line's place on the page at rest: its place on screen plus the
+    // scroll, less the shift an animation gives it, so the rows hold still while the page scrolls or the line
+    // slides in.
+    function rowsTop() {
+        const el = anchor && root.querySelector(anchor);
+        const line = el && document.createTreeWalker(el, NodeFilter.SHOW_TEXT).nextNode();
+        if (!line) return 0;
+        range.selectNodeContents(line);
+        const rect = range.getClientRects()[0];
+        if (!rect) return 0;
+        let top = rect.top + inkOf(line.data, getComputedStyle(line.parentElement)).top + window.scrollY;
+        for (let e = el; e && e !== root; e = e.parentElement) {
+            top -= new DOMMatrixReadOnly(getComputedStyle(e).transform).m42;
+        }
+        return ((((top - ANCHOR_OFFSET) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT) - LINE_HEIGHT;
+    }
+
     function rebuildMask() {
         const w = maskCanvas.width;
         const h = maskCanvas.height;
         if (!w || !h) return;
 
+        gridTop = rowsTop();
+        const scaleY = MASK_CELL[1] / LINE_HEIGHT;
         maskCtx.setTransform(1, 0, 0, 1, 0, 0);
         maskCtx.clearRect(0, 0, w, h);
-        maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, MASK_CELL[1] / LINE_HEIGHT, 0, 0);
+        maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, scaleY, 0, -gridTop * scaleY);
 
         // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
         const styles = new Map();
@@ -423,13 +450,15 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
                 visible[y * cols + x] = open;
             }
         }
+        // Rows below the screen show nothing, so strips of art end at the screen's edge.
+        visible.fill(0, Math.ceil((viewH - gridTop) / LINE_HEIGHT) * cols);
         glass.fill(0);
         for (const panel of frosted) {
             if (isCovered(panel)) continue;
             const rect = panel.getBoundingClientRect();
-            const y1 = Math.min(rows, Math.round(rect.bottom / LINE_HEIGHT));
+            const y1 = Math.min(rows, Math.round((rect.bottom - gridTop) / LINE_HEIGHT));
             const x1 = Math.min(cols, Math.round(rect.right / cellW));
-            for (let y = Math.max(0, Math.round(rect.top / LINE_HEIGHT)); y < y1; y++) {
+            for (let y = Math.max(0, Math.round((rect.top - gridTop) / LINE_HEIGHT)); y < y1; y++) {
                 for (let x = Math.max(0, Math.round(rect.left / cellW)); x < x1; x++) glass[y * cols + x] = 1;
             }
         }
@@ -684,6 +713,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         if (!page) return;
         updateCamera();
         placeCamera(current);
+        // The art projects onto the rows, which start gridTop px from the top of the screen.
+        cam.cy -= gridTop;
         drawStars(grid, cam, t, 1);
         for (const name of names) {
             const gain = gainOf(name);
@@ -769,7 +800,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             for (const row of used) {
                 ctx.fillStyle = colors[row.material];
                 ctx.globalAlpha = Math.min(1, row.alpha * alphaScale);
-                ctx.fillText(row.chars.join(''), 0, y * LINE_HEIGHT);
+                ctx.fillText(row.chars.join(''), 0, gridTop + y * LINE_HEIGHT);
                 row.chars.fill(' ');
             }
             used.length = 0;
