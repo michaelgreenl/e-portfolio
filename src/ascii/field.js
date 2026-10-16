@@ -1,8 +1,9 @@
 // The ASCII art behind the pages. Each page shows one object from a small shared world (see world.js), framed
 // in the box its slot element marks. When the page changes, the camera flies from the old object to the new
 // one: straight in or out when the two are close, and out, across and back in when they are farther apart. When
-// they are too far apart for that, it backs away from the old one as it fades out, and closes in on the new one
-// as it fades in. Faint stars shift as the pointer moves, a finger taps, or the page scrolls.
+// they are too far apart for that, the camera leaves the old one as it fades out: it flies on past it when the
+// new one lies beyond it, and backs away from it when not. Then it closes in on the new one as it fades in.
+// Faint stars shift as the pointer moves, a finger taps, or the page scrolls.
 
 import {
     EDGE_CHARS,
@@ -45,12 +46,13 @@ const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.7 };
 // apart, the camera backs off in the middle of the trip until the sweep fits.
 const MAX_SWEEP = 1.25;
 // Objects more than CUT_GAP world units apart, as Jupiter is from the others, are too far apart to fly between,
-// so a trip between them is a cut: two moves, with no flight across the space between. The camera backs off from
-// the old object to `back` times its distance over `away` seconds, as the object fades out with its page. Then it
-// closes in on the new object from `ahead` times its resting distance over `toward` seconds, as the object fades
-// in over the first third of that.
+// so a trip between them is a cut: two moves, with no flight across the space between. First the camera leaves
+// the old object as it fades out with its page. When the new object lies beyond the old one, the camera flies on
+// past the old one over `past` seconds, `reach` times its distance toward the new one. When not, it backs off to
+// `back` times its distance over `away` seconds. Then it closes in on the new object from `ahead` times its
+// resting distance over `toward` seconds, as the object fades in over the first third of that.
 const CUT_GAP = 100;
-const CUT = { away: 0.4, toward: 0.7, back: 2, ahead: 2.5 };
+const CUT = { away: 0.4, past: 0.25, toward: 0.7, back: 2, reach: 0.6, ahead: 2.5 };
 const PATH_SAMPLES = 48;
 // Objects that are neither leaving nor arriving show this much in the middle of a page change.
 const PASSING_GAIN = 0.8;
@@ -698,17 +700,24 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         const e = easeInOut(k);
         if (travel.cut) {
             const t = k * travel.duration;
-            const away = t < CUT.away;
-            const { target, distance } = away ? a : rest;
-            const steps = away
-                ? Math.log(CUT.back) * easeInOut(t / CUT.away)
-                : Math.log(CUT.ahead) * (1 - easeOut((t - CUT.away) / CUT.toward));
-            travel.across = away ? 0 : 1;
+            const leaving = t < travel.leave;
+            const u = leaving ? t / travel.leave : (t - travel.leave) / CUT.toward;
+            let { target, distance } = leaving ? a : rest;
+            if (!leaving) {
+                distance *= CUT.ahead ** (1 - easeOut(u));
+            } else if (travel.heading) {
+                // On past the old object, toward the new one, without turning, and faster and faster.
+                const along = CUT.reach * distance * u * u;
+                target = target.map((v, i) => v + travel.heading[i] * along);
+            } else {
+                distance *= CUT.back ** easeInOut(u);
+            }
+            travel.across = leaving ? 0 : 1;
             // The camera turns and shifts over the whole trip, so the stars do not jump at the cut.
             current = {
                 target,
                 view: normalize(lerp3(a.view, rest.view, e)),
-                distance: distance * Math.exp(steps),
+                distance,
                 shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
             };
         } else {
@@ -747,9 +756,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         const seen = smoothstep(SEEN_RADIUS[0], SEEN_RADIUS[1], r);
         if (travel.cut) {
             const t = k * travel.duration;
-            if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(0.1, CUT.away, t));
+            const { leave } = travel;
+            if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(leave / 4, leave, t));
             if (name !== travel.to) return 0;
-            return seen * show[name] * smoothstep(CUT.away, CUT.away + CUT.toward / 3, t);
+            return seen * show[name] * smoothstep(leave, leave + CUT.toward / 3, t);
         }
         if (name === travel.to) return seen * show[name] * smoothstep(0, near ? 0.12 : travel.from ? 0.45 : 0.6, k);
         if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(near ? 0.85 : 0.55, 1, k));
@@ -978,6 +988,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             const zoom = Math.abs(Math.log(rest.distance / a.distance)) + 2 * hump;
             const offset = [0, 1, 2].map((i) => rest.target[i] - a.target[i]);
             const cut = Math.hypot(...offset) > CUT_GAP;
+            // The new object lies beyond the old one when it is farther along the camera's line of sight.
+            const heading = normalize(offset);
+            const beyond = cut && heading[0] * a.view[0] + heading[1] * a.view[1] + heading[2] * a.view[2] < 0;
+            const leave = beyond ? CUT.past : CUT.away;
             travel = {
                 from: page,
                 to: name,
@@ -985,10 +999,12 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                 a,
                 fromShow: show[page],
                 cut,
+                leave,
+                heading: beyond ? heading : null,
                 // The camera needs no hump between nearby objects, so both can show for the whole trip.
                 near: hump === 0,
                 duration: cut
-                    ? CUT.away + CUT.toward
+                    ? leave + CUT.toward
                     : Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
             };
         } else {
