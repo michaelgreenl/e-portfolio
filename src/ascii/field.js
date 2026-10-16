@@ -27,7 +27,7 @@ const LINE_HEIGHT = 16;
 const FRAME_MS = 1000 / 30;
 const LAYER_ALPHAS = [0.16, 0.3, 0.48, 0.7, 0.95];
 // Faint characters wash out on the light theme's pale background, so they draw this much stronger there.
-const LIGHT_THEME_ALPHA = 1.4;
+const LIGHT_THEME_ALPHA = 2.8;
 const FOV = 30;
 const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 
