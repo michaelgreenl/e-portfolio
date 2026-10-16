@@ -1,7 +1,8 @@
 // The ASCII art behind the pages. Each page shows one object from a small shared world (see world.js), framed
 // in the box its slot element marks. When the page changes, the camera flies from the old object to the new
-// one: straight in or out when the two are close, and out, across and back in when they are far apart. Faint
-// stars shift as the pointer moves, a finger taps, or the page scrolls.
+// one: straight in or out when the two are close, and out, across and back in when they are farther apart. When
+// they are too far apart for that, it backs away from the old one as it fades out, and closes in on the new one
+// as it fades in. Faint stars shift as the pointer moves, a finger taps, or the page scrolls.
 
 import {
     EDGE_CHARS,
@@ -15,6 +16,7 @@ import {
     createCamera,
     createGrid,
     drawStars,
+    easeOut,
     normalize,
     project,
     smoothstep,
@@ -34,10 +36,17 @@ const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 // The first object flies in from this many times its resting distance.
 const INTRO = { seconds: 1.8, distance: 6 };
 // A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
-const TRAVEL = { base: 1, perStep: 0.15, min: 1, max: 1.7 };
+const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.3 };
 // On a trip the camera's target may sweep this many radians across the view. When the objects are farther
 // apart, the camera backs off in the middle of the trip until the sweep fits.
 const MAX_SWEEP = 1.25;
+// When the camera would have to back off by more than CUT_HUMP steps of zoom for that, the objects are too far
+// apart to fly between, and the trip is a cut instead. The camera backs off from the leaving object to `back`
+// times its distance over `away` seconds, as the object fades out with its page. Then it closes in on the
+// arriving object from `ahead` times its resting distance over `toward` seconds, as the object fades in over the
+// first third of that.
+const CUT_HUMP = 1.5;
+const CUT = { away: 0.4, toward: 0.7, back: 2, ahead: 2.5 };
 const PATH_SAMPLES = 48;
 // Objects that are neither leaving nor arriving show this much in the middle of a page change.
 const PASSING_GAIN = 0.8;
@@ -256,7 +265,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
 
     let page = null; // name of the object the current page shows
     let current = null; // where the camera is now: { target, view, distance, shift }
-    let travel = null; // the page change in progress: { from, to, start, duration, a }
+    let travel = null; // the page change in progress: { from, to, start, duration, a, cut }
     let oldSlot = null; // the leaving page's slot, which the new page's object must not use
     let slotReady = true; // false while the new page is not on screen yet
 
@@ -682,15 +691,32 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         const a = (travel.a ??= { ...rest, distance: rest.distance * INTRO.distance });
         const k = progress();
         const e = easeInOut(k);
-        const hump = humpFor(a, rest);
-        const { sum, total } = pathLength(a, rest, hump, e);
-        travel.across = sum / total;
-        current = {
-            target: lerp3(a.target, rest.target, travel.across),
-            view: normalize(lerp3(a.view, rest.view, travel.across)),
-            distance: distanceAt(a, rest, hump, e),
-            shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
-        };
+        if (travel.cut) {
+            const t = k * travel.duration;
+            const away = t < CUT.away;
+            const { target, distance } = away ? a : rest;
+            const steps = away
+                ? Math.log(CUT.back) * easeInOut(t / CUT.away)
+                : Math.log(CUT.ahead) * (1 - easeOut((t - CUT.away) / CUT.toward));
+            travel.across = away ? 0 : 1;
+            // The camera turns and shifts over the whole trip, so the stars do not jump at the cut.
+            current = {
+                target,
+                view: normalize(lerp3(a.view, rest.view, e)),
+                distance: distance * Math.exp(steps),
+                shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
+            };
+        } else {
+            const hump = humpFor(a, rest);
+            const { sum, total } = pathLength(a, rest, hump, e);
+            travel.across = sum / total;
+            current = {
+                target: lerp3(a.target, rest.target, travel.across),
+                view: normalize(lerp3(a.view, rest.view, travel.across)),
+                distance: distanceAt(a, rest, hump, e),
+                shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
+            };
+        }
         if (k >= 1) travel = null;
     }
 
@@ -705,13 +731,21 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
 
     // How strongly each object draws. On a trip between nearby objects, as from the Earth to the rocket, both
     // show for nearly all of it. On a long trip the arriving object fades in, the leaving one fades out near
-    // the end, and others show only in the middle of the trip. Objects too small on screen do not show.
+    // the end, and others show only in the middle of the trip. On a cut, the leaving object fades out as the
+    // camera backs away from it, and the arriving one fades in as the camera closes in. Objects too small on
+    // screen do not show.
     function gainOf(name) {
         if (!travel) return name === page ? show[name] : 0;
         const k = progress();
         const { near } = travel;
         const r = screenRadius(name);
         const seen = smoothstep(SEEN_RADIUS[0], SEEN_RADIUS[1], r);
+        if (travel.cut) {
+            const t = k * travel.duration;
+            if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(0.1, CUT.away, t));
+            if (name !== travel.to) return 0;
+            return seen * show[name] * smoothstep(CUT.away, CUT.away + CUT.toward / 3, t);
+        }
         if (name === travel.to) return seen * show[name] * smoothstep(0, near ? 0.12 : travel.from ? 0.45 : 0.6, k);
         if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(near ? 0.85 : 0.55, 1, k));
         const passing = PASSING_GAIN * smoothstep(0.1, 0.35, k) * (1 - smoothstep(0.65, 0.9, k));
@@ -937,15 +971,19 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             const a = { ...current };
             const hump = humpFor(a, rest);
             const zoom = Math.abs(Math.log(rest.distance / a.distance)) + 2 * hump;
+            const cut = hump > CUT_HUMP;
             travel = {
                 from: page,
                 to: name,
                 start: clock,
                 a,
                 fromShow: show[page],
+                cut,
                 // The camera needs no hump between nearby objects, so both can show for the whole trip.
                 near: hump === 0,
-                duration: Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
+                duration: cut
+                    ? CUT.away + CUT.toward
+                    : Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
             };
         } else {
             travel = { from: null, to: name, start: clock, a: null, near: false, duration: INTRO.seconds };
