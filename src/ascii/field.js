@@ -52,19 +52,20 @@ const GUESS_SLOT = { left: 0.55, top: 0.15, width: 0.4, height: 0.6 };
 const SETTLE_SECONDS = 0.3;
 const SHOW_EASE = 0.15;
 
-// Page content is drawn into a low-resolution mask, weighted by its opacity. Each line of text clears one box,
-// never the shapes of single letters: from the top of its tallest character, emoji included, to the bottom of
-// its lowest, padded below and to each side but not above. Its corners curve as far as the characters at its
-// ends leave room, up to TEXT_CURVE. The box starts TEXT_TOP_INSET below that top: the art's characters sit
-// high in their row and leave its bottom pixels empty, so text that reaches into the bottom of a row leaves
+// Page content is drawn into a low-resolution mask with its opacity: a cell under content shows art only as far
+// as that content has faded out, so the art fades back in as the content fades away. Each line of text clears
+// one box, never the shapes of single letters: from the top of its tallest character, emoji included, to the
+// bottom of its lowest, padded below and to each side but not above. Its corners curve as far as the characters
+// at its ends leave room, up to TEXT_CURVE. The box starts TEXT_TOP_INSET below that top: the art's characters
+// sit high in their row and leave its bottom pixels empty, so text that reaches into the bottom of a row leaves
 // that row's art in place. Elements matching the surfaces selector clear their whole rounded box while they
 // show a background or a border all around. One bordered on only some sides, such as a divider, clears just
 // those lines. One with neither, such as a nav link, clears one box around its icon and text together, so the
 // cut above them stays level, and the band where its ::after underline draws, so the art holds still while an
 // underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows through them,
-// blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell shows art only
-// where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
-// line, and the edge around content is a clean cut along the rows and columns, with no fade. Strips of art
+// blurred. The mask has MASK_CELL pixels across and down for each character cell, and content covers a cell
+// where any of its mask pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
+// line, and the edge around content is a clean cut along the rows and columns, with no soft edge. Strips of art
 // narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too, so no slivers
 // squeeze between them, and so are runs of at most MAX_POCKET cells in a row with content at both ends and
 // right below, such as art that hangs into the gap between two nav links. The padding and the narrowest strip
@@ -135,36 +136,47 @@ function turnY(v, turn) {
     return [c * v[0] + s * v[2], v[1], -s * v[0] + c * v[2]];
 }
 
-// Clears each run of open cells shorter than min along a line. Cells under glass show art but end a run.
-// There are `lines` lines of `length` cells; a line starts at line * across and its cells are along apart.
+// Clears each run of open cells (255, art in full) shorter than min along a line, down to the art that the
+// content at its ends shows: the run fades back in with that content. Cells under glass show art but end a run,
+// as the ends of a line do. There are `lines` lines of `length` cells; a line starts at line * across and its
+// cells are along apart.
 function clearStrips(open, glass, lines, length, across, along, min) {
     for (let line = 0; line < lines; line++) {
+        const at = (k) => line * across + k * along;
+        const shownAt = (k) => (k < 0 || k >= length || glass[at(k)] ? 0 : open[at(k)]);
         let start = -1;
         for (let k = 0; k <= length; k++) {
-            const i = line * across + k * along;
-            const isOpen = k < length && open[i] && !glass[i];
+            const isOpen = k < length && open[at(k)] === 255 && !glass[at(k)];
             if (isOpen && start < 0) start = k;
             if (isOpen || start < 0) continue;
-            if (k - start < min) for (let j = start; j < k; j++) open[line * across + j * along] = 0;
+            if (k - start < min) {
+                const shown = Math.max(shownAt(start - 1), shownAt(k));
+                for (let j = start; j < k; j++) open[at(j)] = shown;
+            }
             start = -1;
         }
     }
 }
 
-// Clears each run of at most max open cells in a row that has content at both ends and right below all of it.
-// It works from the bottom row up, so a narrow notch between content clears all the way up. Cells under glass
-// show art, so they neither join nor end such a run.
+// Clears each run of at most max open cells in a row that has content at both ends and right below all of it,
+// down to the most art that content shows. It works from the bottom row up, so a narrow notch between content
+// clears all the way up. Cells under glass show art, so they neither join nor end such a run.
 function clearPockets(open, glass, rows, cols, max) {
-    const isContent = (i) => !open[i] && !glass[i];
+    const isOpen = (i) => open[i] === 255 && !glass[i];
+    const isContent = (i) => open[i] < 255 && !glass[i];
     for (let y = rows - 2; y >= 0; y--) {
         const row = y * cols;
         for (let x = 1; x < cols; x++) {
-            if (!open[row + x] || glass[row + x] || !isContent(row + x - 1)) continue;
+            if (!isOpen(row + x) || !isContent(row + x - 1)) continue;
             let end = x;
-            while (end < cols && open[row + end] && !glass[row + end]) end++;
+            while (end < cols && isOpen(row + end)) end++;
             let pocket = end < cols && isContent(row + end) && end - x <= max;
-            for (let k = x; pocket && k < end; k++) pocket = isContent(row + cols + k);
-            if (pocket) open.fill(0, row + x, row + end);
+            let shown = pocket ? Math.max(open[row + x - 1], open[row + end]) : 0;
+            for (let k = x; pocket && k < end; k++) {
+                pocket = isContent(row + cols + k);
+                shown = Math.max(shown, open[row + cols + k]);
+            }
+            if (pocket) open.fill(shown, row + x, row + end);
             x = end;
         }
     }
@@ -236,7 +248,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
     let viewW = 1;
     let viewH = 1;
     let gridTop = 0; // where the first row of art starts, at or above the top of the screen
-    let visible = new Uint8Array(0); // 1 where a cell shows art
+    let visible = new Uint8Array(0); // how much each cell shows its art, from 0 (none) to 255 (all of it)
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
     let minStripCols = MIN_STRIP.cols[1];
@@ -252,6 +264,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
     let frameId = 0;
     let lastFrame = 0;
     let lastMask = 0;
+    let shownSum = 0; // the summed opacity of all content at the last mask rebuild
+    let fading = false; // that sum changed at the last rebuild, so some content is fading in or out
     let lastScrollY = window.scrollY;
     let velocity = 0; // how fast the page scrolls, in px per second, down positive
     let tilt = 0;
@@ -382,6 +396,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         maskCtx.setTransform(1, 0, 0, 1, 0, 0);
         maskCtx.clearRect(0, 0, w, h);
         maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, scaleY, 0, -gridTop * scaleY);
+        maskCtx.globalCompositeOperation = 'lighten';
 
         // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
         const styles = new Map();
@@ -397,6 +412,15 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             return opacities.get(el);
         };
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
+        // Content fills its zones with red as strong as its opacity; where zones overlap, the stronger red stays.
+        // Content that has faded out draws nothing.
+        let sum = 0;
+        const paint = (el) => {
+            const alpha = alphaOf(el);
+            sum += alpha;
+            maskCtx.fillStyle = `rgb(${Math.round(alpha * 255)}, 0, 0)`;
+            return alpha >= 0.02;
+        };
         const shields = new Set();
         const frosted = new Set();
         const dividers = [];
@@ -419,37 +443,31 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         };
 
         for (const surface of shields) {
-            if (isCovered(surface)) continue;
-            maskCtx.globalAlpha = alphaOf(surface);
+            if (isCovered(surface) || !paint(surface)) continue;
             drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
         }
         for (const el of dividers) {
-            if (isCovered(el)) continue;
+            if (isCovered(el) || !paint(el)) continue;
             const style = styleOf(el);
             const box = el.getBoundingClientRect();
-            maskCtx.globalAlpha = alphaOf(el);
             for (const side of bordersOf(style)) drawBox(borderLine(box, style, side), 0);
         }
         for (const el of controls) {
-            if (isCovered(el)) continue;
-            maskCtx.globalAlpha = alphaOf(el);
+            if (isCovered(el) || !paint(el)) continue;
             range.selectNodeContents(el);
             drawBox(range.getBoundingClientRect(), 0);
             const band = underlineOf(el);
             if (band) drawBox(band, 0);
         }
         for (const el of root.querySelectorAll('svg, hr, img, video')) {
-            if (shields.has(el) || frosted.has(el) || isCovered(el)) continue;
-            maskCtx.globalAlpha = alphaOf(el);
+            if (shields.has(el) || frosted.has(el) || isCovered(el) || !paint(el)) continue;
             drawBox(el.getBoundingClientRect(), 4);
         }
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
             const el = node.parentElement;
             if (!el || !node.data.trim() || shields.has(el) || frosted.has(el) || isCovered(el)) continue;
-            const alpha = alphaOf(el);
-            if (alpha < 0.02) continue;
-            maskCtx.globalAlpha = alpha;
+            if (!paint(el)) continue;
             const style = styleOf(el);
             const ink = inkOf(node.data, style);
             const text = node.data.trim();
@@ -462,20 +480,23 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                 drawLine(rects[i], ink, i === 0 && start, i === rects.length - 1 && end);
             }
         }
-        maskCtx.globalAlpha = 1;
+        fading = sum !== shownSum;
+        shownSum = sum;
 
+        // A cell takes the strongest red of the content that covers it, and shows that much less of its art.
         const { data } = maskCtx.getImageData(0, 0, w, h);
         const { cols, rows, cellW } = grid;
         const [across, down] = MASK_CELL;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
-                let open = 1;
+                let veil = 0;
                 for (let my = y * down; my < (y + 1) * down; my++) {
                     for (let mx = x * across; mx < (x + 1) * across; mx++) {
-                        if (data[(my * w + mx) * 4 + 3] >= CLEAR_AT * 255) open = 0;
+                        const k = (my * w + mx) * 4;
+                        if (data[k + 3] >= CLEAR_AT * 255) veil = Math.max(veil, data[k]);
                     }
                 }
-                visible[y * cols + x] = open;
+                visible[y * cols + x] = 255 - veil;
             }
         }
         // Rows below the screen show nothing, so strips of art end at the screen's edge.
@@ -819,7 +840,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                         alpha = starAlpha[i];
                     }
                 }
-                const layer = char === ' ' ? -1 : layerFor(alpha);
+                const layer = char === ' ' ? -1 : layerFor((alpha * visible[i]) / 255);
                 if (layer < 0) continue;
                 const row = rowLayers[material][layer];
                 if (!used.includes(row)) used.push(row);
@@ -870,9 +891,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         lastFrame = now;
         clock = (now - startTime) / 1000;
 
-        // The mask follows layout on an interval, and on every frame while the page scrolls.
+        // The mask follows layout on an interval, and on every frame while the page scrolls, content fades, or the
+        // camera travels between pages.
         const scrolled = measureScroll(dt);
-        const maskDue = scrolled || now - lastMask > MASK_INTERVAL;
+        const maskDue = scrolled || fading || travel || now - lastMask > MASK_INTERVAL;
         if (maskDue) {
             lastMask = now;
             rebuildMask();
