@@ -65,8 +65,9 @@ const SHOW_EASE = 0.15;
 // shows art only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of
 // content, even a thin line, and the edge around content is a clean cut along the rows and columns, with no
 // fade. Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared
-// too, so no slivers squeeze between them. The padding and the narrowest strip kept grow from the first value
-// at phone width to the second at desktop width.
+// too, so no slivers squeeze between them, and so are runs of at most MAX_POCKET cells in a row with content at
+// both ends and right below, such as art that hangs into the gap between two nav links. The padding and the
+// narrowest strip kept grow from the first value at phone width to the second at desktop width.
 const TEXT_TOP_INSET = 2;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
@@ -74,6 +75,7 @@ const MASK_WIDTHS = [390, 1280];
 const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
+const MAX_POCKET = 4;
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
 const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => ((v / 16 - 0.47) / LAST) * 0.5);
@@ -137,6 +139,25 @@ function clearStrips(open, glass, lines, length, across, along, min) {
             if (isOpen || start < 0) continue;
             if (k - start < min) for (let j = start; j < k; j++) open[line * across + j * along] = 0;
             start = -1;
+        }
+    }
+}
+
+// Clears each run of at most max open cells in a row that has content at both ends and right below all of it.
+// It works from the bottom row up, so a narrow notch between content clears all the way up. Cells under glass
+// show art, so they neither join nor end such a run.
+function clearPockets(open, glass, rows, cols, max) {
+    const isContent = (i) => !open[i] && !glass[i];
+    for (let y = rows - 2; y >= 0; y--) {
+        const row = y * cols;
+        for (let x = 1; x < cols; x++) {
+            if (!open[row + x] || glass[row + x] || !isContent(row + x - 1)) continue;
+            let end = x;
+            while (end < cols && open[row + end] && !glass[row + end]) end++;
+            let pocket = end < cols && isContent(row + end) && end - x <= max;
+            for (let k = x; pocket && k < end; k++) pocket = isContent(row + cols + k);
+            if (pocket) open.fill(0, row + x, row + end);
+            x = end;
         }
     }
 }
@@ -414,6 +435,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         }
         clearStrips(visible, glass, rows, cols, cols, 1, minStripCols);
         clearStrips(visible, glass, cols, rows, 1, cols, MIN_STRIP.rows);
+        clearPockets(visible, glass, rows, cols, MAX_POCKET);
     }
 
     /* ---------- Framing ---------- */
