@@ -1,5 +1,5 @@
 <script setup>
-import { useId, useTemplateRef } from 'vue';
+import { computed, useId, useTemplateRef, watch } from 'vue';
 import { useEventListener, useResizeObserver } from '@vueuse/core';
 
 const props = defineProps({
@@ -25,24 +25,30 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    tooltipText: {
+        type: String,
+    },
+    tooltipOpen: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const button = useTemplateRef('button');
 const label = useTemplateRef('label');
 const tooltip = useTemplateRef('tooltip');
 const tooltipId = useId();
+const hasTooltip = computed(() => Boolean(props.tooltipText) || props.tooltipWhenTextHidden);
 
 function showTooltip(event) {
     if (
-        !props.tooltipWhenTextHidden ||
-        !props.text ||
-        !label.value ||
+        !hasTooltip.value ||
         !tooltip.value ||
-        label.value.getClientRects().length
+        (!props.tooltipText && (!props.text || !label.value || label.value.getClientRects().length))
     )
         return;
-    if (event.pointerType === 'touch') return;
-    if (event.type === 'focus' && !event.target.matches(':focus-visible')) return;
+    if (event?.pointerType === 'touch') return;
+    if (event?.type === 'focus' && !event.target.matches(':focus-visible')) return;
 
     tooltip.value.showPopover();
     positionTooltip();
@@ -52,7 +58,11 @@ function positionTooltip() {
     if (!button.value || !label.value || !tooltip.value?.matches(':popover-open')) return;
 
     const trigger = button.value.getBoundingClientRect();
-    if (label.value.getClientRects().length || trigger.bottom <= 0 || trigger.top >= window.innerHeight) {
+    if (
+        (!props.tooltipText && label.value.getClientRects().length) ||
+        trigger.bottom <= 0 ||
+        trigger.top >= window.innerHeight
+    ) {
         hideTooltip();
         return;
     }
@@ -73,6 +83,7 @@ function positionTooltip() {
 
 function hideTooltip(event) {
     if (!button.value) return;
+    if (props.tooltipOpen && (event?.type === 'pointerleave' || event?.type === 'blur')) return;
     if (
         event?.type === 'pointerleave' &&
         (button.value.closest(':focus-visible') ||
@@ -84,7 +95,16 @@ function hideTooltip(event) {
     tooltip.value?.hidePopover();
 }
 
-if (props.tooltipWhenTextHidden) {
+watch(
+    [() => props.tooltipOpen, () => props.tooltipText],
+    () => {
+        if (props.tooltipOpen) showTooltip();
+        else hideTooltip();
+    },
+    { flush: 'post' },
+);
+
+if (hasTooltip.value) {
     useEventListener(() => button.value?.closest('a'), 'focus', showTooltip);
     useEventListener(() => button.value?.closest('a'), 'blur', hideTooltip);
     useEventListener(window, ['resize', 'scroll'], positionTooltip, { capture: true });
@@ -100,13 +120,14 @@ if (props.tooltipWhenTextHidden) {
         :class="preset"
         :style="{ ...styles }"
         :aria-label="tooltipWhenTextHidden ? text : undefined"
-        :aria-describedby="tooltipWhenTextHidden ? tooltipId : undefined"
+        :aria-describedby="hasTooltip ? tooltipId : undefined"
         @pointerenter="showTooltip"
         @pointerleave="hideTooltip"
         @focus="showTooltip"
         @blur="hideTooltip"
+        @keydown.esc="hideTooltip()"
         @click="
-            hideTooltip();
+            tooltipOpen ? showTooltip() : hideTooltip();
             $event.currentTarget.classList.add('is-clicked');
         "
     >
@@ -115,18 +136,18 @@ if (props.tooltipWhenTextHidden) {
             {{ text }}
         </span>
         <component :is="iconRight" class="icon" />
-        <Teleport v-if="tooltipWhenTextHidden" :to="button?.closest('dialog') ?? 'body'">
+        <Teleport v-if="hasTooltip" :to="button?.closest('dialog') ?? 'body'">
             <span
                 :id="tooltipId"
                 ref="tooltip"
                 class="button-tooltip"
                 role="tooltip"
-                popover="auto"
+                :popover="tooltipOpen ? 'manual' : 'auto'"
                 data-testid="external-link-tooltip"
                 @pointerleave="hideTooltip"
                 @click.stop.prevent
             >
-                {{ text }}
+                {{ tooltipText || text }}
             </span>
         </Teleport>
     </component>

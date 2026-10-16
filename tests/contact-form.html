@@ -75,8 +75,8 @@
             const form = document.getElementById('contact-form');
             const submit = document.querySelector('button[type="submit"]');
             assert(submit?.form === form, 'Send is not associated with the form');
-            const links = [...document.querySelectorAll('.contact-links a')];
-            assert(links.length === 3, 'Expected three contact links');
+            const links = [...document.querySelectorAll('.contact-links a, .contact-links button')];
+            assert(links.length === 3, 'Expected three contact controls');
             assert(
                 links.every((link) => link.tabIndex === 0 && !link.querySelector('button')),
                 'Contact links have nested tab stops',
