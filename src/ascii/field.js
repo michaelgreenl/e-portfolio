@@ -40,16 +40,16 @@ const SCREEN_WIDTHS = [390, 1280];
 // art and of the page at first, so the fly-in is shorter there.
 const INTRO = { seconds: [1.1, 1.8], distance: [2.2, 6] };
 // A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
-const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.3 };
+const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.7 };
 // On a trip the camera's target may sweep this many radians across the view. When the objects are farther
 // apart, the camera backs off in the middle of the trip until the sweep fits.
 const MAX_SWEEP = 1.25;
-// When the camera would have to back off by more than CUT_HUMP steps of zoom for that, the objects are too far
-// apart to fly between, and the trip is a cut instead. The camera backs off from the leaving object to `back`
-// times its distance over `away` seconds, as the object fades out with its page. Then it closes in on the
-// arriving object from `ahead` times its resting distance over `toward` seconds, as the object fades in over the
-// first third of that.
-const CUT_HUMP = 1.5;
+// Objects more than CUT_GAP world units apart, as Jupiter is from the others, are too far apart to fly between,
+// so a trip between them is a cut: two moves, with no flight across the space between. The camera backs off from
+// the old object to `back` times its distance over `away` seconds, as the object fades out with its page. Then it
+// closes in on the new object from `ahead` times its resting distance over `toward` seconds, as the object fades
+// in over the first third of that.
+const CUT_GAP = 100;
 const CUT = { away: 0.4, toward: 0.7, back: 2, ahead: 2.5 };
 const PATH_SAMPLES = 48;
 // Objects that are neither leaving nor arriving show this much in the middle of a page change.
@@ -976,7 +976,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             const a = { ...current };
             const hump = humpFor(a, rest);
             const zoom = Math.abs(Math.log(rest.distance / a.distance)) + 2 * hump;
-            const cut = hump > CUT_HUMP;
+            const offset = [0, 1, 2].map((i) => rest.target[i] - a.target[i]);
+            const cut = Math.hypot(...offset) > CUT_GAP;
             travel = {
                 from: page,
                 to: name,
