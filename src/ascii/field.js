@@ -52,24 +52,22 @@ const GUESS_SLOT = { left: 0.55, top: 0.15, width: 0.4, height: 0.6 };
 const SETTLE_SECONDS = 0.3;
 const SHOW_EASE = 0.15;
 
-// Page content is drawn into a low-resolution mask, weighted by its opacity. Large type clears by glyph
-// shape. Smaller text clears the box its letters' ink covers, padded below and to each side but not above.
-// The box starts TEXT_TOP_INSET below the letters' top: the art's characters sit high in their row and leave
-// its bottom pixels empty, so letters that reach into the bottom of a row leave that row's art in place.
-// Emoji draw taller than letters and clear their own line box. Elements matching the surfaces selector clear
-// their whole rounded box while they show a background or a border all around. One bordered on only some
-// sides, such as a divider, clears just those lines, and one with neither clears the band where its ::after
-// underline draws, so the art holds still while an underline grows in on hover. Text in such a control clears
-// its whole line box, so the cut above the text stays level with the cut above its icon. Elements with a
-// backdrop blur clear nothing: the art shows through them, blurred. The mask has MASK_CELL pixels across and
-// down for each character cell, and a cell shows art only where all of its mask pixels are below CLEAR_AT. So
-// the art keeps CLEAR_PADDING clear of content, even a thin line, and the edge around content is a clean cut
-// along the rows and columns, with no fade. Strips of art narrower than MIN_STRIP between content, frosted
-// panels and the screen edge are cleared too, so no slivers squeeze between them. The padding and the
-// narrowest strip kept grow from the first value at phone width to the second at desktop width.
-const GLYPH_MIN_FONT_SIZE = 24;
+// Page content is drawn into a low-resolution mask, weighted by its opacity. Each line of text clears one box,
+// never the shapes of single letters: from the top of its tallest character, emoji included, to the bottom of
+// its lowest, padded below and to each side but not above. The box starts TEXT_TOP_INSET below that top: the
+// art's characters sit high in their row and leave its bottom pixels empty, so text that reaches into the
+// bottom of a row leaves that row's art in place. Elements matching the surfaces selector clear their whole
+// rounded box while they show a background or a border all around. One bordered on only some sides, such as a
+// divider, clears just those lines. One with neither, such as a nav link, clears one box around its icon and
+// text together, so the cut above them stays level, and the band where its ::after underline draws, so the art
+// holds still while an underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows
+// through them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell
+// shows art only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of
+// content, even a thin line, and the edge around content is a clean cut along the rows and columns, with no
+// fade. Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared
+// too, so no slivers squeeze between them. The padding and the narrowest strip kept grow from the first value
+// at phone width to the second at desktop width.
 const TEXT_TOP_INSET = 2;
-const PICTOGRAPH = /\p{Extended_Pictographic}/gu;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
 const MASK_WIDTHS = [390, 1280];
@@ -288,7 +286,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         maskCtx.fill();
     }
 
-    // Where a font's letters draw in their line box: the top of their ink below the box's top, and its height.
+    // Where a text's characters draw in its line box: the top of their ink below the box's top, and its height.
     function inkOf(text, style) {
         maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
         const metrics = maskCtx.measureText(text);
@@ -298,37 +296,14 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         };
     }
 
-    // A line of text clears its letters' ink from TEXT_TOP_INSET below their top, padded below and to each side.
+    // A line of text clears its characters' ink from TEXT_TOP_INSET below their top, padded below and to each side.
     function drawLine(rect, ink) {
         const top = rect.top + ink.top + TEXT_TOP_INSET;
         const height = ink.height - TEXT_TOP_INSET + clearPadding;
         if (top + height < -clearPadding || top > viewH + clearPadding) return;
         maskCtx.beginPath();
-        maskCtx.roundRect(rect.left - clearPadding, top, rect.width + clearPadding * 2, height, height / 2);
+        maskCtx.roundRect(rect.left - clearPadding, top, rect.width + clearPadding * 2, height, clearPadding);
         maskCtx.fill();
-    }
-
-    // Draws each character at its rendered position; the round stroke adds even padding around the glyph.
-    function drawGlyphs(node, style) {
-        range.selectNodeContents(node);
-        const box = range.getBoundingClientRect();
-        if (box.bottom < -clearPadding || box.top > viewH + clearPadding) return;
-        maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-        const ascent = maskCtx.measureText('M').fontBoundingBoxAscent;
-        let offset = 0;
-        for (const char of node.data) {
-            const end = offset + char.length;
-            if (char.trim()) {
-                range.setStart(node, offset);
-                range.setEnd(node, end);
-                const rect = range.getBoundingClientRect();
-                if (rect.width) {
-                    maskCtx.strokeText(char, rect.left, rect.top + ascent);
-                    maskCtx.fillText(char, rect.left, rect.top + ascent);
-                }
-            }
-            offset = end;
-        }
     }
 
     function rebuildMask() {
@@ -339,9 +314,6 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
         maskCtx.setTransform(1, 0, 0, 1, 0, 0);
         maskCtx.clearRect(0, 0, w, h);
         maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, MASK_CELL[1] / LINE_HEIGHT, 0, 0);
-        maskCtx.lineWidth = clearPadding * 2;
-        maskCtx.lineJoin = 'round';
-        maskCtx.textBaseline = 'alphabetic';
 
         // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
         const styles = new Map();
@@ -391,10 +363,12 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             for (const side of bordersOf(style)) drawBox(borderLine(box, style, side), 0);
         }
         for (const el of controls) {
-            const band = !isCovered(el) && underlineOf(el);
-            if (!band) continue;
+            if (isCovered(el)) continue;
             maskCtx.globalAlpha = alphaOf(el);
-            drawBox(band, 0);
+            range.selectNodeContents(el);
+            drawBox(range.getBoundingClientRect(), 0);
+            const band = underlineOf(el);
+            if (band) drawBox(band, 0);
         }
         for (const el of root.querySelectorAll('svg, hr, img, video')) {
             if (shields.has(el) || frosted.has(el) || isCovered(el)) continue;
@@ -408,22 +382,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, world }) {
             const alpha = alphaOf(el);
             if (alpha < 0.02) continue;
             maskCtx.globalAlpha = alpha;
-            const style = styleOf(el);
-            if (parseFloat(style.fontSize) >= GLYPH_MIN_FONT_SIZE) {
-                drawGlyphs(node, style);
-            } else if (controls.includes(el.closest(surfaces))) {
-                range.selectNodeContents(node);
-                for (const rect of range.getClientRects()) drawBox(rect, rect.height / 2);
-            } else {
-                const ink = inkOf(node.data.replace(PICTOGRAPH, ''), style);
-                range.selectNodeContents(node);
-                if (ink.height > 0) for (const rect of range.getClientRects()) drawLine(rect, ink);
-                for (const { index, 0: char } of node.data.matchAll(PICTOGRAPH)) {
-                    range.setStart(node, index);
-                    range.setEnd(node, index + char.length);
-                    drawBox(range.getBoundingClientRect(), 4);
-                }
-            }
+            const ink = inkOf(node.data, styleOf(el));
+            range.selectNodeContents(node);
+            for (const rect of range.getClientRects()) drawLine(rect, ink);
         }
         maskCtx.globalAlpha = 1;
 
