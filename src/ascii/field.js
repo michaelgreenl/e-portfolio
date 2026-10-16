@@ -54,21 +54,23 @@ const SHOW_EASE = 0.15;
 
 // Page content is drawn into a low-resolution mask, weighted by its opacity. Each line of text clears one box,
 // never the shapes of single letters: from the top of its tallest character, emoji included, to the bottom of
-// its lowest, padded below and to each side but not above. The box starts TEXT_TOP_INSET below that top: the
-// art's characters sit high in their row and leave its bottom pixels empty, so text that reaches into the
-// bottom of a row leaves that row's art in place. Elements matching the surfaces selector clear their whole
-// rounded box while they show a background or a border all around. One bordered on only some sides, such as a
-// divider, clears just those lines. One with neither, such as a nav link, clears one box around its icon and
-// text together, so the cut above them stays level, and the band where its ::after underline draws, so the art
-// holds still while an underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows
-// through them, blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell
-// shows art only where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of
-// content, even a thin line, and the edge around content is a clean cut along the rows and columns, with no
-// fade. Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared
-// too, so no slivers squeeze between them, and so are runs of at most MAX_POCKET cells in a row with content at
-// both ends and right below, such as art that hangs into the gap between two nav links. The padding and the
-// narrowest strip kept grow from the first value at phone width to the second at desktop width.
+// its lowest, padded below and to each side but not above. Its corners curve as far as the characters at its
+// ends leave room, up to TEXT_CURVE. The box starts TEXT_TOP_INSET below that top: the art's characters sit
+// high in their row and leave its bottom pixels empty, so text that reaches into the bottom of a row leaves
+// that row's art in place. Elements matching the surfaces selector clear their whole rounded box while they
+// show a background or a border all around. One bordered on only some sides, such as a divider, clears just
+// those lines. One with neither, such as a nav link, clears one box around its icon and text together, so the
+// cut above them stays level, and the band where its ::after underline draws, so the art holds still while an
+// underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows through them,
+// blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell shows art only
+// where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
+// line, and the edge around content is a clean cut along the rows and columns, with no fade. Strips of art
+// narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too, so no slivers
+// squeeze between them, and so are runs of at most MAX_POCKET cells in a row with content at both ends and
+// right below, such as art that hangs into the gap between two nav links. The padding and the narrowest strip
+// kept grow from the first value at phone width to the second at desktop width.
 const TEXT_TOP_INSET = 2;
+const TEXT_CURVE = 24;
 // With an anchor on the page, the rows of art shift down by less than one row, so the anchor line's tallest
 // character starts ANCHOR_OFFSET px into a row, just below that row's characters. With the page at the top,
 // the row above that line then shows in full, at every screen size.
@@ -80,6 +82,8 @@ const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
 const MAX_POCKET = 4;
+
+const graphemes = new Intl.Segmenter();
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
 const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => ((v / 16 - 0.47) / LAST) * 0.5);
@@ -314,23 +318,39 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         maskCtx.fill();
     }
 
-    // Where a text's characters draw in its line box: the top of their ink below the box's top, and its height.
+    // Where a text's characters draw in its line box: the top of their ink below the box's top, the ink's height,
+    // and how far the ink reaches above and below the baseline.
     function inkOf(text, style) {
         maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
         const metrics = maskCtx.measureText(text);
-        return {
-            top: metrics.fontBoundingBoxAscent - metrics.actualBoundingBoxAscent,
-            height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
-        };
+        const ascent = metrics.actualBoundingBoxAscent;
+        const descent = metrics.actualBoundingBoxDescent;
+        return { top: metrics.fontBoundingBoxAscent - ascent, height: ascent + descent, ascent, descent };
+    }
+
+    // How far a corner of a line's box can curve and still hold the ink of the character at that end, which sits
+    // room px in from the box's top or bottom edge and clearPadding in from its side. Without that room, the
+    // corner curves only as far as clearPadding.
+    function curveFor(room) {
+        if (!(room > 0)) return clearPadding;
+        return Math.min(TEXT_CURVE, clearPadding + room + Math.sqrt(2 * clearPadding * room));
     }
 
     // A line of text clears its characters' ink from TEXT_TOP_INSET below their top, padded below and to each side.
-    function drawLine(rect, ink) {
+    // start and end are the ink of the characters at the line's ends, where the text starts and ends on it.
+    function drawLine(rect, ink, start, end) {
         const top = rect.top + ink.top + TEXT_TOP_INSET;
         const height = ink.height - TEXT_TOP_INSET + clearPadding;
         if (top + height < -clearPadding || top > viewH + clearPadding) return;
+        const above = (char) => char && ink.ascent - char.ascent - TEXT_TOP_INSET;
+        const below = (char) => (char ? ink.descent - char.descent : 0) + clearPadding;
         maskCtx.beginPath();
-        maskCtx.roundRect(rect.left - clearPadding, top, rect.width + clearPadding * 2, height, clearPadding);
+        maskCtx.roundRect(rect.left - clearPadding, top, rect.width + clearPadding * 2, height, [
+            curveFor(above(start)),
+            curveFor(above(end)),
+            curveFor(below(end)),
+            curveFor(below(start)),
+        ]);
         maskCtx.fill();
     }
 
@@ -430,9 +450,17 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             const alpha = alphaOf(el);
             if (alpha < 0.02) continue;
             maskCtx.globalAlpha = alpha;
-            const ink = inkOf(node.data, styleOf(el));
+            const style = styleOf(el);
+            const ink = inkOf(node.data, style);
+            const text = node.data.trim();
+            const chars = graphemes.segment(text);
+            const start = inkOf(chars.containing(0).segment, style);
+            const end = inkOf(chars.containing(text.length - 1).segment, style);
             range.selectNodeContents(node);
-            for (const rect of range.getClientRects()) drawLine(rect, ink);
+            const rects = range.getClientRects();
+            for (let i = 0; i < rects.length; i++) {
+                drawLine(rects[i], ink, i === 0 && start, i === rects.length - 1 && end);
+            }
         }
         maskCtx.globalAlpha = 1;
 
