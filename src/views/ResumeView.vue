@@ -264,6 +264,7 @@ onMounted(() => {
 
     @include bp-custom-min(730) {
         --column: 48em;
+        padding: $space-4 $space-6;
     }
 
     @include bp-xl-desktop {
