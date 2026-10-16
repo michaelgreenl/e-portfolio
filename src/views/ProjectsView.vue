@@ -115,7 +115,7 @@ async function openProject(project, autoplay = false) {
 
         <div ref="pageHeader" class="page-header">
             <h1>Projects</h1>
-            <hr />
+            <hr v-if="isLaptop" />
             <p>
                 Recent full-stack projects spanning cross-platform development, offline-first synchronization, real-time
                 systems, and agent-assisted workflows
