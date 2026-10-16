@@ -49,10 +49,10 @@ export const resumeAnimations = {
     exitPage: ({ tl, reducedMotion }) => {
         tl.to('.section-content, .section-header, .download-link, .page-title > span, .page-title > h1', {
             autoAlpha: 0,
-            duration: reducedMotion ? 0.01 : TIMING.duration.fast,
-            ease: TIMING.easing.smooth,
+            duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+            ease: TIMING.easing.fade,
             scale: reducedMotion ? 1 : 0.98,
-            stagger: reducedMotion ? 0 : TIMING.stagger.instant,
+            stagger: reducedMotion ? 0 : { amount: TIMING.stagger.tight },
             y: reducedMotion ? 0 : -10,
         });
     },

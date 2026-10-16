@@ -109,7 +109,7 @@ export function useUtilAnimations() {
     const headerDismiss = registerAnim(({ tl, headerEl, extraTargets = [], reducedMotion }) => {
         const copy = headerEl.querySelectorAll('h1, p');
         const hr = headerEl.querySelector('hr');
-        const duration = reducedMotion ? 0.01 : TIMING.duration.fast;
+        const duration = reducedMotion ? 0.01 : TIMING.duration.normal;
         const stagger = reducedMotion ? 0 : { amount: TIMING.stagger.tight };
         const targets = [...copy, ...gsap.utils.toArray(extraTargets)];
 
@@ -117,7 +117,7 @@ export function useUtilAnimations() {
             .to(targets, {
                 autoAlpha: 0,
                 duration,
-                ease: TIMING.easing.smooth,
+                ease: TIMING.easing.fade,
                 scale: reducedMotion ? 1 : 0.98,
                 stagger,
                 y: reducedMotion ? 0 : -10,
@@ -127,7 +127,7 @@ export function useUtilAnimations() {
                 {
                     autoAlpha: 0,
                     duration,
-                    ease: TIMING.easing.bounce,
+                    ease: TIMING.easing.fade,
                     scaleX: 0,
                 },
                 0,

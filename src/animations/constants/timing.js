@@ -2,7 +2,7 @@
 // trip between pages.
 export const PAGE_TIME_SCALE = 0.75;
 
-// How long the old page has to leave before the route changes, in ms.
+// How long the old page has to leave before the route changes, in ms. Page exits fade out over all of it.
 export const LEAVE_DURATION = 350 / PAGE_TIME_SCALE;
 
 export const TIMING = {
@@ -26,5 +26,6 @@ export const TIMING = {
         bounce: 'power4.out',
         bounceIn: 'power4.in',
         organic: 'circ',
+        fade: 'sine.inOut',
     },
 };
