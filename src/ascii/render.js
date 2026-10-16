@@ -597,22 +597,31 @@ export function traceOutlines(grid) {
             if (cover[i] < 0.5) continue;
             const id = ident[i];
             const d = depth[i];
-            if (same(x - 1, y, id, d) && same(x + 1, y, id, d) && same(x, y - 1, id, d) && same(x, y + 1, id, d))
+            const left = same(x - 1, y, id, d);
+            const right = same(x + 1, y, id, d);
+            const up = same(x, y - 1, id, d);
+            const down = same(x, y + 1, id, d);
+            if (left + right + up + down === 4) continue;
+            // A cell open on one side only is on a straight run of the outline, such as the inner corner of a
+            // step along a gentle curve, so it takes that side's straight character.
+            if (left + right + up + down === 3) {
+                octant[i] = !left ? 0 : !up ? 2 : !right ? 4 : 6;
                 continue;
+            }
             // Sobel gradient of "same object", pointing into the object.
             const gx =
                 same(x + 1, y - 1, id, d) +
-                2 * same(x + 1, y, id, d) +
+                2 * right +
                 same(x + 1, y + 1, id, d) -
                 same(x - 1, y - 1, id, d) -
-                2 * same(x - 1, y, id, d) -
+                2 * left -
                 same(x - 1, y + 1, id, d);
             const gy =
                 same(x - 1, y + 1, id, d) +
-                2 * same(x, y + 1, id, d) +
+                2 * down +
                 same(x + 1, y + 1, id, d) -
                 same(x - 1, y - 1, id, d) -
-                2 * same(x, y - 1, id, d) -
+                2 * up -
                 same(x + 1, y - 1, id, d);
             if (!gx && !gy) {
                 edge[i] = EDGE.dot;

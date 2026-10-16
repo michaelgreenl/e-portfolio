@@ -159,7 +159,7 @@ export const homeAnimations = {
     },
 
     exitPage: ({ tl, reducedMotion }) => {
-        const duration = reducedMotion ? 0.01 : TIMING.duration.fast;
+        const duration = reducedMotion ? 0.01 : TIMING.duration.normal;
         const stagger = reducedMotion ? 0 : { amount: TIMING.stagger.tight };
         const ctaButton = '.cta > button';
         const desktopContactTarget = document.querySelector(DESKTOP_CONTACT_TARGET);
@@ -168,16 +168,16 @@ export const homeAnimations = {
 
         if (desktopContactTarget) {
             tl.to(desktopContactLinkTargets, {
-                duration: TIMING.duration.tight,
-                ease: TIMING.easing.smooth,
+                duration,
+                ease: TIMING.easing.fade,
                 opacity: 0,
-                stagger: reducedMotion ? 0 : { each: TIMING.stagger.instant, from: 'end' },
+                stagger: reducedMotion ? 0 : { amount: TIMING.stagger.tight, from: 'end' },
                 x: reducedMotion ? 0 : 50,
             }).to(
                 desktopContactTarget,
                 {
-                    duration: TIMING.duration.instant,
-                    ease: TIMING.easing.bounceIn,
+                    duration,
+                    ease: TIMING.easing.fade,
                     height: 0,
                     overflow: 'hidden',
                 },
@@ -185,38 +185,39 @@ export const homeAnimations = {
             );
         }
 
-        tl.set(ctaButton, { transition: 'none' })
+        tl.set(ctaButton, { transition: 'none' }, 0)
             .to(
                 '.cta > a, .cta > button, .hero-content > p, .hero-content > h2, .hero-title-2, .hero-title-1, .hero-content > h3',
                 {
                     autoAlpha: 0,
                     duration,
-                    ease: TIMING.easing.smooth,
+                    ease: TIMING.easing.fade,
                     scale: reducedMotion ? 1 : 0.98,
                     stagger,
                     y: reducedMotion ? 0 : -10,
                 },
+                0,
             )
             .to(
                 '.hero-line, .nav-links-line',
                 {
                     autoAlpha: 0,
-                    duration: duration + 0.5,
-                    ease: TIMING.easing.bounce,
+                    duration,
+                    ease: TIMING.easing.fade,
                     scaleX: 0,
                 },
-                0.05,
+                0,
             )
             .to(
                 '.nav-link',
                 {
-                    duration: reducedMotion ? 0.01 : TIMING.duration.fast,
-                    ease: TIMING.easing.smooth,
+                    duration,
+                    ease: TIMING.easing.fade,
                     opacity: 0,
-                    stagger: reducedMotion ? 0 : TIMING.stagger.fast,
+                    stagger,
                     x: reducedMotion ? 0 : 50,
                 },
-                0.15,
+                0,
             );
 
         if (mobileContactTargets.length) {
@@ -225,9 +226,9 @@ export const homeAnimations = {
                 {
                     autoAlpha: 0,
                     duration,
-                    ease: TIMING.easing.smooth,
+                    ease: TIMING.easing.fade,
                     scale: reducedMotion ? 1 : 0.9,
-                    stagger: reducedMotion ? 0 : TIMING.stagger.instant,
+                    stagger,
                     y: reducedMotion ? 0 : -8,
                 },
                 0,

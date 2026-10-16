@@ -1,7 +1,9 @@
 // The ASCII art behind the pages. Each page shows one object from a small shared world (see world.js), framed
 // in the box its slot element marks. When the page changes, the camera flies from the old object to the new
-// one: straight in or out when the two are close, and out, across and back in when they are far apart. Faint
-// stars shift as the pointer moves, a finger taps, or the page scrolls.
+// one: straight in or out when the two are close, and out, across and back in when they are farther apart. When
+// they are too far apart for that, the camera leaves the old one as it fades out: it flies on past it when the
+// new one lies beyond it, and backs away from it when not. Then it closes in on the new one as it fades in.
+// Faint stars shift as the pointer moves, a finger taps, or the page scrolls.
 
 import {
     EDGE_CHARS,
@@ -15,6 +17,7 @@ import {
     createCamera,
     createGrid,
     drawStars,
+    easeOut,
     normalize,
     project,
     smoothstep,
@@ -31,13 +34,25 @@ const LIGHT_THEME_ALPHA = 2.8;
 const FOV = 30;
 const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 
-// The first object flies in from this many times its resting distance.
-const INTRO = { seconds: 1.8, distance: 6 };
+// Settings given as [phone, desktop] pairs change from the first value at the first of these screen widths, in
+// px, to the second value at the second.
+const SCREEN_WIDTHS = [390, 1280];
+// The first object flies in from `distance` times its resting distance over `seconds`. A phone shows less of the
+// art and of the page at first, so the fly-in is shorter there.
+const INTRO = { seconds: [1.1, 1.8], distance: [2.2, 6] };
 // A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
-const TRAVEL = { base: 1, perStep: 0.15, min: 1, max: 1.7 };
+const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.7 };
 // On a trip the camera's target may sweep this many radians across the view. When the objects are farther
 // apart, the camera backs off in the middle of the trip until the sweep fits.
 const MAX_SWEEP = 1.25;
+// Objects more than CUT_GAP world units apart, as Jupiter is from the others, are too far apart to fly between,
+// so a trip between them is a cut: two moves, with no flight across the space between. First the camera leaves
+// the old object as it fades out with its page. When the new object lies beyond the old one, the camera flies on
+// past the old one over `past` seconds, `reach` times its distance toward the new one. When not, it backs off to
+// `back` times its distance over `away` seconds. Then it closes in on the new object from `ahead` times its
+// resting distance over `toward` seconds, as the object fades in over the first third of that.
+const CUT_GAP = 100;
+const CUT = { away: 0.4, past: 0.25, toward: 0.7, back: 2, reach: 0.6, ahead: 2.5 };
 const PATH_SAMPLES = 48;
 // Objects that are neither leaving nor arriving show this much in the middle of a page change.
 const PASSING_GAIN = 0.8;
@@ -52,19 +67,20 @@ const GUESS_SLOT = { left: 0.55, top: 0.15, width: 0.4, height: 0.6 };
 const SETTLE_SECONDS = 0.3;
 const SHOW_EASE = 0.15;
 
-// Page content is drawn into a low-resolution mask, weighted by its opacity. Each line of text clears one box,
-// never the shapes of single letters: from the top of its tallest character, emoji included, to the bottom of
-// its lowest, padded below and to each side but not above. Its corners curve as far as the characters at its
-// ends leave room, up to TEXT_CURVE. The box starts TEXT_TOP_INSET below that top: the art's characters sit
-// high in their row and leave its bottom pixels empty, so text that reaches into the bottom of a row leaves
+// Page content is drawn into a low-resolution mask with its opacity: a cell under content shows art only as far
+// as that content has faded out, so the art fades back in as the content fades away. Each line of text clears
+// one box, never the shapes of single letters: from the top of its tallest character, emoji included, to the
+// bottom of its lowest, padded below and to each side but not above. Its corners curve as far as the characters
+// at its ends leave room, up to TEXT_CURVE. The box starts TEXT_TOP_INSET below that top: the art's characters
+// sit high in their row and leave its bottom pixels empty, so text that reaches into the bottom of a row leaves
 // that row's art in place. Elements matching the surfaces selector clear their whole rounded box while they
 // show a background or a border all around. One bordered on only some sides, such as a divider, clears just
 // those lines. One with neither, such as a nav link, clears one box around its icon and text together, so the
 // cut above them stays level, and the band where its ::after underline draws, so the art holds still while an
 // underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows through them,
-// blurred. The mask has MASK_CELL pixels across and down for each character cell, and a cell shows art only
-// where all of its mask pixels are below CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
-// line, and the edge around content is a clean cut along the rows and columns, with no fade. Strips of art
+// blurred. The mask has MASK_CELL pixels across and down for each character cell, and content covers a cell
+// where any of its mask pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
+// line, and the edge around content is a clean cut along the rows and columns, with no soft edge. Strips of art
 // narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too, so no slivers
 // squeeze between them, and so are runs of at most MAX_POCKET cells in a row with content at both ends and
 // right below, such as art that hangs into the gap between two nav links. The padding and the narrowest strip
@@ -77,7 +93,6 @@ const TEXT_CURVE = 24;
 const ANCHOR_OFFSET = 15;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
-const MASK_WIDTHS = [390, 1280];
 const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
@@ -125,6 +140,8 @@ const bordersOf = (style) =>
     SIDES.filter((side) => parseFloat(style[`border${side}Width`]) > 0 && isVisibleColor(style[`border${side}Color`]));
 
 const lerp = (a, b, t) => a + (b - a) * t;
+// How far a screen width is from phone width (0) to desktop width (1), for the [phone, desktop] settings.
+const widthFit = (width) => clamp01((width - SCREEN_WIDTHS[0]) / (SCREEN_WIDTHS[1] - SCREEN_WIDTHS[0]));
 const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
@@ -135,36 +152,47 @@ function turnY(v, turn) {
     return [c * v[0] + s * v[2], v[1], -s * v[0] + c * v[2]];
 }
 
-// Clears each run of open cells shorter than min along a line. Cells under glass show art but end a run.
-// There are `lines` lines of `length` cells; a line starts at line * across and its cells are along apart.
+// Clears each run of open cells (255, art in full) shorter than min along a line, down to the art that the
+// content at its ends shows: the run fades back in with that content. Cells under glass show art but end a run,
+// as the ends of a line do. There are `lines` lines of `length` cells; a line starts at line * across and its
+// cells are along apart.
 function clearStrips(open, glass, lines, length, across, along, min) {
     for (let line = 0; line < lines; line++) {
+        const at = (k) => line * across + k * along;
+        const shownAt = (k) => (k < 0 || k >= length || glass[at(k)] ? 0 : open[at(k)]);
         let start = -1;
         for (let k = 0; k <= length; k++) {
-            const i = line * across + k * along;
-            const isOpen = k < length && open[i] && !glass[i];
+            const isOpen = k < length && open[at(k)] === 255 && !glass[at(k)];
             if (isOpen && start < 0) start = k;
             if (isOpen || start < 0) continue;
-            if (k - start < min) for (let j = start; j < k; j++) open[line * across + j * along] = 0;
+            if (k - start < min) {
+                const shown = Math.max(shownAt(start - 1), shownAt(k));
+                for (let j = start; j < k; j++) open[at(j)] = shown;
+            }
             start = -1;
         }
     }
 }
 
-// Clears each run of at most max open cells in a row that has content at both ends and right below all of it.
-// It works from the bottom row up, so a narrow notch between content clears all the way up. Cells under glass
-// show art, so they neither join nor end such a run.
+// Clears each run of at most max open cells in a row that has content at both ends and right below all of it,
+// down to the most art that content shows. It works from the bottom row up, so a narrow notch between content
+// clears all the way up. Cells under glass show art, so they neither join nor end such a run.
 function clearPockets(open, glass, rows, cols, max) {
-    const isContent = (i) => !open[i] && !glass[i];
+    const isOpen = (i) => open[i] === 255 && !glass[i];
+    const isContent = (i) => open[i] < 255 && !glass[i];
     for (let y = rows - 2; y >= 0; y--) {
         const row = y * cols;
         for (let x = 1; x < cols; x++) {
-            if (!open[row + x] || glass[row + x] || !isContent(row + x - 1)) continue;
+            if (!isOpen(row + x) || !isContent(row + x - 1)) continue;
             let end = x;
-            while (end < cols && open[row + end] && !glass[row + end]) end++;
+            while (end < cols && isOpen(row + end)) end++;
             let pocket = end < cols && isContent(row + end) && end - x <= max;
-            for (let k = x; pocket && k < end; k++) pocket = isContent(row + cols + k);
-            if (pocket) open.fill(0, row + x, row + end);
+            let shown = pocket ? Math.max(open[row + x - 1], open[row + end]) : 0;
+            for (let k = x; pocket && k < end; k++) {
+                pocket = isContent(row + cols + k);
+                shown = Math.max(shown, open[row + cols + k]);
+            }
+            if (pocket) open.fill(shown, row + x, row + end);
             x = end;
         }
     }
@@ -236,7 +264,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
     let viewW = 1;
     let viewH = 1;
     let gridTop = 0; // where the first row of art starts, at or above the top of the screen
-    let visible = new Uint8Array(0); // 1 where a cell shows art
+    let visible = new Uint8Array(0); // how much each cell shows its art, from 0 (none) to 255 (all of it)
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
     let minStripCols = MIN_STRIP.cols[1];
@@ -244,7 +272,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
 
     let page = null; // name of the object the current page shows
     let current = null; // where the camera is now: { target, view, distance, shift }
-    let travel = null; // the page change in progress: { from, to, start, duration, a }
+    let travel = null; // the page change in progress: { from, to, start, duration, a, cut }
     let oldSlot = null; // the leaving page's slot, which the new page's object must not use
     let slotReady = true; // false while the new page is not on screen yet
 
@@ -252,6 +280,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
     let frameId = 0;
     let lastFrame = 0;
     let lastMask = 0;
+    let shownSum = 0; // the summed opacity of all content at the last mask rebuild
+    let fading = false; // that sum changed at the last rebuild, so some content is fading in or out
     let lastScrollY = window.scrollY;
     let velocity = 0; // how fast the page scrolls, in px per second, down positive
     let tilt = 0;
@@ -270,7 +300,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         // A new screen width moves every slot, so the remembered framings no longer fit.
         if (width !== viewW) lastFraming = {};
         viewW = width;
-        const fit = clamp01((width - MASK_WIDTHS[0]) / (MASK_WIDTHS[1] - MASK_WIDTHS[0]));
+        const fit = widthFit(width);
         clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
         minStripCols = Math.round(lerp(MIN_STRIP.cols[0], MIN_STRIP.cols[1], fit));
         viewH = height;
@@ -382,6 +412,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         maskCtx.setTransform(1, 0, 0, 1, 0, 0);
         maskCtx.clearRect(0, 0, w, h);
         maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, scaleY, 0, -gridTop * scaleY);
+        maskCtx.globalCompositeOperation = 'lighten';
 
         // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
         const styles = new Map();
@@ -397,6 +428,15 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             return opacities.get(el);
         };
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
+        // Content fills its zones with red as strong as its opacity; where zones overlap, the stronger red stays.
+        // Content that has faded out draws nothing.
+        let sum = 0;
+        const paint = (el) => {
+            const alpha = alphaOf(el);
+            sum += alpha;
+            maskCtx.fillStyle = `rgb(${Math.round(alpha * 255)}, 0, 0)`;
+            return alpha >= 0.02;
+        };
         const shields = new Set();
         const frosted = new Set();
         const dividers = [];
@@ -419,37 +459,31 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         };
 
         for (const surface of shields) {
-            if (isCovered(surface)) continue;
-            maskCtx.globalAlpha = alphaOf(surface);
+            if (isCovered(surface) || !paint(surface)) continue;
             drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
         }
         for (const el of dividers) {
-            if (isCovered(el)) continue;
+            if (isCovered(el) || !paint(el)) continue;
             const style = styleOf(el);
             const box = el.getBoundingClientRect();
-            maskCtx.globalAlpha = alphaOf(el);
             for (const side of bordersOf(style)) drawBox(borderLine(box, style, side), 0);
         }
         for (const el of controls) {
-            if (isCovered(el)) continue;
-            maskCtx.globalAlpha = alphaOf(el);
+            if (isCovered(el) || !paint(el)) continue;
             range.selectNodeContents(el);
             drawBox(range.getBoundingClientRect(), 0);
             const band = underlineOf(el);
             if (band) drawBox(band, 0);
         }
         for (const el of root.querySelectorAll('svg, hr, img, video')) {
-            if (shields.has(el) || frosted.has(el) || isCovered(el)) continue;
-            maskCtx.globalAlpha = alphaOf(el);
+            if (shields.has(el) || frosted.has(el) || isCovered(el) || !paint(el)) continue;
             drawBox(el.getBoundingClientRect(), 4);
         }
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
             const el = node.parentElement;
             if (!el || !node.data.trim() || shields.has(el) || frosted.has(el) || isCovered(el)) continue;
-            const alpha = alphaOf(el);
-            if (alpha < 0.02) continue;
-            maskCtx.globalAlpha = alpha;
+            if (!paint(el)) continue;
             const style = styleOf(el);
             const ink = inkOf(node.data, style);
             const text = node.data.trim();
@@ -462,20 +496,23 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                 drawLine(rects[i], ink, i === 0 && start, i === rects.length - 1 && end);
             }
         }
-        maskCtx.globalAlpha = 1;
+        fading = sum !== shownSum;
+        shownSum = sum;
 
+        // A cell takes the strongest red of the content that covers it, and shows that much less of its art.
         const { data } = maskCtx.getImageData(0, 0, w, h);
         const { cols, rows, cellW } = grid;
         const [across, down] = MASK_CELL;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
-                let open = 1;
+                let veil = 0;
                 for (let my = y * down; my < (y + 1) * down; my++) {
                     for (let mx = x * across; mx < (x + 1) * across; mx++) {
-                        if (data[(my * w + mx) * 4 + 3] >= CLEAR_AT * 255) open = 0;
+                        const k = (my * w + mx) * 4;
+                        if (data[k + 3] >= CLEAR_AT * 255) veil = Math.max(veil, data[k]);
                     }
                 }
-                visible[y * cols + x] = open;
+                visible[y * cols + x] = 255 - veil;
             }
         }
         // Rows below the screen show nothing, so strips of art end at the screen's edge.
@@ -658,18 +695,42 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             return;
         }
         // The first page flies in from far away along its own line of sight.
-        const a = (travel.a ??= { ...rest, distance: rest.distance * INTRO.distance });
+        const a = (travel.a ??= { ...rest, distance: rest.distance * travel.introDistance });
         const k = progress();
         const e = easeInOut(k);
-        const hump = humpFor(a, rest);
-        const { sum, total } = pathLength(a, rest, hump, e);
-        travel.across = sum / total;
-        current = {
-            target: lerp3(a.target, rest.target, travel.across),
-            view: normalize(lerp3(a.view, rest.view, travel.across)),
-            distance: distanceAt(a, rest, hump, e),
-            shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
-        };
+        if (travel.cut) {
+            const t = k * travel.duration;
+            const leaving = t < travel.leave;
+            const u = leaving ? t / travel.leave : (t - travel.leave) / CUT.toward;
+            let { target, distance } = leaving ? a : rest;
+            if (!leaving) {
+                distance *= CUT.ahead ** (1 - easeOut(u));
+            } else if (travel.heading) {
+                // On past the old object, toward the new one, without turning, and faster and faster.
+                const along = CUT.reach * distance * u * u;
+                target = target.map((v, i) => v + travel.heading[i] * along);
+            } else {
+                distance *= CUT.back ** easeInOut(u);
+            }
+            travel.across = leaving ? 0 : 1;
+            // The camera turns and shifts over the whole trip, so the stars do not jump at the cut.
+            current = {
+                target,
+                view: normalize(lerp3(a.view, rest.view, e)),
+                distance,
+                shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
+            };
+        } else {
+            const hump = humpFor(a, rest);
+            const { sum, total } = pathLength(a, rest, hump, e);
+            travel.across = sum / total;
+            current = {
+                target: lerp3(a.target, rest.target, travel.across),
+                view: normalize(lerp3(a.view, rest.view, travel.across)),
+                distance: distanceAt(a, rest, hump, e),
+                shift: [lerp(a.shift[0], rest.shift[0], e), lerp(a.shift[1], rest.shift[1], e)],
+            };
+        }
         if (k >= 1) travel = null;
     }
 
@@ -684,13 +745,22 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
 
     // How strongly each object draws. On a trip between nearby objects, as from the Earth to the rocket, both
     // show for nearly all of it. On a long trip the arriving object fades in, the leaving one fades out near
-    // the end, and others show only in the middle of the trip. Objects too small on screen do not show.
+    // the end, and others show only in the middle of the trip. On a cut, the leaving object fades out as the
+    // camera backs away from it, and the arriving one fades in as the camera closes in. Objects too small on
+    // screen do not show.
     function gainOf(name) {
         if (!travel) return name === page ? show[name] : 0;
         const k = progress();
         const { near } = travel;
         const r = screenRadius(name);
         const seen = smoothstep(SEEN_RADIUS[0], SEEN_RADIUS[1], r);
+        if (travel.cut) {
+            const t = k * travel.duration;
+            const { leave } = travel;
+            if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(leave / 4, leave, t));
+            if (name !== travel.to) return 0;
+            return seen * show[name] * smoothstep(leave, leave + CUT.toward / 3, t);
+        }
         if (name === travel.to) return seen * show[name] * smoothstep(0, near ? 0.12 : travel.from ? 0.45 : 0.6, k);
         if (name === travel.from) return seen * travel.fromShow * (1 - smoothstep(near ? 0.85 : 0.55, 1, k));
         const passing = PASSING_GAIN * smoothstep(0.1, 0.35, k) * (1 - smoothstep(0.65, 0.9, k));
@@ -819,7 +889,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                         alpha = starAlpha[i];
                     }
                 }
-                const layer = char === ' ' ? -1 : layerFor(alpha);
+                const layer = char === ' ' ? -1 : layerFor((alpha * visible[i]) / 255);
                 if (layer < 0) continue;
                 const row = rowLayers[material][layer];
                 if (!used.includes(row)) used.push(row);
@@ -870,9 +940,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         lastFrame = now;
         clock = (now - startTime) / 1000;
 
-        // The mask follows layout on an interval, and on every frame while the page scrolls.
+        // The mask follows layout on an interval, and on every frame while the page scrolls, content fades, or the
+        // camera travels between pages.
         const scrolled = measureScroll(dt);
-        const maskDue = scrolled || now - lastMask > MASK_INTERVAL;
+        const maskDue = scrolled || fading || travel || now - lastMask > MASK_INTERVAL;
         if (maskDue) {
             lastMask = now;
             rebuildMask();
@@ -915,18 +986,38 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             const a = { ...current };
             const hump = humpFor(a, rest);
             const zoom = Math.abs(Math.log(rest.distance / a.distance)) + 2 * hump;
+            const offset = [0, 1, 2].map((i) => rest.target[i] - a.target[i]);
+            const cut = Math.hypot(...offset) > CUT_GAP;
+            // The new object lies beyond the old one when it is farther along the camera's line of sight.
+            const heading = normalize(offset);
+            const beyond = cut && heading[0] * a.view[0] + heading[1] * a.view[1] + heading[2] * a.view[2] < 0;
+            const leave = beyond ? CUT.past : CUT.away;
             travel = {
                 from: page,
                 to: name,
                 start: clock,
                 a,
                 fromShow: show[page],
+                cut,
+                leave,
+                heading: beyond ? heading : null,
                 // The camera needs no hump between nearby objects, so both can show for the whole trip.
                 near: hump === 0,
-                duration: Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
+                duration: cut
+                    ? leave + CUT.toward
+                    : Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
             };
         } else {
-            travel = { from: null, to: name, start: clock, a: null, near: false, duration: INTRO.seconds };
+            const fit = widthFit(window.innerWidth);
+            travel = {
+                from: null,
+                to: name,
+                start: clock,
+                a: null,
+                near: false,
+                duration: lerp(INTRO.seconds[0], INTRO.seconds[1], fit),
+                introDistance: lerp(INTRO.distance[0], INTRO.distance[1], fit),
+            };
         }
         if (travel && drawn[name] < 0.01) epoch[name] = travel.start + travel.duration;
         page = name;

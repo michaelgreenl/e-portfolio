@@ -71,11 +71,11 @@ export const navbarAnimations = {
     exitNavItem: ({ tl }) => {
         tl.to('.nav-item', {
             duration: TIMING.duration.normal,
-            ease: TIMING.easing.smooth,
+            ease: TIMING.easing.fade,
             opacity: 0,
             x: -50,
             scaleX: 0.5,
-            stagger: TIMING.stagger.tight,
+            stagger: { amount: TIMING.stagger.tight },
         });
     },
 
