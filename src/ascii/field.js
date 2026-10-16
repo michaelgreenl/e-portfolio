@@ -33,8 +33,12 @@ const LIGHT_THEME_ALPHA = 2.8;
 const FOV = 30;
 const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 
-// The first object flies in from this many times its resting distance.
-const INTRO = { seconds: 1.8, distance: 6 };
+// Settings given as [phone, desktop] pairs change from the first value at the first of these screen widths, in
+// px, to the second value at the second.
+const SCREEN_WIDTHS = [390, 1280];
+// The first object flies in from `distance` times its resting distance over `seconds`. A phone shows less of the
+// art and of the page at first, so the fly-in is shorter there.
+const INTRO = { seconds: [1.1, 1.8], distance: [2.2, 6] };
 // A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
 const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.3 };
 // On a trip the camera's target may sweep this many radians across the view. When the objects are farther
@@ -87,7 +91,6 @@ const TEXT_CURVE = 24;
 const ANCHOR_OFFSET = 15;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
-const MASK_WIDTHS = [390, 1280];
 const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
@@ -135,6 +138,8 @@ const bordersOf = (style) =>
     SIDES.filter((side) => parseFloat(style[`border${side}Width`]) > 0 && isVisibleColor(style[`border${side}Color`]));
 
 const lerp = (a, b, t) => a + (b - a) * t;
+// How far a screen width is from phone width (0) to desktop width (1), for the [phone, desktop] settings.
+const widthFit = (width) => clamp01((width - SCREEN_WIDTHS[0]) / (SCREEN_WIDTHS[1] - SCREEN_WIDTHS[0]));
 const lerp3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
@@ -293,7 +298,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
         // A new screen width moves every slot, so the remembered framings no longer fit.
         if (width !== viewW) lastFraming = {};
         viewW = width;
-        const fit = clamp01((width - MASK_WIDTHS[0]) / (MASK_WIDTHS[1] - MASK_WIDTHS[0]));
+        const fit = widthFit(width);
         clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
         minStripCols = Math.round(lerp(MIN_STRIP.cols[0], MIN_STRIP.cols[1], fit));
         viewH = height;
@@ -688,7 +693,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             return;
         }
         // The first page flies in from far away along its own line of sight.
-        const a = (travel.a ??= { ...rest, distance: rest.distance * INTRO.distance });
+        const a = (travel.a ??= { ...rest, distance: rest.distance * travel.introDistance });
         const k = progress();
         const e = easeInOut(k);
         if (travel.cut) {
@@ -986,7 +991,16 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                     : Math.min(TRAVEL.max, Math.max(TRAVEL.min, TRAVEL.base + TRAVEL.perStep * zoom)),
             };
         } else {
-            travel = { from: null, to: name, start: clock, a: null, near: false, duration: INTRO.seconds };
+            const fit = widthFit(window.innerWidth);
+            travel = {
+                from: null,
+                to: name,
+                start: clock,
+                a: null,
+                near: false,
+                duration: lerp(INTRO.seconds[0], INTRO.seconds[1], fit),
+                introDistance: lerp(INTRO.distance[0], INTRO.distance[1], fit),
+            };
         }
         if (travel && drawn[name] < 0.01) epoch[name] = travel.start + travel.duration;
         page = name;
