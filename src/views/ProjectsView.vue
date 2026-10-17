@@ -173,6 +173,14 @@ async function openProject(project, autoplay = false) {
     }
 }
 
+:deep(.project-card[data-project-slug='tally'] .card-title h2) {
+    font-size: 2.05em !important;
+}
+
+.tally-project-window :deep(.project-title h2) {
+    font-size: 3.8em !important;
+}
+
 .projects-container {
     position: relative;
     padding: $space-10 0 $space-3;

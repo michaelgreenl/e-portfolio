@@ -57,3 +57,12 @@
     src: url('/fonts/projects/audiowide-normal-400.woff2') format('woff2');
     font-display: block;
 }
+
+/* Inter 24pt SemiBold, subset to Latin to keep the preload small. */
+@font-face {
+    font-family: 'Inter24pt';
+    font-style: normal;
+    font-weight: 600;
+    src: url('/fonts/projects/inter24pt-normal-600.woff2') format('woff2');
+    font-display: block;
+}

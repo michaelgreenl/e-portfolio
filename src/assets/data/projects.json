@@ -111,7 +111,7 @@
                 "Web and native clients share an authentication API, with HTTP-only cookies in the browser and secure device storage on native. When access tokens expire, concurrent requests share a single refresh request before retrying, with refresh-token rotation handled by the API."
             ]
         },
-        "fontFamily": "ClashDisplay",
+        "fontFamily": "Inter24pt",
         "img": "tally_blurred.webp",
         "video": "1166819858",
         "externalLinks": {

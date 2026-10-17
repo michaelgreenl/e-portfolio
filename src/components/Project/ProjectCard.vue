@@ -431,7 +431,7 @@ defineExpose({ openProject, projectSelected, scrollToSelectedCard });
                     <h2
                         :style="{
                             fontFamily: project.fontFamily,
-                            fontWeight: project.slug === 'tally' ? '500' : '400',
+                            fontWeight: project.slug === 'tally' ? '600' : '400',
                         }"
                     >
                         {{ project.title }}
