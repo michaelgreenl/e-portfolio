@@ -63,7 +63,7 @@ onMounted(() => {
     revealIn({
         selector: '.project-card',
         opts: {
-            delay: 0.3,
+            delay: 0.2,
             duration: TIMING.duration.moderate,
             stagger: {
                 each: TIMING.stagger.loose,

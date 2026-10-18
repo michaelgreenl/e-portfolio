@@ -114,19 +114,19 @@ export const homeAnimations = {
                 0,
             );
 
+        // The contact links carry on the nav links' stagger, so they land with the rest of the row while the ASCII
+        // Earth closes in around it, not after the Earth has settled.
         if (desktopContactTarget) {
-            tl.addLabel('desktopSeparator', '>-=0.2')
-                .to(
-                    desktopContactTarget,
-                    {
-                        duration: reducedMotion ? 0.01 : TIMING.duration.normal,
-                        ease: TIMING.easing.bounce,
-                        height: desktopContactHeight,
-                    },
-                    'desktopSeparator',
-                )
-                .set(desktopContactTarget, { clearProps: 'height,overflow' })
-                .addLabel('desktopContacts')
+            tl.to(
+                desktopContactTarget,
+                {
+                    duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+                    ease: TIMING.easing.bounce,
+                    height: desktopContactHeight,
+                },
+                reducedMotion ? 0 : 'hero+=0.3',
+            )
+                .set(desktopContactTarget, { clearProps: 'height,overflow' }, '>')
                 .to(
                     desktopContactLinkTargets,
                     {
@@ -137,7 +137,7 @@ export const homeAnimations = {
                         stagger: reducedMotion ? 0 : TIMING.stagger.normal,
                         x: 0,
                     },
-                    'desktopContacts-=0.2',
+                    reducedMotion ? 0 : 'hero+=0.4',
                 );
         }
 

@@ -17,7 +17,6 @@ import {
     createCamera,
     createGrid,
     drawStars,
-    easeOut,
     normalize,
     project,
     smoothstep,
@@ -37,9 +36,9 @@ const TAN_HALF_FOV = Math.tan((FOV * Math.PI) / 360);
 // Settings given as [phone, desktop] pairs change from the first value at the first of these screen widths, in
 // px, to the second value at the second.
 const SCREEN_WIDTHS = [390, 1280];
-// The first object flies in from `distance` times its resting distance over `seconds`. A phone shows less of the
-// art and of the page at first, so the fly-in is shorter there.
-const INTRO = { seconds: [1.1, 1.8], distance: [2.2, 6] };
+// The first object flies in from `distance` times its resting distance over `seconds`, and settles about as the
+// page content does. A phone shows less of the art and of the page at first, so the fly-in starts closer there.
+const INTRO = { seconds: [1.5, 1.8], distance: [2.2, 6] };
 // A page change takes base seconds plus perStep for each step of zoom (a factor of e), within min and max.
 const TRAVEL = { base: 0.9, perStep: 0.1, min: 0.9, max: 1.7 };
 // On a trip the camera's target may sweep this many radians across the view. When the objects are farther
@@ -50,9 +49,11 @@ const MAX_SWEEP = 1.25;
 // the old object as it fades out with its page. When the new object lies beyond the old one, the camera flies on
 // past the old one over `past` seconds, `reach` times its distance toward the new one. When not, it backs off to
 // `back` times its distance over `away` seconds. Then it closes in on the new object from `ahead` times its
-// resting distance over `toward` seconds, as the object fades in over the first third of that.
+// resting distance over `toward` seconds, as the object fades in over the first third of that. It is still
+// closing in as the new page's content lands, so the object grows around that content instead of the content
+// cutting into an object at rest.
 const CUT_GAP = 100;
-const CUT = { away: 0.4, past: 0.25, toward: 0.7, back: 2, reach: 0.6, ahead: 2.5 };
+const CUT = { away: 0.4, past: 0.25, toward: 1.3, back: 2, reach: 0.6, ahead: 2.5 };
 const PATH_SAMPLES = 48;
 // Objects that are neither leaving nor arriving show this much in the middle of a page change.
 const PASSING_GAIN = 0.8;
@@ -704,7 +705,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
             const u = leaving ? t / travel.leave : (t - travel.leave) / CUT.toward;
             let { target, distance } = leaving ? a : rest;
             if (!leaving) {
-                distance *= CUT.ahead ** (1 - easeOut(u));
+                distance *= CUT.ahead ** ((1 - u) ** 2);
             } else if (travel.heading) {
                 // On past the old object, toward the new one, without turning, and faster and faster.
                 const along = CUT.reach * distance * u * u;

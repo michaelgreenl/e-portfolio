@@ -48,7 +48,6 @@ export const smoothstep = (a, b, x) => {
     return t * t * (3 - 2 * t);
 };
 export const easeIn = (t) => t * t * t;
-export const easeOut = (t) => 1 - (1 - t) ** 3;
 export const normalize = (v) => {
     const l = Math.hypot(v[0], v[1], v[2]) || 1;
     return [v[0] / l, v[1] / l, v[2] / l];
