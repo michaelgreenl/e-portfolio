@@ -239,9 +239,13 @@ async function openProject(project, autoplay = false) {
 // screens it takes the right side. Its moons reach far past the slot.
 .art-slot {
     position: absolute;
-    inset: calc(-7px - 16.2vw) -12.5vw auto;
+    inset: calc(-7px - 24.2vw) -12.5vw auto;
     height: calc(5.4vw + 531px);
     pointer-events: none;
+
+    @include bp-custom-min(450) {
+        inset: calc(-7px - 16.2vw) -12.5vw auto;
+    }
 
     @include bp-sm-phone {
         inset: calc(-7px - 11.2vw) -12.5vw auto;
@@ -281,6 +285,12 @@ async function openProject(project, autoplay = false) {
     }
 
     h1 {
+        line-height: 1.1;
+
+        @include bp-sm-phone {
+            line-height: normal;
+        }
+
         @include bp-lg-laptop {
             font-size: 6.2em;
         }
