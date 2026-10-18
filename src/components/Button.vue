@@ -162,17 +162,21 @@ if (hasTooltip.value) {
     padding: $space-2 $space-3;
     margin: 0;
     overflow: visible;
-    font-family: $secondary-font-stack;
+    font-family:
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        sans-serif;
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.4;
-    color: $color-text-primary;
+    color: #fff;
     text-align: center;
     overflow-wrap: anywhere;
     white-space: normal;
     cursor: default;
-    background: $color-bg-primary;
-    border: 1px solid $color-text-muted;
+    background: #000;
+    border: 0;
     border-radius: $radius-sm;
     box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 
