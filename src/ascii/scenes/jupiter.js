@@ -53,7 +53,7 @@ const INNER = [
 ];
 // The small outer moons: how many, the range of their orbit radii in Jupiter radii, and their orbit times in
 // seconds, from the nearest to the farthest. Most go round the wrong way, as the real ones do.
-const OUTER = { count: 107, near: 3.2, far: 11, seconds: [200, 520], backward: 0.75 };
+const OUTER = { count: 10, near: 3.2, far: 11, seconds: [200, 520], backward: 0.75 };
 const SPECK_ALPHA = 0.3;
 
 // Cloud brightness by latitude (v, about its sine) and longitude: bright zones and dark belts with wavy edges,
