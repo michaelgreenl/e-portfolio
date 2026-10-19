@@ -173,7 +173,6 @@ async function openProject(project, autoplay = false) {
     }
 }
 
-// The Tally logo matches the title's Quicksand "l": 0.74em tall, resting on the baseline.
 $tally-card-title-size: 2.05em;
 $tally-window-title-size: 3.8em;
 
@@ -185,6 +184,7 @@ $tally-window-title-size: 3.8em;
     }
 
     .project-logo {
+        transform: translateY(1px);
         height: 0.74em;
         font-size: $tally-card-title-size;
     }
@@ -195,9 +195,11 @@ $tally-window-title-size: 3.8em;
 
     h2 {
         font-size: $tally-window-title-size !important;
+        line-height: 1.1;
     }
 
     svg {
+        transform: translateY(1px);
         height: 0.74em !important;
         font-size: $tally-window-title-size;
     }
