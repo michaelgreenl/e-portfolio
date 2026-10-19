@@ -1,22 +1,22 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="1 1 22 22">
-        <path
-            d="M6 20c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1s1 .4 1 1v14c0 .6-.4 1-1 1zM10 20c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1s1 .4 1 1v14c0 .6-.4 1-1 1zM14 20c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1s1 .4 1 1v14c0 .6-.4 1-1 1zM18 20c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1s1 .4 1 1v14c0 .6-.4 1-1 1z"
-        ></path>
-        <path
-            d="M3 18c-.4 0-.7-.2-.9-.5-.2-.5-.1-1.1.4-1.4l18-10c.5-.2 1.1-.1 1.4.4.2.5.1 1.1-.4 1.4l-18 10c-.2.1-.3.1-.5.1z"
-        ></path>
+    <!-- Each mark matches the "l" in Quicksand Bold: 0.12em wide, 0.74em tall, round ends. -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-180 0 1200 740">
+        <path d="M60 60V680M300 60V680M540 60V680M780 60V680M-120 600L960 140"></path>
     </svg>
 </template>
 
 <style lang="scss" scoped>
 path {
+    fill: none;
+    stroke-width: 120;
+    stroke-linecap: round;
+
     @include theme-dark {
-        fill: $color-gray3;
+        stroke: $color-gray3;
     }
 
     @include theme-light {
-        fill: $color-primary-darker;
+        stroke: $color-primary-darker;
     }
 }
 </style>

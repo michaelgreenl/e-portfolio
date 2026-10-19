@@ -173,12 +173,34 @@ async function openProject(project, autoplay = false) {
     }
 }
 
-:deep(.project-card[data-project-slug='tally'] .card-title h2) {
-    font-size: 2.05em !important;
+// The Tally logo matches the title's Quicksand "l": 0.74em tall, resting on the baseline.
+$tally-card-title-size: 2.05em;
+$tally-window-title-size: 3.8em;
+
+:deep(.project-card[data-project-slug='tally'] .card-title) {
+    align-items: baseline;
+
+    h2 {
+        font-size: $tally-card-title-size !important;
+    }
+
+    .project-logo {
+        height: 0.74em;
+        font-size: $tally-card-title-size;
+    }
 }
 
-.tally-project-window :deep(.project-title h2) {
-    font-size: 3.8em !important;
+.tally-project-window :deep(.project-title) {
+    align-items: baseline;
+
+    h2 {
+        font-size: $tally-window-title-size !important;
+    }
+
+    svg {
+        height: 0.74em !important;
+        font-size: $tally-window-title-size;
+    }
 }
 
 .projects-container {
