@@ -396,7 +396,7 @@ export function wave(grid, cx, cy, radius, angle, spread, strength, seed) {
 export const STAR_CHARS = ' .·+*°';
 const SPECK = 5;
 const STAR_COUNT = 16000;
-const STAR_DENSITY = 1.2e-4; // stars per square px, on every screen size
+const STAR_DENSITY = 1.05e-4; // stars per square px, on every screen size
 const stars = (() => {
     const rand = mulberry32(42);
     const data = new Float32Array(STAR_COUNT * 5);
