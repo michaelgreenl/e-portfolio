@@ -36,11 +36,12 @@ const TAU = Math.PI * 2;
 // The large moons: orbit radius and size in Jupiter radii, orbit time relative to Io, surface brightness,
 // material, and where each is on its orbit when the camera arrives. Then Io is beside the planet, up and to the
 // right, and Callisto is far to the left, which wide screens show. Europa and Ganymede cross low in front of the
-// planet, which phones show below the header.
+// planet, which phones show below the header. Ganymede's orbit tilts back by `tilt` radians, so its near side
+// stays above the bottom of the planet, clear of the content below it.
 const MOONS = [
     { orbit: 2.4, size: 0.17, period: 1, albedo: 0.85, start: 5.26, tint: TINT.io }, // Io
     { orbit: 3.2, size: 0.15, period: 2.007, albedo: 0.95, start: 1.66, tint: TINT.europa }, // Europa
-    { orbit: 4.3, size: 0.22, period: 4.044, albedo: 0.7, start: 1.48, tint: TINT.ganymede }, // Ganymede
+    { orbit: 4.3, size: 0.22, period: 4.044, albedo: 0.7, start: 1.48, tint: TINT.ganymede, tilt: 0.1 }, // Ganymede
     { orbit: 6, size: 0.2, period: 9.433, albedo: 0.5, start: 4.01, tint: TINT.callisto }, // Callisto
 ];
 // The small inner moons, Metis, Adrastea, Amalthea and Thebe: orbit radius in Jupiter radii and orbit time in
@@ -172,7 +173,9 @@ export function createJupiter() {
             for (const m of moons) {
                 m.angle = m.start + (t * TAU) / (IO_SECONDS * m.period);
                 const r = m.orbit * RADIUS;
-                transform(view, Math.cos(m.angle) * r, 0, Math.sin(m.angle) * r, m.at);
+                const across = Math.sin(m.angle) * r;
+                const tilt = m.tilt ?? 0;
+                transform(view, Math.cos(m.angle) * r, across * Math.sin(tilt), across * Math.cos(tilt), m.at);
                 m.at[2] *= DEPTH;
                 m.front = nearerThanCenter(cam, m.at);
                 transformBack(view, m.at[0], m.at[1], m.at[2], m.local);
