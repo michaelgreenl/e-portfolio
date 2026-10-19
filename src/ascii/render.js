@@ -397,6 +397,7 @@ export const STAR_CHARS = ' .·+*°';
 const SPECK = 5;
 const STAR_COUNT = 16000;
 const STAR_DENSITY = 1.05e-4; // stars per square px, on every screen size
+const BRIGHT_STAR_ALPHA = 0.5; // + and * are large characters, so they draw this much fainter
 const stars = (() => {
     const rand = mulberry32(42);
     const data = new Float32Array(STAR_COUNT * 5);
@@ -426,11 +427,16 @@ export function drawStars(grid, cam, t, gain) {
         );
         if (x < 0 || y < 0 || x >= cols || y >= rows) continue;
         const bright = stars[o + 3];
-        const alpha = (0.2 + 0.8 * bright ** 0.8) * (0.8 + 0.2 * Math.sin(t * 0.9 + stars[o + 4])) * gain;
+        const char = bright < 0.2 ? 1 : bright < 0.3 ? 2 : bright < 0.42 ? 3 : 4;
+        const alpha =
+            (0.2 + 0.8 * bright ** 0.8) *
+            (0.8 + 0.2 * Math.sin(t * 0.9 + stars[o + 4])) *
+            (char >= 3 ? BRIGHT_STAR_ALPHA : 1) *
+            gain;
         const i = y * cols + x;
         if (alpha > starAlpha[i]) {
             starAlpha[i] = alpha;
-            star[i] = bright < 0.2 ? 1 : bright < 0.3 ? 2 : bright < 0.42 ? 3 : 4;
+            star[i] = char;
         }
     }
 }
