@@ -72,7 +72,7 @@ defineExpose({ close });
                         <h2
                             :style="{
                                 fontFamily: project.fontFamily,
-                                fontWeight: project.slug === 'tally' ? '600' : '400',
+                                fontWeight: project.slug === 'tally' ? '700' : '400',
                             }"
                         >
                             {{ project.slug === 'oakley' ? project.title.replace(' / ', ' /\n') : project.title }}

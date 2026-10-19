@@ -58,11 +58,11 @@
     font-display: block;
 }
 
-/* Inter 24pt SemiBold, subset to Latin to keep the preload small. */
+/* Quicksand Bold, subset to Latin to keep the preload small. */
 @font-face {
-    font-family: 'Inter24pt';
+    font-family: Quicksand;
     font-style: normal;
-    font-weight: 600;
-    src: url('/fonts/projects/inter24pt-normal-600.woff2') format('woff2');
+    font-weight: 700;
+    src: url('/fonts/projects/quicksand-normal-700.woff2') format('woff2');
     font-display: block;
 }
