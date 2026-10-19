@@ -885,7 +885,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world }
                         char = LINE_CHARS[lineCode[i]];
                         alpha = lines[i] * 0.55;
                         material = glowTint[i];
-                    } else if (star[i]) {
+                    } else if (star[i] && !glass[i]) {
+                        // Stars blur into spots behind frosted panels, so they stop at the panel's edge.
                         char = STAR_CHARS[star[i]];
                         alpha = starAlpha[i];
                     }
