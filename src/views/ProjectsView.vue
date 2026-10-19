@@ -264,10 +264,10 @@ async function openProject(project, autoplay = false) {
 
     flex-direction: column;
     padding: 0 $space-3;
-    margin: $space-20 0;
+    margin: $space-20 0 $space-36;
 
     @include bp-sm-phone {
-        margin: $space-24 0 $space-20;
+        margin: $space-24 0 $space-32;
     }
 
     @include bp-md-tablet {
