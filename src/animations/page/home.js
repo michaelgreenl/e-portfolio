@@ -34,6 +34,7 @@ export const homeAnimations = {
         if (desktopContactTarget) {
             gsap.set(desktopContactTarget, {
                 height: 0,
+                opacity: 0,
                 overflow: 'hidden',
             });
             gsap.set(desktopContactLinkTargets, {
@@ -127,6 +128,17 @@ export const homeAnimations = {
                 reducedMotion ? 0 : 'hero+=0.3',
             )
                 .set(desktopContactTarget, { clearProps: 'height,overflow' }, '>')
+                // The ASCII art clears the whole contact row at the row's opacity, so the row fades in with its
+                // links. At full opacity from the start, the cut jumps in over art the Earth has already drawn.
+                .to(
+                    desktopContactTarget,
+                    {
+                        duration: reducedMotion ? 0.01 : TIMING.duration.normal,
+                        ease: TIMING.easing.organic,
+                        opacity: 1,
+                    },
+                    reducedMotion ? 0 : 'hero+=0.4',
+                )
                 .to(
                     desktopContactLinkTargets,
                     {
