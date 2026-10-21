@@ -37,8 +37,11 @@ export const homeAnimations = {
                 opacity: 0,
                 overflow: 'hidden',
             });
+            // The links' CSS transform transition, for their press effect, would trail GSAP's slide: they would
+            // reach full opacity well short of their place and hold the art beside them open as they creep in.
             gsap.set(desktopContactLinkTargets, {
                 opacity: 0,
+                transition: 'none',
                 x: reducedMotion ? 0 : 50,
             });
         }
@@ -128,8 +131,8 @@ export const homeAnimations = {
                 reducedMotion ? 0 : 'hero+=0.3',
             )
                 .set(desktopContactTarget, { clearProps: 'height,overflow' }, '>')
-                // The ASCII art clears the whole contact row at the row's opacity, so the row fades in with its
-                // links. At full opacity from the start, the cut jumps in over art the Earth has already drawn.
+                // The ASCII art clears the row's divider at the row's opacity, so the row fades in with its links.
+                // At full opacity from the start, the divider's cut jumps in over art the Earth has already drawn.
                 .to(
                     desktopContactTarget,
                     {
@@ -142,7 +145,7 @@ export const homeAnimations = {
                 .to(
                     desktopContactLinkTargets,
                     {
-                        clearProps: 'transform',
+                        clearProps: 'transform,transition',
                         duration: reducedMotion ? 0.01 : TIMING.duration.normal,
                         ease: TIMING.easing.organic,
                         opacity: 1,
