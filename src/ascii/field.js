@@ -81,11 +81,13 @@ const SHOW_EASE = 0.15;
 // underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows through them,
 // blurred. The mask has MASK_CELL pixels across and down for each character cell, and content covers a cell
 // where any of its mask pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
-// line, and the edge around content is a clean cut along the rows and columns, with no soft edge. Strips of art
-// narrower than MIN_STRIP between content, frosted panels and the screen edge are cleared too, so no slivers
-// squeeze between them, and so are runs of at most MAX_POCKET cells in a row with content at both ends and
-// right below, such as art that hangs into the gap between two nav links. The padding and the narrowest strip
-// kept grow from the first value at phone width to the second at desktop width.
+// line, and the edge around content is a clean cut along the rows and columns, with no soft edge. It keeps
+// TEXT_PADDING clear of text, more than of other content, most of all on phones and tablets, where whole
+// paragraphs sit on the art and need room around them to read well. Strips of art narrower than MIN_STRIP
+// between content, frosted panels and the screen edge are cleared too, so no slivers squeeze between them, and
+// so are runs of at most MAX_POCKET cells in a row with content at both ends and right below, such as art that
+// hangs into the gap between two nav links. The paddings and the narrowest strip kept change from the first
+// value at phone width to the second at desktop width.
 const TEXT_TOP_INSET = 2;
 const TEXT_CURVE = 24;
 // With an anchor on the page, the rows of art shift down by less than one row, so the anchor line's tallest
@@ -95,6 +97,7 @@ const ANCHOR_OFFSET = 15;
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
 const CLEAR_PADDING = [4, 6];
+const TEXT_PADDING = [8, 7];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
 const MAX_POCKET = 4;
@@ -269,6 +272,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
     let visible = new Uint8Array(0); // how much each cell shows its art, from 0 (none) to 255 (all of it)
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
+    let textPadding = TEXT_PADDING[1];
     let minStripCols = MIN_STRIP.cols[1];
     let rowLayers = [];
 
@@ -304,6 +308,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         viewW = width;
         const fit = widthFit(width);
         clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
+        textPadding = lerp(TEXT_PADDING[0], TEXT_PADDING[1], fit);
         minStripCols = Math.round(lerp(MIN_STRIP.cols[0], MIN_STRIP.cols[1], fit));
         viewH = height;
         // One row more than the screen needs, for when the rows shift to line up with the anchor.
@@ -361,23 +366,23 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
     }
 
     // How far a corner of a line's box can curve and still hold the ink of the character at that end, which sits
-    // room px in from the box's top or bottom edge and clearPadding in from its side. Without that room, the
-    // corner curves only as far as clearPadding.
+    // room px in from the box's top or bottom edge and textPadding in from its side. Without that room, the
+    // corner curves only as far as textPadding.
     function curveFor(room) {
-        if (!(room > 0)) return clearPadding;
-        return Math.min(TEXT_CURVE, clearPadding + room + Math.sqrt(2 * clearPadding * room));
+        if (!(room > 0)) return textPadding;
+        return Math.min(TEXT_CURVE, textPadding + room + Math.sqrt(2 * textPadding * room));
     }
 
     // A line of text clears its characters' ink from TEXT_TOP_INSET below their top, padded below and to each side.
     // start and end are the ink of the characters at the line's ends, where the text starts and ends on it.
     function drawLine(rect, ink, start, end) {
         const top = rect.top + ink.top + TEXT_TOP_INSET;
-        const height = ink.height - TEXT_TOP_INSET + clearPadding;
-        if (top + height < -clearPadding || top > viewH + clearPadding) return;
+        const height = ink.height - TEXT_TOP_INSET + textPadding;
+        if (top + height < -textPadding || top > viewH + textPadding) return;
         const above = (char) => char && ink.ascent - char.ascent - TEXT_TOP_INSET;
-        const below = (char) => (char ? ink.descent - char.descent : 0) + clearPadding;
+        const below = (char) => (char ? ink.descent - char.descent : 0) + textPadding;
         maskCtx.beginPath();
-        maskCtx.roundRect(rect.left - clearPadding, top, rect.width + clearPadding * 2, height, [
+        maskCtx.roundRect(rect.left - textPadding, top, rect.width + textPadding * 2, height, [
             curveFor(above(start)),
             curveFor(above(end)),
             curveFor(below(end)),
