@@ -52,6 +52,7 @@ onMounted(() => {
         slot: '.art-slot',
         anchor: '.art-anchor',
         world: createWorld(),
+        leave: routeStore.leaveDuration / 1000,
     });
     field.setScene(PAGE_OBJECTS[routeStore.currentRoute.base]);
     field.relayout();
