@@ -12,13 +12,13 @@ for (const route of ROUTES) {
 }
 
 // The host serves the same HTML for every query string, so /projects?slug=x can't have its own link preview. Each
-// project gets a /demo/<slug>/ page with its own preview tags that sends visitors on to the autoplaying video.
+// project gets a /demo/<slug>/ page with its own preview tags that sends visitors to the project.
 const projects = JSON.parse(readFileSync('src/assets/data/projects.json', 'utf8'));
 const attr = (text) => text.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 
 for (const { slug, title, description } of projects) {
     const url = `${ORIGIN}demo/${slug}/`;
-    const target = `/projects?slug=${slug}&autoplay=true`;
+    const target = `/projects?slug=${slug}`;
     const image = `${ORIGIN}og/${existsSync(`dist/og/${slug}.jpg`) ? slug : 'home'}.jpg`;
     const name = attr(`${title} Demo Video`);
     const summary = attr(description.short);
