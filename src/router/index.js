@@ -18,7 +18,7 @@ export const navigationRoutes = {
         meta: { title: 'Portfolio', icon: markRaw(HomeIcon), iconFill: markRaw(HomeIconFill) },
     },
     projects: {
-        path: '/projects',
+        path: '/projects/:slug?',
         name: 'Projects',
         component: () => import('@/views/ProjectsView.vue'),
         meta: { title: 'Projects', icon: markRaw(ProjectsIcon), iconFill: markRaw(ProjectsIcon) },

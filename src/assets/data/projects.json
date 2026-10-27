@@ -49,11 +49,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects?slug=jsf&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/jsf/",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=jsf&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/jsf/"
             }
         },
         "gallery": [
@@ -123,11 +123,11 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects?slug=tally&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/tally/",
                 "text": "Demo Video"
             },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=tally&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/tally/"
             }
         },
         "gallery": [
@@ -161,12 +161,12 @@
                 "text": "Repository"
             },
             "demoVideo": {
-                "href": "https://michaelgreenl.net/projects?slug=reaction&autoplay=true",
+                "href": "https://michaelgreenl.net/projects/reaction/",
                 "text": "Demo Video"
             },
             "liveSite": { "href": "https://trainreaction.gg", "text": "Live Site" },
             "porfolioLink": {
-                "href": "https://michaelgreenl.net/projects?slug=reaction&autoplay=false"
+                "href": "https://michaelgreenl.net/projects/reaction/"
             }
         },
         "gallery": [
