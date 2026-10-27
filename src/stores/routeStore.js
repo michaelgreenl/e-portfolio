@@ -9,21 +9,6 @@ export const useRouteStore = defineStore('router', () => {
     const toPath = ref();
     const leaveDuration = LEAVE_DURATION;
 
-    function parsePath(fullPath) {
-        const [pathString, queryString] = fullPath.split('?');
-        const parts = pathString.split('/').filter(Boolean);
-        const base = parts[0] || 'home';
-
-        const query = {};
-        if (queryString) {
-            new URLSearchParams(queryString).forEach((val, key) => {
-                query[key] = val;
-            });
-        }
-
-        return { base, query };
-    }
-
     function getRouteBase(route) {
         const name = route.name?.toString();
 
@@ -36,15 +21,6 @@ export const useRouteStore = defineStore('router', () => {
         if (base === 'home') return 'home';
 
         return route.fullPath.replace(/^\//, '');
-    }
-
-    function resolveRoute(to) {
-        if (typeof to !== 'string') return to;
-
-        const { base, query } = parsePath(to);
-        if (!routes[base]) return { name: 'home' };
-
-        return { name: base, query };
     }
 
     const activePath = computed(() => toActivePath(router.currentRoute.value));
@@ -62,8 +38,8 @@ export const useRouteStore = defineStore('router', () => {
         };
     });
 
-    function toRoute(to) {
-        return router.push(resolveRoute(to));
+    function toRoute(name) {
+        return router.push({ name: routes[name] ? name : 'home' });
     }
 
     router.beforeEach(async (to, from) => {

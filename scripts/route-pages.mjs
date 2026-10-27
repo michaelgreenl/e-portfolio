@@ -11,49 +11,34 @@ for (const route of ROUTES) {
     writeFileSync(`dist/${route}/index.html`, html.replaceAll(`"${ORIGIN}"`, `"${ORIGIN}${route}/"`));
 }
 
-// The host serves the same HTML for every query string, so /projects?slug=x can't have its own link preview. Each
-// project gets a /demo/<slug>/ page with its own preview tags that sends visitors to the project.
+// Each project also gets a /projects/<slug>/ page with its own link preview tags.
 const projects = JSON.parse(readFileSync('src/assets/data/projects.json', 'utf8'));
 const attr = (text) => text.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
+const setMeta = (page, key, value) =>
+    page.replace(new RegExp(`((?:name|property)="${key}"\\s+content=")[^"]*`), (_, start) => start + value);
 
 for (const { slug, title, description } of projects) {
-    const url = `${ORIGIN}demo/${slug}/`;
-    const target = `/projects?slug=${slug}`;
     const image = `${ORIGIN}og/${existsSync(`dist/og/${slug}.jpg`) ? slug : 'home'}.jpg`;
     const name = attr(`${title} Demo Video`);
     const summary = attr(description.short);
+    const meta = {
+        description: summary,
+        'og:title': name,
+        'og:description': summary,
+        'og:image': image,
+        'og:image:alt': name,
+        'twitter:title': name,
+        'twitter:description': summary,
+        'twitter:image': image,
+    };
 
-    mkdirSync(`dist/demo/${slug}`, { recursive: true });
-    writeFileSync(
-        `dist/demo/${slug}/index.html`,
-        `<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>${name} | Michael Green</title>
-        <meta name="description" content="${summary}" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="${url}" />
-        <meta property="og:site_name" content="Michael Green Portfolio" />
-        <meta property="og:title" content="${name}" />
-        <meta property="og:description" content="${summary}" />
-        <meta property="og:image" content="${image}" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="627" />
-        <meta property="og:image:alt" content="${name}" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="${name}" />
-        <meta name="twitter:description" content="${summary}" />
-        <meta name="twitter:image" content="${image}" />
-        <script>
-            location.replace('${target}');
-        </script>
-    </head>
-    <body>
-        <a href="${attr(target)}">Watch the ${name}</a>
-    </body>
-</html>
-`,
-    );
+    let page = html
+        .replaceAll(`"${ORIGIN}"`, `"${ORIGIN}projects/${slug}/"`)
+        .replace(/<title>[^<]*<\/title>/, () => `<title>${name} | Michael Green</title>`);
+    for (const [key, value] of Object.entries(meta)) {
+        page = setMeta(page, key, value);
+    }
+
+    mkdirSync(`dist/projects/${slug}`, { recursive: true });
+    writeFileSync(`dist/projects/${slug}/index.html`, page);
 }

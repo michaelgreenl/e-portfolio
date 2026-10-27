@@ -74,11 +74,10 @@ onMounted(() => {
         },
     });
 
-    const query = routeStore.currentRoute.query;
-    const projectToOpen = projectsData.find((p) => p.slug === query.slug);
+    const projectToOpen = projectsData.find((p) => p.slug === routeStore.currentRoute.params.slug);
 
-    if (query && projectToOpen) {
-        openProject(projectToOpen, query.autoplay === 'true');
+    if (projectToOpen) {
+        openProject(projectToOpen);
     }
 });
 

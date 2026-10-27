@@ -103,7 +103,7 @@
             }
 
             try {
-                history.replaceState(null, '', '/projects?slug=tally&autoplay=false');
+                history.replaceState(null, '', '/projects/tally');
                 await import('/src/main.js');
                 const image = await until(
                     () => document.querySelector('[data-testid="enlarge-image"]'),
