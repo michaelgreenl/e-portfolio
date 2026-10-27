@@ -24,8 +24,8 @@ import {
     traceOutlines,
 } from './render.js';
 
-const FONT_SIZE = 14;
-const LINE_HEIGHT = 16;
+const FONT_SIZE = 12;
+const LINE_HEIGHT = 12;
 const FRAME_MS = 1000 / 30;
 const LAYER_ALPHAS = [0.16, 0.3, 0.48, 0.7, 0.95];
 // Faint characters wash out on the light theme's pale background, so they draw this much stronger there.
