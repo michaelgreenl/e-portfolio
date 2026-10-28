@@ -53,6 +53,39 @@ export const normalize = (v) => {
     return [v[0] / l, v[1] / l, v[2] / l];
 };
 
+// Smooth value noise in 3D, 0 to 1.
+function hash(x, y, z) {
+    let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1440662683);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+export function noise(x, y, z) {
+    const xi = Math.floor(x);
+    const yi = Math.floor(y);
+    const zi = Math.floor(z);
+    const u = smoothstep(0, 1, x - xi);
+    const v = smoothstep(0, 1, y - yi);
+    const w = smoothstep(0, 1, z - zi);
+    const lerp = (a, b, f) => a + (b - a) * f;
+    const edge = (dy, dz) => lerp(hash(xi, yi + dy, zi + dz), hash(xi + 1, yi + dy, zi + dz), u);
+    return lerp(lerp(edge(0, 0), edge(1, 0), v), lerp(edge(0, 1), edge(1, 1), v), w);
+}
+
+// Noise with finer detail added in `octaves` steps, about 0.5 on average.
+export function fbm(x, y, z, octaves) {
+    let sum = 0;
+    let amp = 0.5;
+    for (let k = 0; k < octaves; k++) {
+        sum += amp * noise(x, y, z);
+        x *= 2;
+        y *= 2;
+        z *= 2;
+        amp /= 2;
+    }
+    return sum / (1 - amp * 2);
+}
+
 export function mulberry32(seed) {
     return () => {
         seed = (seed + 0x6d2b79f5) | 0;

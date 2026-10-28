@@ -4,6 +4,7 @@ import {
     TINT,
     castRegion,
     eulerMatrix,
+    fbm,
     multiply,
     normalize,
     screenCircle,
@@ -28,39 +29,6 @@ const POLAR = 64; // land past this latitude, north or south, reads as ice
 const MAP_STEP = 2;
 const MAP_COLS = 360 / MAP_STEP;
 const MAP_ROWS = 180 / MAP_STEP;
-
-// Smooth value noise in 3D, 0 to 1.
-function hash(x, y, z) {
-    let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1440662683);
-    h = Math.imul(h ^ (h >>> 13), 1274126177);
-    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-
-function noise(x, y, z) {
-    const xi = Math.floor(x);
-    const yi = Math.floor(y);
-    const zi = Math.floor(z);
-    const u = smoothstep(0, 1, x - xi);
-    const v = smoothstep(0, 1, y - yi);
-    const w = smoothstep(0, 1, z - zi);
-    const lerp = (a, b, f) => a + (b - a) * f;
-    const edge = (dy, dz) => lerp(hash(xi, yi + dy, zi + dz), hash(xi + 1, yi + dy, zi + dz), u);
-    return lerp(lerp(edge(0, 0), edge(1, 0), v), lerp(edge(0, 1), edge(1, 1), v), w);
-}
-
-// Noise with finer detail added in `octaves` steps, about 0.5 on average.
-function fbm(x, y, z, octaves) {
-    let sum = 0;
-    let amp = 0.5;
-    for (let k = 0; k < octaves; k++) {
-        sum += amp * noise(x, y, z);
-        x *= 2;
-        y *= 2;
-        z *= 2;
-        amp /= 2;
-    }
-    return sum / (1 - amp * 2);
-}
 
 // Calls fn(q, lat, index) for the middle of each map cell, with q the point on the unit sphere.
 function eachCell(fn) {
