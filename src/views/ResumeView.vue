@@ -264,6 +264,7 @@ onMounted(() => {
 
     @include bp-custom-min(730) {
         --column: 48em;
+
         padding: $space-4 $space-6;
     }
 
@@ -642,8 +643,8 @@ li {
         display: inline-flex;
         gap: 0.2em;
         align-items: center;
-        transition: color 0.15s ease;
         margin-right: $space-4;
+        transition: color 0.15s ease;
 
         @include interactive {
             color: $color-primary-light;

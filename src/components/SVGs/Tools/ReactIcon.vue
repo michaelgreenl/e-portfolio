@@ -12,13 +12,13 @@
 <style lang="scss" scoped>
 svg {
     @include theme-dark {
-        stroke: #61dafb;
         fill: #61dafb;
+        stroke: #61dafb;
     }
 
     @include theme-light {
-        stroke: #53b9d5;
         fill: #53b9d5;
+        stroke: #53b9d5;
     }
 }
 </style>

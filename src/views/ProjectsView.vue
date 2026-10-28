@@ -183,9 +183,9 @@ $tally-window-title-size: 3.8em;
     }
 
     .project-logo {
-        transform: translateY(1px);
         height: 0.74em;
         font-size: $tally-card-title-size;
+        transform: translateY(1px);
     }
 }
 
@@ -198,9 +198,9 @@ $tally-window-title-size: 3.8em;
     }
 
     svg {
-        transform: translateY(1px);
         height: 0.74em !important;
         font-size: $tally-window-title-size;
+        transform: translateY(1px);
     }
 }
 
@@ -302,9 +302,9 @@ $tally-window-title-size: 3.8em;
     }
 
     @include bp-xl-desktop {
+        width: 81%;
         max-width: 116em;
         padding-left: 0;
-        width: 81%;
     }
 
     h1 {
@@ -326,8 +326,8 @@ $tally-window-title-size: 3.8em;
         text-align: center;
 
         @include bp-md-tablet {
-            text-align: left;
             min-width: 48ch;
+            text-align: left;
         }
 
         @include bp-lg-laptop {
