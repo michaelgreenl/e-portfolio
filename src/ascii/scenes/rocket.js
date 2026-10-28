@@ -22,7 +22,8 @@ const BODY_RADIUS = 1;
 const BODY_BOTTOM = 0.8;
 const BODY_TOP = 5.8;
 const NOSE_TIP = 7.6;
-const WINDOW = { y: 4.3, radius: 0.5, angle: Math.PI / 2 };
+const WINDOW = { y: 4.3, radius: 0.5, frame: 0.15, angle: Math.PI / 2 };
+const BAND = { bottom: 5, top: 5.6, step: Math.PI / 4 }; // a red and white checker below the nose
 const FIN_ANGLES = [Math.PI / 2 + Math.PI / 3, Math.PI / 2 + Math.PI, Math.PI / 2 - Math.PI / 3];
 const BOUND = { y: 3.4, radius: 4.8 }; // a sphere around the whole rocket
 const LIGHT = normalize([0.6, 0.5, 0.65]);
@@ -101,14 +102,20 @@ export function createRocket() {
             return true;
         };
         if (take(tube(o, d, BODY_RADIUS, BODY_BOTTOM, BODY_TOP, n), 1, 0.7, TINT.hull)) {
-            // A round window on the body, outlined as its own part.
+            // A round window on the body, outlined as its own part inside a bright frame, and the checker band.
             const y = o[1] + d[1] * best;
             let da = Math.atan2(n[2], n[0]) - WINDOW.angle;
             da -= Math.round(da / (Math.PI * 2)) * Math.PI * 2;
-            if (Math.hypot(da * BODY_RADIUS, y - WINDOW.y) < WINDOW.radius) {
+            const toWindow = Math.hypot(da * BODY_RADIUS, y - WINDOW.y);
+            if (toWindow < WINDOW.radius) {
                 id = 4;
-                albedo = 0.1;
+                albedo = 0.3;
                 tint = TINT.glass;
+            } else if (toWindow < WINDOW.radius + WINDOW.frame) {
+                albedo = 1;
+            } else if (y > BAND.bottom && y < BAND.top && Math.floor(da / BAND.step) & 1) {
+                albedo = 0.45;
+                tint = TINT.red;
             }
         }
         take(cone(o, d, NOSE.apex, NOSE.axis, NOSE.k, 0, NOSE_TIP - BODY_TOP, n), 1, 0.45, TINT.red);

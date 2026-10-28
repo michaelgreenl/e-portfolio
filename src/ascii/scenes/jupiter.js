@@ -8,7 +8,9 @@ import {
     castRegion,
     drawSpecks,
     eulerMatrix,
+    fbm,
     mulberry32,
+    noise,
     multiply,
     normalize,
     screenCircle,
@@ -57,14 +59,33 @@ const INNER = [
 const OUTER = { count: 10, near: 3.2, far: 11, seconds: [200, 520], backward: 0.75 };
 const SPECK_ALPHA = 0.3;
 
-// Cloud brightness by latitude (v, about its sine) and longitude: bright zones and dark belts with wavy edges,
-// and darker poles. The material goes in out.tint.
+// Cloud bands from the north pole down: each runs from the one before it to `to`, the sine of its southern
+// latitude, at brightness `bright`. Bright zones alternate with dark belts: the North Equatorial Belt is the
+// widest and darkest, and the South Equatorial Belt holds the Great Red Spot at its southern edge.
+const BANDS = [
+    { to: 0.72, bright: 0.55 },
+    { to: 0.6, bright: 0.76 },
+    { to: 0.5, bright: 0.6 },
+    { to: 0.3, bright: 0.86 },
+    { to: 0.12, bright: 0.48 },
+    { to: -0.12, bright: 0.92 },
+    { to: -0.36, bright: 0.56 },
+    { to: -0.48, bright: 0.88 },
+    { to: -0.58, bright: 0.64 },
+    { to: -0.72, bright: 0.8 },
+    { to: -1, bright: 0.55 },
+];
+// Cloud brightness by latitude (v, about its sine) and longitude. The band edges wander with the longitude,
+// the clouds are mottled with streaks a few cells wide, and the poles darken. The material goes in out.tint.
 function cloudsAt(v, lon, out) {
-    const u = v + 0.025 * Math.sin(lon * 6 + v * 11) + 0.015 * Math.sin(lon * 13 - v * 31);
-    const a = Math.abs(u);
-    const band = a < 0.11 ? 0.92 : a < 0.3 ? 0.53 : a < 0.42 ? 0.88 : a < 0.53 ? 0.66 : a < 0.63 ? 0.82 : 0.62;
-    out.tint = a > 0.7 ? TINT.pole : band > 0.8 ? TINT.zone : TINT.belt;
-    return band * (1 - 0.25 * smoothstep(0.65, 0.95, a));
+    const x = Math.cos(lon) * 3;
+    const z = Math.sin(lon) * 3;
+    const u = v + 0.05 * (noise(x, v * 6, z) - 0.5);
+    const band = BANDS.find((b) => u > b.to) ?? BANDS[BANDS.length - 1];
+    const bright = band.bright * (0.85 + 0.3 * fbm(x * 4, v * 20, z * 4, 2));
+    const polar = Math.abs(v);
+    out.tint = polar > 0.72 ? TINT.pole : band.bright > 0.75 ? TINT.zone : TINT.belt;
+    return bright * (1 - 0.25 * smoothstep(0.75, 0.98, polar));
 }
 
 const nearerThanCenter = (cam, p) =>
@@ -132,9 +153,9 @@ export function createJupiter() {
         }
         out.id = spot < 1 ? 2 : 1;
         out.depth = t;
-        // The spot is darker than the zone around it, with a paler middle.
+        // The spot is brighter than its belt, with a pale middle, inside a dark collar.
         out.tint = TINT.spot;
-        const albedo = spot < 1 ? 0.34 + 0.3 * (1 - spot) ** 2 : cloudsAt(v, lon, out);
+        const albedo = spot < 1 ? 0.45 + 0.35 * (1 - spot) ** 1.5 : cloudsAt(v, lon, out) * (spot < 1.25 ? 0.7 : 1);
         out.shade = albedo * (0.05 + 0.95 * lit ** 0.7) * shadow;
     }
 
