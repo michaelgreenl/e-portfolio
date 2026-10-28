@@ -31,7 +31,8 @@ const HORN = boxPlanes([3.25, 0, 0], [0.1, 0.12, 0.12]);
 const BOUND = 5;
 const CORE = { x: 1, radius: 2.5 };
 const WING_BOUND = { y: (WING.inner + WING.outer) / 2, radius: 1.85 };
-const LIGHT = normalize([0.3, 0.55, 0.75]);
+// From the front and a little to the left, so it reaches into the dish.
+const LIGHT = normalize([-0.2, 0.3, 0.93]);
 // The dish turns left and partly toward the viewer, and sways a little. Then the whole satellite leans
 // (roll), so the dish aims down and to the left.
 const YAW = { base: Math.atan2(-0.55, -0.82), sway: 0.25, seconds: 16 };
@@ -105,9 +106,10 @@ export function createSatellite() {
 
         transform(frame, hit[0], hit[1], hit[2], n);
         const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
-        const albedo = id === 1 ? 0.8 : id === 6 ? 0.95 : 0.7;
+        // The body is wrapped in gold foil; the dish is white and the wings are blue.
+        const albedo = id === 1 ? 0.9 : id === 6 ? 0.95 : 0.7;
         out.id = id;
-        out.tint = id === 1 ? TINT.metal : id === 6 ? TINT.hull : TINT.accent;
+        out.tint = id === 1 ? TINT.tan : id === 6 ? TINT.hull : TINT.accent;
         out.depth = best;
         out.shade = albedo * (0.1 + 0.9 * lit ** 0.8);
     }
