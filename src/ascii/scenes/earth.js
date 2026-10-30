@@ -23,6 +23,9 @@ const START = (-10 * Math.PI) / 180; // Africa and Europe face the viewer first
 const LAND = 1;
 const SEA = 0.24;
 const ICE = 0.9;
+// The night side keeps this share of full daylight: enough for the sea's faintest character, so the disk
+// fills out to its limb instead of fading to nothing short of its outline.
+const NIGHT = 0.32;
 const DEGREES = 180 / Math.PI;
 const POLAR = 64; // land past this latitude, north or south, reads as ice
 // The land's materials come from a map on a grid of this many degrees, made once.
@@ -109,7 +112,7 @@ export function createEarth() {
         const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
         out.id = 1;
         out.depth = t;
-        out.shade = albedo * (0.04 + 0.96 * lit ** 0.6);
+        out.shade = albedo * Math.max(NIGHT, 0.04 + 0.96 * lit ** 0.6);
     }
 
     return {
