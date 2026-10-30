@@ -5,9 +5,10 @@ import { useThemeStore } from '@/stores/themeStore.js';
 import { createAsciiField } from '@/ascii/field.js';
 import { createWorld } from '@/ascii/world.js';
 
-// Panels, controls and dividers that clear their whole rounded box while they show a background or border.
+// Panels, controls and dividers that clear their whole rounded box while they show a background or border, and the
+// home page's nav row, which clears one straight box around all its links.
 const SURFACES =
-    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message, .contact-links-desktop';
+    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message, .contact-links-desktop, .site-nav';
 
 // Which object each page shows, in the box its .art-slot element marks.
 const PAGE_OBJECTS = { home: 'earth', projects: 'jupiter', resume: 'rocket', contact: 'satellite' };
@@ -50,7 +51,7 @@ onMounted(() => {
         root: document.getElementById('app'),
         surfaces: SURFACES,
         slot: '.art-slot',
-        anchor: '.art-anchor',
+        hug: '.art-hug',
         world: createWorld(),
         leave: routeStore.leaveDuration / 1000,
     });

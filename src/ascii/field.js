@@ -70,33 +70,60 @@ const SHOW_EASE = 0.15;
 
 // Page content is drawn into a low-resolution mask with its opacity: a cell under content shows art only as far
 // as that content has faded out, so the art fades back in as the content fades away. Each line of text clears
-// one box, never the shapes of single letters: from the top of its tallest character, emoji included, to the
-// bottom of its lowest, padded on every side. Above, the padding is TEXT_TOP_INSET less: the art's characters
-// sit high in their row and leave its bottom pixels empty. The box's corners curve by TEXT_CURVE paddings.
+// one box: from the top of its tallest letter to the bottom of its lowest, padded by TEXT_PADDING on every
+// side. Emoji reach above the letters, so the art comes closer to them. Above and below, the padding is
+// TEXT_INSET less: the art's characters leave the top and bottom pixels of their row empty. The box's corners
+// curve by the padding, so the art keeps the padding at the corners too. Where a line reaches into the slot
+// from outside it, its end that faces the art, with no other content within a cell beyond it, reaches
+// TEXT_END_PADDING past the last letter from the top of the letters' ink down: the art that flows around the
+// tip of the line stays a little farther from it, in a straight column, and keeps its character at the corner
+// above the line. Text matching
+// the hug selector, the home page's greeting and title, is what the art hugs: its rows and columns line up with
+// the edges of that text's boxes, see ANCHOR_STEP, and when a row of art fits in the notch above the text's
+// lowercase letters, each of its characters clears a box of its own around its ink, so the art fills the notches
+// above the lowercase letters and between the lines of the title instead of stopping at the height of its
+// capitals.
 // Elements matching the surfaces selector clear their whole rounded box while they show a background or a
 // border all around. One bordered on only some sides, such as a divider, clears just those lines. One with
 // neither, such as a nav link, clears one box around its icon and text together, so the cut above them stays
 // level, and the band where its ::after underline draws, so the art holds still while an underline grows in on
-// hover. Elements with a backdrop blur clear nothing: the art shows through them, blurred. The mask has
+// hover. The home page's nav row is such an element too: it clears one straight box around all its links.
+// Elements with a backdrop blur clear nothing: the art shows through them, blurred. The mask has
 // MASK_CELL pixels across and down for each character cell, and content covers a cell where any of its mask
 // pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin line, and the edge
-// around content is a clean cut along the rows and columns, with no soft edge. It keeps TEXT_PADDING clear of
-// text, more than of other content, most of all on phones and tablets, where whole paragraphs sit on the art
-// and need room around them to read well. Strips of art narrower than MIN_STRIP between content, frosted
-// panels and the screen edge are cleared too, so no slivers squeeze between them, and so are runs of at most
-// MAX_POCKET cells in a row with content at both ends and right below, such as art that hangs into the gap
-// between two nav links. The paddings and the narrowest strip kept change from the first value at phone width
-// to the second at desktop width.
-const TEXT_TOP_INSET = 2;
-const TEXT_CURVE = 2;
-// With an anchor on the page, the rows of art shift down by less than one row, so the band of rows that the
-// anchor's text clears has the same slack above its box as below it: the art stays as far from the top of that
-// text as from its bottom, at every screen size.
-const MASK_CELL = [2, 4];
+// around content is a clean cut along the rows and columns, with no soft edge. Content that reaches into a cell
+// by less than CLEAR_AT of a mask pixel leaves the cell showing. So where the title's padding only grazes a row
+// in one of its notches, that row of art still fills the notch. It keeps TEXT_PADDING clear of
+// text, more than of other content: on phones and tablets whole paragraphs sit on the art and need room around
+// them to read well. Strips of art narrower than MIN_STRIP between content, frosted panels and the screen edge
+// are cleared too, so no slivers squeeze between them, and so are runs of at most MAX_POCKET cells in a row
+// with content at both ends and right below, such as art that hangs into the gap between two nav links. The
+// clear padding and the narrowest strip kept change from the first value at phone width to the second at
+// desktop width.
+const TEXT_PADDING = 10;
+const TEXT_INSET = 2;
+const TEXT_END_PADDING = 16;
+// Outline characters that reach the top or bottom of their row, see EDGE_CHARS. Next to hidden content above
+// or below, they draw as dots instead, so the art keeps its padding from the content there.
+const TALL_EDGES = new Set('_/\\|()');
+// With hugged text on the page, the rows of art shift down by less than one row, and the columns right by less
+// than one column, to line up with the text that clears a box per character. An edge of one of its boxes faces
+// the art where no other content lies within a cell of it on that side; where the edge faces the art under the
+// page's slot, the art sits closest to the text when a grid line falls on the edge, and up to a cell farther
+// away when not. Each axis shifts to the offset, tried every ANCHOR_STEP px, with the least sum of squared slack
+// over those edges, each weighted by the cells it spans, so the art stays close to the text's lowercase letters,
+// its capitals, its bottom and its ends all at once, at every screen size. Where the text spans a little more
+// than a whole number of rows, the spare room splits evenly above and below it: a row the text reaches into at
+// all counts as cleared, even where the mask leaves it showing. Smaller hugged text moves down to the rows
+// instead, by less than half a row, through its NUDGE_PROPERTY, where it reaches into the slot and meets the
+// art: where the layout puts the greeting within half a row of lining up, a full row of art lines up above it,
+// and it never moves away from the title below it.
+const ANCHOR_STEP = 0.25;
+const NUDGE_PROPERTY = '--art-nudge';
+const MASK_CELL = [4, 4];
 const MASK_INTERVAL = 150;
 const CLEAR_PADDING = [4, 6];
-const TEXT_PADDING = [8, 7];
-const CLEAR_AT = 0.25;
+const CLEAR_AT = 0.5;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
 const MAX_POCKET = 4;
 
@@ -132,6 +159,9 @@ const PALETTE = {
     // The site's --color-primary-light on the dark theme and --color-primary on the light one.
     accent: ['#b2cfd7', '#6b8f9e'],
 };
+
+const graphemes = new Intl.Segmenter();
+const pictographs = /\p{Extended_Pictographic}️?/gu;
 
 const isVisibleColor = (color) => color !== 'transparent' && !/[,/]\s*0\)$/.test(color);
 const SIDES = ['Top', 'Right', 'Bottom', 'Left'];
@@ -228,11 +258,14 @@ function underlineOf(el) {
  * @param {HTMLElement} options.root Element whose content the art keeps clear of.
  * @param {string} options.surfaces Selector for panels and controls that clear their whole box.
  * @param {string} options.slot Selector for the element that marks where the page's object goes.
- * @param {string} options.anchor Selector for the text that the rows of art stay as far above as below.
+ * @param {string} options.hug Selector for the text the art hugs. Large hugged text lines the art's rows and
+ * columns up with its edges, and its characters each clear a box of their own. Smaller hugged text moves down
+ * to the rows instead where it reaches into the slot: it takes the --art-nudge custom property set on it, from 0
+ * to less than half a row down, into its position.
  * @param {Record<string, object>} options.world Objects by name, see world.js.
  * @param {number} options.leave Seconds the old page takes to leave after setScene(), before the new one shows.
  */
-export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, leave }) {
+export function createAsciiField(canvas, { root, surfaces, slot, hug, world, leave }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = canvas.getContext('2d');
     const grid = createGrid();
@@ -265,10 +298,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
     let viewW = 1;
     let viewH = 1;
     let gridTop = 0; // where the first row of art starts, at or above the top of the screen
+    let gridLeft = 0; // and where the first column starts, at or left of its left edge
     let visible = new Uint8Array(0); // how much each cell shows its art, from 0 (none) to 255 (all of it)
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
-    let textPadding = TEXT_PADDING[1];
     let minStripCols = MIN_STRIP.cols[1];
     let rowLayers = [];
 
@@ -304,11 +337,18 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         viewW = width;
         const fit = widthFit(width);
         clearPadding = lerp(CLEAR_PADDING[0], CLEAR_PADDING[1], fit);
-        textPadding = lerp(TEXT_PADDING[0], TEXT_PADDING[1], fit);
         minStripCols = Math.round(lerp(MIN_STRIP.cols[0], MIN_STRIP.cols[1], fit));
         viewH = height;
-        // One row more than the screen needs, for when the rows shift to line up with the anchor.
-        grid.resize(width, height, ctx.measureText('M').width, LINE_HEIGHT, Math.ceil(height / LINE_HEIGHT) + 1);
+        // One row and one column more than the screen needs, for when the grid shifts to line up with hugged text.
+        const cellW = ctx.measureText('M').width;
+        grid.resize(
+            width,
+            height,
+            cellW,
+            LINE_HEIGHT,
+            Math.ceil(height / LINE_HEIGHT) + 1,
+            Math.ceil(width / cellW) + 1,
+        );
         const n = grid.cols * grid.rows;
         maskCanvas.width = grid.cols * MASK_CELL[0];
         maskCanvas.height = grid.rows * MASK_CELL[1];
@@ -336,81 +376,121 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
 
     /* ---------- Content mask ---------- */
 
-    function drawBox(rect, radius) {
-        if (!rect.width && !rect.height) return;
-        if (rect.bottom < -clearPadding * 3 || rect.top > viewH + clearPadding * 3) return;
-        const r = Math.min(radius, rect.width / 2, rect.height / 2) + clearPadding;
-        maskCtx.beginPath();
-        maskCtx.roundRect(
-            rect.left - clearPadding,
-            rect.top - clearPadding,
-            rect.width + clearPadding * 2,
-            rect.height + clearPadding * 2,
-            r,
-        );
-        maskCtx.fill();
-    }
-
-    // Where a text's characters draw in its line box: the top of their ink below the box's top, and the ink's
-    // height.
+    // Where a text's letters draw in its box: the top of their ink below the box's top, how far it starts past
+    // the box's left edge, and its size. Emoji do not count: they reach above the letters.
     function inkOf(text, style) {
         maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-        const metrics = maskCtx.measureText(text);
-        const ascent = metrics.actualBoundingBoxAscent;
-        return { top: metrics.fontBoundingBoxAscent - ascent, height: ascent + metrics.actualBoundingBoxDescent };
+        const metrics = maskCtx.measureText(text.replace(pictographs, '') || text);
+        const { actualBoundingBoxAscent: ascent, actualBoundingBoxLeft: left } = metrics;
+        return {
+            top: metrics.fontBoundingBoxAscent - ascent,
+            left: -left,
+            width: left + metrics.actualBoundingBoxRight,
+            height: ascent + metrics.actualBoundingBoxDescent,
+        };
     }
 
-    // The box that a line of text clears: where it starts, below the top of the line box, and how tall it is.
-    function boxOf(ink) {
-        const top = ink.top - textPadding + TEXT_TOP_INSET;
-        return { top, height: ink.height + textPadding * 2 - TEXT_TOP_INSET };
-    }
-
-    // A line of text clears its characters' ink, padded by textPadding below and to each side and by
-    // TEXT_TOP_INSET less above, with corners that curve by TEXT_CURVE paddings.
-    function drawLine(rect, ink) {
-        const box = boxOf(ink);
-        const top = rect.top + box.top;
-        if (top + box.height < -textPadding || top > viewH + textPadding) return;
-        maskCtx.beginPath();
-        maskCtx.roundRect(
-            rect.left - textPadding,
-            top,
-            rect.width + textPadding * 2,
-            box.height,
-            textPadding * TEXT_CURVE,
+    // The box that text clears around its ink: padded by TEXT_PADDING to each side and by TEXT_INSET less above
+    // and below.
+    function inkBox(left, top, width, height) {
+        return new DOMRect(
+            left - TEXT_PADDING,
+            top - TEXT_PADDING + TEXT_INSET,
+            width + TEXT_PADDING * 2,
+            height + (TEXT_PADDING - TEXT_INSET) * 2,
         );
-        maskCtx.fill();
     }
 
-    // Where the first row of art starts so that the band of rows the anchor's text clears has the same slack above
-    // the text's box as below it, or 0 without an anchor. It uses the text's place on the page at rest: its place
-    // on screen plus the scroll, less the shift an animation gives it, so the rows hold still while the page
-    // scrolls or the text slides in.
-    function rowsTop() {
-        const el = anchor && root.querySelector(anchor);
-        if (!el) return 0;
-        let top = Infinity;
-        let bottom = -Infinity;
-        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-            if (!node.data.trim()) continue;
-            const box = boxOf(inkOf(node.data, getComputedStyle(node.parentElement)));
-            let lift = 0;
-            for (let e = node.parentElement; e && e !== root; e = e.parentElement) {
-                lift += new DOMMatrixReadOnly(getComputedStyle(e).transform).m42;
-            }
-            range.selectNodeContents(node);
-            for (const rect of range.getClientRects()) {
-                top = Math.min(top, rect.top + box.top - lift);
-                bottom = Math.max(bottom, rect.top + box.top + box.height - lift);
+    // The box a line of text clears: as wide as the line, as tall as its ink.
+    const lineBox = (rect, ink) => inkBox(rect.left, rect.top + ink.top, rect.width, ink.height);
+
+    // Whether a row of art fits in the notch above a text's lowercase letters, between their tops and the tops
+    // of its capitals.
+    const notchFits = (style) => inkOf('x', style).top - inkOf('H', style).top >= LINE_HEIGHT;
+
+    // The boxes that a text node clears character by character: one around each character's ink. Spaces clear
+    // nothing.
+    function glyphBoxes(node, style) {
+        const boxes = [];
+        for (const { segment, index } of graphemes.segment(node.data)) {
+            if (!segment.trim()) continue;
+            range.setStart(node, index);
+            range.setEnd(node, index + segment.length);
+            const rect = range.getBoundingClientRect();
+            const ink = inkOf(segment, style);
+            boxes.push(inkBox(rect.left + ink.left, rect.top + ink.top, ink.width, ink.height));
+        }
+        return boxes;
+    }
+
+    // The boxes content clears, each on screen and at rest on the page: on screen plus the scroll, less the
+    // shift an animation gives it, so the grid holds still while the page scrolls or the text slides in.
+    function boxesOf(shapes) {
+        const boxes = [];
+        for (const { rects, lift, hug } of shapes) {
+            const shift = window.scrollY - lift;
+            for (const at of rects) {
+                const rest = { left: at.left, right: at.right, top: at.top + shift, bottom: at.bottom + shift };
+                boxes.push({ at, rest, hug });
             }
         }
-        if (top > bottom) return 0;
-        top += window.scrollY;
-        // The box starts slack px into a row and ends the same slack short of a row's end.
-        const slack = (LINE_HEIGHT - ((bottom - top) % LINE_HEIGHT)) / 2;
-        return ((((top - slack) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT) - LINE_HEIGHT;
+        return boxes;
+    }
+
+    // Where the rows ('y') or the columns ('x') of art start: one cell before the offset with the least weighted
+    // sum of squared slack over the edges of the hugged boxes that face the art under the slot, see ANCHOR_STEP,
+    // or 0 without such edges.
+    function gridStart(boxes, slotBox, axis) {
+        const vertical = axis === 'y';
+        const [lo, hi, from, to] = vertical ? ['top', 'bottom', 'left', 'right'] : ['left', 'right', 'top', 'bottom'];
+        const period = vertical ? LINE_HEIGHT : grid.cellW; // the cell size along the axis
+        const across = vertical ? grid.cellW : LINE_HEIGHT; // and across it
+        const first = Math.max(0, Math.floor(slotBox[from] / across));
+        const last = Math.ceil(slotBox[to] / across);
+        // Each edge's place at rest, the sign that turns its distance past a grid line into its slack, and the
+        // cells across the axis where it faces the art.
+        const edges = [];
+        boxes.forEach(({ at, rest, hug }, i) => {
+            if (!hug) return;
+            const k0 = Math.max(first, Math.floor(at[from] / across));
+            const k1 = Math.min(last, Math.ceil(at[to] / across));
+            for (const [edge, sign] of [
+                [lo, 1],
+                [hi, -1],
+            ]) {
+                if (at[edge] < slotBox[lo] || at[edge] > slotBox[hi]) continue;
+                // Whether another box covers the art within one cell beyond the edge: before a lo edge, after a
+                // hi edge.
+                const beyond = (other) =>
+                    sign > 0
+                        ? other[lo] < at[lo] && other[hi] > at[lo] - period
+                        : other[hi] > at[hi] && other[lo] < at[hi] + period;
+                let count = 0;
+                for (let k = k0; k < k1; k++) {
+                    const covered = boxes.some(
+                        (box, j) =>
+                            j !== i && box.at[to] > k * across && box.at[from] < (k + 1) * across && beyond(box.at),
+                    );
+                    if (!covered) count++;
+                }
+                if (count) edges.push([rest[edge], sign, count]);
+            }
+        });
+        if (!edges.length) return 0;
+        let best = 0;
+        let least = Infinity;
+        for (let offset = 0; offset < period; offset += ANCHOR_STEP) {
+            let cost = 0;
+            for (const [place, sign, weight] of edges) {
+                const slack = (((sign * (place - offset)) % period) + period) % period;
+                cost += weight * slack * slack;
+            }
+            if (cost < least) {
+                least = cost;
+                best = offset;
+            }
+        }
+        return best - period;
     }
 
     function rebuildMask() {
@@ -418,16 +498,12 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         const h = maskCanvas.height;
         if (!w || !h) return;
 
-        gridTop = rowsTop();
-        const scaleY = MASK_CELL[1] / LINE_HEIGHT;
-        maskCtx.setTransform(1, 0, 0, 1, 0, 0);
-        maskCtx.clearRect(0, 0, w, h);
-        maskCtx.setTransform(MASK_CELL[0] / grid.cellW, 0, 0, scaleY, 0, -gridTop * scaleY);
-        maskCtx.globalCompositeOperation = 'lighten';
-
-        // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
+        // Memoized per rebuild: computed styles, inherited opacity, how far animations have moved an element down
+        // from its place at rest (its transform's and its ancestors' translateY), and whether an ancestor is a
+        // surface.
         const styles = new Map();
         const opacities = new Map();
+        const lifts = new Map();
         const covered = new Map();
         const styleOf = (el) => {
             if (!styles.has(el)) styles.set(el, getComputedStyle(el));
@@ -439,14 +515,44 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
             return opacities.get(el);
         };
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
-        // Content fills its zones with red as strong as its opacity; where zones overlap, the stronger red stays.
-        // Content that has faded out draws nothing.
+        const liftOf = (el) => {
+            if (!el || el === root) return 0;
+            if (!lifts.has(el)) {
+                const { transform } = styleOf(el);
+                const own = transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m42;
+                lifts.set(el, own + liftOf(el.parentElement));
+            }
+            return lifts.get(el);
+        };
+        // Content covers its boxes as strongly as its opacity: the boxes are collected first, to line the rows up
+        // with, and drawn once the rows are placed. Where boxes overlap, the strongest stays.
         let sum = 0;
-        const paint = (el) => {
-            const alpha = alphaOf(el);
+        const shapes = [];
+        let alpha = 0; // of the element whose boxes are being collected
+        let lift = 0; // and how far animations have moved it down from its place at rest
+        const collect = (el) => {
+            alpha = alphaOf(el);
+            lift = liftOf(el);
             sum += alpha;
-            maskCtx.fillStyle = `rgb(${Math.round(alpha * 255)}, 0, 0)`;
-            return alpha >= 0.02;
+        };
+        // A shape's boxes draw as one path, so where a hugged text's boxes overlap, the mask's edge is no stronger.
+        const add = (rects, radius, text = false, hug = false, span = null) =>
+            shapes.push({ rects, radius, alpha, lift, text, hug, span });
+        // An element's box, padded by clearPadding, with corners that curve by its border radius and the padding.
+        const addBox = (rect, radius) => {
+            if (!rect.width && !rect.height) return;
+            const r = Math.min(radius, rect.width / 2, rect.height / 2) + clearPadding;
+            add(
+                [
+                    new DOMRect(
+                        rect.left - clearPadding,
+                        rect.top - clearPadding,
+                        rect.width + clearPadding * 2,
+                        rect.height + clearPadding * 2,
+                    ),
+                ],
+                r,
+            );
         };
         const shields = new Set();
         const frosted = new Set();
@@ -470,37 +576,132 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         };
 
         for (const surface of shields) {
-            if (isCovered(surface) || !paint(surface)) continue;
-            drawBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
+            if (isCovered(surface)) continue;
+            collect(surface);
+            addBox(surface.getBoundingClientRect(), parseFloat(styleOf(surface).borderTopLeftRadius) || 0);
         }
         for (const el of dividers) {
-            if (isCovered(el) || !paint(el)) continue;
+            if (isCovered(el)) continue;
+            collect(el);
             const style = styleOf(el);
             const box = el.getBoundingClientRect();
-            for (const side of bordersOf(style)) drawBox(borderLine(box, style, side), 0);
+            for (const side of bordersOf(style)) addBox(borderLine(box, style, side), 0);
         }
         for (const el of controls) {
-            if (isCovered(el) || !paint(el)) continue;
+            if (isCovered(el)) continue;
+            collect(el);
             range.selectNodeContents(el);
-            drawBox(range.getBoundingClientRect(), 0);
+            addBox(range.getBoundingClientRect(), 0);
             const band = underlineOf(el);
-            if (band) drawBox(band, 0);
+            if (band) addBox(band, 0);
         }
         for (const el of root.querySelectorAll('svg, hr, img, video')) {
-            if (shields.has(el) || frosted.has(el) || isCovered(el) || !paint(el)) continue;
-            drawBox(el.getBoundingClientRect(), 4);
+            if (shields.has(el) || frosted.has(el) || isCovered(el)) continue;
+            collect(el);
+            addBox(el.getBoundingClientRect(), 4);
         }
+        // Text boxes curve at the corners by the padding. Hugged text clears a box around each of its characters
+        // when a row of art fits in the notches above its lowercase letters, and anchors the grid. Smaller hugged
+        // text, like the greeting, clears one box per line and follows the rows instead: its first line's box on
+        // screen and its top at rest, by the element the nudge goes on.
+        const followers = new Map();
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
             const el = node.parentElement;
             if (!el || !node.data.trim() || shields.has(el) || frosted.has(el) || isCovered(el)) continue;
-            if (!paint(el)) continue;
-            const ink = inkOf(node.data, styleOf(el));
+            collect(el);
+            const style = styleOf(el);
+            const hugged = hug && el.closest(hug);
+            // The whole text's box, the title's two words together: whether it lies within the slot.
+            const span = (hugged || el).getBoundingClientRect();
+            if (hugged && notchFits(style)) {
+                add(glyphBoxes(node, style), TEXT_PADDING, true, true, span);
+                continue;
+            }
+            const ink = inkOf(node.data, style);
             range.selectNodeContents(node);
-            for (const rect of range.getClientRects()) drawLine(rect, ink);
+            const rects = Array.from(range.getClientRects(), (rect) => lineBox(rect, ink));
+            add(rects, TEXT_PADDING, true, false, span);
+            if (hugged && rects.length && !followers.has(hugged)) {
+                followers.set(hugged, { box: rects[0], top: rects[0].top - lift + window.scrollY });
+            }
+        }
+        // An end of a text's box faces the art where no other content lies within a cell beyond the middle of that
+        // end. The boxes of a word's letters overlap, so only its first and last letters have such ends. A box
+        // that only touches another above or below it, as the greeting's can touch the title's, keeps its ends.
+        // Where a text reaches into the slot from outside it, as the title does on desktop, its end under the
+        // slot clears one more box, from the top of the letters' ink to the bottom of their box, that reaches
+        // TEXT_END_PADDING past the text. So beside and below the letters the column of art is straight, a little
+        // farther from the tip of the line that the art flows around, while the row above the line keeps its
+        // character at the corner of the end. Text within the slot keeps TEXT_PADDING at its ends.
+        const slotBox = findSlot()?.rect ?? new DOMRect(0, 0, viewW, viewH);
+        const all = shapes.flatMap((shape) => shape.rects);
+        for (const shape of shapes) {
+            if (!shape.text) continue;
+            const within = shape.span.left >= slotBox.left && shape.span.right <= slotBox.right;
+            shape.rects = shape.rects.flatMap((rect) => {
+                const middle = (rect.top + rect.bottom) / 2;
+                const faces = [-1, 1].map(
+                    (sign) =>
+                        !all.some(
+                            (other) =>
+                                other !== rect &&
+                                other.top < middle &&
+                                other.bottom > middle &&
+                                (sign < 0
+                                    ? other.left < rect.left && other.right > rect.left - grid.cellW
+                                    : other.right > rect.right && other.left < rect.right + grid.cellW),
+                        ),
+                );
+                if (within) return [rect];
+                const inkTop = rect.top + TEXT_PADDING - TEXT_INSET;
+                const ends = [];
+                [rect.left, rect.right].forEach((x, i) => {
+                    if (!faces[i] || x <= slotBox.left || x >= slotBox.right) return;
+                    const left = i ? x - TEXT_PADDING * 2 : x - (TEXT_END_PADDING - TEXT_PADDING);
+                    ends.push(new DOMRect(left, inkTop, TEXT_PADDING + TEXT_END_PADDING, rect.bottom - inkTop));
+                });
+                return [rect, ...ends];
+            });
         }
         fading = sum !== shownSum;
         shownSum = sum;
+
+        // Content fills its boxes with red as strong as its opacity, into the grid as placed. Content that has
+        // faded out draws nothing.
+        const boxes = boxesOf(shapes);
+        gridTop = gridStart(boxes, slotBox, 'y');
+        gridLeft = gridStart(boxes, slotBox, 'x');
+        // A follower that reaches into the slot moves down so that a row line falls on its top edge, when that
+        // takes less than half a row: by the nudge that takes its top, as laid out without the nudge it has now,
+        // to the row line below it. One farther from that line, or outside the slot, stays where the layout puts
+        // it. So the greeting never moves away from the title. The mask takes the move at the next rebuild.
+        for (const [el, { box, top }] of followers) {
+            const laidOut = top - (parseFloat(el.style.getPropertyValue(NUDGE_PROPERTY)) || 0);
+            const meetsArt =
+                box.right > slotBox.left &&
+                box.left < slotBox.right &&
+                box.bottom > slotBox.top &&
+                box.top < slotBox.bottom;
+            const nudge = meetsArt ? (((gridTop - laidOut) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT : 0;
+            el.style.setProperty(NUDGE_PROPERTY, `${(nudge < LINE_HEIGHT / 2 ? nudge : 0).toFixed(2)}px`);
+        }
+        const scaleX = MASK_CELL[0] / grid.cellW;
+        const scaleY = MASK_CELL[1] / LINE_HEIGHT;
+        maskCtx.setTransform(1, 0, 0, 1, 0, 0);
+        maskCtx.clearRect(0, 0, w, h);
+        maskCtx.setTransform(scaleX, 0, 0, scaleY, -gridLeft * scaleX, -gridTop * scaleY);
+        maskCtx.globalCompositeOperation = 'lighten';
+        for (const { rects, radius, alpha: shown } of shapes) {
+            if (shown < 0.02) continue;
+            maskCtx.fillStyle = `rgb(${Math.round(shown * 255)}, 0, 0)`;
+            maskCtx.beginPath();
+            rects.forEach((rect) => {
+                if (rect.bottom < -LINE_HEIGHT || rect.top > viewH + LINE_HEIGHT) return;
+                maskCtx.roundRect(rect.x, rect.y, rect.width, rect.height, radius);
+            });
+            maskCtx.fill();
+        }
 
         // A cell takes the strongest red of the content that covers it, and shows that much less of its art.
         const { data } = maskCtx.getImageData(0, 0, w, h);
@@ -525,9 +726,11 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
             if (isCovered(panel)) continue;
             const rect = panel.getBoundingClientRect();
             const y1 = Math.min(rows, Math.round((rect.bottom - gridTop) / LINE_HEIGHT));
-            const x1 = Math.min(cols, Math.round(rect.right / cellW));
+            const x1 = Math.min(cols, Math.round((rect.right - gridLeft) / cellW));
             for (let y = Math.max(0, Math.round((rect.top - gridTop) / LINE_HEIGHT)); y < y1; y++) {
-                for (let x = Math.max(0, Math.round(rect.left / cellW)); x < x1; x++) glass[y * cols + x] = 1;
+                for (let x = Math.max(0, Math.round((rect.left - gridLeft) / cellW)); x < x1; x++) {
+                    glass[y * cols + x] = 1;
+                }
             }
         }
         clearStrips(visible, glass, rows, cols, cols, 1, minStripCols);
@@ -820,7 +1023,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         if (!page) return;
         updateCamera();
         placeCamera(current);
-        // The art projects onto the rows, which start gridTop px from the top of the screen.
+        // The art projects onto the grid, whose columns start gridLeft px from the left edge of the screen and
+        // whose rows start gridTop px from its top.
+        cam.cx -= gridLeft;
         cam.cy -= gridTop;
         drawStars(grid, cam, t, 1);
         for (const name of names) {
@@ -860,6 +1065,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         const used = [];
 
         ctx.clearRect(0, 0, viewW, viewH);
+        const shown = Math.ceil((viewH - gridTop) / LINE_HEIGHT); // rows on screen
         for (let y = 0; y < rows; y++) {
             // One string per material and opacity layer keeps this to a few fillText calls per row.
             for (let x = 0; x < cols; x++) {
@@ -873,6 +1079,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
                     alpha = starAlpha[i];
                 } else if (edge[i]) {
                     char = EDGE_CHARS[edge[i]];
+                    const hiddenAbove = y > 0 && !visible[i - cols];
+                    const hiddenBelow = y + 1 < shown && !visible[i + cols];
+                    if (TALL_EDGES.has(char) && (hiddenAbove || hiddenBelow)) char = '·';
                     alpha = (0.62 + 0.33 * shade[i]) * opacity[i];
                     material = tint[i];
                 } else if (cover[i] >= 0.5) {
@@ -908,7 +1117,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
             for (const row of used) {
                 ctx.fillStyle = colors[row.material];
                 ctx.globalAlpha = Math.min(1, row.alpha * alphaScale);
-                ctx.fillText(row.chars.join(''), 0, gridTop + y * LINE_HEIGHT);
+                ctx.fillText(row.chars.join(''), gridLeft, gridTop + y * LINE_HEIGHT);
                 row.chars.fill(' ');
             }
             used.length = 0;

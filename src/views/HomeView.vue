@@ -42,8 +42,8 @@ onMounted(() => {
     <div class="home-container page page-shell">
         <div class="art-slot" aria-hidden="true"></div>
         <div class="hero-content">
-            <h3>Hi 👋, my name is</h3>
-            <h1 class="art-anchor">
+            <h3 class="art-hug">Hi 👋, my name is</h3>
+            <h1 class="art-hug">
                 <span class="hero-title hero-title-1">Michael</span>
                 <span class="hero-title hero-title-2">Green</span>
             </h1>
@@ -197,7 +197,11 @@ h2 {
     }
 }
 
+// Where the greeting meets the ascii art, the art moves it down by less than half a row of art when that lines a
+// full row up above it, see field.js.
 h3 {
+    position: relative;
+    top: var(--art-nudge, 0);
     margin: 0 2px $space-2;
 
     @include bp-custom-min($hero-tablet-bp) {
