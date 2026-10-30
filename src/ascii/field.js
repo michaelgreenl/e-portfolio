@@ -71,29 +71,27 @@ const SHOW_EASE = 0.15;
 // Page content is drawn into a low-resolution mask with its opacity: a cell under content shows art only as far
 // as that content has faded out, so the art fades back in as the content fades away. Each line of text clears
 // one box, never the shapes of single letters: from the top of its tallest character, emoji included, to the
-// bottom of its lowest, padded below and to each side but not above. Its corners curve as far as the characters
-// at its ends leave room, up to TEXT_CURVE. The box starts TEXT_TOP_INSET below that top: the art's characters
-// sit high in their row and leave its bottom pixels empty, so text that reaches into the bottom of a row leaves
-// that row's art in place. Elements matching the surfaces selector clear their whole rounded box while they
-// show a background or a border all around. One bordered on only some sides, such as a divider, clears just
-// those lines. One with neither, such as a nav link, clears one box around its icon and text together, so the
-// cut above them stays level, and the band where its ::after underline draws, so the art holds still while an
-// underline grows in on hover. Elements with a backdrop blur clear nothing: the art shows through them,
-// blurred. The mask has MASK_CELL pixels across and down for each character cell, and content covers a cell
-// where any of its mask pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin
-// line, and the edge around content is a clean cut along the rows and columns, with no soft edge. It keeps
-// TEXT_PADDING clear of text, more than of other content, most of all on phones and tablets, where whole
-// paragraphs sit on the art and need room around them to read well. Strips of art narrower than MIN_STRIP
-// between content, frosted panels and the screen edge are cleared too, so no slivers squeeze between them, and
-// so are runs of at most MAX_POCKET cells in a row with content at both ends and right below, such as art that
-// hangs into the gap between two nav links. The paddings and the narrowest strip kept change from the first
-// value at phone width to the second at desktop width.
+// bottom of its lowest, padded on every side. Above, the padding is TEXT_TOP_INSET less: the art's characters
+// sit high in their row and leave its bottom pixels empty. The box's corners curve by TEXT_CURVE paddings.
+// Elements matching the surfaces selector clear their whole rounded box while they show a background or a
+// border all around. One bordered on only some sides, such as a divider, clears just those lines. One with
+// neither, such as a nav link, clears one box around its icon and text together, so the cut above them stays
+// level, and the band where its ::after underline draws, so the art holds still while an underline grows in on
+// hover. Elements with a backdrop blur clear nothing: the art shows through them, blurred. The mask has
+// MASK_CELL pixels across and down for each character cell, and content covers a cell where any of its mask
+// pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin line, and the edge
+// around content is a clean cut along the rows and columns, with no soft edge. It keeps TEXT_PADDING clear of
+// text, more than of other content, most of all on phones and tablets, where whole paragraphs sit on the art
+// and need room around them to read well. Strips of art narrower than MIN_STRIP between content, frosted
+// panels and the screen edge are cleared too, so no slivers squeeze between them, and so are runs of at most
+// MAX_POCKET cells in a row with content at both ends and right below, such as art that hangs into the gap
+// between two nav links. The paddings and the narrowest strip kept change from the first value at phone width
+// to the second at desktop width.
 const TEXT_TOP_INSET = 2;
-const TEXT_CURVE = 24;
-// With an anchor on the page, the rows of art shift down by less than one row, so the anchor line's tallest
-// character starts ANCHOR_OFFSET px into a row, just below that row's characters. With the page at the top,
-// the row above that line then shows in full, at every screen size.
-const ANCHOR_OFFSET = 15;
+const TEXT_CURVE = 2;
+// With an anchor on the page, the rows of art shift down by less than one row, so the band of rows that the
+// anchor's text clears has the same slack above its box as below it: the art stays as far from the top of that
+// text as from its bottom, at every screen size.
 const MASK_CELL = [2, 4];
 const MASK_INTERVAL = 150;
 const CLEAR_PADDING = [4, 6];
@@ -101,8 +99,6 @@ const TEXT_PADDING = [8, 7];
 const CLEAR_AT = 0.25;
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
 const MAX_POCKET = 4;
-
-const graphemes = new Intl.Segmenter();
 
 // A small ordered dither breaks up bands where brightness crosses from one character to the next.
 const DITHER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => ((v / 16 - 0.47) / LAST) * 0.5);
@@ -232,7 +228,7 @@ function underlineOf(el) {
  * @param {HTMLElement} options.root Element whose content the art keeps clear of.
  * @param {string} options.surfaces Selector for panels and controls that clear their whole box.
  * @param {string} options.slot Selector for the element that marks where the page's object goes.
- * @param {string} options.anchor Selector for the line of text that the rows of art line up with.
+ * @param {string} options.anchor Selector for the text that the rows of art stay as far above as below.
  * @param {Record<string, object>} options.world Objects by name, see world.js.
  * @param {number} options.leave Seconds the old page takes to leave after setScene(), before the new one shows.
  */
@@ -355,58 +351,66 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
         maskCtx.fill();
     }
 
-    // Where a text's characters draw in its line box: the top of their ink below the box's top, the ink's height,
-    // and how far the ink reaches above and below the baseline.
+    // Where a text's characters draw in its line box: the top of their ink below the box's top, and the ink's
+    // height.
     function inkOf(text, style) {
         maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
         const metrics = maskCtx.measureText(text);
         const ascent = metrics.actualBoundingBoxAscent;
-        const descent = metrics.actualBoundingBoxDescent;
-        return { top: metrics.fontBoundingBoxAscent - ascent, height: ascent + descent, ascent, descent };
+        return { top: metrics.fontBoundingBoxAscent - ascent, height: ascent + metrics.actualBoundingBoxDescent };
     }
 
-    // How far a corner of a line's box can curve and still hold the ink of the character at that end, which sits
-    // room px in from the box's top or bottom edge and textPadding in from its side. Without that room, the
-    // corner curves only as far as textPadding.
-    function curveFor(room) {
-        if (!(room > 0)) return textPadding;
-        return Math.min(TEXT_CURVE, textPadding + room + Math.sqrt(2 * textPadding * room));
+    // The box that a line of text clears: where it starts, below the top of the line box, and how tall it is.
+    function boxOf(ink) {
+        const top = ink.top - textPadding + TEXT_TOP_INSET;
+        return { top, height: ink.height + textPadding * 2 - TEXT_TOP_INSET };
     }
 
-    // A line of text clears its characters' ink from TEXT_TOP_INSET below their top, padded below and to each side.
-    // start and end are the ink of the characters at the line's ends, where the text starts and ends on it.
-    function drawLine(rect, ink, start, end) {
-        const top = rect.top + ink.top + TEXT_TOP_INSET;
-        const height = ink.height - TEXT_TOP_INSET + textPadding;
-        if (top + height < -textPadding || top > viewH + textPadding) return;
-        const above = (char) => char && ink.ascent - char.ascent - TEXT_TOP_INSET;
-        const below = (char) => (char ? ink.descent - char.descent : 0) + textPadding;
+    // A line of text clears its characters' ink, padded by textPadding below and to each side and by
+    // TEXT_TOP_INSET less above, with corners that curve by TEXT_CURVE paddings.
+    function drawLine(rect, ink) {
+        const box = boxOf(ink);
+        const top = rect.top + box.top;
+        if (top + box.height < -textPadding || top > viewH + textPadding) return;
         maskCtx.beginPath();
-        maskCtx.roundRect(rect.left - textPadding, top, rect.width + textPadding * 2, height, [
-            curveFor(above(start)),
-            curveFor(above(end)),
-            curveFor(below(end)),
-            curveFor(below(start)),
-        ]);
+        maskCtx.roundRect(
+            rect.left - textPadding,
+            top,
+            rect.width + textPadding * 2,
+            box.height,
+            textPadding * TEXT_CURVE,
+        );
         maskCtx.fill();
     }
 
-    // Where the first row of art starts so that the anchor line's tallest character starts ANCHOR_OFFSET into a
-    // row, or 0 without an anchor. It uses the line's place on the page at rest: its place on screen plus the
-    // scroll, less the shift an animation gives it, so the rows hold still while the page scrolls or the line
-    // slides in.
+    // Where the first row of art starts so that the band of rows the anchor's text clears has the same slack above
+    // the text's box as below it, or 0 without an anchor. It uses the text's place on the page at rest: its place
+    // on screen plus the scroll, less the shift an animation gives it, so the rows hold still while the page
+    // scrolls or the text slides in.
     function rowsTop() {
         const el = anchor && root.querySelector(anchor);
-        const line = el && document.createTreeWalker(el, NodeFilter.SHOW_TEXT).nextNode();
-        if (!line) return 0;
-        range.selectNodeContents(line);
-        const rect = range.getClientRects()[0];
-        if (!rect) return 0;
-        let top = rect.top + inkOf(line.data, getComputedStyle(line.parentElement)).top + window.scrollY;
-        for (let e = el; e && e !== root; e = e.parentElement) {
-            top -= new DOMMatrixReadOnly(getComputedStyle(e).transform).m42;
+        if (!el) return 0;
+        let top = Infinity;
+        let bottom = -Infinity;
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            if (!node.data.trim()) continue;
+            const box = boxOf(inkOf(node.data, getComputedStyle(node.parentElement)));
+            let lift = 0;
+            for (let e = node.parentElement; e && e !== root; e = e.parentElement) {
+                lift += new DOMMatrixReadOnly(getComputedStyle(e).transform).m42;
+            }
+            range.selectNodeContents(node);
+            for (const rect of range.getClientRects()) {
+                top = Math.min(top, rect.top + box.top - lift);
+                bottom = Math.max(bottom, rect.top + box.top + box.height - lift);
+            }
         }
-        return ((((top - ANCHOR_OFFSET) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT) - LINE_HEIGHT;
+        if (top > bottom) return 0;
+        top += window.scrollY;
+        // The box starts slack px into a row and ends the same slack short of a row's end.
+        const slack = (LINE_HEIGHT - ((bottom - top) % LINE_HEIGHT)) / 2;
+        return ((((top - slack) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT) - LINE_HEIGHT;
     }
 
     function rebuildMask() {
@@ -491,17 +495,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, anchor, world, 
             const el = node.parentElement;
             if (!el || !node.data.trim() || shields.has(el) || frosted.has(el) || isCovered(el)) continue;
             if (!paint(el)) continue;
-            const style = styleOf(el);
-            const ink = inkOf(node.data, style);
-            const text = node.data.trim();
-            const chars = graphemes.segment(text);
-            const start = inkOf(chars.containing(0).segment, style);
-            const end = inkOf(chars.containing(text.length - 1).segment, style);
+            const ink = inkOf(node.data, styleOf(el));
             range.selectNodeContents(node);
-            const rects = range.getClientRects();
-            for (let i = 0; i < rects.length; i++) {
-                drawLine(rects[i], ink, i === 0 && start, i === rects.length - 1 && end);
-            }
+            for (const rect of range.getClientRects()) drawLine(rect, ink);
         }
         fading = sum !== shownSum;
         shownSum = sum;

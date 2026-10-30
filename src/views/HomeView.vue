@@ -42,8 +42,8 @@ onMounted(() => {
     <div class="home-container page page-shell">
         <div class="art-slot" aria-hidden="true"></div>
         <div class="hero-content">
-            <h3 class="art-anchor">Hi 👋, my name is</h3>
-            <h1>
+            <h3>Hi 👋, my name is</h3>
+            <h1 class="art-anchor">
                 <span class="hero-title hero-title-1">Michael</span>
                 <span class="hero-title hero-title-2">Green</span>
             </h1>
