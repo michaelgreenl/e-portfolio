@@ -103,8 +103,8 @@ const SHOW_EASE = 0.15;
 const TEXT_PADDING = 10;
 const TEXT_INSET = 2;
 const TEXT_END_PADDING = 16;
-// Wider corners keep a character beside the shoulder of a hugged lowercase letter.
-const TEXT_HUG_RADIUS = 16;
+// A two-row corner keeps a character beside lowercase shoulders across different font metrics.
+const TEXT_HUG_RADIUS = LINE_HEIGHT * 2;
 // Outline characters that reach the top or bottom of their row, see EDGE_CHARS. Next to hidden content above
 // or below, they draw as dots instead, so the art keeps its padding from the content there.
 const TALL_EDGES = new Set('_/\\|()');
@@ -412,7 +412,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
 
     // The boxes that a text node clears character by character: one around each character's ink. Spaces clear
     // nothing.
-    function glyphBoxes(node, style) {
+    function glyphBoxes(node, style, layoutRect) {
         const boxes = [];
         for (const { segment, index } of graphemes.segment(node.data)) {
             if (!segment.trim()) continue;
@@ -420,19 +420,26 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             range.setEnd(node, index + segment.length);
             const rect = range.getBoundingClientRect();
             const ink = inkOf(segment, style);
-            boxes.push(inkBox(rect.left + ink.left, rect.top + ink.top, ink.width, ink.height));
+            const box = inkBox(rect.left + ink.left, rect.top + ink.top, ink.width, ink.height);
+            const layout = layoutRect(rect, node.parentElement);
+            box.layout = inkBox(layout.left + ink.left, layout.top + ink.top, ink.width, ink.height);
+            boxes.push(box);
         }
         return boxes;
     }
 
-    // The boxes content clears, each on screen and at rest on the page: on screen plus the scroll, less the
-    // shift an animation gives it, so the grid holds still while the page scrolls or the text slides in.
+    // Grid placement uses layout boxes before animation or the greeting's nudge. Scrolling changes which edges
+    // face the art, while their page positions keep the grid still.
     function boxesOf(shapes) {
         const boxes = [];
-        for (const { rects, lift, hug } of shapes) {
-            const shift = window.scrollY - lift;
-            for (const at of rects) {
-                const rest = { left: at.left, right: at.right, top: at.top + shift, bottom: at.bottom + shift };
+        for (const { rects, hug } of shapes) {
+            for (const { layout: at } of rects) {
+                const rest = {
+                    left: at.left,
+                    right: at.right,
+                    top: at.top + window.scrollY,
+                    bottom: at.bottom + window.scrollY,
+                };
                 boxes.push({ at, rest, hug });
             }
         }
@@ -500,12 +507,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         const h = maskCanvas.height;
         if (!w || !h) return;
 
-        // Memoized per rebuild: computed styles, inherited opacity, how far animations have moved an element down
-        // from its place at rest (its transform's and its ancestors' translateY), and whether an ancestor is a
-        // surface.
+        // Memoized per rebuild: computed styles, inherited opacity, and whether an ancestor is a surface.
         const styles = new Map();
         const opacities = new Map();
-        const lifts = new Map();
         const covered = new Map();
         const styleOf = (el) => {
             if (!styles.has(el)) styles.set(el, getComputedStyle(el));
@@ -517,44 +521,57 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             return opacities.get(el);
         };
         const alphaOf = (el) => (styleOf(el).visibility === 'hidden' ? 0 : opacityOf(el));
-        const liftOf = (el) => {
-            if (!el || el === root) return 0;
-            if (!lifts.has(el)) {
-                const { transform } = styleOf(el);
-                const own = transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m42;
-                lifts.set(el, own + liftOf(el.parentElement));
+        // Page animations translate and scale. Undo them before measuring the grid's anchors, including a
+        // divider whose scale starts at zero. The greeting follows the grid, so its nudge cannot move anchors.
+        const layoutRect = (rect, el) => {
+            for (; el && el !== root; el = el.parentElement) {
+                const style = styleOf(el);
+                if (style.transform !== 'none') {
+                    const matrix = new DOMMatrixReadOnly(style.transform);
+                    const box = el.getBoundingClientRect();
+                    const [ox, oy] = style.transformOrigin.split(' ').map(parseFloat);
+                    const left = box.left - matrix.m41 - ox * (1 - matrix.a);
+                    const top = box.top - matrix.m42 - oy * (1 - matrix.d);
+                    rect = new DOMRect(
+                        left + (matrix.a ? (rect.left - box.left) / matrix.a : 0),
+                        top + (matrix.d ? (rect.top - box.top) / matrix.d : 0),
+                        matrix.a ? rect.width / matrix.a : parseFloat(style.width),
+                        matrix.d ? rect.height / matrix.d : parseFloat(style.height),
+                    );
+                }
+                const nudge = parseFloat(el.style.getPropertyValue(NUDGE_PROPERTY)) || 0;
+                if (nudge) rect = new DOMRect(rect.left, rect.top - nudge, rect.width, rect.height);
             }
-            return lifts.get(el);
+            return rect;
         };
         // Content covers its boxes as strongly as its opacity: the boxes are collected first, to line the rows up
         // with, and drawn once the rows are placed. Where boxes overlap, the strongest stays.
         let sum = 0;
         const shapes = [];
         let alpha = 0; // of the element whose boxes are being collected
-        let lift = 0; // and how far animations have moved it down from its place at rest
+        let element;
         const collect = (el) => {
+            element = el;
             alpha = alphaOf(el);
-            lift = liftOf(el);
             sum += alpha;
         };
         // A shape's boxes draw as one path, so where a hugged text's boxes overlap, the mask's edge is no stronger.
         const add = (rects, radius, text = false, hug = false, span = null) =>
-            shapes.push({ rects, radius, alpha, lift, text, hug, span });
+            shapes.push({ rects, radius, alpha, text, hug, span });
         // An element's box, padded by clearPadding, with corners that curve by its border radius and the padding.
         const addBox = (rect, radius) => {
             if (!rect.width && !rect.height) return;
             const r = Math.min(radius, rect.width / 2, rect.height / 2) + clearPadding;
-            add(
-                [
-                    new DOMRect(
-                        rect.left - clearPadding,
-                        rect.top - clearPadding,
-                        rect.width + clearPadding * 2,
-                        rect.height + clearPadding * 2,
-                    ),
-                ],
-                r,
-            );
+            const pad = (box) =>
+                new DOMRect(
+                    box.left - clearPadding,
+                    box.top - clearPadding,
+                    box.width + clearPadding * 2,
+                    box.height + clearPadding * 2,
+                );
+            const box = pad(rect);
+            box.layout = pad(layoutRect(rect, element));
+            add([box], r);
         };
         const shields = new Set();
         const frosted = new Set();
@@ -617,15 +634,19 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             // The whole text's box, the title's two words together: whether it lies within the slot.
             const span = (hugged || el).getBoundingClientRect();
             if (hugged && notchFits(style)) {
-                add(glyphBoxes(node, style), TEXT_HUG_RADIUS, true, true, span);
+                add(glyphBoxes(node, style, layoutRect), TEXT_HUG_RADIUS, true, true, span);
                 continue;
             }
             const ink = inkOf(node.data, style);
             range.selectNodeContents(node);
-            const rects = Array.from(range.getClientRects(), (rect) => lineBox(rect, ink));
+            const rects = Array.from(range.getClientRects(), (rect) => {
+                const box = lineBox(rect, ink);
+                box.layout = lineBox(layoutRect(rect, el), ink);
+                return box;
+            });
             add(rects, TEXT_PADDING, true, false, span);
             if (hugged && rects.length && !followers.has(hugged)) {
-                followers.set(hugged, { box: rects[0], top: rects[0].top - lift + window.scrollY });
+                followers.set(hugged, { box: rects[0].layout, top: rects[0].layout.top + window.scrollY });
             }
         }
         // An end of a text's box faces the art where no other content lies within a cell beyond the middle of that
@@ -637,31 +658,42 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         // farther from the tip of the line that the art flows around, while the row above the line keeps its
         // character at the corner of the end. Text within the slot keeps TEXT_PADDING at its ends.
         const slotBox = findSlot()?.rect ?? new DOMRect(0, 0, viewW, viewH);
-        const all = shapes.flatMap((shape) => shape.rects);
+        const all = shapes.flatMap((shape) => shape.rects.map((rect) => rect.layout));
         for (const shape of shapes) {
             if (!shape.text) continue;
             const within = shape.span.left >= slotBox.left && shape.span.right <= slotBox.right;
             shape.rects = shape.rects.flatMap((rect) => {
-                const middle = (rect.top + rect.bottom) / 2;
+                const layout = rect.layout;
+                const middle = (layout.top + layout.bottom) / 2;
                 const faces = [-1, 1].map(
                     (sign) =>
                         !all.some(
                             (other) =>
-                                other !== rect &&
+                                other !== layout &&
                                 other.top < middle &&
                                 other.bottom > middle &&
                                 (sign < 0
-                                    ? other.left < rect.left && other.right > rect.left - grid.cellW
-                                    : other.right > rect.right && other.left < rect.right + grid.cellW),
+                                    ? other.left < layout.left && other.right > layout.left - grid.cellW
+                                    : other.right > layout.right && other.left < layout.right + grid.cellW),
                         ),
                 );
                 if (within) return [rect];
                 const inkTop = rect.top + TEXT_PADDING - TEXT_INSET;
                 const ends = [];
                 [rect.left, rect.right].forEach((x, i) => {
-                    if (!faces[i] || x <= slotBox.left || x >= slotBox.right) return;
+                    const edge = i ? layout.right : layout.left;
+                    if (!faces[i] || edge <= slotBox.left || edge >= slotBox.right) return;
                     const left = i ? x - TEXT_PADDING * 2 : x - (TEXT_END_PADDING - TEXT_PADDING);
-                    ends.push(new DOMRect(left, inkTop, TEXT_PADDING + TEXT_END_PADDING, rect.bottom - inkTop));
+                    const end = new DOMRect(left, inkTop, TEXT_PADDING + TEXT_END_PADDING, rect.bottom - inkTop);
+                    const layoutLeft = i ? edge - TEXT_PADDING * 2 : edge - (TEXT_END_PADDING - TEXT_PADDING);
+                    const layoutTop = layout.top + TEXT_PADDING - TEXT_INSET;
+                    end.layout = new DOMRect(
+                        layoutLeft,
+                        layoutTop,
+                        TEXT_PADDING + TEXT_END_PADDING,
+                        layout.bottom - layoutTop,
+                    );
+                    ends.push(end);
                 });
                 return [rect, ...ends];
             });
@@ -679,14 +711,18 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         // to the row line below it. One farther from that line, or outside the slot, stays where the layout puts
         // it. So the greeting never moves away from the title. The mask takes the move at the next rebuild.
         for (const [el, { box, top }] of followers) {
-            const laidOut = top - (parseFloat(el.style.getPropertyValue(NUDGE_PROPERTY)) || 0);
             const meetsArt =
                 box.right > slotBox.left &&
                 box.left < slotBox.right &&
                 box.bottom > slotBox.top &&
                 box.top < slotBox.bottom;
-            const nudge = meetsArt ? (((gridTop - laidOut) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT : 0;
-            el.style.setProperty(NUDGE_PROPERTY, `${(nudge < LINE_HEIGHT / 2 ? nudge : 0).toFixed(2)}px`);
+            const slack = meetsArt ? (((gridTop - top) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT : 0;
+            const nudge = slack < LINE_HEIGHT / 2 ? slack : 0;
+            const previous = parseFloat(el.style.getPropertyValue(NUDGE_PROPERTY)) || 0;
+            // Range bounds can round differently after a nudge. Ignore changes below half an anchor step.
+            if (Math.abs(nudge - previous) >= ANCHOR_STEP / 2) {
+                el.style.setProperty(NUDGE_PROPERTY, `${nudge.toFixed(2)}px`);
+            }
         }
         const scaleX = MASK_CELL[0] / grid.cellW;
         const scaleY = MASK_CELL[1] / LINE_HEIGHT;

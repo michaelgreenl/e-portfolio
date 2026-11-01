@@ -42,10 +42,10 @@ onMounted(() => {
     <div class="home-container page page-shell">
         <div class="art-slot" aria-hidden="true"></div>
         <div class="hero-content">
-            <h3 class="art-hug">Hi 👋, my name is</h3>
+            <h3 class="art-hug" data-testid="hero-greeting">Hi 👋, my name is</h3>
             <h1 class="art-hug">
                 <span class="hero-title hero-title-1">Michael</span>
-                <span class="hero-title hero-title-2">Green</span>
+                <span class="hero-title hero-title-2" data-testid="hero-last-name">Green</span>
             </h1>
             <hr class="hero-line" />
             <h2>Software Engineer</h2>
