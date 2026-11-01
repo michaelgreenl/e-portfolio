@@ -103,6 +103,8 @@ const SHOW_EASE = 0.15;
 const TEXT_PADDING = 10;
 const TEXT_INSET = 2;
 const TEXT_END_PADDING = 16;
+// Wider corners keep a character beside the shoulder of a hugged lowercase letter.
+const TEXT_HUG_RADIUS = 16;
 // Outline characters that reach the top or bottom of their row, see EDGE_CHARS. Next to hidden content above
 // or below, they draw as dots instead, so the art keeps its padding from the content there.
 const TALL_EDGES = new Set('_/\\|()');
@@ -600,7 +602,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             collect(el);
             addBox(el.getBoundingClientRect(), 4);
         }
-        // Text boxes curve at the corners by the padding. Hugged text clears a box around each of its characters
+        // Text boxes curve at the corners by the padding. Hugged text uses wider corners around each character
         // when a row of art fits in the notches above its lowercase letters, and anchors the grid. Smaller hugged
         // text, like the greeting, clears one box per line and follows the rows instead: its first line's box on
         // screen and its top at rest, by the element the nudge goes on.
@@ -615,7 +617,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             // The whole text's box, the title's two words together: whether it lies within the slot.
             const span = (hugged || el).getBoundingClientRect();
             if (hugged && notchFits(style)) {
-                add(glyphBoxes(node, style), TEXT_PADDING, true, true, span);
+                add(glyphBoxes(node, style), TEXT_HUG_RADIUS, true, true, span);
                 continue;
             }
             const ink = inkOf(node.data, style);
