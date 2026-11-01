@@ -12,7 +12,7 @@ permissions:
 
 jobs:
     build-and-deploy:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
@@ -52,7 +52,9 @@ jobs:
                   artifact_name: github-pages-${{ github.run_attempt }}
 
             - name: Install contact check browser
-              run: bunx playwright install --with-deps chromium
+              timeout-minutes: 5
+              # Ubuntu 24.04 runners include Chromium's system libraries. Avoid apt mirror failures.
+              run: bunx playwright install --only-shell chromium
 
             - name: Check deployed contact form
               id: contact-health
