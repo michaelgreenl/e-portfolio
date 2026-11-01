@@ -308,10 +308,11 @@ $tally-window-title-size: 3.8em;
     }
 
     h1 {
-        line-height: 1.1;
+        line-height: 1.35;
 
         @include bp-sm-phone {
             line-height: normal;
+            line-height: 1.1;
         }
 
         @include bp-lg-laptop {
