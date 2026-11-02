@@ -64,13 +64,7 @@ onUnmounted(() => field?.destroy());
 </script>
 
 <template>
-    <canvas
-        ref="canvas"
-        class="ascii-field"
-        :class="{ 'is-ready': isReady }"
-        aria-hidden="true"
-        data-testid="ascii-field"
-    ></canvas>
+    <canvas ref="canvas" class="ascii-field" :class="{ 'is-ready': isReady }" aria-hidden="true"></canvas>
 </template>
 
 <style lang="scss" scoped>

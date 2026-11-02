@@ -15,8 +15,10 @@ export const homeAnimations = {
         const mobileContactTargets = gsap.utils.toArray(MOBILE_CONTACT_TARGETS);
 
         gsap.set('.hero-content > h3', { autoAlpha: 0, y: reducedMotion ? 0 : -16 });
-        gsap.set('.hero-title-1', { autoAlpha: 0, scale: reducedMotion ? 1 : 0.96, x: reducedMotion ? 0 : -48 });
-        gsap.set('.hero-title-2', { autoAlpha: 0, scale: reducedMotion ? 1 : 0.96, x: reducedMotion ? 0 : 48 });
+        // The title slides in without a scale: the ASCII art lines its rows up with the title's letters and moves
+        // the greeting to them, so a scale that grows as the title lands would shift the greeting as it lands.
+        gsap.set('.hero-title-1', { autoAlpha: 0, x: reducedMotion ? 0 : -48 });
+        gsap.set('.hero-title-2', { autoAlpha: 0, x: reducedMotion ? 0 : 48 });
         gsap.set('.hero-content > h2, .hero-content > p', { autoAlpha: 0, y: reducedMotion ? 0 : 20 });
         gsap.set('.cta > button, .cta > a', {
             autoAlpha: 0,
@@ -27,9 +29,11 @@ export const homeAnimations = {
             opacity: 0,
             x: reducedMotion ? 0 : 50,
         });
+        // The lines draw in from their middle through a clip instead of a scale, so their boxes stay full width
+        // and the art's rows, which the divider's width helps place on phones, hold still.
         gsap.set('.hero-line, .nav-links-line', {
             autoAlpha: 0,
-            scaleX: 0,
+            clipPath: 'inset(0 50%)',
         });
         if (desktopContactTarget) {
             gsap.set(desktopContactTarget, {
@@ -66,7 +70,6 @@ export const homeAnimations = {
                     autoAlpha: 1,
                     duration: reducedMotion ? 0.01 : TIMING.duration.slow,
                     ease: TIMING.easing.smooth,
-                    scale: 1,
                     stagger: TIMING.stagger.loose,
                     x: 0,
                 },
@@ -100,9 +103,9 @@ export const homeAnimations = {
                 '.hero-line, .nav-links-line',
                 {
                     autoAlpha: 1,
+                    clipPath: 'inset(0 0%)',
                     duration: reducedMotion ? 0.01 : TIMING.duration.slow,
                     ease: TIMING.easing.bounce,
-                    scaleX: 1,
                 },
                 reducedMotion ? 0 : 'hero+=0.12',
             )
@@ -207,7 +210,8 @@ export const homeAnimations = {
                     autoAlpha: 0,
                     duration,
                     ease: TIMING.easing.fade,
-                    scale: reducedMotion ? 1 : 0.98,
+                    // The title keeps its size, as on entry, so the art's rows and the greeting hold still.
+                    scale: (i, el) => (reducedMotion || el.matches('.hero-title') ? 1 : 0.98),
                     stagger,
                     y: reducedMotion ? 0 : -10,
                 },
@@ -217,9 +221,9 @@ export const homeAnimations = {
                 '.hero-line, .nav-links-line',
                 {
                     autoAlpha: 0,
+                    clipPath: 'inset(0 50%)',
                     duration,
                     ease: TIMING.easing.fade,
-                    scaleX: 0,
                 },
                 0,
             )
