@@ -335,6 +335,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
     let shownSum = 0; // the summed opacity of all content at the last mask rebuild
     let fading = false; // that sum changed at the last rebuild, so some content is fading in or out
     let lastScrollY = window.scrollY;
+    let scrolled = false; // the window or a panel in it has scrolled since the last frame
     let velocity = 0; // how fast the page scrolls, in px per second, down positive
     let tilt = 0;
 
@@ -1228,9 +1229,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         const settle = 1 - Math.exp(-dt / 0.2);
         velocity += (rate - velocity) * settle;
         tilt += (Math.max(-1, Math.min(1, velocity / 3000)) - tilt) * settle;
-        const moved = y !== lastScrollY;
         lastScrollY = y;
-        return moved;
     }
 
     function updateShow() {
@@ -1249,15 +1248,20 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
 
     function frame(now) {
         frameId = requestAnimationFrame(frame);
-        if (now - lastFrame < FRAME_MS) return;
+        // A frame every FRAME_MS, but one on every frame of the display while the page scrolls: the boxes content
+        // clears move with the content, and the art with its slot, so a frame kept from before a scroll shows art
+        // over the text and holes beside it.
+        scrolled ||= window.scrollY !== lastScrollY;
+        if (!scrolled && now - lastFrame < FRAME_MS) return;
         const dt = lastFrame ? Math.min(0.1, (now - lastFrame) / 1000) : 0;
         lastFrame = now;
         clock = (now - startTime) / 1000;
 
         // The mask follows layout on an interval, and on every frame while the page scrolls, content fades, or the
         // camera travels between pages.
-        const scrolled = measureScroll(dt);
+        measureScroll(dt);
         const maskDue = scrolled || fading || travel || now - lastMask > MASK_INTERVAL;
+        scrolled = false;
         if (maskDue) {
             lastMask = now;
             rebuildMask();
@@ -1362,8 +1366,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
     const resizeObserver = new ResizeObserver(() => resize());
     resizeObserver.observe(canvas);
 
-    const on = (target, type, handler) =>
-        target.addEventListener(type, handler, { passive: true, signal: listeners.signal });
+    const on = (target, type, handler, capture = false) =>
+        target.addEventListener(type, handler, { capture, passive: true, signal: listeners.signal });
+    // A scroll of the window, or of any panel within it, moves content under the art.
+    on(window, 'scroll', () => (scrolled = true), true);
     on(window, 'pointermove', (e) => {
         pointer.x = e.clientX;
         pointer.y = e.clientY;
