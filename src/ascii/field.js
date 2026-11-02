@@ -87,7 +87,8 @@ const SHOW_EASE = 0.15;
 // border all around. One bordered on only some sides, such as a divider, clears just those lines. One with
 // neither, such as a nav link, clears one box around its icon and text together, so the cut above them stays
 // level, and the band where its ::after underline draws, so the art holds still while an underline grows in on
-// hover. The home page's nav row is such an element too: it clears one straight box around all its links.
+// hover. The home page's nav row and its row of call-to-action buttons are such elements too: each clears one
+// straight box around all its buttons.
 // Elements with a backdrop blur clear nothing: the art shows through them, blurred. The mask has
 // MASK_CELL pixels across and down for each character cell, and content covers a cell where any of its mask
 // pixels reaches CLEAR_AT. So the art keeps CLEAR_PADDING clear of content, even a thin line, and the edge

@@ -6,9 +6,9 @@ import { createAsciiField } from '@/ascii/field.js';
 import { createWorld } from '@/ascii/world.js';
 
 // Panels, controls and dividers that clear their whole rounded box while they show a background or border, and the
-// home page's nav row, which clears one straight box around all its links.
+// home page's nav row and call-to-action row, which each clear one straight box around all their buttons.
 const SURFACES =
-    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message, .contact-links-desktop, .site-nav';
+    'button, input, textarea, select, .theme-toggle, .nav-mobile, .project-card, .section-content, .status-message, .contact-links-desktop, .site-nav, .cta';
 
 // Which object each page shows, in the box its .art-slot element marks.
 const PAGE_OBJECTS = { home: 'earth', projects: 'jupiter', resume: 'rocket', contact: 'satellite' };
