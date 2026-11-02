@@ -58,7 +58,7 @@ onMounted(() => {
                 <Button @click="() => routeStore.toRoute('contact')" text="Contact" preset="primary primary-accent" />
                 <a href="/files/Michael-L-Green-Resume.pdf" download="Michael-L-Green-Resume.pdf">
                     <Button
-                        text="Resume/CV"
+                        text="Resume"
                         :iconRight="themeStore.theme === 'light' ? DownloadThickIcon : DownloadIcon"
                         preset="primary"
                     />
