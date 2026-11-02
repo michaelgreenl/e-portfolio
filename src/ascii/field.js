@@ -103,12 +103,19 @@ const SHOW_EASE = 0.15;
 const TEXT_PADDING = 10;
 const TEXT_INSET = 2;
 const TEXT_END_PADDING = 16;
-// Each letter of hugged text clears a box of its own. At a word's ends, the padding above the letters' ink stops
-// TEXT_CORNER short of the box's end, so the row of art above the word's lowercase letters keeps its character at
-// the corner past its last letter: between TEXT_PADDING - TEXT_CORNER and a cell farther from the letter, where
-// the full padding would clear it, and never right at the letter's shoulder. Below the ink the box's corners
-// curve by the padding, so the column of art beside the word runs straight down to its bottom.
+// Each letter of hugged text clears a box of its own. A word's last letter's box reaches past its ink by one cell
+// more than TEXT_PADDING - TEXT_CORNER, or by TEXT_END_PADDING where the word reaches into the slot from outside.
+// The padding above the letter's ink stops one cell short of that, down to the row line below the last row of art
+// it clears. So the row of art above the word's lowercase letters keeps exactly one character at the corner past
+// its last letter, at every alignment of the columns, between TEXT_PADDING - TEXT_CORNER and a cell farther from
+// the letter, and the column of art beside the letter is one cell farther still, straight down to the letter's
+// bottom. Where no column of art fits between that box and the edge of the screen, and before a word's first
+// letter, the padding stays, so narrow screens keep what art fits beside the word.
 const TEXT_CORNER = 3;
+// A hugged character's ink is read from its pixels, drawn INK_SCALE times its size, see inkSpan; its ink may
+// reach past its advance box by up to INK_OVERHANG of its font size.
+const INK_SCALE = 4;
+const INK_OVERHANG = 0.25;
 // Outline characters that reach the top or bottom of their row, see EDGE_CHARS. Next to hidden content above
 // or below, they draw as dots instead, so the art keeps its padding from the content there.
 const TALL_EDGES = new Set('_/\\|()');
@@ -130,6 +137,8 @@ const MASK_CELL = [4, 4];
 const MASK_INTERVAL = 150;
 const CLEAR_PADDING = [4, 6];
 const CLEAR_AT = 0.5;
+// So a box clears a row where it covers this much of the row, in px: CLEAR_AT of one of its mask pixels.
+const CLEAR_DEPTH = (CLEAR_AT * LINE_HEIGHT) / MASK_CELL[1];
 const MIN_STRIP = { cols: [2, 3], rows: 2 };
 const MAX_POCKET = 4;
 
@@ -281,6 +290,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
     const range = document.createRange();
     const maskCanvas = document.createElement('canvas');
     const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
+    const inkCanvas = document.createElement('canvas');
+    const inkCtx = inkCanvas.getContext('2d', { willReadFrequently: true });
     const listeners = new AbortController();
     const pointer = { x: 0, y: 0, sx: 0, sy: 0, inside: 0, until: 0 };
     const startTime = performance.now();
@@ -382,18 +393,53 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
 
     /* ---------- Content mask ---------- */
 
-    // Where a text's letters draw in its box: the top of their ink below the box's top, how far it starts past
-    // the box's left edge, and its size. Emoji do not count: they reach above the letters.
+    const fontOf = (style) => `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+    // Where a text's letters draw in its box: the top of their ink below the box's top, and its height. Emoji do
+    // not count: they reach above the letters.
     function inkOf(text, style) {
-        maskCtx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        maskCtx.font = fontOf(style);
         const metrics = maskCtx.measureText(text.replace(pictographs, '') || text);
-        const { actualBoundingBoxAscent: ascent, actualBoundingBoxLeft: left } = metrics;
-        return {
-            top: metrics.fontBoundingBoxAscent - ascent,
-            left: -left,
-            width: left + metrics.actualBoundingBoxRight,
-            height: ascent + metrics.actualBoundingBoxDescent,
-        };
+        const { actualBoundingBoxAscent: ascent } = metrics;
+        return { top: metrics.fontBoundingBoxAscent - ascent, height: ascent + metrics.actualBoundingBoxDescent };
+    }
+
+    // Where a character's ink lies across its advance box: how far it starts past the box's left edge, and its
+    // width. In WebKit, measureText's actualBoundingBoxLeft and actualBoundingBoxRight give the advance box, not
+    // the ink, so the character is drawn INK_SCALE times its size and its pixels are read instead. Memoized by
+    // font and character; a font that loads later empties the memo.
+    const spans = new Map();
+    function inkSpan(char, style) {
+        const font = fontOf(style);
+        const key = `${font}|${char}`;
+        if (!spans.has(key)) {
+            const margin = parseFloat(style.fontSize) * INK_OVERHANG;
+            inkCtx.font = font;
+            const { width, fontBoundingBoxAscent: ascent, fontBoundingBoxDescent: descent } = inkCtx.measureText(char);
+            // Sizing the canvas resets its context.
+            inkCanvas.width = Math.ceil((width + margin * 2) * INK_SCALE);
+            inkCanvas.height = Math.ceil((ascent + descent + 2) * INK_SCALE);
+            inkCtx.setTransform(INK_SCALE, 0, 0, INK_SCALE, 0, 0);
+            inkCtx.font = font;
+            inkCtx.fillText(char, margin, ascent + 1);
+            const { width: w, height: h } = inkCanvas;
+            const { data } = inkCtx.getImageData(0, 0, w, h);
+            const inked = (x) => {
+                for (let y = 0; y < h; y++) if (data[(y * w + x) * 4 + 3]) return true;
+                return false;
+            };
+            let first = 0;
+            while (first < w && !inked(first)) first++;
+            let last = w;
+            while (last > first && !inked(last - 1)) last--;
+            spans.set(
+                key,
+                first < w
+                    ? { left: first / INK_SCALE - margin, width: (last - first) / INK_SCALE }
+                    : { left: 0, width },
+            );
+        }
+        return spans.get(key);
     }
 
     // The box that text clears around its ink: padded by TEXT_PADDING to each side and by TEXT_INSET less above
@@ -424,7 +470,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             range.setEnd(node, index + segment.length);
             const rect = range.getBoundingClientRect();
             const ink = inkOf(segment, style);
-            boxes.push(inkBox(rect.left + ink.left, rect.top + ink.top, ink.width, ink.height));
+            const { left, width } = inkSpan(segment, style);
+            boxes.push(inkBox(rect.left + left, rect.top + ink.top, width, ink.height));
         }
         return boxes;
     }
@@ -548,7 +595,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         // A shape's boxes draw as one path, so where a hugged text's boxes overlap, the mask's edge is no stronger.
         // They are kept where their content rests, less the shift an animation gives it, so the grid lines up with
         // content at rest and holds still while text slides in. The mask draws them where the content is now.
-        const add = (rects, radius, text = false, hug = false, span = null) =>
+        const add = (rects, radius, { text = false, hug = false, span = null, letters = false, corner = false } = {}) =>
             shapes.push({
                 rects: rects.map((rect) => new DOMRect(rect.x - lift[0], rect.y - lift[1], rect.width, rect.height)),
                 radius,
@@ -557,6 +604,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
                 text,
                 hug,
                 span,
+                letters,
+                corner,
             });
         // An element's box, padded by clearPadding, with corners that curve by its border radius and the padding.
         const addBox = (rect, radius) => {
@@ -624,6 +673,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         // when a row of art fits in the notches above its lowercase letters, and anchors the grid. Smaller hugged
         // text, like the greeting, clears one box per line and follows the rows instead: its first line's box on
         // screen and its top at rest, by the element the nudge goes on.
+        const slotBox = findSlot()?.rect ?? new DOMRect(0, 0, viewW, viewH);
+        const within = (box) => box.left >= slotBox.left && box.right <= slotBox.right;
         const followers = new Map();
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -635,31 +686,37 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             // The whole text's box, the title's two words together: whether it lies within the slot.
             const span = (hugged || el).getBoundingClientRect();
             if (hugged && notchFits(style)) {
-                add(glyphBoxes(node, style), TEXT_PADDING, true, true, span);
+                // The word's last letter keeps a character at its corner where a column of art fits between its
+                // box, at rest, and the edge of the screen: its box reaches farther past its ink, see TEXT_CORNER.
+                const boxes = glyphBoxes(node, style);
+                const last = boxes.at(-1);
+                const reach = within(span) ? TEXT_PADDING - TEXT_CORNER + grid.cellW : TEXT_END_PADDING;
+                const corner = Boolean(last) && last.right - lift[0] + reach - TEXT_PADDING <= viewW - grid.cellW;
+                if (corner) last.width += reach - TEXT_PADDING;
+                add(boxes, TEXT_PADDING, { text: true, hug: true, span, letters: true, corner });
                 continue;
             }
             const ink = inkOf(node.data, style);
             range.selectNodeContents(node);
             const rects = Array.from(range.getClientRects(), (rect) => lineBox(rect, ink));
-            add(rects, TEXT_PADDING, true, false, span);
+            add(rects, TEXT_PADDING, { text: true, span });
             if (hugged && rects.length && !followers.has(hugged)) {
                 followers.set(hugged, { box: rects[0], top: rects[0].top - lift[1] + window.scrollY });
             }
         }
         // An end of a text's box faces the art where no other content lies within a cell beyond the middle of that
-        // end. The boxes of a word's letters overlap, so only its first and last letters have such ends. A box
-        // that only touches another above or below it, as the greeting's can touch the title's, keeps its ends.
-        // Where a text reaches into the slot from outside it, as the title does on desktop, its end under the
-        // slot clears one more box, from the top of the letters' ink to the bottom of their box, that reaches
-        // TEXT_END_PADDING past the text. So beside and below the letters the column of art is straight, a little
-        // farther from the tip of the line that the art flows around, while the row above the line keeps its
-        // character at the corner of the end. Text within the slot keeps TEXT_PADDING at its ends. The ends make a
-        // shape of their own, with their text's opacity and anchoring: plain boxes, drawn apart from the letters.
-        const slotBox = findSlot()?.rect ?? new DOMRect(0, 0, viewW, viewH);
+        // end. A box that only touches another above or below it, as the greeting's can touch the title's, keeps
+        // its ends. Where a text reaches into the slot from outside it, its end under the slot clears one more
+        // box, from the top of the letters' ink to the bottom of their box, that reaches TEXT_END_PADDING past
+        // the text. So beside and below the letters the column of art is straight, a little farther from the tip
+        // of the line that the art flows around, while the row above the line keeps its character at the corner
+        // of the end. Text within the slot keeps TEXT_PADDING at its ends. The ends make a shape of their own,
+        // with their text's opacity and anchoring: plain boxes, drawn apart from the lines. A word's letters reach
+        // past the word on their own, see TEXT_CORNER.
         const all = shapes.flatMap((shape) => shape.rects);
         const endShapes = [];
         for (const shape of shapes) {
-            if (!shape.text || (shape.span.left >= slotBox.left && shape.span.right <= slotBox.right)) continue;
+            if (!shape.text || shape.letters || within(shape.span)) continue;
             const ends = [];
             for (const rect of shape.rects) {
                 const middle = (rect.top + rect.bottom) / 2;
@@ -715,8 +772,8 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             radius,
             alpha: shown,
             lift: [dx, dy],
-            text,
-            hug,
+            letters,
+            corner,
         } of shapes) {
             if (shown < 0.02) continue;
             maskCtx.fillStyle = `rgb(${Math.round(shown * 255)}, 0, 0)`;
@@ -724,17 +781,19 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             for (const [k, rect] of rects.entries()) {
                 const top = rect.top + dy;
                 if (top + rect.height < -LINE_HEIGHT || top > viewH + LINE_HEIGHT) continue;
-                if (!(text && hug)) {
+                if (!letters) {
                     maskCtx.roundRect(rect.x + dx, top, rect.width, rect.height, radius);
                     continue;
                 }
-                // A hugged letter's box: the padding above its ink, which stops TEXT_CORNER short of the box's end
-                // at the word's ends, over the box from the ink down, with its corners curved by the padding.
-                const band = TEXT_PADDING - TEXT_INSET;
-                const left = k ? 0 : TEXT_CORNER;
-                const right = k < rects.length - 1 ? 0 : TEXT_CORNER;
-                maskCtx.rect(rect.x + dx + left, top, rect.width - left - right, band);
-                maskCtx.roundRect(rect.x + dx, top + band, rect.width, rect.height - band, radius);
+                // A letter's box: the padding above its ink, which at a corner stops a cell short of the box's end,
+                // down to the row line below the last row that padding clears, over the box from there down,
+                // square at the top and with its bottom corners curved by the padding.
+                const inkTop = top + TEXT_PADDING - TEXT_INSET;
+                const into = (((inkTop - gridTop) % LINE_HEIGHT) + LINE_HEIGHT) % LINE_HEIGHT;
+                const split = into >= CLEAR_DEPTH ? inkTop + LINE_HEIGHT - into : inkTop;
+                const short = corner && k === rects.length - 1 ? grid.cellW : 0;
+                maskCtx.rect(rect.x + dx, top, rect.width - short, split - top);
+                maskCtx.roundRect(rect.x + dx, split, rect.width, top + rect.height - split, [0, 0, radius, radius]);
             }
             maskCtx.fill();
         }
@@ -1322,6 +1381,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         if (!e.relatedTarget) pointer.inside = 0;
     });
     on(document, 'visibilitychange', () => (document.hidden ? stop() : start()));
+    on(document.fonts, 'loadingdone', () => spans.clear());
 
     refreshColors();
     resize();
