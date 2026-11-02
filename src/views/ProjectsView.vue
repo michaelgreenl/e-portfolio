@@ -113,7 +113,7 @@ async function openProject(project, autoplay = false) {
         <div class="art-slot" aria-hidden="true"></div>
 
         <div ref="pageHeader" class="page-header">
-            <h1>Projects</h1>
+            <h1 class="art-hug">Projects</h1>
             <hr v-if="isLaptop" />
             <p>
                 Recent full-stack projects spanning cross-platform development, offline-first synchronization, real-time

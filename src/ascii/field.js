@@ -77,12 +77,11 @@ const SHOW_EASE = 0.15;
 // from outside it, its end that faces the art, with no other content within a cell beyond it, reaches
 // TEXT_END_PADDING past the last letter from the top of the letters' ink down: the art that flows around the
 // tip of the line stays a little farther from it, in a straight column, and keeps its character at the corner
-// above the line. Text matching
-// the hug selector, the home page's greeting and title, is what the art hugs: its rows and columns line up with
-// the edges of that text's boxes, see ANCHOR_STEP, and when a row of art fits in the notch above the text's
-// lowercase letters, each of its characters clears a box of its own around its ink, see TEXT_CORNER, so the art
-// fills the notches above the lowercase letters and between the lines of the title instead of stopping at the
-// height of its capitals.
+// above the line. Text matching the hug selector, such as the home page's greeting and title and the projects
+// page's heading, is what the art hugs: its rows and columns line up with the edges of that text's boxes, see
+// ANCHOR_STEP, and when a row of art fits in the notch above the text's lowercase letters, each of its
+// characters clears a box of its own around its ink, see TEXT_CORNER, so the art fills the notches above the
+// lowercase letters and between the lines of the title instead of stopping at the height of its capitals.
 // Elements matching the surfaces selector clear their whole rounded box while they show a background or a
 // border all around. One bordered on only some sides, such as a divider, clears just those lines. One with
 // neither, such as a nav link, clears one box around its icon and text together, so the cut above them stays
@@ -126,13 +125,15 @@ const TALL_EDGES = new Set('_/\\|()');
 // page's slot, the art sits closest to the text when a grid line falls on the edge, and up to a cell farther
 // away when not. Each axis shifts to the offset, tried every ANCHOR_STEP px, with the least sum of squared slack
 // over those edges, each weighted by the cells it spans, so the art stays close to the text's lowercase letters,
-// its capitals, its bottom and its ends all at once, at every screen size. Where the text spans a little more
-// than a whole number of rows, the spare room splits evenly above and below it: a row the text reaches into at
-// all counts as cleared, even where the mask leaves it showing. Smaller hugged text moves down to the rows
-// instead, by less than half a row, through its NUDGE_PROPERTY, where it reaches into the slot and meets the
-// art: where the layout puts the greeting within half a row of lining up, a full row of art lines up above it,
-// and it never moves away from the title below it.
+// its capitals, its bottom and its ends all at once, at every screen size. Hugged text anchors the grid where
+// its lines are at least ANCHOR_ROWS rows tall. Where the text spans a little more than a whole number of rows,
+// the spare room splits evenly above and below it: a row the text reaches into at all counts as cleared, even
+// where the mask leaves it showing. Smaller hugged text moves down to the rows instead, by less than half a row,
+// through its NUDGE_PROPERTY, where it reaches into the slot and meets the art: where the layout puts the
+// greeting within half a row of lining up, a full row of art lines up above it, and it never moves away from the
+// title below it.
 const ANCHOR_STEP = 0.25;
+const ANCHOR_ROWS = 4;
 const NUDGE_PROPERTY = '--art-nudge';
 const MASK_CELL = [4, 4];
 const MASK_INTERVAL = 150;
@@ -671,10 +672,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             collect(el);
             addBox(el.getBoundingClientRect(), 4);
         }
-        // Text boxes curve at the corners by the padding. Hugged text clears a box around each of its characters
-        // when a row of art fits in the notches above its lowercase letters, and anchors the grid. Smaller hugged
-        // text, like the greeting, clears one box per line and follows the rows instead: its first line's box on
-        // screen and its top at rest, by the element the nudge goes on.
+        // Text boxes curve at the corners by the padding. Hugged text at least ANCHOR_ROWS rows tall anchors the
+        // grid, and clears a box around each of its characters when a row of art fits in the notches above its
+        // lowercase letters. Smaller hugged text, like the greeting, clears one box per line and follows the rows
+        // instead: its first line's box on screen and its top at rest, by the element the nudge goes on.
         const slotBox = findSlot()?.rect ?? new DOMRect(0, 0, viewW, viewH);
         const within = (box) => box.left >= slotBox.left && box.right <= slotBox.right;
         const followers = new Map();
@@ -701,8 +702,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             const ink = inkOf(node.data, style);
             range.selectNodeContents(node);
             const rects = Array.from(range.getClientRects(), (rect) => lineBox(rect, ink));
-            add(rects, TEXT_PADDING, { text: true, span });
-            if (hugged && rects.length && !followers.has(hugged)) {
+            const anchors = Boolean(hugged) && rects.length > 0 && rects[0].height >= ANCHOR_ROWS * LINE_HEIGHT;
+            add(rects, TEXT_PADDING, { text: true, hug: anchors, span });
+            if (hugged && !anchors && rects.length && !followers.has(hugged)) {
                 followers.set(hugged, { box: rects[0], top: rects[0].top - lift[1] + window.scrollY });
             }
         }

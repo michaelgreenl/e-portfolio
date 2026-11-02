@@ -64,9 +64,11 @@ export function useUtilAnimations() {
         const hr = headerEl.querySelector('hr');
         const duration = reducedMotion ? 0.01 : TIMING.duration.normal;
 
+        // Text the ASCII art hugs keeps its size: the art lines its rows and columns up with the text, and a scale
+        // that grows as the text lands would move them as it lands.
         gsap.set([...copy, ...extraTargets], {
             autoAlpha: 0,
-            scale: reducedMotion ? 1 : 0.98,
+            scale: (i, el) => (reducedMotion || el.matches('.art-hug') ? 1 : 0.98),
             y: reducedMotion ? 0 : 18,
         });
         gsap.set(hr, { autoAlpha: 0, scaleX: 0 });
@@ -118,7 +120,7 @@ export function useUtilAnimations() {
                 autoAlpha: 0,
                 duration,
                 ease: TIMING.easing.fade,
-                scale: reducedMotion ? 1 : 0.98,
+                scale: (i, el) => (reducedMotion || el.matches('.art-hug') ? 1 : 0.98),
                 stagger,
                 y: reducedMotion ? 0 : -10,
             })
