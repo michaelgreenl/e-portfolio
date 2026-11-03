@@ -324,7 +324,9 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
     let glass = new Uint8Array(0); // 1 where a frosted panel covers a cell
     let clearPadding = CLEAR_PADDING[1];
     let minStripCols = MIN_STRIP.cols[1];
-    let rowLayers = [];
+    let chars = []; // the character each cell draws this frame
+    // The cells each material and opacity layer draws this frame, at material * LAYER_ALPHAS.length + layer.
+    const groups = TINTS.flatMap(() => LAYER_ALPHAS.map(() => []));
 
     let page = null; // name of the object the current page shows
     let current = null; // where the camera is now: { target, view, distance, shift }
@@ -376,10 +378,7 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
         maskCanvas.height = grid.rows * MASK_CELL[1];
         visible = new Uint8Array(n);
         glass = new Uint8Array(n);
-        // One row of characters for each material and opacity layer.
-        rowLayers = TINTS.map((_, material) =>
-            LAYER_ALPHAS.map((alpha) => ({ material, alpha, chars: new Array(grid.cols).fill(' ') })),
-        );
+        chars = new Array(n);
 
         rebuildMask();
         if (reducedMotion) redraw();
@@ -1146,10 +1145,14 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
 
     /* ---------- Characters ---------- */
 
+    // Each character fills its own cell. WebKit keeps every distinct string a canvas fills with text until the
+    // system runs short of memory: a row filled as one string, new on every frame, grew the page by megabytes a
+    // second until iOS killed it. One character at a time, the strings stay the few dozen the art uses.
     function draw() {
         const {
             cols,
             rows,
+            cellW,
             lum,
             lines,
             lineCode,
@@ -1163,12 +1166,10 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
             tint,
             glowTint,
         } = grid;
-        const used = [];
 
         ctx.clearRect(0, 0, viewW, viewH);
         const shown = Math.ceil((viewH - gridTop) / LINE_HEIGHT); // rows on screen
         for (let y = 0; y < rows; y++) {
-            // One string per material and opacity layer keeps this to a few fillText calls per row.
             for (let x = 0; x < cols; x++) {
                 const i = y * cols + x;
                 if (!visible[i]) continue;
@@ -1211,18 +1212,20 @@ export function createAsciiField(canvas, { root, surfaces, slot, hug, world, lea
                 }
                 const layer = char === ' ' ? -1 : layerFor((alpha * visible[i]) / 255);
                 if (layer < 0) continue;
-                const row = rowLayers[material][layer];
-                if (!used.includes(row)) used.push(row);
-                row.chars[x] = char;
+                chars[i] = char;
+                groups[material * LAYER_ALPHAS.length + layer].push(i);
             }
-            for (const row of used) {
-                ctx.fillStyle = colors[row.material];
-                ctx.globalAlpha = Math.min(1, row.alpha * alphaScale);
-                ctx.fillText(row.chars.join(''), gridLeft, gridTop + y * LINE_HEIGHT);
-                row.chars.fill(' ');
-            }
-            used.length = 0;
         }
+        // One fill color and opacity per material and layer, then each of its cells.
+        groups.forEach((cells, g) => {
+            if (!cells.length) return;
+            ctx.fillStyle = colors[Math.floor(g / LAYER_ALPHAS.length)];
+            ctx.globalAlpha = Math.min(1, LAYER_ALPHAS[g % LAYER_ALPHAS.length] * alphaScale);
+            for (const i of cells) {
+                ctx.fillText(chars[i], gridLeft + (i % cols) * cellW, gridTop + Math.floor(i / cols) * LINE_HEIGHT);
+            }
+            cells.length = 0;
+        });
         ctx.globalAlpha = 1;
     }
 
