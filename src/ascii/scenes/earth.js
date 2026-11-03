@@ -37,8 +37,9 @@ const MAP_ROWS = 180 / MAP_STEP;
 
 // The Moon: real size next to the Earth, 12 Earth radii away, a fifth of its real distance. At its real distance,
 // 60 Earth radii, it would be one character across from where the camera rests; from here it is a few rows
-// across. It goes round the Earth once a month, 27.3 of the Earth's days, the way the Earth turns, on an orbit
-// that leans toward the viewer as the Earth's axis does, 20° from the equator, within the real orbit's range. The
+// across. It goes round the Earth the way the Earth turns, once in two of the Earth's days where the real Moon
+// takes 27, so it crosses the screen about as fast as Jupiter's moons do on the projects page, on an orbit that
+// leans toward the viewer as the Earth's axis does, 20° from the equator, within the real orbit's range. The
 // far half of the orbit crosses above the Earth, up from the camera's resting line of sight, where it clears the
 // Earth and the page's content at every screen size; the near half passes behind the camera. The sun stands 37°
 // above the orbit, where the real one stays within 5°, so that the crossing runs where the page can show it. The
@@ -47,7 +48,7 @@ const MAP_ROWS = 180 / MAP_STEP;
 // the Earth, with the orbit's north as its north, so the maria show as darker cells when it is large enough.
 const MOON_RADIUS = 0.2727 * RADIUS;
 const MOON_ORBIT = 12 * RADIUS;
-const MONTH_SECONDS = 27.3 * DAY_SECONDS;
+const MONTH_SECONDS = 2 * DAY_SECONDS; // one orbit of the Moon
 const ORBIT = eulerMatrix(0.32, 0, 0); // the Moon circles this frame's y axis, which leans toward the viewer
 const ORBIT_NORTH = transform(ORBIT, 0, 1, 0, [0, 0, 0]);
 // Where the Moon is on its orbit when the camera arrives: the angle from its near point, the way it goes.
