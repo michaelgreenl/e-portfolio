@@ -36,6 +36,8 @@ export const TINTS = [
     'europa',
     'ganymede',
     'callisto',
+    'moon',
+    'mare',
     'accent',
 ];
 export const TINT = Object.fromEntries(TINTS.map((name, k) => [name, k]));

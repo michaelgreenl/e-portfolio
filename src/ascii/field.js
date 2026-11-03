@@ -173,6 +173,8 @@ const PALETTE = {
     europa: ['#e9e1d2', '#83786a'],
     ganymede: ['#b8aa98', '#6c5f50'],
     callisto: ['#9d9184', '#5a5047'],
+    moon: ['#d9d3c7', '#6c675e'],
+    mare: ['#a8a296', '#4b4740'],
     // The site's --color-primary-light on the dark theme and --color-primary on the light one.
     accent: ['#b2cfd7', '#6b8f9e'],
 };
