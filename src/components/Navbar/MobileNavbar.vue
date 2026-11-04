@@ -264,6 +264,7 @@ const navMobileRouteTo = (key) => {
 
         @media (height >= 900px) {
             max-width: 435px;
+            font-size: 1.35em;
         }
     }
 
