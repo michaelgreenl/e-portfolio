@@ -36,7 +36,7 @@
                     "shortDate": "March 2022 - April 2022",
                     "longDate": "March 2022 - April 2022",
                     "description": {
-                        "short": "An expo photo kiosk where visitors pick an athlete, pose for a photo with them, and download the finished image by QR code, with custom animated transitions between each step.",
+                        "short": "An interactive expo photo experience where visitors pick an athlete, pose for a photo with them, and download the finished image by QR code, with custom animated transitions between each step.",
                         "long": [
                             "As the sole frontend developer, I built the interface from supplied visual mockups and owned its interactive design and API integration.",
                             "I requested separate assets from the design team so I could animate elements embedded in the supplied artwork. I used them in staggered animations during transitions, making the background artwork part of how the interface responded to user actions.",
